@@ -5579,7 +5579,7 @@ function F_Trig_Move_Paths_1_Actions(){
 function F_InitTrig_Move_Paths_1(){
   G_gg_trg_Move_Paths_1=N.CreateTrigger();
   N.DisableTrigger(G_gg_trg_Move_Paths_1);
-  N.TriggerRegisterTimerEventPeriodic(G_gg_trg_Move_Paths_1,1.5);
+  N.TriggerRegisterTimerEventPeriodic(G_gg_trg_Move_Paths_1,0.75); // MapMix: the moving path goes twice as fast
   N.TriggerAddAction(G_gg_trg_Move_Paths_1,F_Trig_Move_Paths_1_Actions);
 }
 function F_Trig_Switch_5_Conditions(){
@@ -13610,6 +13610,7 @@ class World {
     if (this.onTick) this.onTick(dt);
   }
   moveUnit(u, dt) {
+    if (u._fleeUntil && this.time > u._fleeUntil) { u.speed = u.defSpeed || u.t.speed; u._fleeUntil = 0; }
     const o = u.order;
     const tx = o.type === 'patrol' && o.leg === 1 ? o.ax : o.x, ty = o.type === 'patrol' && o.leg === 1 ? o.ay : o.y;
     if (!u.path) { u.path = this.findPath(u, tx, ty); u.pi = 0; if (!u.path.length) { u.order = null; return; } }
@@ -13715,12 +13716,26 @@ class World {
       h.mana -= 25;
       this.missiles.push({ kind: 'coil', sx: h.x, sy: h.y, x: h.x, y: h.y, tx: target.x, ty: target.y, target, t0: this.time, dur: Math.max(0.15, Math.hypot(target.x - h.x, target.y - h.y) / 1000), src: h });
       this.emit('sound', { name: 'coil' });
+      if (this.profile.id === 'shroom25' && target.t.code === 'h007') this.scareClowns(h, target);
     }
     A.cd = A.max;
     if (ab === 'A005') { h.order = null; h.path = null; } // start/stop gliding from a standstill: no walking back to an old click
     this.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_CAST', { unit: h, player: h.owner, spell: fourcc(ab) });
     this.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_EFFECT', { unit: h, player: h.owner, spell: fourcc(ab) });
     return true;
+  }
+  /* MapMix (stage 8): when you shoot a clown the others get scared and run to the side you shot towards */
+  scareClowns(h, target) {
+    const side = Math.sign(target.x - h.x) || (this.rand() < 0.5 ? -1 : 1);
+    const R0 = { x0: 128, y0: 4352, x1: 2944, y1: 5504 };
+    for (const u of this.units) {
+      if (u === target || u.removed || !u.alive || u.t.code !== 'h007' || Math.hypot(u.x - target.x, u.y - target.y) > 1800) continue;
+      const tx = side > 0 ? R0.x1 - 60 - this.rand() * 500 : R0.x0 + 60 + this.rand() * 500;
+      const ty = Math.max(R0.y0 + 60, Math.min(R0.y1 - 60, u.y + (this.rand() - 0.5) * 600));
+      const p = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 300); if (!p) continue;
+      u.speed = (u.defSpeed || u.t.speed) * 1.6; u._fleeUntil = this.time + 2.5; u.wanderT = 3 + this.rand() * 2;
+      this.issueOrder(u, 851986, p.x, p.y);
+    }
   }
   cmdUseItem(p, slot) {
     const h = this.heroOf(p); if (!h || !h.alive) return;
@@ -16358,7 +16373,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   // ---------- dances (original moves; hold the button to pick one) ----------
   const DANCES = { columpio: ['🕺', 'Columpio'], robot: ['🤖', 'Robot'], saltitos: ['🐰', 'Saltitos'], molino: ['🌀', 'Molino'], pollito: ['🐔', 'Pollito'], ola: ['🌊', 'La Ola'] };
   if (!settings.danceLast || !DANCES[settings.danceLast]) settings.danceLast = 'columpio';
-  const DANCE_CD = 1, DANCE_LEN = 5000;
+  const DANCE_CD = 1, DANCE_LEN = Infinity; // dances loop until you move
   function sendDance(id, who) {
     if (!W || !DANCES[id]) return; const u = who || W.heroOf(W.local); if (!u || !u.alive) return;
     const still = !u.glide && !(u.order && !u.paused) && !(u._mv > 0.5) && (who || u._stillT >= 0.05); if (!still) { if (!who) showText('|cffffd34d🕺 Quédate quieto para bailar|r'); return; }
@@ -16455,7 +16470,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mapId = online ? (online.game.map || 'shroom25') : (settings.map || 'shroom25');
     const md = mapId === 'kitty5' && window.MAPDATA_KITTY5 ? window.MAPDATA_KITTY5 : MAPDATA; document.body.dataset.map = md === MAPDATA ? 'shroom25' : mapId;
     W = startGame(md, opts);
-    $('#stats .t').textContent = W.profile.id === 'kitty5' ? 'CORRE GATITO 5' : 'ESCAPE SHROOM'; $('#stats .ver').textContent = W.profile.id === 'kitty5' ? '5 rondas' : 'v1.0';
+    $('#stats .t').textContent = W.profile.id === 'kitty5' ? 'CORRE GATITO 5' : 'ESCAPE SHROOM'; $('#stats .ver').textContent = W.profile.id === 'kitty5' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
     W.on('text', showText);
     W.on('sound', s => sfx.play(s.name));
@@ -16622,6 +16637,9 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
       botChatter();
+      if (W.profile.id === 'kitty5') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
+      else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
+        let st = 1; W._endTrigs.forEach((t, i) => { if (t && t.execs > 0) st = Math.max(st, i + 2); }); setText('#stats .ver', 'Etapa ' + Math.min(12, st) + '/12'); }
       { const still = hero.alive && !hero.glide && !(hero.order && !hero.paused) && !(hero._mv > 0.5); const nw = performance.now(); if (!still) hero._still0 = nw; else if (hero._still0 == null) hero._still0 = nw; hero._stillT = (nw - hero._still0) / 1000; if (!still && sendDance.next > nw) { sendDance.next = 0; $('#bDance').classList.remove('cool'); } $('#bDance').classList.toggle('off', !still || hero._stillT < 0.05); $('#danceWrap').classList.toggle('hidden', !hero.alive || !$('#bBlink').classList.contains('hidden')); if (!hero.alive) $('#dancePick').classList.add('hidden'); } // gray while moving
       $('#bGive').classList.toggle('hidden', !(hero.alive && hero.items.length && nearFriend(hero, 220)));
       $('#mana').style.width = (hero.mana / hero.maxMana * 100) + '%';
