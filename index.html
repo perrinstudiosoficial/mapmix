@@ -63,6 +63,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #danceWrap{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 148px);pointer-events:none;z-index:5}
 #bDance{pointer-events:auto;width:56px;height:56px;font-size:26px;user-select:none;-webkit-user-select:none;touch-action:none}
 #dancePick{pointer-events:auto;position:absolute;right:66px;bottom:0;display:grid;grid-template-columns:repeat(3,54px);gap:6px;background:rgba(20,8,30,.9);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+body:not([data-map=kitty5]) #kSongRow{display:none}
 body[data-map=kitty5] #tox, body[data-map=kitty5] #abil, body[data-map=kitty5] #bGive, body[data-map=kitty5] #manaw, body[data-map=kitty5] #glideTag{display:none!important}
 #abil.deadoff .ab{filter:grayscale(1) brightness(.6);opacity:.5;pointer-events:none}
 #bJump{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 70px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 12px);width:72px;height:72px;font-size:32px;pointer-events:auto;z-index:5;border-color:#ffd34d}
@@ -365,6 +366,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
       <label>Controles <select id="optControl"><option value="tap">Tocar / mantener</option><option value="stick">Joystick virtual</option></select></label>
       <label>Sonido <input type="checkbox" id="optSound"></label>
       <label>Música <input type="checkbox" id="optMusic"></label>
+      <label id="kSongRow">Canción <select id="optKSong"><option value="turbo">⚡ Turbo Felino</option><option value="estampida">🐾 Estampida</option><option value="rayo">🌩 Rayo Blanco</option></select></label>
     </div>
     <button class="big-btn" id="bResume">VOLVER AL JUEGO</button><br>
     <button class="big-btn ghost" id="bQuit">🚪 Abandonar partida</button>
@@ -15023,6 +15025,37 @@ const SONGS = {
     intro: bars(['i1', 'i2'], ['Am', 'E']), introQuiet: 'i1', introFill: 'i2',
     loop: bars(['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'],
       ['Am', 'F', 'G', 'E', 'Am', 'F', 'Dm', 'E', 'Dm', 'Am', 'Dm', 'E', 'F', 'G', 'Am', 'E']) },
+  // ---- super-speed themes for Corre Gatito (original) ----
+  turbo: { name: 'Turbo Felino', bpm: 192, bass: 'drive', harm: true, wave: ['p25', 'p12'],
+    drums: { k: 'x...x...x...x...', s: '....x.......x...', h: 'xxxxxxxxxxxxxxxx' },
+    lead: { i1: '. . . . . . . .', i2: 'B5 - - - - - - - F#5 - - - D#5 - F#5 -',
+      a1: 'E5 - B5 - E6 - B5 - G5 - A5 - B5 - - -', a2: 'C6 - B5 - A5 - G5 - E5 - G5 - C6 - - -',
+      a3: 'D6 - C6 - B5 - A5 - F#5 - A5 - D6 - - -', a4: 'D#6 - - - B5 - - - F#5 - B5 - D#6 - F#6 -',
+      b1: 'G5 A5 B5 - E6 - D6 - B5 - G5 - E5 - - -', b2: 'E5 G5 C6 - E6 - D6 - C6 - G5 - E5 - - -',
+      b3: 'F#5 A5 D6 - F#6 - E6 - D6 - A5 - F#5 - - -', b4: 'B5 - D#6 - F#6 - B6 - A6 - F#6 - D#6 - B5 -' },
+    intro: bars(['i1', 'i2'], ['Em', 'B']), introQuiet: 'i1', introFill: 'i2',
+    loop: bars(['a1', 'a2', 'a3', 'a4', 'a1', 'a2', 'a3', 'a4', 'b1', 'b2', 'b3', 'b4', 'b1', 'b2', 'b3', 'b4'],
+      ['Em', 'C', 'D', 'B', 'Em', 'C', 'D', 'B', 'Em', 'C', 'D', 'B', 'Em', 'C', 'D', 'B']) },
+  estampida: { name: 'Estampida', bpm: 208, bass: 'gallop', harm: false, wave: ['p12', 'p25'],
+    drums: { k: 'x...x...x...x.x.', s: '....x.......x...', h: 'x.xxx.xxx.xxx.xx' },
+    lead: { i1: '. . . . . . . .', i2: 'E5 - - - - - - - B4 - - - G#4 - B4 -',
+      c1: 'A5 - A5 C6 - A5 E6 - D6 - C6 - B5 - G5 -', c2: 'G5 - G5 B5 - G5 D6 - C6 - B5 - A5 - G5 -',
+      c3: 'F5 - F5 A5 - F5 C6 - B5 - A5 - G5 - F5 -', c4: 'E5 - G#5 - B5 - E6 - D6 - B5 - G#5 - E5 -',
+      d1: 'E6 - - - D6 - C6 - B5 - C6 - D6 - E6 -', d2: 'D6 - - - C6 - B5 - A5 - B5 - C6 - D6 -',
+      d3: 'C6 - - - B5 - A5 - G5 - A5 - B5 - C6 -', d4: 'B5 - G#5 - E5 - G#5 - B5 - D6 - E6 - - -' },
+    intro: bars(['i1', 'i2'], ['Am', 'E']), introQuiet: 'i1', introFill: 'i2',
+    loop: bars(['c1', 'c2', 'c3', 'c4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4', 'd1', 'd2', 'd3', 'd4'],
+      ['Am', 'G', 'F', 'E', 'Am', 'G', 'F', 'E', 'Am', 'G', 'F', 'E', 'Am', 'G', 'F', 'E']) },
+  rayo: { name: 'Rayo Blanco', bpm: 184, bass: 'oct', harm: true, wave: ['p50', 'p25'],
+    drums: { k: 'x...x...x...x...', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+    lead: { i1: '. . . . . . . .', i2: 'G5 - - - - - - - D5 - - - B4 - D5 -',
+      e1: 'G5 - C6 - E6 - G6 - E6 - C6 - G5 - - -', e2: 'G5 - B5 - D6 - G6 - D6 - B5 - G5 - - -',
+      e3: 'A5 - C6 - E6 - A6 - G6 - E6 - C6 - - -', e4: 'F5 - A5 - C6 - F6 - E6 - D6 - C6 - B5 -',
+      f1: 'E6 - E6 - D6 - E6 - - - C6 - D6 - E6 -', f2: 'D6 - D6 - C6 - D6 - - - B5 - C6 - D6 -',
+      f3: 'C6 - C6 - B5 - C6 - - - A5 - B5 - C6 -', f4: 'A5 - C6 - F6 - E6 - D6 - C6 - D6 - - -' },
+    intro: bars(['i1', 'i2'], ['C', 'G']), introQuiet: 'i1', introFill: 'i2',
+    loop: bars(['e1', 'e2', 'e3', 'e4', 'e1', 'e2', 'e3', 'e4', 'f1', 'f2', 'f3', 'f4', 'f1', 'f2', 'f3', 'f4'],
+      ['C', 'G', 'Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'Am', 'F', 'C', 'G', 'Am', 'F']) },
 };
 
 class Sfx {
@@ -16137,6 +16170,20 @@ class Renderer {
   // white tiger sprites (art provided by Perrin Studios): 0-7 directions pose A, 8-15 pose B, 16-20 run (facing right), 21-25 circles
   let kImg = null; const kArt = () => { if (kImg === null && typeof window !== 'undefined' && window.KITTY_ART) { kImg = new Image(); kImg.src = window.KITTY_ART.src; } return kImg && kImg.complete && kImg.naturalWidth ? kImg : null; };
   const kBlit = (g, k, h, ax = 0.5, ay = 0.86, flip = false) => { const img = kArt(); const r = window.KITTY_ART.rects[k]; const s = h < 0 ? -h : h / r[3]; /* h < 0: fixed pixels-to-world factor */ g.save(); g.scale(flip ? -1 : 1, -1); g.drawImage(img, r[0], r[1], r[2], r[3], -r[2] * s * ax, -r[3] * s * ay, r[2] * s, r[3] * s); g.restore(); };
+  // trot: draw the body bobbing and the legs (bottom of the picture) in two halves that lift in turns
+  const kTrot = (g, k, F, ph) => {
+    const img = kArt(); const r = window.KITTY_ART.rects[k]; const w = r[2], h = r[3], cut = Math.round(h * 0.66), lh = h - cut;
+    const W2 = w * F, bob = -Math.abs(Math.sin(ph)) * 7, lean = Math.sin(ph) * 0.04;
+    g.save(); g.scale(1, -1); const top = -h * F * 0.92; // feet near the unit position
+    g.save(); g.translate(0, bob); g.rotate(lean);
+    g.drawImage(img, r[0], r[1], w, cut + 2, -W2 / 2, top, W2, (cut + 2) * F); g.restore();
+    for (const [half, p] of [[0, 0], [1, Math.PI]]) {
+      const lift = Math.max(0, Math.sin(ph + p)), sx = r[0] + half * w / 2, dx = -W2 / 2 + half * W2 / 2;
+      const hy = lh * F * (1 - 0.25 * lift), dy = top + cut * F - lift * 14 + bob * 0.5;
+      g.drawImage(img, sx, r[1] + cut, w / 2, lh, dx + (half ? 1 : -1) * Math.sin(ph + p) * 5, dy, W2 / 2, hy);
+    }
+    g.restore();
+  };
   P.drawKitty = function (g, u) {
     const W = this.W; if (!u.alive) return;
     if (kArt()) {
@@ -16148,10 +16195,10 @@ class Renderer {
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 46 : 0; if (lift) g.translate(0, lift);
       if ((moving || u.jump) && (k === 5 || k === 2 || k === 1 || k === 6)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2 || k === 1); } // run frames without the red slash ones
-      else if (moving || u.jump) { // running towards the camera, away from it or diagonally: alternate the two poses with a gallop bounce
-        const ph = u.walkPhase * 0.9, alt = Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * 9, sq = 1 + Math.sin(ph * 2) * 0.05;
+      else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
+        const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
-        g.save(); g.translate(0, bob); g.rotate(Math.sin(ph) * 0.05); g.scale(1 / sq, sq); kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); }
+        kTrot(g, k + (Math.floor(ph / (2 * Math.PI)) % 2 ? 8 : 0), 1.2, ph); }
       else { const alt = Math.sin(t * 1.5) > 0.6 ? 1 : 0; kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); }
       return;
     }
@@ -16513,6 +16560,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mapId = online ? (online.game.map || 'shroom25') : (settings.map || 'shroom25');
     const md = mapId === 'kitty5' && window.MAPDATA_KITTY5 ? window.MAPDATA_KITTY5 : MAPDATA; document.body.dataset.map = md === MAPDATA ? 'shroom25' : mapId;
     W = startGame(md, opts);
+    if (W.profile.id === 'kitty5') sfx.setSong(settings.kittySong || 'turbo'); // super-speed theme for the kitties
     $('#stats .t').textContent = W.profile.id === 'kitty5' ? 'CORRE GATITO 5' : 'ESCAPE SHROOM'; $('#stats .ver').textContent = W.profile.id === 'kitty5' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
     W.on('text', showText);
@@ -16858,6 +16906,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let quitArm = 0; function confirmQuit() { const now = performance.now(); if (now - quitArm < 3000) return true; quitArm = now; $('#bQuit').textContent = '¿Seguro? Toca otra vez para abandonar'; setTimeout(() => { $('#bQuit').textContent = '🚪 Abandonar partida'; }, 3000); return false; }
   btn('#bCenter', () => { if (R) R.freeCam = false; camWatch = null; });
   btn('#bWatch', watchNext);
+  { const ks = $('#optKSong'); ks.value = settings.kittySong || 'turbo'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
