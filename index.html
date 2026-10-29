@@ -65,6 +65,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #dancePick{pointer-events:auto;position:absolute;right:66px;bottom:0;display:grid;grid-template-columns:repeat(3,54px);gap:6px;background:rgba(20,8,30,.9);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 body[data-map=kitty5] #tox, body[data-map=kitty5] #abil, body[data-map=kitty5] #bGive, body[data-map=kitty5] #manaw, body[data-map=kitty5] #glideTag{display:none!important}
 #abil.deadoff .ab{filter:grayscale(1) brightness(.6);opacity:.5;pointer-events:none}
+#bJump{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 70px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 12px);width:72px;height:72px;font-size:32px;pointer-events:auto;z-index:5;border-color:#ffd34d}
 #bDance.off{filter:grayscale(1) brightness(.7);opacity:.45}
 #dancePick .eslot{text-align:center;padding:4px 0}
 #emotePick{pointer-events:auto;position:absolute;right:0;bottom:66px;display:flex;gap:8px;background:rgba(20,8,30,.9);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
@@ -243,6 +244,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div id="dead" class="pill hidden"><div class="big">¡CAÍSTE!</div><div id="deadMsg"></div></div>
   <div class="ab hidden" id="bGive">🎁<kbd>D</kbd><small>Dar hongo</small></div>
   <div class="ab hidden" id="bBlink">📍<small>Blink tumba</small></div>
+  <div class="ab hidden" id="bJump">🐾<small>Saltar</small></div>
   <div id="danceWrap"><div id="dancePick" class="hidden"></div><div class="ab" id="bDance"><span id="danceIcon"></span><small>Baile</small></div></div>
   <div id="emoteWrap"><div id="emotePick" class="hidden"></div><div class="ab" id="bEmote"><span id="emoteIcon"></span><small>Emote</small></div></div>
   <div id="abil">
@@ -13141,7 +13143,7 @@ function buildUnitTypes(md) {
   const prof = md.profile || { id: 'shroom25' };
   const base = prof.id === 'kitty5' ? {
     E000: { speed: 350, hero: true, r: 22, sight: 1800, mana: 0, kind: 'kitty' },
-    nwwg: { speed: 320, r: 30, wander: true, kind: 'wolf' }, n001: { speed: 320, r: 30, wander: true, kind: 'wolf' },
+    nwwg: { speed: 420, r: 30, wander: true, wanderFast: true, kind: 'wolf' }, n001: { speed: 420, wanderFast: true, r: 30, wander: true, kind: 'wolf' },
     ngme: { speed: 0, r: 60, inv: true, kind: 'shop' },
   } : {
     H003: { speed: 300, hero: true, r: 34, sight: 1400, mana: 225 },
@@ -13166,7 +13168,7 @@ function buildUnitTypes(md) {
     if ((m.uabi || '').includes('Apiv')) b.invis = true;
     if ((m.uabi || '').includes('Awan')) b.wander = true;
     b.scale = m.usca || 1;
-    if (prof.id === 'kitty5' && id === 'E000') b.speed = 480; // MapMix: very fast kitties
+    if (prof.id === 'kitty5' && id === 'E000') b.speed = 640; // MapMix: very fast kitties (permanent turbo)
     if (prof.id === 'kitty5' && from === 'ncop') { b.speed = 0; b.r = 26; b.kind = 'circle'; b.inv = true; }
     b.name = md.strings[m.unam] || id;
     b.code = id;
@@ -13401,6 +13403,7 @@ class World {
   killUnit(u, by) {
     if (!u || !u.alive || u.removed) return;
     if (u.hero && u.graceUntil && this.time < u.graceUntil) return;
+    if (u.jump) return; // in the air
     if (this.isRemoteUnit(u) && !u._netKill) return;
     u.alive = false; u.deathTime = this.time; u.order = null; u.path = null; u.killer = by || null;
     this.emit('death', u);
@@ -13548,6 +13551,11 @@ class World {
       if (u.cd > 0) u.cd -= dt;
       if (u.hero) { u.mana = Math.min(u.maxMana, u.mana + dt * 1.0); for (const k in u.abil) if (u.abil[k].cd > 0) u.abil[k].cd -= dt; }
       if (u.paused) continue;
+      if (u.jump) { // kitty jump: a short leap forward, wolves can't touch you in the air
+        const J = u.jump, k = (this.time - J.t0) / J.dur;
+        if (k >= 1) { u.jump = null; for (const reg of this.rangeRegs) if (reg.unit === u) reg.seen.clear(); } // land: wolves still on you count again
+        else { const st = J.spd * dt, nx = u.x + J.dx * st, ny = u.y + J.dy * st; if (this.walkable(nx, ny)) { u.x = nx; u.y = ny; } u.walkPhase += dt * 8; continue; }
+      }
       const o = u.order;
       if (o && o.type === 'attackground') {
         if (u.cd <= 0) { this.fireMortar(u, o.x, o.y); u.cd = u.t.cd; }
@@ -13555,7 +13563,7 @@ class World {
       }
       if (!o && u.t.wander && !u.paused) {
         u.wanderT -= dt;
-        if (u.wanderT <= 0) { u.wanderT = 2 + this.rand() * 4; const a = this.rand() * 6.283, r = 150 + this.rand() * 250; const tx = u.x + Math.cos(a) * r, ty = u.y + Math.sin(a) * r; if (this.walkable(tx, ty) && this.lineClear(u.x, u.y, tx, ty)) { u.order = { type: 'move', x: tx, y: ty, wander: true }; u.path = null; } }
+        if (u.wanderT <= 0) { u.wanderT = u.t.wanderFast ? 0.15 + this.rand() * 0.9 : 2 + this.rand() * 4; const a = this.rand() * 6.283, r = u.t.wanderFast ? 250 + this.rand() * 450 : 150 + this.rand() * 250; const tx = u.x + Math.cos(a) * r, ty = u.y + Math.sin(a) * r; if (this.walkable(tx, ty) && this.lineClear(u.x, u.y, tx, ty)) { u.order = { type: 'move', x: tx, y: ty, wander: true }; u.path = null; } }
       }
       if (o && (o.type === 'move' || o.type === 'patrol') && !(u.hero && this.remote.has(u.owner.id))) this.moveUnit(u, dt);
     }
@@ -13736,6 +13744,13 @@ class World {
       u.speed = (u.defSpeed || u.t.speed) * 1.6; u._fleeUntil = this.time + 2.5; u.wanderT = 3 + this.rand() * 2;
       this.issueOrder(u, 851986, p.x, p.y);
     }
+  }
+  cmdJump(p, dirX, dirY) {
+    const h = this.heroOf(p); if (!h || !h.alive || h.hidden || h.paused || h.jump) return false;
+    if (this.time < (h.jumpReady || 0)) return false;
+    let dx = dirX, dy = dirY; if (dx == null) { const f = h.facing * Math.PI / 180; dx = Math.cos(f); dy = Math.sin(f); }
+    const L = Math.hypot(dx, dy) || 1; h.jump = { t0: this.time, dur: 0.55, dx: dx / L, dy: dy / L, spd: Math.max(700, h.speed * 1.2) };
+    h.jumpReady = this.time + 12; // ~10 real seconds at the usual game speed this.emit('sound', { name: 'coil' }); this.emit('jump', h); return true;
   }
   cmdUseItem(p, slot) {
     const h = this.heroOf(p); if (!h || !h.alive) return;
@@ -14939,6 +14954,17 @@ class KittyBots {
         const prog = (cur - f) * 32; const keep = b.dx != null && !(x === h.x && y === h.y) ? ((x - h.x) * b.dx + (y - h.y) * b.dy) / R * 12 : 0;
         const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 0.9 + keep + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
       if (!pick) continue;
+      // jump over the wolves when cornered (10 s cooldown, like the player's button)
+      if (!h.jump && W.time >= (h.jumpReady || 0) && typeof window !== 'undefined' && window.botJump) {
+        const threat = near.some(w => Math.hypot(w.x + (w._vx || 0) * 0.25 - h.x, w.y + (w._vy || 0) * 0.25 - h.y) < 115);
+        if (threat || danger(pick[0], pick[1]) > 260) {
+          const JL = Math.max(700, sp * 1.2) * 0.55; let jb = null, js = -Infinity;
+          for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, x = h.x + Math.cos(a) * JL, y = h.y + Math.sin(a) * JL; if (!this.clear(h.x, h.y, x, y)) continue; const f = this.fAt(D, x, y); if (!isFinite(f)) continue;
+            let land = 0; for (const w of near) { const d = Math.hypot(w.x + (w._vx || 0) * 0.6 - x, w.y + (w._vy || 0) * 0.6 - y); if (d < 140) land += 140 - d; }
+            const sc = (cur - f) * 32 - land * 4; if (sc > js) { js = sc; jb = [Math.cos(a), Math.sin(a)]; } }
+          if (jb && js > -200) { window.botJump(h, jb[0], jb[1]); continue; }
+        }
+      }
       { // impatience grows while there is no NET progress (a new best distance), so nobody dithers forever
         if (b.goal !== D) { b.goal = D; b.bestF = cur; }
         if (cur < b.bestF - 2) { b.bestF = cur; b.wait = Math.max(0, b.wait - 1); } else b.wait = Math.min(8, b.wait + 0.05); }
@@ -16120,7 +16146,8 @@ class Renderer {
       g.fillStyle = hexA(col, 0.18); g.fill();
       let a = ((u.facing % 360) + 360) % 360; const dirs = [[22.5, 5], [90, 4], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 0], [337.5, 6], [360, 5]];
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
-      if (moving && (k === 5 || k === 2)) { const f = 16 + Math.floor(u.walkPhase * 0.55) % 5; kBlit(g, f, 92, 0.5, 0.86, k === 2); }
+      const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 46 : 0; if (lift) g.translate(0, lift);
+      if ((moving || u.jump) && (k === 5 || k === 2)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, 92, 0.5, 0.86, k === 2); } // run frames without the red slash ones
       else { const alt = moving ? Math.floor(u.walkPhase * 0.5) % 2 : (Math.sin(t * 1.5) > 0.6 ? 1 : 0); kBlit(g, k + (alt ? 8 : 0), 120, 0.5, 0.9); }
       return;
     }
@@ -16370,6 +16397,9 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   function showBlink(p, col) { const name = p === W.local ? (settings.nick || 'Tú') : (p.name || 'Jugador'); let hex = (col || '#ffd34d').replace('#', ''); if (hex === '000000') hex = 'cccccc'; showText(`|cff${hex}📍 Blink de ${name}|r`); }
   let blinkAt = 0; function blinkTomb() { if (!W) return; const nowB = performance.now(); if (nowB - blinkAt < 1500) return; blinkAt = nowB; 
     const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) doPing(mk.x, mk.y, null, true); } // the camera stays where you are looking (watching a friend or free look)
+  function doJump() { if (!W || W.profile.id !== 'kitty5') return; const h = W.heroOf(W.local); if (!h) return; let dx = null, dy = null; if (stick.active && Math.hypot(stick.dx, stick.dy) > 0.2) { dx = stick.dx; dy = stick.dy; }
+    if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
+  window.botJump = (u, dx, dy) => { if (W.cmdJump(u.owner, dx, dy) && online && online.host) online.net.pushEvent('bjump', u.owner.id, Math.round(dx * 100), Math.round(dy * 100)); };
   window.botEmote = (u, id) => { sendEmote(id, u); if (online && online.host && u && u.owner) online.net.pushEvent('bemote', u.owner.id, id); }; // the bots use this too
   // ---------- dances (original moves; hold the button to pick one) ----------
   const DANCES = { columpio: ['🕺', 'Columpio'], robot: ['🤖', 'Robot'], saltitos: ['🐰', 'Saltitos'], molino: ['🌀', 'Molino'], pollito: ['🐔', 'Pollito'], ola: ['🌊', 'La Ola'] };
@@ -16516,6 +16546,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'give' && slot != null && typeof a === 'number') { const from = W.heroOf(W.players[slot]), to = W.heroOf(W.players[a]); if (from && to) { moveItem(from, to); if (to.owner === W.local) { sfx.play('pickup'); showText(`|cff9fffa0${from.owner.name || 'Un compañero'} te pasó un hongo de teletransporte.|r`); } } }
       if (kind === 'pause' && slot != null) setPause(!!a, (W.players[slot] && W.players[slot].name) || 'Alguien');
       if (kind === 'ping' && slot != null && typeof a === 'number') doPing(a, e[3], W.players[slot], e[4] === 1);
+      if (kind === 'jump' && slot != null && typeof a === 'number') W.cmdJump(W.players[slot], a / 100, e[3] / 100);
+      if (kind === 'bjump' && typeof a === 'number' && !online.owned.includes(a)) W.cmdJump(W.players[a], e[3] / 100, e[4] / 100);
       if (kind === 'bping' && typeof a === 'number' && !online.owned.includes(a)) { const p = W.players[a]; if (p) doPing(e[3], e[4], p, true); }
       if (kind === 'kill') { const u = W.units.find(v => v.handle === a && !v.hero); if (u) W.killUnit(u); }
       if (kind === 'emote' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendEmote(a, u); }
@@ -16646,6 +16678,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       { const left = Math.max(0, tpReadyAt - W.time); const ready = left <= 0 && hero.items.length > 0; $('#bItem0').classList.toggle('has', !!ready); $('#bItem0').classList.toggle('cool', !ready); $('#bItem0').style.setProperty('--cd', (left <= 0 ? 0 : left / TP_CD * 360) + 'deg'); }
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
+      if (W.profile.id === 'kitty5') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / 12 * 360) + 'deg'); } else $('#bJump').classList.add('hidden');
       botChatter();
       if (W.profile.id === 'kitty5') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
@@ -16821,6 +16854,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let quitArm = 0; function confirmQuit() { const now = performance.now(); if (now - quitArm < 3000) return true; quitArm = now; $('#bQuit').textContent = '¿Seguro? Toca otra vez para abandonar'; setTimeout(() => { $('#bQuit').textContent = '🚪 Abandonar partida'; }, 3000); return false; }
   btn('#bCenter', () => { if (R) R.freeCam = false; camWatch = null; });
   btn('#bWatch', watchNext);
+  btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
   btn('#bPauseG', pauseButton);
