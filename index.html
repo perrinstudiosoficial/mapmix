@@ -63,7 +63,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #danceWrap{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 148px);pointer-events:none;z-index:5}
 #bDance{pointer-events:auto;width:56px;height:56px;font-size:26px;user-select:none;-webkit-user-select:none;touch-action:none}
 #dancePick{pointer-events:auto;position:absolute;right:66px;bottom:0;display:grid;grid-template-columns:repeat(3,54px);gap:6px;background:rgba(20,8,30,.9);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-body[data-map=kitty5] #abil, body[data-map=kitty5] #bGive, body[data-map=kitty5] #manaw, body[data-map=kitty5] #glideTag{display:none!important}
+body[data-map=kitty5] #tox, body[data-map=kitty5] #abil, body[data-map=kitty5] #bGive, body[data-map=kitty5] #manaw, body[data-map=kitty5] #glideTag{display:none!important}
 #abil.deadoff .ab{filter:grayscale(1) brightness(.6);opacity:.5;pointer-events:none}
 #bDance.off{filter:grayscale(1) brightness(.7);opacity:.45}
 #dancePick .eslot{text-align:center;padding:4px 0}
@@ -10993,6 +10993,7 @@ function F_Trig_Trigger_Next_Round_Func012002(){
   N.PanCameraToTimedLocForPlayer(N.GetEnumPlayer(),N.GetRectCenter(G_gg_rct_Kitty_Start),5.0);
 }
 function F_Trig_Trigger_Next_Round_Actions(){
+  N.DisableTrigger(N.GetTriggeringTrigger()); /* MapMix: only the first kitty that arrives counts, not the whole pack */
   N.PauseAllUnitsBJ(true);
   N.AddHeroXPSwapped(300,N.GetTriggerUnit(),true);
   N.AdjustPlayerStateBJ(200,N.GetOwningPlayer(N.GetTriggerUnit()),N.PLAYER_STATE_RESOURCE_GOLD);
@@ -11503,6 +11504,7 @@ function* F_Trig_Next_Round_Actions(){
   N.ReviveHeroLoc(G_gg_unit_E000_0011,N.GetRectCenter(G_gg_rct_Dark_Green_Revive),true);
   (yield N.$sleep(2.0));
   N.TriggerExecute(G_gg_trg_Set_level);
+  N.EnableTrigger(G_gg_trg_Trigger_Next_Round);
   N.ConditionalTriggerExecute(G_gg_trg_Win);
   (yield N.$sleep(10.0));
 }
@@ -13164,6 +13166,7 @@ function buildUnitTypes(md) {
     if ((m.uabi || '').includes('Apiv')) b.invis = true;
     if ((m.uabi || '').includes('Awan')) b.wander = true;
     b.scale = m.usca || 1;
+    if (prof.id === 'kitty5' && id === 'E000') b.speed = 480; // MapMix: very fast kitties
     if (prof.id === 'kitty5' && from === 'ncop') { b.speed = 0; b.r = 26; b.kind = 'circle'; b.inv = true; }
     b.name = md.strings[m.unam] || id;
     b.code = id;
@@ -14901,19 +14904,30 @@ class KittyBots {
       const parking = W.script.gget.gg_rct_Players && W.script.gget.gg_rct_Players();
       const circles = W.units.filter(u => u.t.kind === 'circle' && !u.removed && u.owner !== b.p && !(parking && u.x >= parking.x0 && u.x <= parking.x1 && u.y >= parking.y0 && u.y <= parking.y1));
       let best = null, bd = Infinity; const Dg = this.field(gx, gy), here = this.fAt(Dg, h.x, h.y);
-      for (const c of circles) { const owner = W.heroOf(c.owner); if (owner && owner.alive) continue; const d = Math.hypot(c.x - h.x, c.y - h.y); const behind = this.fAt(Dg, c.x, c.y) >= here - 4; if (d < bd && d < (behind ? 900 : 2600)) { bd = d; best = c; } }
+      for (const c of circles) { const owner = W.heroOf(c.owner); if (owner && owner.alive) continue; if (Math.abs(c.x - h.x) > 3500 || Math.abs(c.y - h.y) > 3500) continue;
+        const d = this.fAt(this.field(c.x, c.y), h.x, h.y) * 32; const behind = this.fAt(Dg, c.x, c.y) >= here - 4; const lim = (behind ? 1100 : 3200) * (b.target === c ? 1.4 : 1); // stick to the friend you chose
+        if (d < bd && d < lim) { bd = d; best = c; } }
+      b.target = best;
       if (best) { gx = best.x; gy = best.y; }
       const D = best ? this.field(gx, gy) : Dg; const cur = this.fAt(D, h.x, h.y);
       if (Math.hypot(gx - h.x, gy - h.y) < 130 && this.clear(h.x, h.y, gx, gy)) { W.issueOrder(h, 851986, gx, gy); continue; }
       // candidate steps: score progress minus predicted danger
-      const danger = (x, y) => { let s = 0; for (const w of wolves) { const dx0 = w.x - x, dy0 = w.y - y; if (Math.abs(dx0) > 600 || Math.abs(dy0) > 600) continue;
-        for (const tau of [0, 0.25, 0.5, 0.8]) { const d = Math.hypot(w.x + (w._vx || 0) * tau - x, w.y + (w._vy || 0) * tau - y) - 20 * tau; if (d < 150) s += (150 - Math.max(0, d)) * (tau === 0 ? 3 : 1.6 - tau); } } return s; };
-      let pick = null, ps = -Infinity; const R = 110;
+      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = h.speed || 350;
+      // danger of walking from here towards (x, y): kitty and wolves both move, the kill range is 70
+      const danger = (x, y) => { let s = 0; const dx = x - h.x, dy = y - h.y, L = Math.hypot(dx, dy) || 1;
+        for (const tau of [0, 0.12, 0.25, 0.4, 0.6, 0.85]) { const m = Math.min(L, sp * tau), kx = h.x + dx / L * m, ky = h.y + dy / L * m, hold = sp * tau > L ? 1 : 0;
+          for (const w of near) { const d = Math.hypot(w.x + (w._vx || 0) * tau - kx, w.y + (w._vy || 0) * tau - ky) - 25 * tau; if (d < 135) s += (d < 92 ? 6 : 1) * (135 - Math.max(0, d)) * (1.2 - tau) * (hold ? 0.7 : 1); } }
+        return s; };
+      let pick = null, ps = -Infinity; const R = Math.max(110, sp * 0.3);
       const opts = [[h.x, h.y]]; for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8; opts.push([h.x + Math.cos(a) * R, h.y + Math.sin(a) * R]); }
       for (const [x, y] of opts) { if (!this.clear(h.x, h.y, x, y)) continue; const f = this.fAt(D, x, y); if (!isFinite(f)) continue;
-        const prog = (cur - f) * 32; const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 2.2 + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
+        const prog = (cur - f) * 32; const keep = b.dx != null && !(x === h.x && y === h.y) ? ((x - h.x) * b.dx + (y - h.y) * b.dy) / R * 12 : 0;
+        const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 0.9 + keep + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
       if (!pick) continue;
-      { const fp = this.fAt(D, pick[0], pick[1]); if (fp < cur - 1) b.wait = Math.max(0, b.wait - 0.3); else b.wait = Math.min(6, b.wait + 0.1); }
+      { // impatience grows while there is no NET progress (a new best distance), so nobody dithers forever
+        if (b.goal !== D) { b.goal = D; b.bestF = cur; }
+        if (cur < b.bestF - 2) { b.bestF = cur; b.wait = Math.max(0, b.wait - 1); } else b.wait = Math.min(8, b.wait + 0.05); }
+      if (!(pick[0] === h.x && pick[1] === h.y)) { const L = Math.hypot(pick[0] - h.x, pick[1] - h.y) || 1; b.dx = (pick[0] - h.x) / L; b.dy = (pick[1] - h.y) / L; }
       // stuck check: no progress for a while -> go straight along the field
       if (Math.hypot(h.x - b.lx, h.y - b.ly) < 8) b.stuck += 0.1; else b.stuck = 0; b.lx = h.x; b.ly = h.y;
       if (b.stuck > 3 && danger(h.x, h.y) < 20) { b.stuck = 0; let bx = null, bf = cur; for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, x = h.x + Math.cos(a) * 64, y = h.y + Math.sin(a) * 64; const f = this.fAt(D, x, y); if (W.walkable(x, y) && f < bf) { bf = f; bx = [x, y]; } } if (bx) pick = bx; }
@@ -16382,7 +16396,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let chatterAt = 0;
   function botChatter() {
     if (!W || !W.ai || !W.ai.bots || !W.ai.bots.length || (online && !online.host)) return; const now = performance.now();
-    if (!chatterAt) { chatterAt = now + 6000 + Math.random() * 6000; return; } if (now < chatterAt) return; chatterAt = now + 9000 + Math.random() * 14000;
+    if (!chatterAt) { chatterAt = now + 3000 + Math.random() * 3000; return; } if (now < chatterAt) return; chatterAt = now + 4000 + Math.random() * 7000;
     const list = CHATTER[W.profile.id] || CHATTER.shroom25; const alive = W.ai.bots.map(b => W.heroOf(b.p)).filter(u => u && !u.removed);
     if (!alive.length) return; const u = alive[Math.floor(Math.random() * alive.length)];
     const dead = W.units.filter(h => h.hero && !h.removed && !h.alive);
