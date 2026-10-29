@@ -166,6 +166,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .item{position:relative;background:linear-gradient(180deg,#2c1239,#1e0b28);border:1px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center}
 .item .pv{font-size:40px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}.item b{display:block;margin-top:6px}.item small{color:var(--dim)}
 .item .price{margin-top:6px;font-weight:900;color:var(--gold)}
+.item .price.owned{text-decoration:line-through;text-decoration-thickness:3px;opacity:.6;color:#cdb8dc}
 .item .lockd{position:absolute;top:8px;right:8px;border-radius:8px;background:rgba(10,2,16,.75);padding:3px 7px;font:900 9px Nunito,sans-serif;letter-spacing:.6px;color:#ffd23f}
 .item .lockd.eq{background:#2e7d32;color:#fff}
 .item .pv img{width:64px;height:64px}
@@ -5028,6 +5029,8 @@ function F_Trig_Start_Level_5_Actions(){
   N.IssuePointOrderLocBJ(G_gg_unit_h000_0134,"patrol",N.GetRectCenter(G_gg_rct_Region_136));
   N.IssuePointOrderLocBJ(G_gg_unit_h000_0135,"patrol",N.GetRectCenter(G_gg_rct_Region_135));
   N.IssuePointOrderLocBJ(G_gg_unit_h000_0136,"patrol",N.GetRectCenter(G_gg_rct_Region_138));
+  /* MapMix: in stage 5 the patrolling clowns are faster than you, so you have to rest in the side pockets */
+  for (const c of [G_gg_unit_h000_0133,G_gg_unit_h000_0134,G_gg_unit_h000_0135,G_gg_unit_h000_0136]) N.SetUnitMoveSpeed(c,380.0);
   N.EnableTrigger(G_gg_trg_Create_Clowns_1_Level_5);
   N.ConditionalTriggerExecute(G_gg_trg_Mortar_1_Level_5);
 }
@@ -16438,7 +16441,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     if (online) W.on('death', u => { if (!u.hero && u.killer && u.killer.hero && online.owned.includes(u.killer.owner.id)) online.net.pushEvent('kill', u.handle); });
     // fixed slow walk (user's request: like the original feels, no option)
     const spd = HERO_WALK;
-    for (const u of W.units) if (u.hero) { u.defSpeed = spd; u.speed = spd; }
+    if (W.profile.id === 'shroom25') for (const u of W.units) if (u.hero) { u.defSpeed = spd; u.speed = spd; }
     if (W.script.gset.udg_SlideSpeed) W.script.gset.udg_SlideSpeed(5.5);
     W.practice = mode === 'practice';
     if (W.practice) { const lose = W.script.gget.gg_trg_Lose && W.script.gget.gg_trg_Lose(); if (lose) lose.enabled = false; }
@@ -17063,7 +17066,7 @@ class Net {
   const SKINS = [['🌈', 'Gorro Arcoíris', 'Sombrero'], ['👑', 'Hongo Rey', 'Sombrero'], ['🔥', 'Estela de Fuego', 'Estela'], ['✨', 'Polvo de Estrellas', 'Estela'], ['👻', 'Fantasma Neón', 'Tumba'], ['🌌', 'Hongo Galaxia', 'Skin'], ['🤡', 'Pack Payaso', 'Skin'], ['🐸', 'Ranita', 'Skin'], ['💀', 'Calavera Dorada', 'Tumba'], ['🎆', 'Ping Fuegos Artificiales', 'Ping']];
   const SHOP_EMOTES = [['payaso', '', 'Payasete'], ['dormilon', '', 'Dormilón'], ['mareado', '', 'Mareado'], ['enamorado', '', 'Enamorado'], ['furioso', '', 'Furioso'], ['fantasma', '', 'Fantasmita'], ['rey', '', 'Rey Hongo'], ['asustado', '', 'Asustado'], ['guino', '', 'Guiño']];
   const pvOf = (id, emo) => { const u = window.EmoteArt && window.EmoteArt(id); return u ? `<img src="${u}" alt="">` : emo; };
-  $('#emoteGrid').innerHTML = `<div class="item"><div class="pv">${pvOf('nero', '😎')}</div><b>El Ñero</b><small>Emote</small><div class="price">GRATIS</div><div class="lockd eq">EQUIPADO</div></div>` + SHOP_EMOTES.map(([id, emo, n]) => `<div class="item"><div class="pv">${pvOf(id, emo)}</div><b>${esc(n)}</b><small>Emote</small><div class="price">$0.99</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
+  $('#emoteGrid').innerHTML = `<div class="item"><div class="pv">${pvOf('nero', '😎')}</div><b>El Ñero</b><small>Emote</small><div class="price owned">GRATIS</div><div class="lockd eq">EQUIPADO</div></div>` + SHOP_EMOTES.map(([id, emo, n]) => `<div class="item"><div class="pv">${pvOf(id, emo)}</div><b>${esc(n)}</b><small>Emote</small><div class="price">$0.99</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
   const shopTab = em => { $('#tabSkins').classList.toggle('on', !em); $('#tabEmotes').classList.toggle('on', em); $('#shopGrid').classList.toggle('hidden', em); $('#emoteGrid').classList.toggle('hidden', !em); $('#shopHint').textContent = em ? 'Los emotes se usan sin límite en todos los mapas. Comprados se agregan a tus 5 casillas.' : 'Las skins sirven en todos los mapas del juego.'; };
   click('#tabSkins', () => shopTab(false)); click('#tabEmotes', () => shopTab(true));
   $('#shopGrid').innerHTML = SKINS.map(([pv, n, k]) => `<div class="item"><div class="pv">${pv}</div><b>${esc(n)}</b><small>${esc(k)}</small><div class="price">— —</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
