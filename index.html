@@ -96,6 +96,10 @@ body[data-fam=run] #danceWrap{display:none!important}
 .mchat{margin-top:8px;background:rgba(10,3,16,.55);border:1px solid var(--line);border-radius:14px;padding:8px}.mlog{text-align:left;height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:700;padding:2px 4px}.mlog .ml b{color:#c8ff4d}.mlog .ml.me b{color:#ffd34d}.mnone{color:var(--dim);font-weight:600}.mrow{display:flex;gap:6px;margin-top:6px}.mrow input{flex:1;font:inherit;font-weight:700;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(20,8,30,.9);color:#fff;outline:none;min-width:0}.mrow button{font:inherit;font-weight:900;border:0;border-radius:10px;padding:0 12px;color:#1a0d24;background:linear-gradient(#c8ff4d,#7fd321);cursor:pointer}
 .minfo{position:absolute;right:8px;bottom:8px;width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(20,8,30,.7);color:#fff;font:900 13px Nunito,sans-serif;cursor:pointer;padding:0;z-index:2}.lorep{text-align:left;font-size:14px;line-height:1.45;color:#e9dcf5;margin:4px 0 12px}
 .wallet{display:inline-block;margin:6px auto 0;padding:5px 14px;border-radius:999px;background:linear-gradient(#5a3a08,#2e1d04);border:1px solid #d9a441;color:#ffe27a;font-weight:900}#stats .wal{color:#ffe27a;font-weight:900;font-size:11px}
+.dd{position:relative;display:inline-block;min-width:180px;max-width:70vw}.ddb{width:100%;font:inherit;font-weight:800;color:#fff;background:#24102f;border:1px solid var(--line);border-radius:12px;padding:9px 34px 9px 12px;text-align:left;cursor:pointer;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ddb::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);opacity:.8}.dd.open .ddb{border-color:#b4ff5a}.dd.open .ddb::after{content:'▴'}
+.ddl{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:50;background:#1c0d27;border:1px solid #b4ff5a;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5)}.ddl.hidden{display:none}
+.ddi{padding:10px 12px;font-weight:700;cursor:pointer;text-align:left}.ddi+.ddi{border-top:1px solid rgba(255,255,255,.08)}.ddi.on{background:#3b1f52;color:#b4ff5a}.ddi:active{background:#4b2378}
 .shoptabs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.shoptabs button{font:inherit;font-weight:800;color:#fff;background:#2c1239;border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer}.shoptabs button.on{background:linear-gradient(#7a3fb8,#4b2378)}
 .ab.item.has{opacity:1;border-style:solid;border-color:var(--gold)}
 #manaw{grid-column:1/4;height:6px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden}
@@ -24512,6 +24516,17 @@ class Net {
   }
   window.Lobby = { showWait() { show('wait'); startedGame = null; autoAt = 0; clearInterval(waitTimer); waitTimer = setInterval(waitTick, 300); }, net };
   // solo play
+  // dropdowns that open right there (no system pop-up window over the game)
+  function inlineSelect(sel) { if (!sel || sel._dd) return; sel._dd = true; sel.style.display = 'none';
+    const box = document.createElement('div'); box.className = 'dd'; const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'ddb'; const list = document.createElement('div'); list.className = 'ddl hidden';
+    box.append(btn, list); sel.after(box);
+    const label = () => { const o = sel.options[sel.selectedIndex]; btn.textContent = o ? o.textContent : ''; };
+    const build = () => { list.innerHTML = ''; for (const o of sel.options) { const it = document.createElement('div'); it.className = 'ddi' + (o.value === sel.value ? ' on' : ''); it.textContent = o.textContent;
+      it.addEventListener('click', ev => { ev.stopPropagation(); sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); label(); list.classList.add('hidden'); box.classList.remove('open'); }); list.appendChild(it); } };
+    btn.addEventListener('click', ev => { ev.stopPropagation(); const open = list.classList.contains('hidden'); document.querySelectorAll('.ddl').forEach(l => { l.classList.add('hidden'); l.parentNode.classList.remove('open'); }); if (open) { build(); list.classList.remove('hidden'); box.classList.add('open'); } });
+    sel.addEventListener('change', label); label(); setInterval(label, 1000); }
+  document.addEventListener('click', () => document.querySelectorAll('.ddl').forEach(l => { l.classList.add('hidden'); l.parentNode.classList.remove('open'); }));
+  setTimeout(() => document.querySelectorAll('select').forEach(inlineSelect), 50);
   // solo: a classic pre-game lobby (names, colours, teams) before the game starts
   let preBots = 11;
   function renderPre() { const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
