@@ -22690,8 +22690,8 @@ class Renderer {
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3; if (u._wasMv && !moving) u._foot = !u._foot; u._wasMv = moving; // each stop ends with the other front paw ahead
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); // your aura under your tiger (the same one you leave when you fall)
-      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 300 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
-      let a = ((u._rf % 360) + 360) % 360; const dirs = [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // wide left/right sectors: full profile
+      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; if (Math.abs(d) > 150 && !(u._turnD > 1)) { const c0 = u._rf * Math.PI / 180; if (Math.abs(Math.cos(c0)) > 0.5) { const up = Math.sin(c0 + Math.PI / 2) > Math.sin(c0 - Math.PI / 2) ? 1 : -1; d = up * Math.abs(d); } } /* left<->right reversal: always sweep over the top (right, up-right, up, up-left, left) */ const st = 300 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
+      let a = ((u._rf % 360) + 360) % 360; const dirs = u._turnD > 8 ? [[22.5, 5], [67.5, 3], [112.5, 'N'], [157.5, 4], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]] : [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // while turning every view gets the same share (so all 8 show); settled: wide left/right sectors = full profile
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const straight = k === 'N' || k === 'S', step = Math.floor(u.walkPhase * 0.75 / Math.PI) % 2; // straight up/down: swap the two mirrored views each step, so it reads as running straight
       if (k === 'N') k = window.KITTY_ART.rects[26] ? 26 : 4; else if (k === 'S') k = 0; // straight back (26) and straight front (0) views
@@ -22701,7 +22701,7 @@ class Renderer {
       const FADE = 0.2, fp = u._pk != null ? Math.min(1, (W.time - u._kt) / FADE) : 1;
       { const q = Math.min(1, (W.time - (u._kt || -9)) / 0.14); g.scale(1 - 0.12 * Math.sin(q * Math.PI), 1); } // short squeeze as it turns to the next drawing
       const pose = (k, al) => { if (al <= 0.01) return; g.save(); g.globalAlpha *= al;
-      if ((moving || u.jump) && (k === 5 || k === 2)) { /* side run, the body tilted toward the exact angle so a circle has no jumps */ const f = 16 + Math.floor(u.walkPhase * 0.6) % 3, off = (k === 5 ? ((a + 180) % 360) - 180 : a - 180) * Math.PI / 180; g.save(); g.rotate(off * 0.55); kBlit(g, f, -1.2, 0.5, 0.9, k === 2); g.restore(); } // same scale as every other frame, so the size never changes // run frames without the red slash ones
+      if ((moving || u.jump) && (k === 5 || k === 2)) { /* side run, the body tilted toward the exact angle so a circle has no jumps */ const f = 16 + Math.floor(u.walkPhase * 0.6) % 3, off = (k === 5 ? ((a + 180) % 360) - 180 : a - 180) * Math.PI / 180; g.save(); g.rotate(off * 0.12); kBlit(g, f, -1.2, 0.5, 0.9, k === 2); g.restore(); } /* almost no tilt: a true side view */ // same scale as every other frame, so the size never changes // run frames without the red slash ones
       else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
         const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
@@ -22710,7 +22710,12 @@ class Renderer {
         const F2 = fatigue(W, u, false, 0.6), A = F2.amp, br = F2.s, e = A * (0.5 + 0.5 * F2.s); // e >= 0: the torso only ever swells over the still picture
         const hz = (a < 50 || a > 310) ? 5 : (a > 130 && a < 230) ? 2 : null; let kk = hz != null ? 16 : k; const fl = hz === 2 || ((kk === 0 || kk === 26) && !!u._foot), ay = hz != null ? 0.9 : 0.92; // facing you or away: the mirrored drawing = the other paw forward
         const img = kArt(), r = window.KITTY_ART.rects[kk], sc = 1.2 * ((window.KITTY_ART.norm && window.KITTY_ART.norm[kk]) || 1), w = r[2] * sc, h = r[3] * sc, x0 = -w * 0.5, y0 = -h * ay, cut = 0.6;
-        g.save(); g.scale(fl ? -1 : 1, -1); g.drawImage(img, r[0], r[1], r[2], r[3], x0, y0, w, h);
+        g.save(); g.scale(fl ? -1 : 1, -1);
+        if (kk === 0 || kk === 26) { // standing facing you / away: one front paw a step ahead of the other (it swaps every time you stop)
+          const sd = u._foot ? 1 : -1, cutP = Math.round(r[3] * cut); for (const hf of [0, 1]) { const ahead = (hf ? 1 : -1) === sd, dy = kk === 0 ? (ahead ? 6 : -5) : (ahead ? -8 : 7), sc2 = ahead ? (kk === 0 ? 1.06 : 0.95) : (kk === 0 ? 0.96 : 1.04);
+            g.drawImage(img, r[0] + hf * r[2] / 2, r[1] + cutP - 3, r[2] / 2 + (hf ? 0 : 1), r[3] - cutP + 3, x0 + hf * w / 2 + (1 - sc2) * w / 4, y0 + (cutP - 3) * sc, w / 2 * sc2 + (hf ? 0 : 1), (r[3] - cutP + 3) * sc * sc2 + dy); }
+          g.drawImage(img, r[0], r[1], r[2], cutP + 1, x0, y0, w, (cutP + 1) * sc); }
+        else g.drawImage(img, r[0], r[1], r[2], r[3], x0, y0, w, h);
         g.save(); g.translate(0, y0 + h * cut); g.scale(1 + e * 0.9, 1 + e * 1.3); g.drawImage(img, r[0], r[1], r[2], r[3] * cut, x0, -h * cut, w, h * cut + 0.5); g.restore();
         const M = { 0: [0.47, 0.6], 1: [0.08, 0.58], 6: [0.9, 0.58], 16: [0.94, 0.45] }[kk]; const tired = u._tired || 0;
         if (M && tired > 0.3) { const tx = (x0 + M[0] * w) * (1 + e * 0.9), ty = y0 + h * cut - (cut - M[1]) * h * (1 + e * 1.3), L = (4 + 9 * tired) * (1 + 0.25 * F2.s), side = kk === 0 ? 0 : (kk === 1 ? -1 : 1);
