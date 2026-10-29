@@ -67,6 +67,8 @@ body:not([data-map=kitty5]) #kSongRow{display:none}
 body[data-fam=run] #tox, body[data-fam=run] #abil, body[data-fam=run] #bGive, body[data-fam=run] #manaw, body[data-fam=run] #glideTag{display:none!important}
 #abil.deadoff .ab{filter:grayscale(1) brightness(.6);opacity:.5;pointer-events:none}
 #bJump{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 70px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 12px);width:72px;height:72px;font-size:32px;pointer-events:auto;z-index:5;border-color:#ffd34d}
+#bRoar{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 160px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#ff9a3d}
+body[data-fam=run] #danceWrap{display:none!important}
 #bDance.off{filter:grayscale(1) brightness(.7);opacity:.45}
 #dancePick .eslot{text-align:center;padding:4px 0}
 #emotePick{pointer-events:auto;position:absolute;right:0;bottom:66px;display:flex;gap:8px;background:rgba(20,8,30,.9);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
@@ -246,6 +248,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="ab hidden" id="bGive">🎁<kbd>D</kbd><small>Dar hongo</small></div>
   <div class="ab hidden" id="bBlink">📍<small>Blink tumba</small></div>
   <div class="ab hidden" id="bJump">🐾<small>Saltar</small></div>
+  <div class="ab hidden" id="bRoar">😾<small>Gruñido</small></div>
   <div id="danceWrap"><div id="dancePick" class="hidden"></div><div class="ab" id="bDance"><span id="danceIcon"></span><small>Baile</small></div></div>
   <div id="emoteWrap"><div id="emotePick" class="hidden"></div><div class="ab" id="bEmote"><span id="emoteIcon"></span><small>Emote</small></div></div>
   <div id="abil">
@@ -20160,6 +20163,18 @@ class World {
       this.issueOrder(u, 851986, p.x, p.y);
     }
   }
+  /* run maps: a growl that scares the wolves (or crabs) around you, they run away for a moment */
+  cmdRoar(p) {
+    const h = this.heroOf(p); if (!h || !h.alive || h.hidden || h.paused) return false;
+    if (this.time < (h.roarReady || 0)) return false; h.roarReady = this.time + 14;
+    for (const u of this.units) {
+      if (u.removed || !u.alive || (u.t.kind !== 'wolf' && u.t.kind !== 'crab')) continue;
+      const dx = u.x - h.x, dy = u.y - h.y, d = Math.hypot(dx, dy); if (d > 520) continue;
+      const L = d || 1; let tx = u.x + dx / L * 420, ty = u.y + dy / L * 420; const q = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 300); if (!q) continue;
+      u.speed = (u.defSpeed || u.t.speed) * 1.4; u._fleeUntil = this.time + 1.6; u.wanderT = 2; this.issueOrder(u, 851986, q.x, q.y);
+    }
+    const e = this.addEffect(h.x, h.y, 'roar'); e.dur = 0.7; this.emit('sound', { name: 'roar' }); this.emit('roar', h); return true;
+  }
   cmdJump(p, dirX, dirY) {
     const h = this.heroOf(p); if (!h || !h.alive || h.hidden || h.paused || h.jump) return false;
     if (this.time < (h.jumpReady || 0)) return false;
@@ -21388,6 +21403,7 @@ class KittyBots {
         const prog = (cur - f) * 32; const keep = b.dx != null && !(x === h.x && y === h.y) ? ((x - h.x) * b.dx + (y - h.y) * b.dy) / R * 12 : 0;
         const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 0.9 + keep + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
       if (!pick) continue;
+      if (W.time >= (h.roarReady || 0) && typeof window !== 'undefined' && window.botRoar && near.filter(w => Math.hypot(w.x - h.x, w.y - h.y) < 300).length >= 2) { window.botRoar(h); }
       // jump over the wolves when cornered (10 s cooldown, like the player's button)
       if (!h.jump && W.time >= (h.jumpReady || 0) && typeof window !== 'undefined' && window.botJump) {
         const threat = near.some(w => Math.hypot(w.x + (w._vx || 0) * 0.25 - h.x, w.y + (w._vy || 0) * 0.25 - h.y) < 115);
@@ -21583,6 +21599,7 @@ class Sfx {
       o.connect(g); o2.connect(g); g.connect(this.master); for (const x of [o, o2, lfo]) { x.start(t); x.stop(t + 3.3); }
       for (let i = 0; i < 10; i++) this.tone(1200 + Math.random() * 1600, 1800 + Math.random() * 1600, 0.12, 'sine', 0.05, Math.random() * 3); }
     else if (n === 'tparrive') { this.noise(0.5, 0.3, 2500, 1.5); this.tone(1600, 300, 0.6, 'sine', 0.25); this.tone(800, 1600, 0.4, 'triangle', 0.12, 0.05); }
+    else if (n === 'roar') { this.tone(180, 70, 0.55, 'sawtooth', 0.35); this.tone(260, 90, 0.45, 'square', 0.12, 0.03); }
     else if (n === 'click') { this.tone(900, 700, 0.04, 'square', 0.05); }
     else if (n === 'rescue') { [660, 880].forEach((f, i) => this.tone(f, f, 0.15, 'sine', 0.2, i * 0.08)); }
   }
@@ -22120,7 +22137,8 @@ class Renderer {
       const p = (W.time - e.t0) / e.dur; if (p < 0 || p > 1) continue;
       const x = e.unit ? e.unit.x : e.x, y = e.unit ? e.unit.y : e.y; const m = e.model.toLowerCase();
       g.save(); g.translate(x, y);
-      if (m === 'shroomdeath') { this.drawShroomDeath(g, e, p); }
+      if (m === 'roar') { g.save(); g.scale(1, 0.5); for (let k = 0; k < 3; k++) { const q = Math.min(1, p * 1.3 - k * 0.15); if (q <= 0) continue; g.strokeStyle = `rgba(255,170,60,${(1 - q) * 0.9})`; g.lineWidth = 10 - k * 2; g.beginPath(); g.arc(0, 0, 60 + q * 460, 0, 7); g.stroke(); } g.restore(); }
+      else if (m === 'shroomdeath') { this.drawShroomDeath(g, e, p); }
       else if (m === 'explosion') {
         const R = e.r || 116;
         g.fillStyle = `rgba(255,${160 - p * 120},40,${0.85 * (1 - p)})`; g.beginPath(); g.arc(0, 0, R * (0.75 + 0.25 * Math.min(1, p * 4)), 0, 7); g.fill();
@@ -22643,17 +22661,18 @@ class Renderer {
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
       g.fillStyle = hexA(col, 0.18); g.fill();
-      let a = ((u.facing % 360) + 360) % 360; const dirs = [[22.5, 5], [67.5, 4], [112.5, 'N'], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]];
+      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 900 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
+      let a = ((u._rf % 360) + 360) % 360; const dirs = [[22.5, 5], [67.5, 4], [112.5, 'N'], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]];
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const straight = k === 'N' || k === 'S', step = Math.floor(u.walkPhase * 0.75 / Math.PI) % 2; // straight up/down: swap the two mirrored views each step, so it reads as running straight
       if (k === 'N') k = window.KITTY_ART.rects[26] ? 26 : 4; else if (k === 'S') k = 0; // straight back (26) and straight front (0) views
       const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 46 : 0; if (lift) g.translate(0, lift);
-      if ((moving || u.jump) && (k === 5 || k === 2 || k === 1 || k === 6)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.38, 0.5, 0.9, k === 2 || k === 1); } // run frames are drawn smaller in the sheet: scale them up to the same tiger size // run frames without the red slash ones
+      if ((moving || u.jump) && (k === 5 || k === 2 || k === 1 || k === 6)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2 || k === 1); } // same scale as every other frame, so the size never changes // run frames without the red slash ones
       else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
         const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
-        kTrot(g, straight ? k : k + (Math.floor(ph / (2 * Math.PI)) % 2 ? 8 : 0), 1.2, ph); }
-      else { const alt = !straight && Math.sin(t * 1.5) > 0.6 ? 1 : 0; kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); } // (straight views have one pose only)
+        if (k === 26) kTrot(g, 26, 1.56, ph); else { const B = Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * 6; g.save(); g.translate(0, bob); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
+      else kBlit(g, k, k === 26 ? -1.56 : -1.2, 0.5, 0.92); // standing still: the planted pose (all four paws on the ground)
       return;
     }
     const moving = !!u.order && !u.paused; const ph = u.walkPhase * 2.2; const t = W.time + u.handle * 0.3;
@@ -22945,6 +22964,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) doPing(mk.x, mk.y, null, true); } // the camera stays where you are looking (watching a friend or free look)
   function doJump() { if (!W || W.profile.family !== 'run') return; const h = W.heroOf(W.local); if (!h) return; let dx = null, dy = null; if (stick.active && Math.hypot(stick.dx, stick.dy) > 0.2) { dx = stick.dx; dy = stick.dy; }
     if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
+  function doRoar() { if (!W || W.profile.family !== 'run') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
+  window.botRoar = u => { if (W.cmdRoar(u.owner) && online && online.host) online.net.pushEvent('broar', u.owner.id); };
   window.botJump = (u, dx, dy) => { if (W.cmdJump(u.owner, dx, dy) && online && online.host) online.net.pushEvent('bjump', u.owner.id, Math.round(dx * 100), Math.round(dy * 100)); };
   window.botEmote = (u, id) => { sendEmote(id, u); if (online && online.host && u && u.owner) online.net.pushEvent('bemote', u.owner.id, id); }; // the bots use this too
   // ---------- dances (original moves; hold the button to pick one) ----------
@@ -23095,6 +23116,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'give' && slot != null && typeof a === 'number') { const from = W.heroOf(W.players[slot]), to = W.heroOf(W.players[a]); if (from && to) { moveItem(from, to); if (to.owner === W.local) { sfx.play('pickup'); showText(`|cff9fffa0${from.owner.name || 'Un compañero'} te pasó un hongo de teletransporte.|r`); } } }
       if (kind === 'pause' && slot != null) setPause(!!a, (W.players[slot] && W.players[slot].name) || 'Alguien');
       if (kind === 'ping' && slot != null && typeof a === 'number') doPing(a, e[3], W.players[slot], e[4] === 1);
+      if (kind === 'roar' && slot != null) W.cmdRoar(W.players[slot]);
+      if (kind === 'broar' && typeof a === 'number' && !online.owned.includes(a)) W.cmdRoar(W.players[a]);
       if (kind === 'jump' && slot != null && typeof a === 'number') W.cmdJump(W.players[slot], a / 100, e[3] / 100);
       if (kind === 'bjump' && typeof a === 'number' && !online.owned.includes(a)) W.cmdJump(W.players[a], e[3] / 100, e[4] / 100);
       if (kind === 'bping' && typeof a === 'number' && !online.owned.includes(a)) { const p = W.players[a]; if (p) doPing(e[3], e[4], p, true); }
@@ -23227,7 +23250,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       { const left = Math.max(0, tpReadyAt - W.time); const ready = left <= 0 && hero.items.length > 0; $('#bItem0').classList.toggle('has', !!ready); $('#bItem0').classList.toggle('cool', !ready); $('#bItem0').style.setProperty('--cd', (left <= 0 ? 0 : left / TP_CD * 360) + 'deg'); }
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
-      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / 12 * 360) + 'deg'); } else $('#bJump').classList.add('hidden');
+      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / 12 * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); }
       botChatter();
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
@@ -23405,6 +23428,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   btn('#bWatch', watchNext);
   if (!settings.kSongV2) { settings.kittySong = 'sinfreno'; settings.kSongV2 = 1; saveSettings(); } // the owner picked Sin Freno as the theme
   { const ks = $('#optKSong'); ks.value = settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
+  btn('#bRoar', doRoar);
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
