@@ -13504,7 +13504,7 @@ function F_InitGlobals(){
   G_udg_teleportSize=0;
   G_udg_loopGuard=false;
   G_udg_minTeleport=0;
-  G_udg_speedMultiplier=7.0; // MapMix: much faster slide on ice
+  G_udg_speedMultiplier=11.0; // MapMix: very fast slide on ice
   G_udg_REALSPD1=0;
   G_udg_REALSPD2=0;
   G_udg_REALSPD4=0;
@@ -19556,7 +19556,7 @@ function buildUnitTypes(md) {
   const prof = md.profile || { id: 'shroom25' };
   const run = prof.family === 'run' || prof.id === 'kitty5';
   const base = prof.id === 'bob' ? {
-    E000: { speed: 650, hero: true, r: 22, sight: 1800, mana: 0, kind: 'swimmer', life: 700 },
+    E000: { speed: 900, hero: true, r: 26, sight: 1800, mana: 0, kind: 'swimmer', life: 700 },
     nwwg: { speed: 300, r: 28, wander: true, wanderFast: true, kind: 'crab' },
     ngme: { speed: 0, r: 60, inv: true, kind: 'shop' }, hpea: { speed: 0, r: 8, inv: true, kind: 'hidden' }, nech: { speed: 0, r: 8, inv: true, kind: 'hidden', fly: true },
   } : prof.id === 'kitty5' ? {
@@ -21391,7 +21391,7 @@ class KittyBots {
       if (Math.hypot(gx - h.x, gy - h.y) < 130 && this.clear(h.x, h.y, gx, gy)) { W.issueOrder(h, 851986, gx, gy); continue; }
       // candidate steps: score progress minus predicted danger
       const slide = W.profile.id === 'bob' && W.tileTypeAt(h.x, h.y) === 'Nice'; // on ice you can't stop: you slide at 700
-      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 700 : (h.speed || 350);
+      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 1100 : (h.speed || 350);
       // danger of walking from here towards (x, y): kitty and wolves both move, the kill range is 70
       const danger = (x, y) => { let s = 0; const dx = x - h.x, dy = y - h.y, L = Math.hypot(dx, dy) || 1;
         for (const tau of [0, 0.12, 0.25, 0.4, 0.6, 0.85]) { const m = Math.min(L, sp * tau), kx = h.x + dx / L * m, ky = h.y + dy / L * m, hold = sp * tau > L ? 1 : 0;
@@ -22206,7 +22206,7 @@ class Renderer {
     for (const u of W.units) {
       if (!u.hero || u.removed || u.hidden || !u.alive || u === hero) continue;
       if (!this.view || u.x < this.view.vx0 || u.x > this.view.vx1 || u.y < this.view.vy0 || u.y > this.view.vy1) continue;
-      const ny = u.t.kind === 'kitty' ? 112 : u.t.kind === 'swimmer' ? 62 : 86;
+      const ny = u.t.kind === 'kitty' ? 112 : u.t.kind === 'swimmer' ? 92 : 86;
       g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,0.7)'; g.strokeText(u.owner.name, u.x, -u.y - ny);
       g.fillStyle = this.heroColor(u); g.fillText(u.owner.name, u.x, -u.y - ny);
     }
@@ -22755,16 +22755,16 @@ class Renderer {
     const moving = W.time - (u._movedAt || 0) < 0.15, onIce = W.tileTypeAt(u.x, u.y) === 'Nice';
     const fx = Math.cos(u.facing * Math.PI / 180), dir = fx < -0.1 ? -1 : 1, ph = t * (moving ? 10 : 3.2);
     const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 40 : 0;
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(0, -14, 30, 9, 0, 0, TAU); g.fill();
-    g.save(); g.scale(dir, -1); g.translate(0, -18 - lift);
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(0, -16, 48, 13, 0, 0, TAU); g.fill();
+    g.save(); g.scale(dir * 1.45, -1.45); g.translate(0, -20 - lift / 1.45); // a big chubby seal
     const slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? Math.sin(ph) : 0; // breathing when resting
     g.save(); g.scale(1 + 0.05 * wave + 0.03 * br, 1 - 0.05 * wave - 0.04 * br + (slide ? -0.12 : 0));
     // tail flippers
     g.save(); g.translate(-30, 6); g.rotate(0.3 + wave * 0.4 + br * 0.08); g.fillStyle = '#6f7d8c'; g.beginPath(); g.moveTo(0, 0); g.lineTo(-14, -9); g.lineTo(-11, 0); g.lineTo(-14, 9); g.closePath(); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2; g.stroke(); g.restore();
     // body
     const gr = g.createLinearGradient(0, -16, 0, 18); gr.addColorStop(0, '#a9b6c4'); gr.addColorStop(1, '#7c8a99'); g.fillStyle = gr;
-    g.beginPath(); g.ellipse(-4, 4, 30, 15, slide ? 0 : -0.12, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2.5; g.stroke();
-    g.fillStyle = 'rgba(255,255,255,0.45)'; g.beginPath(); g.ellipse(0, 11, 20, 6, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(-4, 6, 32, 22 + br * 1.5, slide ? 0 : -0.1, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2.5; g.stroke();
+    { const bg = g.createRadialGradient(2, 14, 2, 2, 14, 22); bg.addColorStop(0, '#f2efe6'); bg.addColorStop(1, '#cfcabd'); g.fillStyle = bg; g.beginPath(); g.ellipse(2, 15, 24 + br * 2, 13 + br * 2, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(80,80,70,0.35)'; g.lineWidth = 1.5; g.stroke(); } // huge round belly
     for (const [sx, sy] of [[-14, -2], [-4, -6], [-20, 6]]) { g.fillStyle = 'rgba(70,80,95,0.45)'; g.beginPath(); g.arc(sx, sy, 2.2, 0, TAU); g.fill(); }
     // front flipper
     g.save(); g.translate(4, 12); g.rotate(0.5 + (moving && !slide ? Math.sin(ph + 1) * 0.7 : slide ? -0.9 : br * 0.1)); g.fillStyle = '#6f7d8c'; g.beginPath(); g.ellipse(6, 0, 10, 4, 0, 0, TAU); g.fill(); g.restore();
