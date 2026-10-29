@@ -229,7 +229,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 <div id="hud" class="hidden">
   <div id="top">
     <div id="stats" class="pill">
-      <div class="t">ESCAPE SHROOM</div><div class="ver">v1.0</div>
+      <div class="t">ESCAPE HONGO</div><div class="ver">v1.0</div>
       <div id="team"></div>
       <div id="tox" style="display:none">Toxicidad<div class="bar"><i id="toxbar"></i></div></div>
     </div>
@@ -381,7 +381,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="card">
     <h1 id="endTitle">GAME OVER</h1>
     <div class="sub" id="endMsg"></div>
-    <div class="brand">Escape Shroom v1.0 · Creado por <b>Perrin Studios</b> · © 2026</div>
+    <div class="brand">Escape Hongo · Creado por <b>Perrin Studios</b> · © 2026</div>
     <button class="big-btn" id="bAgain">JUGAR DE NUEVO</button><br>
     <button class="big-btn ghost" id="bMenuBack">Menú</button>
   </div>
@@ -19974,6 +19974,10 @@ class World {
         const onIce = this.tileTypeAt(u.x, u.y) === 'Nice';
         if (u._wasIce && !onIce && !u.order && !u.jump) { const f = u.facing * Math.PI / 180; const tx = u.x + Math.cos(f) * 500, ty = u.y + Math.sin(f) * 500; const q = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 200); if (q) this.issueOrder(u, 851986, q.x, q.y); }
         u._wasIce = onIce;
+        if (onIce && !u.jump && !this.remote.has(u.owner.id)) { // on ice you can't stop or turn on the spot: the slide carries you, the stick only steers a curve
+          const o = u.order; if (o && o.type === 'move') { if (Math.hypot(o.x - u.x, o.y - u.y) < 40) { u.order = null; u.path = null; }
+            else { const want = Math.atan2(o.y - u.y, o.x - u.x) * 180 / Math.PI; const d = ((want - u.facing) % 360 + 540) % 360 - 180, st = (u.owner.ai ? 900 : 230) * dt; u.facing = (u.facing + (Math.abs(d) <= st ? d : Math.sign(d) * st) + 360) % 360; } }
+          u.walkPhase += dt * 2; continue; }
       }
       if (u.jump) { // kitty jump: a short leap forward, wolves can't touch you in the air
         const J = u.jump, k = (this.time - J.t0) / J.dur;
@@ -20378,7 +20382,7 @@ function makeNatives(W) {
     GetCameraField: field => field === 'rot' ? 90 + W.camera.rotT : field === 'roll' ? W.camera.rollT : 0,
     SetCameraBounds: (x0, y0, x1, y1) => { W.camBounds = { x0: Math.min(x0, x1), y0: Math.min(y0, y1), x1: Math.max(x0, x1), y1: Math.max(y0, y1) }; },
     CinematicFadeBJ: (type, dur, tex, r, g, b, tr) => { const f = W.fade; const a = W.fadeAlpha ? W.fadeAlpha() : f.to; f.from = a; f.to = type === 1 ? 1 : 0; f.t0 = W.time; f.dur = Math.min(dur, W.opts.maxFade || 99); },
-    CreateFogModifierRectBJ: (en, p, st, r) => { if (p === W.local && W.vision && r) W.vision.addRect(r); return null; }, CreateMultiboardBJ: (c, r, title) => { const m = { title: 'ESCAPE SHROOM', items: {}, show: true }; W.multiboard = m; N.bj_lastCreatedMultiboard = m; return m; },
+    CreateFogModifierRectBJ: (en, p, st, r) => { if (p === W.local && W.vision && r) W.vision.addRect(r); return null; }, CreateMultiboardBJ: (c, r, title) => { const m = { title: 'ESCAPE HONGO', items: {}, show: true }; W.multiboard = m; N.bj_lastCreatedMultiboard = m; return m; },
     MultiboardSetItemValueBJ: (m, c, r, v) => { if (m) m.items[c + ',' + r] = str(v); }, MultiboardSetItemWidthBJ: () => {}, MultiboardSetItemStyleBJ: () => {},
     MultiboardMinimize: () => {}, MultiboardDisplay: (m, b) => { if (m) m.show = b; }, DestroyMultiboard: m => { if (m === W.multiboard) W.multiboard = null; },
     CreateQuestBJ: (type, title, desc, icon) => { W.quests.push({ title: str(title), desc: str(desc) }); },
@@ -22674,7 +22678,7 @@ class Renderer {
       g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
       g.fillStyle = hexA(col, 0.18); g.fill();
       { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 300 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
-      let a = ((u._rf % 360) + 360) % 360; const dirs = [[22.5, 5], [67.5, 3], [112.5, 'N'], [157.5, 4], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]];
+      let a = ((u._rf % 360) + 360) % 360; const dirs = [[30, 5], [60, 3], [120, 'N'], [150, 4], [210, 2], [240, 1], [300, 'S'], [330, 6], [360, 5]];
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const straight = k === 'N' || k === 'S', step = Math.floor(u.walkPhase * 0.75 / Math.PI) % 2; // straight up/down: swap the two mirrored views each step, so it reads as running straight
       if (k === 'N') k = window.KITTY_ART.rects[26] ? 26 : 4; else if (k === 'S') k = 0; // straight back (26) and straight front (0) views
@@ -22683,11 +22687,11 @@ class Renderer {
       if (u._dk == null) u._dk = k; if (k !== u._dk) { u._pk = u._dk; u._dk = k; u._kt = W.time; }
       const FADE = 0.2, fp = u._pk != null ? Math.min(1, (W.time - u._kt) / FADE) : 1;
       const pose = (k, al) => { if (al <= 0.01) return; g.save(); g.globalAlpha *= al;
-      if ((moving || u.jump) && (k === 5 || k === 2 || ((k === 1 || k === 6) && !(u._turnD > 12)))) { /* while turning, the diagonals show their own drawing so the head visibly sweeps round */ const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2 || k === 1); } // same scale as every other frame, so the size never changes // run frames without the red slash ones
+      if ((moving || u.jump) && (k === 5 || k === 2)) { /* side run, the body tilted toward the exact angle so a circle has no jumps */ const f = 16 + Math.floor(u.walkPhase * 0.6) % 3, off = (k === 5 ? ((a + 180) % 360) - 180 : a - 180) * Math.PI / 180; g.save(); g.rotate(off * 0.55); kBlit(g, f, -1.2, 0.5, 0.9, k === 2); g.restore(); } // same scale as every other frame, so the size never changes // run frames without the red slash ones
       else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
         const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
-        if (k === 26 || k === 0 || k === 3 || k === 4) { /* straight up/down and up-diagonals: legs cut from the drawing and stepping in diagonal pairs, so 2 paws are always on the ground */ g.fillStyle = 'rgba(0,0,0,0.25)'; for (const [px, p] of [[-12, 0], [12, Math.PI]]) { const l = Math.max(0, Math.sin(ph * 1.6 + p)); g.beginPath(); g.ellipse(px, -4, 10 * (1 - l * 0.5), 4 * (1 - l * 0.5), 0, 0, TAU); g.fill(); } kTrot(g, k, 1.2, ph * 1.6); } else { const up = k === 3 || k === 4, B = up ? 0 : Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * (up ? 2.5 : 6); /* going up diagonally: the planted pose only (the striding drawing looks airborne from behind) */ if (up) { g.fillStyle = 'rgba(0,0,0,0.28)'; for (const [px, py] of [[-14, -2], [14, -2], [-9, -14], [9, -14]]) { g.beginPath(); g.ellipse(px * (k === 3 ? -1 : 1), py, 9, 4, 0, 0, TAU); g.fill(); } } g.save(); g.translate(0, bob); g.rotate(Math.sin(ph) * 0.015); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
+        if (k === 26 || k === 0 || k === 3 || k === 4 || k === 1 || k === 6) { /* straight up/down and up-diagonals: legs cut from the drawing and stepping in diagonal pairs, so 2 paws are always on the ground */ g.fillStyle = 'rgba(0,0,0,0.25)'; for (const [px, p] of [[-12, 0], [12, Math.PI]]) { const l = Math.max(0, Math.sin(ph * 1.6 + p)); g.beginPath(); g.ellipse(px, -4, 10 * (1 - l * 0.5), 4 * (1 - l * 0.5), 0, 0, TAU); g.fill(); } kTrot(g, k, 1.2, ph * 1.6); } else { const up = k === 3 || k === 4, B = up ? 0 : Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * (up ? 2.5 : 6); /* going up diagonally: the planted pose only (the striding drawing looks airborne from behind) */ if (up) { g.fillStyle = 'rgba(0,0,0,0.28)'; for (const [px, py] of [[-14, -2], [14, -2], [-9, -14], [9, -14]]) { g.beginPath(); g.ellipse(px * (k === 3 ? -1 : 1), py, 9, 4, 0, 0, TAU); g.fill(); } } g.save(); g.translate(0, bob); g.rotate(Math.sin(ph) * 0.015); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
       else { const F2 = fatigue(W, u, false), br = F2.s, A = F2.amp; g.save(); g.translate(0, 3 * A / 0.068 * Math.max(0, br)); g.rotate(0.02 * br * (A / 0.068)); g.scale(1 + A * 0.8 * br, 1 - A * 1.1 * br); if (k === 5 || k === 2) kBlit(g, 16, -1.2, 0.5, 0.9, k === 2); else kBlit(g, k, -1.2, 0.5, 0.92); g.restore(); /* left/right: the true side view */ const still = W.time - (u._movedAt || 0);
         if (still > 0.4 && br > 0.92 && Math.random() < 0.25) { const f = u._rf * Math.PI / 180; this.puff(u.x + Math.cos(f) * 40, u.y + 70 + Math.sin(f) * 10, { r0: 3, r1: 10, life: 0.6, col: '255,255,255', a: 0.5, vx: Math.cos(f) * 30, vy: 20 }); } } // standing still: paws planted, tired breathing in a loop
       g.restore(); };
@@ -22787,9 +22791,13 @@ class Renderer {
       g.restore();
       const hy = slide ? -2 : -14 + br * 1.5, hx = slide ? 27 : 22;
       g.fillStyle = grey; g.beginPath(); g.arc(hx, hy, 15, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
-      g.fillStyle = '#cdd6df'; g.beginPath(); g.ellipse(hx + 8, hy + 5, 8.5, 6.5, 0, 0, TAU); g.fill(); g.fillStyle = '#1b1f2e'; g.beginPath(); g.arc(hx + 15, hy + 3, 2.8, 0, TAU); g.fill();
-      const blink = !moving && Math.sin(t * 0.8) > 0.6; g.fillStyle = '#1b1f2e'; if (blink) g.fillRect(hx + 2, hy - 4, 7, 1.8); else { g.beginPath(); g.arc(hx + 5, hy - 3, 3.4, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4, 1.1, 0, TAU); g.fill(); }
-      g.strokeStyle = 'rgba(30,35,50,0.7)'; g.lineWidth = 1; for (const k of [-1, 1]) { g.beginPath(); g.moveTo(hx + 12, hy + 6); g.lineTo(hx + 23, hy + 4 + k * 3); g.stroke(); }
+      // real seal face: short puffy muzzle (no beak), small dark nose, big wet eyes and long whiskers
+      g.fillStyle = '#c3ccd6'; g.beginPath(); g.ellipse(hx + 10, hy + 5, 6.5, 5.5, 0.15, 0, TAU); g.fill();
+      g.fillStyle = 'rgba(60,70,85,0.6)'; for (const [dx, dy] of [[8, 4], [11, 6], [9, 7.5], [12, 3.5]]) { g.beginPath(); g.arc(hx + dx, hy + dy, 0.8, 0, TAU); g.fill(); }
+      g.fillStyle = '#1b1f2e'; g.beginPath(); g.ellipse(hx + 14.5, hy + 1.5, 2.2, 1.6, 0.3, 0, TAU); g.fill();
+      g.strokeStyle = '#2a2f3d'; g.lineWidth = 1.1; g.beginPath(); g.moveTo(hx + 15, hy + 7.5); g.quadraticCurveTo(hx + 11, hy + 10, hx + 7, hy + 8.5); g.stroke();
+      const blink = !moving && Math.sin(t * 0.8) > 0.6; g.fillStyle = '#10131c'; if (blink) g.fillRect(hx + 1, hy - 4, 8, 1.8); else { g.beginPath(); g.ellipse(hx + 4.5, hy - 3, 4, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4.6, 1.4, 0, TAU); g.fill(); g.beginPath(); g.arc(hx + 3.5, hy - 1.5, 0.6, 0, TAU); g.fill(); }
+      g.lineCap = 'round'; for (const [k, L] of [[-4, 15], [0, 17], [4, 14]]) { const ww = moving ? Math.sin(ph * 0.5 + k) * 1 : br * 0.8; g.strokeStyle = 'rgba(30,35,50,0.55)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(hx + 11, hy + 5.5); g.quadraticCurveTo(hx + 11 + L * 0.6, hy + 5 + k * 0.6, hx + 11 + L, hy + 5 + k + ww); g.stroke(); g.strokeStyle = '#f3f1ea'; g.lineWidth = 0.9; g.stroke(); }
       if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 11, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       g.fillStyle = scarf; g.beginPath(); g.ellipse(hx - 7, hy + 11, 10, 4.5, 0.5, 0, TAU); g.fill(); g.fillRect(hx - 15, hy + 11, 4, 11);
     } else { // front (coming at you) or back (going away): a round, fat seal seen head-on
@@ -22803,9 +22811,12 @@ class Renderer {
       g.restore();
       const hy = -20 + br * 1.5; g.fillStyle = grey; g.beginPath(); g.arc(0, hy, 15, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
       if (front) {
-        g.fillStyle = '#cdd6df'; g.beginPath(); g.ellipse(0, hy + 6, 9, 6.5, 0, 0, TAU); g.fill(); g.fillStyle = '#1b1f2e'; g.beginPath(); g.ellipse(0, hy + 3, 3.2, 2.4, 0, 0, TAU); g.fill();
-        const blink = !moving && Math.sin(t * 0.8) > 0.6; for (const ex of [-6, 6]) { g.fillStyle = '#1b1f2e'; if (blink) g.fillRect(ex - 3, hy - 5, 6, 1.8); else { g.beginPath(); g.arc(ex, hy - 4, 3.4, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ex + 1, hy - 5, 1.1, 0, TAU); g.fill(); } }
-        g.strokeStyle = 'rgba(30,35,50,0.7)'; g.lineWidth = 1; for (const sd of [-1, 1]) for (const k of [-1, 1]) { g.beginPath(); g.moveTo(sd * 5, hy + 7); g.lineTo(sd * 16, hy + 5 + k * 3); g.stroke(); }
+        // two puffy whisker pads, a small dark nose on top and a little mouth: a seal, not a bird
+        for (const sd of [-1, 1]) { g.fillStyle = '#c3ccd6'; g.beginPath(); g.ellipse(sd * 4.2, hy + 6.5, 5, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = 'rgba(60,70,85,0.6)'; for (const [dx, dy] of [[3, 5.5], [5.5, 7], [3.5, 8.5], [6, 4.8]]) { g.beginPath(); g.arc(sd * dx, hy + dy, 0.75, 0, TAU); g.fill(); } }
+        g.fillStyle = '#1b1f2e'; g.beginPath(); g.moveTo(-3, hy + 2); g.quadraticCurveTo(0, hy + 1, 3, hy + 2); g.quadraticCurveTo(0, hy + 5.5, -3, hy + 2); g.fill();
+        g.strokeStyle = '#2a2f3d'; g.lineWidth = 1; g.beginPath(); g.moveTo(0, hy + 4.5); g.lineTo(0, hy + 8); g.moveTo(-3, hy + 9.5); g.quadraticCurveTo(0, hy + 7.5, 3, hy + 9.5); g.stroke();
+        const blink = !moving && Math.sin(t * 0.8) > 0.6; for (const ex of [-6.5, 6.5]) { g.fillStyle = '#10131c'; if (blink) g.fillRect(ex - 3.5, hy - 5, 7, 1.8); else { g.beginPath(); g.ellipse(ex, hy - 4, 4, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ex + 1.4, hy - 5.6, 1.4, 0, TAU); g.fill(); g.beginPath(); g.arc(ex - 1, hy - 2.5, 0.6, 0, TAU); g.fill(); } }
+        g.lineCap = 'round'; for (const sd of [-1, 1]) for (const [k, L] of [[-3.5, 15], [0, 17], [3.5, 14]]) { const ww = moving ? Math.sin(ph * 0.5 + k) : br * 0.8; g.strokeStyle = 'rgba(30,35,50,0.55)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(sd * 6, hy + 6.5); g.quadraticCurveTo(sd * (6 + L * 0.6), hy + 6 + k * 0.5, sd * (6 + L), hy + 6 + k + ww); g.stroke(); g.strokeStyle = '#f3f1ea'; g.lineWidth = 0.9; g.stroke(); }
         if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(0, hy + 12, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       }
       g.fillStyle = scarf; g.beginPath(); g.ellipse(0, hy + 13, 13, 4.5, 0, 0, TAU); g.fill(); g.fillRect(front ? 5 : -9, hy + 13, 4, 11);
@@ -22846,7 +22857,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
 
   // ---------- text translation ----------
   const TR = [
-    [/^Welcome To Shroom World$/i, '¡Bienvenidos a Escape Shroom! Ayúdense a revivir.'],
+    [/^Welcome To Shroom World$/i, '¡Bienvenidos a Escape Hongo! Ayúdense a revivir.'],
     [/^Shroom!$/i, '¡Apareció un hongo escondido!'],
     [/Oxy-Cotton.*$/i, 'Comiste un Hongo Mareador: ¡todo da vueltas!'],
     [/Ecstasy Roll.*$/i, 'Comiste un Hongo Escudo: ¡los cañones no te dañan!'],
@@ -23127,7 +23138,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     W = startGame(md, opts);
     if (W.profile.id === 'bob') sfx.setSong('rayo'); // ice map: Rayo Blanco
     else if (W.profile.id === 'kitty5') sfx.setSong(settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'); // super-speed theme for the kitties
-    $('#stats .t').textContent = W.profile.id === 'kitty5' ? 'CORRE GATITO 5' : W.profile.id === 'bob' ? 'FUGA BAJO EL MAR' : 'ESCAPE SHROOM'; $('#stats .ver').textContent = W.profile.family === 'run' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
+    $('#stats .t').textContent = W.profile.id === 'kitty5' ? 'CORRE GATITO CORRE' : W.profile.id === 'bob' ? 'CORRE FOCA GORDA' : 'ESCAPE HONGO'; $('#stats .ver').textContent = W.profile.family === 'run' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
     W.on('text', showText);
     W.on('sound', s => sfx.play(s.name));
@@ -23571,20 +23582,20 @@ function makeMockRoom() {
 }
 
 const MAPS = [
-  { id: 'shroom25', name: 'Escape Shroom v1.0', icon: '🍄', ready: true },
-  { id: 'shroom27', name: 'Escape Shroom: Noche Eterna', icon: '🌙' },
+  { id: 'shroom25', name: 'Escape Hongo', icon: '🍄', ready: true },
+  { id: 'shroom27', name: 'Escape Hongo: Noche Eterna', icon: '🌙' },
   { id: 'polar', name: 'Escape Ártico', icon: '❄️' }, { id: 'polar3', name: 'Escape Ártico: Tormenta', icon: '🧊' }, { id: 'polarrf', name: 'Pingüinos en Fuga', icon: '🐧' },
   { id: 'gayheaven', name: 'Escape Arcoíris', icon: '☁️' }, { id: 'gaymars', name: 'Escape Planeta Rojo', icon: '🪐' },
   { id: 'correk', name: '¡Corre o Te Pillan!', icon: '🏃' }, { id: 'rungay', name: 'Corre, Arcoíris, Corre', icon: '🌈' },
-  { id: 'bob', name: 'Fuga Bajo el Mar', icon: '🐠', ready: true }, { id: 'kitty5', name: 'Corre Gatito 5', icon: '🐱', ready: true }, { id: 'kitty', name: 'Corre Gatito', icon: '🐈' },
+  { id: 'bob', name: '¡Corre Foca Gorda!', icon: '🦭', ready: true }, { id: 'kitty5', name: 'Corre Gatito Corre', icon: '🐯', ready: true }, { id: 'kitty', name: 'Corre Gatito', icon: '🐈' },
   { id: 'jurassic', name: 'Isla de Dinosaurios', icon: '🦖' }, { id: 'orc', name: 'Arena de Gladiadores', icon: '⚔️' },
   { id: 'spell', name: 'Duelo de Hechizos', icon: '🔮' }, { id: 'uther4', name: 'Fiesta de Minijuegos 4', icon: '🎉' }, { id: 'utherz', name: 'Fiesta de Minijuegos Z', icon: '🎊' },
   { id: 'zombie', name: 'Infección Zombi', icon: '🧟' },
   { id: 'estupido1', name: 'Mapa Absurdo 1', icon: '🤪' }, { id: 'estupido2', name: 'Mapa Absurdo 2', icon: '🤪' }, { id: 'estupido3', name: 'Mapa Absurdo 3', icon: '🤪' }, { id: 'estupido4', name: 'Mapa Absurdo 4', icon: '🤪' },
 ];
 const MAP_LORE = {
-  shroom25: { t: 'Escape Shroom v1.0', lore: 'En lo más profundo del Bosque Psicodélico, un grupo de hongos mareados despertó dentro de un laberinto encantado. Payasos de feria, carritos sin frenos, fuegos que saltan de zona en zona y espinas escondidas bajo las palancas vigilan cada pasillo. Nadie escapa solo: el que cae deja su tumba y solo un compañero puede traerlo de vuelta.', how: '12 etapas · llega a cada punto de control · tocar la tumba de un amigo lo revive · si caen todos, pierden · 🛼 planear, 🌀 disparar a los payasos y 🍄 teletransportarte con los hongos escondidos.' },
-  shroom27: { t: 'Escape Shroom: Noche Eterna', lore: 'La luna nunca se fue. El bosque se volvió más oscuro y los hongos brillan para encontrarse entre las sombras.', how: 'Próximamente: nuevas etapas más difíciles.' },
+  shroom25: { t: 'Escape Hongo', lore: 'En lo más profundo del Bosque Psicodélico, un grupo de hongos mareados despertó dentro de un laberinto encantado. Payasos de feria, carritos sin frenos, fuegos que saltan de zona en zona y espinas escondidas bajo las palancas vigilan cada pasillo. Nadie escapa solo: el que cae deja su tumba y solo un compañero puede traerlo de vuelta.', how: '12 etapas · llega a cada punto de control · tocar la tumba de un amigo lo revive · si caen todos, pierden · 🛼 planear, 🌀 disparar a los payasos y 🍄 teletransportarte con los hongos escondidos.' },
+  shroom27: { t: 'Escape Hongo: Noche Eterna', lore: 'La luna nunca se fue. El bosque se volvió más oscuro y los hongos brillan para encontrarse entre las sombras.', how: 'Próximamente: nuevas etapas más difíciles.' },
   polar: { t: 'Escape Ártico', lore: 'Un glaciar que se resquebraja bajo tus pies. Desliza, frena y no caigas al agua helada.', how: 'Próximamente.' },
   polar3: { t: 'Escape Ártico: Tormenta', lore: 'La tormenta llegó al glaciar: viento, hielo y menos tiempo para pensar.', how: 'Próximamente.' },
   polarrf: { t: 'Pingüinos en Fuga', lore: 'Una colonia de pingüinos escapa del zoológico más frío del mundo.', how: 'Próximamente.' },
