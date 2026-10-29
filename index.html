@@ -24241,9 +24241,9 @@ class Net {
   const pvOf = (id, emo) => { const u = window.EmoteArt && window.EmoteArt(id); return u ? `<img src="${u}" alt="">` : emo; };
   $('#emoteGrid').innerHTML = `<div class="item"><div class="pv">${pvOf('nero', '😎')}</div><b>El Ñero</b><small>Emote</small><div class="price owned">GRATIS</div><div class="lockd eq">EQUIPADO</div></div>` + SHOP_EMOTES.map(([id, emo, n]) => `<div class="item"><div class="pv">${pvOf(id, emo)}</div><b>${esc(n)}</b><small>Emote</small><div class="price">$0.99</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
   const TABS = [['#tabSkins', '#shopGrid', 'Las skins sirven en todos los mapas del juego.'], ['#tabEmotes', '#emoteGrid', 'Los emotes se usan sin límite en todos los mapas. Comprados se agregan a tus 5 casillas.'],
-    ['#tabDfx', '#dfxGrid', 'Tu efecto al caer, con su propio grito, en todos los juegos. Toca uno para escucharlo; los gratis se equipan al tocarlos.'], ['#tabSpawn', '#spawnGrid', 'Tu efecto al aparecer al empezar cada ronda, en todos los juegos.'], ['#tabAura', '#auraGrid', 'El círculo que queda donde caes, en todos los mapas. Tus amigos te reviven pasando cerca o encima.'],
+    ['#tabDfx', '#dfxGrid', 'Tu efecto al caer, con su propio grito, en todos los juegos. Toca uno para escucharlo. Si no tienes ninguno, usas el Clásico.'], ['#tabSpawn', '#spawnGrid', 'Tu efecto al aparecer al empezar cada ronda, en todos los juegos.'], ['#tabAura', '#auraGrid', 'El círculo que queda donde caes, en todos los mapas. Tus amigos te reviven pasando cerca o encima.'],
     ['#tabSpray', '#sprayGrid', 'Pinta el piso con el botón 🎨 (tócalo para pintar, mantenlo para elegir entre tus 5). Dura 40 segundos, todos lo ven, y sirve en todos los juegos.'], ['#tabPass', '#passBox', 'Juega cualquier mapa para subir de nivel: ganas XP por cada ronda o etapa que pasa tu equipo y por cada minuto jugado.'], ['#tabCoins', '#coinGrid', 'Las monedas servirán para comprar skins, emotes, efectos y auras.']];
-  const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 4) animAuras(); if (n === 5) drawSprays(); if (n === 6) renderPass(); };
+  const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 5) drawSprays(); if (n === 6) renderPass(); };
   TABS.forEach(([tb], i) => click(tb, () => shopTab(i)));
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
@@ -24252,43 +24252,39 @@ class Net {
   const passOwns = (kind, id) => Object.entries(PASS_FREE).some(([l, r]) => r[0] === kind && r[1] === id && passLv() >= +l);
   const VIP = () => !!(SW.isVip && SW.isVip());
   // death effects: id, icon, name, free?  ('vip' = only the creator has it)
-  const DFX_ITEMS = [['fundador', '👑', 'Caída del Fundador', 'vip'], ['clasico', '💨', 'Clásico', true], ['luz', '💠', 'Destello Azul', true], ['ko', '💥', '¡KO!', true], ['epico', '🗣️', 'Grito Épico', true], ['calavera', '💀', 'Calavera Neón', false], ['fuegos', '🎆', 'Fuegos Artificiales', false], ['flor', '🌸', 'Flor de Despedida', false], ['rayo', '⚡', 'Rayo Final', false], ['confeti', '🎉', 'Fiesta de Confeti', false], ['fantasma', '👻', 'Fantasma Llorón', false]];
-  const SPAWN_ITEMS = [['fundador', '👑', 'Llegada del Fundador', 'sell'], ['estandar', '✨', 'Estándar', true], ['portal', '🌀', 'Portal Azul', false], ['meteoro', '☄️', 'Meteoro', false], ['humo', '💨', 'Bomba de Humo', false], ['arcoiris', '🌈', 'Arcoíris', false]];
+  // everything in the shop has a price (only the "El Ñero" emote is free). The basics (Clásico, Estándar, Círculo de Poder)
+  // are what everybody wears when nothing else is equipped, so they are not sold. Each card shows the real animated effect.
+  const DFX_ITEMS = [['fundador', 'Caída del Fundador', '$1.99', 'vip'], ['ko', '¡KO!', '$0.99'], ['luz', 'Destello Azul', '$0.99'], ['epico', 'Grito Épico', '$0.99'], ['calavera', 'Calavera Neón', '$1.49'], ['fuegos', 'Fuegos Artificiales', '$1.49'], ['flor', 'Flor de Despedida', '$0.99'], ['rayo', 'Rayo Final', '$1.49'], ['confeti', 'Fiesta de Confeti', '$0.99'], ['fantasma', 'Fantasma Llorón', '$0.99']];
+  const SPAWN_ITEMS = [['fundador', 'Llegada del Fundador', '$1.99', 'sell'], ['portal', 'Portal Azul', '$0.99'], ['meteoro', 'Meteoro', '$1.49'], ['humo', 'Bomba de Humo', '$0.99'], ['arcoiris', 'Arcoíris', '$0.99']];
   const SPRAY_ITEMS = [['gg', 'GG', false], ['huella', 'Huella', false], ['corazon', 'Corazón', false], ['xd', 'XD', false], ['calavera', 'Calavera Punk', false], ['hongo', 'Hongo Loco', false], ['corona', 'Corona', false], ['rayo', 'Rayo', false]];
-  const AURA_ITEMS = [['piedra', 'Círculo de Poder', true], ['oro', 'Sello Dorado', true], ['fuego', 'Anillo de Fuego', false], ['hielo', 'Escarcha', false], ['galaxia', 'Galaxia', false], ['toxico', 'Tóxico', false]];
-  const shown = list => list.filter(it => it[it.length - 1] !== 'vip' || VIP());
-  const priceTag = (free, p) => free === 'vip' ? '<div class="price owned" style="text-decoration:none;opacity:1;color:#ffd23a">EXCLUSIVO</div>' : `<div class="price${free ? ' owned' : ''}">${free ? 'GRATIS' : p}</div>`;
-  const tagTxt = (eq, free) => `<div class="lockd${eq ? ' eq' : ''}">${eq ? 'EQUIPADO' : free ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div>`;
-  const grid = (sel, list, key, cur, kindTxt, price, ownFn, onPick, sound) => {
-    $(sel).innerHTML = shown(list).map(it => { const [id, emo, n, f0] = it; const free = f0 === 'vip' ? 'vip' : f0 === 'sell' ? (VIP() ? 'vip' : ownFn(id)) : (f0 || ownFn(id)); const price2 = f0 === 'sell' ? '$1.99' : price; return `<div class="item tap" data-k="${id}"><div class="pv">${emo}</div><b>${esc(n)}</b><small>${kindTxt}</small>${priceTag(free, price2)}${tagTxt(cur() === id, free)}</div>`; }).join('');
-    $(sel).querySelectorAll('[data-k]').forEach(el => el.addEventListener('click', () => { const it = list.find(x => x[0] === el.dataset.k); try { SW.sfx.init(); SW.sfx.play(sound + it[0]); } catch (e) {} if ((it[3] && it[3] !== 'sell') || (it[3] === 'sell' && VIP()) || ownFn(it[0])) { onPick(it[0]); renderDA(); } })); };
-  const renderDA = () => {
-    grid('#dfxGrid', DFX_ITEMS, 'dfx', () => S.deathFx || 'clasico', 'Efecto + grito', '$0.99', id => passOwns('dfx', id), id => { S.deathFx = id; SW.saveSettings(); }, 'dx_');
-    grid('#spawnGrid', SPAWN_ITEMS, 'spawn', () => S.spawnFx || 'estandar', 'Aparición', '$0.99', () => false, id => { S.spawnFx = id; SW.saveSettings(); }, 'sp_');
-    $('#auraGrid').innerHTML = AURA_ITEMS.map(([id, n, free0]) => { const free = free0 || passOwns('aura', id); return `<div class="item tap" data-aura="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Aura</small>${priceTag(free, '$0.99')}${tagTxt((S.aura || 'piedra') === id, free)}</div>`; }).join('');
-    $('#auraGrid').querySelectorAll('[data-aura]').forEach(el => el.addEventListener('click', () => { const it = AURA_ITEMS.find(x => x[0] === el.dataset.aura); if (it[2] || passOwns('aura', it[0])) { S.aura = it[0]; SW.saveSettings(); renderDA(); animAuras(); } }));
-  };
+  const AURA_ITEMS = [['oro', 'Sello Dorado', '$0.99'], ['fuego', 'Anillo de Fuego', '$0.99'], ['hielo', 'Escarcha', '$0.99'], ['galaxia', 'Galaxia', '$1.49'], ['toxico', 'Tóxico', '$0.99']];
+  const shown = list => list.filter(it => it[3] !== 'vip' || VIP());
+  const owns = (kind, it) => ((it[3] === 'vip' || it[3] === 'sell') && VIP()) || passOwns(kind, it[0]) || ((S.bought || []).includes(kind + ':' + it[0]));
+  // something equipped that you don't own goes back to the basic one
+  { const fix = (key, kind, list, base) => { const v = S[key]; if (!v || v === base) return; const it = list.find(x => x[0] === v); if (!it || !owns(kind, it)) S[key] = base; };
+    setTimeout(() => { fix('deathFx', 'dfx', DFX_ITEMS, 'clasico'); fix('spawnFx', 'spawn', SPAWN_ITEMS, 'estandar'); fix('aura', 'aura', AURA_ITEMS, 'piedra'); SW.saveSettings(); }, 1500); }
+  const priceTag = (own, p, vip) => vip && own ? '<div class="price owned" style="text-decoration:none;opacity:1;color:#ffd23a">TUYO 👑</div>' : `<div class="price${own ? ' owned' : ''}">${p}</div>`;
+  const tagTxt = (eq, own) => `<div class="lockd${eq ? ' eq' : ''}">${eq ? 'EQUIPADO' : own ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div>`;
+  const prevs = []; // animated previews: [canvas, draw(g, t)]
+  const grid = (sel, list, kind, key, base, kindTxt, sound, drawFn) => {
+    const L = shown(list);
+    $(sel).innerHTML = L.map(it => { const own = owns(kind, it); return `<div class="item tap" data-k="${it[0]}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(it[1])}</b><small>${kindTxt}</small>${priceTag(own, it[2], it[3] === 'vip' || it[3] === 'sell')}${tagTxt((S[key] || base) === it[0], own)}</div>`; }).join('');
+    $(sel).querySelectorAll('[data-k]').forEach((el, i) => { const it = L[i]; prevs.push([el.querySelector('canvas'), sel, (g, t) => drawFn(g, it[0], t)]);
+      el.addEventListener('click', () => { try { SW.sfx.init(); if (sound) SW.sfx.play(sound + it[0]); } catch (e) {} if (!owns(kind, it)) return; S[key] = (S[key] === it[0]) ? base : it[0]; SW.saveSettings(); renderDA(); }); }); };
+  const R0 = () => typeof Renderer !== 'undefined' && Renderer.prototype; const fake = { W: { time: 0 }, puff() {} };
+  const renderDA = () => { prevs.length = 0;
+    grid('#dfxGrid', DFX_ITEMS, 'dfx', 'deathFx', 'clasico', 'Efecto + grito', 'dx_', (g, id, t) => { const d = { ko: 1.4, calavera: 1.8, fuegos: 1.9, flor: 1.5, epico: 1.5, confeti: 1.6 }[id] || 1.2, p = (t % (d + 0.5)) / d; if (p <= 1) R0().drawDeathFx.call(fake, g, { kind: id, col: '#ff3b3b', t0: Math.floor(t / (d + 0.5)) }, p); });
+    grid('#spawnGrid', SPAWN_ITEMS, 'spawn', 'spawnFx', 'estandar', 'Aparición', 'sp_', (g, id, t) => { const d = id === 'fundador' ? 1.0 : 0.8, p = (t % (d + 0.25)) / d; if (p <= 1) R0().drawSpawnFx.call(fake, g, { kind: id, col: '#ff3b3b' }, p); });
+    grid('#auraGrid', AURA_ITEMS, 'aura', 'aura', 'piedra', 'Aura', null, (g, id, t) => R0().drawDeathAura.call(fake, g, '#ff3b3b', id, t, 1, 46));
+    animAuras(); };
   let auraRaf = 0;
-  function animAuras() { cancelAnimationFrame(auraRaf); const fake = { W: { time: 0 } }; const draw = typeof Renderer !== 'undefined' && Renderer.prototype.drawDeathAura;
-    const step = ts => { if ($('#auraGrid').classList.contains('hidden') || $('#shop').classList.contains('hidden')) return; fake.W.time = ts / 1000;
-      $('#auraGrid').querySelectorAll('canvas.apv').forEach((cv, i) => { const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 192, 192); g.fillStyle = '#4a3a2c'; g.fillRect(0, 0, 192, 192); g.translate(96, 104); g.scale(1.65, -1.65); try { draw.call(fake, g, '#ff3b3b', AURA_ITEMS[i][0], fake.W.time, i, 46); } catch (e) {} });
+  function animAuras() { cancelAnimationFrame(auraRaf); if (!R0()) return;
+    const step = ts => { if ($('#shop').classList.contains('hidden')) { auraRaf = requestAnimationFrame(step); return; } const t = ts / 1000; fake.W.time = t;
+      for (const [cv, sel, fn] of prevs) { if ($(sel).classList.contains('hidden')) continue; const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#3a2f44'; g.fillRect(0, 0, 192, 192); const aura = sel === '#auraGrid'; g.translate(96, aura ? 104 : 150); g.scale(aura ? 1.65 : 0.62, aura ? -1.65 : -0.62); try { fn(g, t); } catch (e) {} }
       auraRaf = requestAnimationFrame(step); };
-    if (draw) auraRaf = requestAnimationFrame(step); }
+    auraRaf = requestAnimationFrame(step); }
   renderDA();
-  // graffiti: none are free; once you own some, pick up to 5 for the in-game button
-  function drawSprays() { const draw = typeof Renderer !== 'undefined' && Renderer.prototype.drawGraffitiArt; if (!draw) return; const own = SW.sprayOwned ? SW.sprayOwned() : []; const slots = (S.spraySlots || []).filter(id => own.includes(id)); const list = shown(SPRAY_ITEMS);
-    $('#sprayGrid').innerHTML = `<div class="coinbal" style="font-size:14px">Tus casillas: ${slots.length || Math.min(5, own.length)}/5 · ${own.length ? 'toca un grafiti tuyo para ponerlo o sacarlo' : 'compra tu primer grafiti para activar el botón 🎨'}</div>` + list.map(([id, n, free]) => { const mine = own.includes(id), inSlot = slots.includes(id) || (!slots.length && own.indexOf(id) > -1 && own.indexOf(id) < 5); return `<div class="item tap" data-spray="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Grafiti</small>${priceTag(free === 'vip' ? 'vip' : mine, '$0.49')}<div class="lockd${inSlot ? ' eq' : ''}">${inSlot ? 'EN TU BOTÓN' : mine ? 'TOCA PARA AGREGAR' : 'PRÓXIMAMENTE'}</div></div>`; }).join('');
-    $('#sprayGrid').querySelectorAll('canvas.apv').forEach((cv, i) => { const g = cv.getContext('2d'); g.fillStyle = '#5b5f66'; g.fillRect(0, 0, 192, 192); g.translate(96, 96); g.scale(1.25, -1.25 / 0.62); try { draw.call({ W: { time: 0 } }, g, list[i][0], '#ff3b3b', 1); } catch (e) {} });
-    $('#sprayGrid').querySelectorAll('[data-spray]').forEach(el => el.addEventListener('click', () => { const id = el.dataset.spray; try { SW.sfx.init(); SW.sfx.play('spray'); } catch (e) {} if (!own.includes(id)) return; let sl = slots.length ? slots.slice() : own.slice(0, 5); if (sl.includes(id)) { if (sl.length > 1) sl = sl.filter(x => x !== id); } else { if (sl.length >= 5) sl.shift(); sl.push(id); } S.spraySlots = sl; S.spray = id; SW.saveSettings(); drawSprays(); })); }
-  { const c = $('#opt3d'); c.checked = S.tiger3d === true; c.addEventListener('change', () => { S.tiger3d = c.checked; SW.saveSettings(); }); }
-  // creator code (settings)
-  { const msg = () => { $('#vipMsg').textContent = VIP() ? '👑 Modo creador activo: Caída y Llegada del Fundador y el grafiti Perrin.' : ''; }; msg();
-    click('#vipBtn', () => { const c = String($('#vipIn').value || '').trim().toUpperCase(); if (SW.vipHash && SW.vipHash(c) === '557405f325ebd6f3') { S.vipCode = c; S.deathFx = 'fundador'; S.spawnFx = 'fundador'; S.spraySlots = ['perrin']; S.spray = 'perrin'; SW.saveSettings(); $('#vipIn').value = ''; renderDA(); msg(); } else { $('#vipMsg').textContent = 'Código incorrecto.'; } }); }
-  function renderPass() { const xp = S.passXP || 0, lv = passLv(), inLv = lv >= 30 ? 100 : xp % 100; let h = `<div class="ph"><b>🎖️ Pase de Batalla · Temporada 1</b>Nivel ${lv}/30 · ${xp} XP<div class="bar"><i style="width:${inLv}%"></i></div><small>${lv >= 30 ? '¡Pase completo!' : (100 - inLv) + ' XP para el nivel ' + (lv + 1)}</small><div style="margin-top:8px"><button class="buy" disabled>⭐ Pase Premium $4.99 · Próximamente</button></div></div><div class="hd"><span>Nv</span><span>Gratis</span><span>⭐ Premium</span></div>`;
-    for (let l = 1; l <= 30; l++) { const f = PASS_FREE[l], pm = PASS_PREM[l], got = lv >= l; h += `<div class="lv${got ? ' got' : ''}"><div class="n">${l}</div><div class="rw${f ? (got ? ' got' : '') : ' none'}">${f ? (got ? '✅ ' : '🔒 ') + esc(f[2]) : '—'}</div><div class="rw pr${pm ? '' : ' none'}">${pm ? '🔒 ' + esc(pm[2]) : '—'}</div></div>`; }
-    $('#passBox').innerHTML = h; }
-  $('#coinGrid').innerHTML = `<div class="coinbal">🪙 ${S.coins || 0} monedas</div>` + [['🪙', 100, '$0.99'], ['💰', 550, '$4.99', '+10%'], ['💎', 1200, '$9.99', '+20%'], ['👑', 2600, '$19.99', '+30%']].map(([e, n, pr, bonus]) => `<div class="item"><div class="pv">${e}</div><b>${n} monedas</b><small>${bonus ? 'bono ' + bonus : 'paquete inicial'}</small><div class="price">${pr}</div><button class="buy" disabled>Próximamente</button></div>`).join('');
-  $('#shopGrid').innerHTML = SKINS.map(([pv, n, k]) => `<div class="item"><div class="pv">${pv}</div><b>${esc(n)}</b><small>${esc(k)}</small><div class="price">— —</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
+  $('#shopGrid').innerHTML = SKINS.map(([pv, n, k], i) => `<div class="item"><div class="pv">${pv}</div><b>${esc(n)}</b><small>${esc(k)}</small><div class="price">${['$1.99', '$2.99', '$0.99', '$0.99', '$1.49', '$2.99', '$1.99', '$1.49', '$1.49', '$0.99'][i] || '$0.99'}</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
 
   // ---------- online: room list ----------
   let listTimer = null;
