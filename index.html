@@ -13504,7 +13504,7 @@ function F_InitGlobals(){
   G_udg_teleportSize=0;
   G_udg_loopGuard=false;
   G_udg_minTeleport=0;
-  G_udg_speedMultiplier=4.0;
+  G_udg_speedMultiplier=7.0; // MapMix: much faster slide on ice
   G_udg_REALSPD1=0;
   G_udg_REALSPD2=0;
   G_udg_REALSPD4=0;
@@ -19556,7 +19556,7 @@ function buildUnitTypes(md) {
   const prof = md.profile || { id: 'shroom25' };
   const run = prof.family === 'run' || prof.id === 'kitty5';
   const base = prof.id === 'bob' ? {
-    E000: { speed: 380, hero: true, r: 22, sight: 1800, mana: 0, kind: 'swimmer', life: 700 },
+    E000: { speed: 650, hero: true, r: 22, sight: 1800, mana: 0, kind: 'swimmer', life: 700 },
     nwwg: { speed: 300, r: 28, wander: true, wanderFast: true, kind: 'crab' },
     ngme: { speed: 0, r: 60, inv: true, kind: 'shop' }, hpea: { speed: 0, r: 8, inv: true, kind: 'hidden' }, nech: { speed: 0, r: 8, inv: true, kind: 'hidden', fly: true },
   } : prof.id === 'kitty5' ? {
@@ -21390,8 +21390,8 @@ class KittyBots {
       const D = best ? this.field(gx, gy) : Dg; const cur = this.fAt(D, h.x, h.y);
       if (Math.hypot(gx - h.x, gy - h.y) < 130 && this.clear(h.x, h.y, gx, gy)) { W.issueOrder(h, 851986, gx, gy); continue; }
       // candidate steps: score progress minus predicted danger
-      const slide = W.profile.id === 'bob' && W.tileTypeAt(h.x, h.y) === 'Nice'; // on ice you can't stop: you slide at 400
-      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 400 : (h.speed || 350);
+      const slide = W.profile.id === 'bob' && W.tileTypeAt(h.x, h.y) === 'Nice'; // on ice you can't stop: you slide at 700
+      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 700 : (h.speed || 350);
       // danger of walking from here towards (x, y): kitty and wolves both move, the kill range is 70
       const danger = (x, y) => { let s = 0; const dx = x - h.x, dy = y - h.y, L = Math.hypot(dx, dy) || 1;
         for (const tau of [0, 0.12, 0.25, 0.4, 0.6, 0.85]) { const m = Math.min(L, sp * tau), kx = h.x + dx / L * m, ky = h.y + dy / L * m, hold = sp * tau > L ? 1 : 0;
@@ -21403,7 +21403,7 @@ class KittyBots {
         const prog = (cur - f) * 32; const keep = b.dx != null && !(x === h.x && y === h.y) ? ((x - h.x) * b.dx + (y - h.y) * b.dy) / R * 12 : 0;
         const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 0.9 + keep + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
       if (!pick) continue;
-      if (W.time >= (h.roarReady || 0) && typeof window !== 'undefined' && window.botRoar && near.filter(w => Math.hypot(w.x - h.x, w.y - h.y) < 300).length >= 2) { window.botRoar(h); }
+      if (W.profile.id === 'kitty5' && W.time >= (h.roarReady || 0) && typeof window !== 'undefined' && window.botRoar && near.filter(w => Math.hypot(w.x - h.x, w.y - h.y) < 300).length >= 2) { window.botRoar(h); }
       // jump over the wolves when cornered (10 s cooldown, like the player's button)
       if (!h.jump && W.time >= (h.jumpReady || 0) && typeof window !== 'undefined' && window.botJump) {
         const threat = near.some(w => Math.hypot(w.x + (w._vx || 0) * 0.25 - h.x, w.y + (w._vy || 0) * 0.25 - h.y) < 115);
@@ -22964,7 +22964,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) doPing(mk.x, mk.y, null, true); } // the camera stays where you are looking (watching a friend or free look)
   function doJump() { if (!W || W.profile.family !== 'run') return; const h = W.heroOf(W.local); if (!h) return; let dx = null, dy = null; if (stick.active && Math.hypot(stick.dx, stick.dy) > 0.2) { dx = stick.dx; dy = stick.dy; }
     if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
-  function doRoar() { if (!W || W.profile.family !== 'run') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
+  function doRoar() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
   window.botRoar = u => { if (W.cmdRoar(u.owner) && online && online.host) online.net.pushEvent('broar', u.owner.id); };
   window.botJump = (u, dx, dy) => { if (W.cmdJump(u.owner, dx, dy) && online && online.host) online.net.pushEvent('bjump', u.owner.id, Math.round(dx * 100), Math.round(dy * 100)); };
   window.botEmote = (u, id) => { sendEmote(id, u); if (online && online.host && u && u.owner) online.net.pushEvent('bemote', u.owner.id, id); }; // the bots use this too
@@ -23250,7 +23250,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       { const left = Math.max(0, tpReadyAt - W.time); const ready = left <= 0 && hero.items.length > 0; $('#bItem0').classList.toggle('has', !!ready); $('#bItem0').classList.toggle('cool', !ready); $('#bItem0').style.setProperty('--cd', (left <= 0 ? 0 : left / TP_CD * 360) + 'deg'); }
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
-      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / 12 * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); }
+      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / 12 * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); }
       botChatter();
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
