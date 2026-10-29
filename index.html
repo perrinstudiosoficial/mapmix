@@ -22531,7 +22531,10 @@ class Renderer {
   function dancePose(id, p) {
     const o = { L: [-3, 16], R: [3, 16], hip: 0, bob: 0, jump: 0, sx: 1, sy: 1, lean: 0, head: 0, wide: 1, liftL: 0, liftR: 0, note: true };
     const TP = Math.PI * 2;
-    if (id === 'columpio') { // swing both straight arms side to side while the hips go the other way
+    if (id === 'show_saludo') { o.note = false; const w = Math.sin(p * TP * 3); o.R = [12 + w * 4, -16]; o.L = [-3, 16]; o.head = 0.06 + w * 0.03; o.lean = -0.04; } // shop showcase: waving hello
+    else if (id === 'show_bostezo') { o.note = false; const k = Math.sin(Math.min(1, p) * Math.PI); o.L = [-6 - k * 4, 16 - k * 33]; o.R = [6 + k * 4, 16 - k * 33]; o.head = -0.12 * k; o.sy = 1 + 0.05 * k; o.sx = 1 - 0.03 * k; o.yawn = k; } // a big yawn with a stretch
+    else if (id === 'show_salto') { o.note = false; const j = Math.max(0, Math.sin(p * Math.PI * 2)); o.jump = j * 12; o.L = [-10, -6 * j]; o.R = [10, -6 * j]; o.liftL = o.liftR = j * 3; o.sy = 1 - (1 - j) * 0.03; }
+    else if (id === 'columpio') { // swing both straight arms side to side while the hips go the other way
       const s = Math.sin(p * TP * 1.7), c = Math.cos(p * TP * 1.7);
       o.L = [s * 15 - 1, 13 - Math.abs(c) * 2]; o.R = [s * 15 + 1, 13 - Math.abs(c) * 2]; o.hip = -s * 5; o.lean = -s * 0.06; o.head = s * 0.08; o.bob = Math.abs(c) * 2 - 1;
     } else if (id === 'robot') { // stiff ticks between four poses
@@ -22583,9 +22586,9 @@ class Renderer {
     const t = W.time + u.handle * 0.37;
     const nowR = performance.now(); u._mv = u._px == null ? 0 : Math.hypot(u.x - u._px, u.y - u._py); u._px = u.x; u._py = u.y; if (u.dance && (moving || u.glide || (u.order && !u.paused) || Math.hypot(u.x - u.dance.x, u.y - u.dance.y) > 3 || nowR > u.dance.until)) u.dance = null; // any movement (walk, glide, slide, push) stops the dance
     { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; const d = ((u.facing - u._rf) % 360 + 540) % 360 - 180, st = 540 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; } // turn smoothly through every angle (no snapping)
-    const dz = u.dance ? { id: u.dance.id, p: (nowR - u.dance.t0) / 1000 } : null; // dancing (front view, hands and hips scripted)
+    const dz = u._show && u._show.d ? { id: u._show.d, p: u._show.p } : u.dance ? { id: u.dance.id, p: (nowR - u.dance.t0) / 1000 } : null; // dancing (front view, hands and hips scripted)
     const D = dz ? dancePose(dz.id, dz.p) : null;
-    const bob = D ? D.bob : moving ? -Math.abs(Math.cos(ph)) * 6 : Math.sin(t * 2.2) * 1.2;
+    const bob = D ? D.bob : moving ? -Math.abs(Math.cos(ph)) * 6 : u._show ? 0 : Math.sin(t * 2.2) * 1.2;
     const col = this.heroColor(u); const v = D ? { dir: 1, back: false, front: true, side: false } : view(u); const f = u.facing * Math.PI / 180;
     if (D && D.note && Math.random() < 0.05) this.puff((Math.random() - 0.5) * 50 + u.x, u.y + 60, { r0: 3, r1: 7, life: 0.8, col: '255,220,120', a: 0.8, vx: 0, vy: 40 });
     if (moving && Math.random() < 0.22) this.puff(u.x - Math.cos(f) * 14, u.y - 24 - Math.sin(f) * 14, { r0: 4, r1: 14, life: 0.45, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 25, vy: -Math.sin(f) * 25 });
@@ -22594,7 +22597,7 @@ class Renderer {
     this.drawAura(g, u, col, t);
     if (u.inv && !u.t.inv) { g.strokeStyle = `rgba(255,240,120,${0.6 + 0.3 * Math.sin(W.time * 12)})`; g.lineWidth = 5; g.beginPath(); g.arc(0, 10, 58, 0, TAU); g.stroke(); }
     g.save(); g.scale(1, -1); g.translate(0, -2 + (D ? D.jump : 0)); g.scale(v.dir * 0.95 * (D ? D.sx : 1) * (!D && v.side ? 0.72 + 0.28 * Math.min(1, (Math.abs(v.fx) - 0.45) / 0.5) : 1), 0.95 * (D ? D.sy : 1)); if (!D && !v.side) g.transform(1, 0, v.fx * 0.18, 1, 0, 0); // foreshortened while turning, leaning toward the exact angle
-    const amp = moving ? 1 : 0, breathe = moving ? 0 : Math.sin(t * 2.2);
+    const amp = moving ? 1 : 0, breathe = moving || u._show ? 0 : Math.sin(t * 2.2);
     const SKD = HERO_SKINS[this.skinOf ? this.skinOf(u.owner, 'shroom25') : ''] || HERO_SKINS.base; const pants = SKD.pants, boot = SKD.boot, skin = '#f1dfc2', tunic = SKD.tunic, leather = SKD.leather;
     const leg = (hx, p2, far) => {
       const c2 = Math.cos(p2), s2 = Math.sin(p2); let fx, fy, bend;
@@ -22651,6 +22654,7 @@ class Renderer {
       }
       g.fillStyle = 'rgba(255,120,150,0.35)'; g.beginPath(); g.arc(v.side ? ox + 9 : -10, -17, 3, 0, TAU); if (!v.side) g.arc(10, -17, 3, 0, TAU); g.fill();
       g.strokeStyle = '#6a2a2a'; g.lineWidth = 1.7; g.beginPath(); g.arc(v.side ? ox + 5 : 0, -13.5, 3.5, Math.PI + 0.5, TAU - 0.5); g.stroke(); // small unimpressed mouth
+      if (D && D.yawn > 0.05) { g.fillStyle = '#4a1a22'; g.beginPath(); g.ellipse(v.side ? ox + 5 : 0, -13, 3 + D.yawn * 2, 1 + D.yawn * 4.5, 0, 0, TAU); g.fill(); }
       if (SKD.glasses) { g.fillStyle = SKD.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.6; for (const ex of v.side ? [ox + 3] : [-6, 6]) { g.beginPath(); if (g.roundRect) g.roundRect(ex - 5.5, -27, 11, 7.5, 3); else g.rect(ex - 5.5, -27, 11, 7.5); g.fill(); g.stroke(); } if (!v.side) { g.beginPath(); g.moveTo(-0.5, -24); g.lineTo(0.5, -24); g.stroke(); } g.fillStyle = 'rgba(255,255,255,0.55)'; g.fillRect(v.side ? ox : -9, -26, 3, 2); }
     }
     // cap: violet with glowing multicolour spots, jelly wobble
@@ -22843,9 +22847,9 @@ class Renderer {
       if (sd > 0 && sd < 1) { const dx = sd * w, r = dx * 0.62; for (const ex of [-dx, dx]) { g.beginPath(); g.ellipse(ex, 0, r, r * 0.7, 0, 0, TAU); g.fill(); g.stroke(); } g.beginPath(); g.moveTo(-dx + r, 0); g.lineTo(dx - r, 0); g.stroke(); g.fillStyle = 'rgba(255,255,255,0.55)'; for (const ex of [-dx, dx]) g.fillRect(ex - r * 0.5, -r * 0.4, r * 0.35, r * 0.25); }
       else { const r = 0.045 * w * (kk >= 16 ? 0.7 : 1) + 2; g.beginPath(); g.ellipse(0, 0, r, r * 0.7, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(-sd * r, -1); g.lineTo(-sd * r * 3, -2); g.stroke(); }
       g.restore(); }
-    if (A.hat && K_HEAD[kk]) { const [fx, fy, hw] = K_HEAD[kk], sc = hw * w / 56; g.save(); g.translate(x0 + fx * w, y0 + fy * h); g.scale(sc, sc); if (kk >= 16 || kk === 5 || kk === 6) g.rotate(0.18); else if (kk === 1 || kk === 2) g.rotate(-0.18); g.translate(0, 24); drawHat(g, A.hat, kAccT, null); g.restore(); } // brim sits a bit into the fur, so the hat is worn, not floating
+    if (A.hat && K_HEAD[kk]) { const [fx, fy, hw] = K_HEAD[kk], sc = hw * w / 56; g.save(); g.translate(x0 + fx * w, y0 + fy * h); g.scale(sc, sc); if (kk >= 16 || kk === 5 || kk === 6) g.rotate(0.18); else if (kk === 1 || kk === 2) g.rotate(-0.18); g.translate(0, 24); if (kAccMv) g.rotate(Math.sin(kAccT * 15) * 0.07); drawHat(g, A.hat, kAccT, null); g.restore(); } // the hat bounces a little with each stride // brim sits a bit into the fur, so the hat is worn, not floating
     g.restore(); };
-  let kAccT = 0;
+  let kAccT = 0, kAccMv = 0;
   const kBlit = (g, k, h, ax = 0.5, ay = 0.86, flip = false) => { const img = kArt(); const r = window.KITTY_ART.rects[k]; const nm = (window.KITTY_ART.norm && window.KITTY_ART.norm[k]) || 1; const s = h < 0 ? -h * nm : h / r[3]; /* h < 0: fixed factor, times a per-drawing correction so the tiger always looks the same size */ g.save(); g.scale(flip ? -1 : 1, -1); g.drawImage(img, r[0], r[1], r[2], r[3], -r[2] * s * ax, -r[3] * s * ay, r[2] * s, r[3] * s); kAcc(g, k, -r[2] * s * ax, -r[3] * s * ay, r[2] * s, r[3] * s); g.restore(); };
   // trot: draw the body bobbing and the legs (bottom of the picture) in two halves that lift in turns
   // trot like a real four-legged animal: diagonal pairs move together (front-left with back-right, then front-right with back-left).
@@ -22871,7 +22875,7 @@ class Renderer {
       W._rdt = this._dt; if ((!!u.order && !u.paused) || u.jump) { u._movedAt = W.time; fatigue(W, u, true); }
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3; if (u._wasMv && !moving) u._foot = !u._foot; u._wasMv = moving; // each stop ends with the other front paw ahead
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
-      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); { const TS = TIGER_SKINS[this.skinOf(u.owner, 'kitty5')]; if (TS && TS.f) g.filter = TS.f; kAccU = TS && (TS.hat || TS.scarf || TS.glasses) ? TS : null; kAccT = W.time; } /* tiger skin: colour + accessories */ // your aura under your tiger (the same one you leave when you fall)
+      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); { const TS = TIGER_SKINS[this.skinOf(u.owner, 'kitty5')]; if (TS && TS.f) g.filter = TS.f; kAccU = TS && (TS.hat || TS.scarf || TS.glasses) ? TS : null; kAccT = W.time; kAccMv = (!!u.order && !u.paused) || !!u.jump; } /* tiger skin: colour + accessories */ // your aura under your tiger (the same one you leave when you fall)
       { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; if (Math.abs(d) > 150 && !(u._turnD > 1)) { const c0 = u._rf * Math.PI / 180; if (Math.abs(Math.cos(c0)) > 0.5) { const up = Math.sin(c0 + Math.PI / 2) > Math.sin(c0 - Math.PI / 2) ? 1 : -1; d = up * Math.abs(d); } } /* left<->right reversal: always sweep over the top (right, up-right, up, up-left, left) */ const st = 420 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
       let a = ((u._rf % 360) + 360) % 360; const dirs = u._turnD > 8 ? [[22.5, 5], [67.5, 3], [112.5, 'N'], [157.5, 4], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]] : [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // while turning every view gets the same share (so all 8 show); settled: wide left/right sectors = full profile
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
@@ -22890,18 +22894,19 @@ class Renderer {
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
         if (k === 26 || k === 0 || k === 3 || k === 4 || k === 1 || k === 6) { /* straight up/down and up-diagonals: legs cut from the drawing and stepping in diagonal pairs, so 2 paws are always on the ground */ g.fillStyle = 'rgba(0,0,0,0.25)'; for (const [px, p] of [[-12, 0], [12, Math.PI]]) { const l = Math.max(0, Math.sin(ph * 1.6 + p)); g.beginPath(); g.ellipse(px, -4, 10 * (1 - l * 0.5), 4 * (1 - l * 0.5), 0, 0, TAU); g.fill(); } kTrot(g, k, 1.2, ph * 1.6 + (u._foot ? Math.PI : 0)); } else { const up = k === 3 || k === 4, B = up ? 0 : Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * (up ? 2.5 : 6); /* going up diagonally: the planted pose only (the striding drawing looks airborne from behind) */ if (up) { g.fillStyle = 'rgba(0,0,0,0.28)'; for (const [px, py] of [[-14, -2], [14, -2], [-9, -14], [9, -14]]) { g.beginPath(); g.ellipse(px * (k === 3 ? -1 : 1), py, 9, 4, 0, 0, TAU); g.fill(); } } g.save(); g.translate(0, bob); g.rotate(Math.sin(ph) * 0.015); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
       else { /* standing still: paws planted on the ground, only the chest and head breathe (one picture, no seams), tongue out when tired */
-        const F2 = fatigue(W, u, false, 0.6), A = F2.amp, br = F2.s, e = A * (0.5 + 0.5 * F2.s); // e >= 0: the torso only ever swells over the still picture
+        const F2 = fatigue(W, u, false, 0.6), A = F2.amp, br = F2.s, e = u._show ? 0 : A * (0.5 + 0.5 * F2.s); // no breathing in the shop showcase // e >= 0: the torso only ever swells over the still picture
         const hz = (a < 50 || a > 310) ? 5 : (a > 130 && a < 230) ? 2 : null; let kk = hz != null ? 16 : k; const fl = hz === 2 || ((kk === 0 || kk === 26) && !!u._foot), ay = hz != null ? 0.9 : 0.92; // facing you or away: the mirrored drawing = the other paw forward
         const img = kArt(), r = window.KITTY_ART.rects[kk], sc = 1.2 * ((window.KITTY_ART.norm && window.KITTY_ART.norm[kk]) || 1), w = r[2] * sc, h = r[3] * sc, x0 = -w * 0.5, y0 = -h * ay, cut = 0.6;
         g.save(); g.scale(fl ? -1 : 1, -1);
+        if (u._show) { const S2 = u._show, q = S2.p; if (S2.a === 'salto') { const j = Math.max(0, Math.sin(q * Math.PI * 2)); g.translate(0, -j * 16); g.scale(1 - j * 0.03, 1 + j * 0.05); } else if (S2.a === 'bostezo') { const k2 = Math.sin(Math.min(1, q) * Math.PI); g.translate(0, h * 0.0); g.scale(1 + 0.06 * k2, 1 - 0.05 * k2); } else if (S2.a === 'sacudir') g.rotate(Math.sin(q * 38) * 0.07 * (1 - q)); } // shop: little natural actions
         if (kk === 0 || kk === 26) { // standing facing you / away: one front paw a step ahead of the other (it swaps every time you stop)
           const sd = u._foot ? 1 : -1, cutP = Math.round(r[3] * cut); for (const hf of [0, 1]) { const ahead = (hf ? 1 : -1) === sd, dy = kk === 0 ? (ahead ? 6 : -5) : (ahead ? -8 : 7), sc2 = ahead ? (kk === 0 ? 1.06 : 0.95) : (kk === 0 ? 0.96 : 1.04);
             g.drawImage(img, r[0] + hf * r[2] / 2, r[1] + cutP - 3, r[2] / 2 + (hf ? 0 : 1), r[3] - cutP + 3, x0 + hf * w / 2 + (1 - sc2) * w / 4, y0 + (cutP - 3) * sc, w / 2 * sc2 + (hf ? 0 : 1), (r[3] - cutP + 3) * sc * sc2 + dy); }
           g.drawImage(img, r[0], r[1], r[2], cutP + 1, x0, y0, w, (cutP + 1) * sc); }
         else g.drawImage(img, r[0], r[1], r[2], r[3], x0, y0, w, h);
         g.save(); g.translate(0, y0 + h * cut); g.scale(1 + e * 0.9, 1 + e * 1.3); g.drawImage(img, r[0], r[1], r[2], r[3] * cut, x0, -h * cut, w, h * cut + 0.5); g.restore();
-        kAcc(g, kk, x0, y0, w, h);
-        const M = { 0: [0.47, 0.6], 1: [0.08, 0.58], 6: [0.9, 0.58], 16: [0.94, 0.45] }[kk]; const tired = u._tired || 0;
+        g.save(); g.translate(0, y0 + h * cut); g.scale(1 + e * 0.9, 1 + e * 1.3); g.translate(0, -(y0 + h * cut)); kAcc(g, kk, x0, y0, w, h); g.restore(); // the hat rides the breathing head
+        const M = { 0: [0.47, 0.6], 1: [0.08, 0.58], 6: [0.9, 0.58], 16: [0.94, 0.45] }[kk]; const tired = u._show ? (u._show.a === 'bostezo' ? Math.sin(Math.min(1, u._show.p) * Math.PI) : 0) : (u._tired || 0);
         if (M && tired > 0.3) { const tx = (x0 + M[0] * w) * (1 + e * 0.9), ty = y0 + h * cut - (cut - M[1]) * h * (1 + e * 1.3), L = (4 + 9 * tired) * (1 + 0.25 * F2.s), side = kk === 0 ? 0 : (kk === 1 ? -1 : 1);
           g.fillStyle = '#e8687f'; g.strokeStyle = '#a83a50'; g.lineWidth = 1; g.beginPath(); g.moveTo(tx - 3.5, ty); g.quadraticCurveTo(tx - 4 + side * 2, ty + L, tx + side * 2.5, ty + L + 1.5); g.quadraticCurveTo(tx + 4 + side * 2, ty + L, tx + 3.5, ty); g.closePath(); g.fill(); g.stroke();
           g.strokeStyle = 'rgba(160,50,70,0.6)'; g.beginPath(); g.moveTo(tx, ty + 1); g.lineTo(tx + side, ty + L * 0.7); g.stroke(); }
@@ -23127,8 +23132,8 @@ class Renderer {
     const moving = W.time - (u._movedAt || 0) < 0.15, onIce = W.tileTypeAt(u.x, u.y) === 'Nice';
     { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 480 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
     const fa = u._rf * Math.PI / 180, fx = Math.cos(fa), fy = Math.sin(fa); // fy > 0: going up (away from camera)
-    const jp = u.jump ? Math.min(1, (W.time - u.jump.t0) / u.jump.dur) : 0, lift = u.jump ? Math.sin(jp * Math.PI) * 230 : 0;
-    W._rdt = this._dt; const FT = fatigue(W, u, moving, 0.4), ph = t * (moving ? 10 : 3.2), slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? FT.s * (FT.amp / 0.035) : 0; // panting: deep and fast after running
+    const jp = u.jump ? Math.min(1, (W.time - u.jump.t0) / u.jump.dur) : 0, lift = (u.jump ? Math.sin(jp * Math.PI) * 230 : 0) + (u._show && u._show.a === 'salto' ? Math.max(0, Math.sin(u._show.p * Math.PI * 2)) * 34 : 0); const SHW = u._show ? u._show.a : null, SHP = u._show ? u._show.p : 0, yawnK = SHW === 'bostezo' ? Math.sin(Math.min(1, SHP) * Math.PI) : 0, waveF = SHW === 'saludo' ? 1.9 + Math.sin(SHP * 22) * 0.5 : 0, clapF = SHW === 'aplauso' ? 0.6 + Math.sin(SHP * 30) * 0.6 : 0;
+    W._rdt = this._dt; const FT = fatigue(W, u, moving, 0.4), ph = t * (moving ? 10 : 3.2), slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving && !u._show ? FT.s * (FT.amp / 0.035) : 0; // panting: deep and fast after running
     g.save(); g.translate(0, -16); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 50); g.restore(); const sh = Math.max(0.35, 1 - lift / 330); g.fillStyle = `rgba(0,0,0,${0.3 * sh})`; g.beginPath(); g.ellipse(0, -16, 52 * sh, 15 * sh, 0, 0, TAU); g.fill();
     const view = fy > 0.8 ? 'back' : fy < -0.8 ? 'front' : 'side', dir = fx < 0 ? -1 : 1, fore = 0.55 + 0.45 * Math.abs(fx); // turning toward/away from the camera the body gets shorter, so a circle looks continuous
     const js = 1 + (u.jump ? Math.sin(jp * Math.PI) * 0.3 : 0); // a little bigger in the air: reads as high up
@@ -23144,7 +23149,7 @@ class Renderer {
       g.beginPath(); g.ellipse(-4, 7, 34, 27 + br * 1.5, slide ? 0 : -0.08, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
       belly(2, 17, 27 + br * 2, 16 + br * 2);
       for (const [sx, sy] of [[-16, -6], [-5, -11], [-22, 4]]) { g.fillStyle = 'rgba(70,80,95,0.45)'; g.beginPath(); g.arc(sx, sy, 2.4, 0, TAU); g.fill(); }
-      g.save(); g.translate(6, 18); g.rotate(0.5 + (moving && !slide ? Math.sin(ph + 1) * 0.7 : slide ? -0.9 : br * 0.1)); g.fillStyle = greyD; g.beginPath(); g.ellipse(7, 0, 11, 4.5, 0, 0, TAU); g.fill(); g.restore();
+      g.save(); g.translate(6, 18); g.rotate(0.5 - waveF - clapF * 0.8 + (moving && !slide ? Math.sin(ph + 1) * 0.7 : slide ? -0.9 : br * 0.1)); g.fillStyle = greyD; g.beginPath(); g.ellipse(7, 0, 11, 4.5, 0, 0, TAU); g.fill(); g.restore();
       g.restore();
       const hy = slide ? -2 : -14 + br * 1.5, hx = slide ? 27 : 22;
       g.fillStyle = grey; g.beginPath(); g.arc(hx, hy, 15, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
@@ -23153,15 +23158,16 @@ class Renderer {
       g.fillStyle = 'rgba(60,70,85,0.6)'; for (const [dx, dy] of [[8, 4], [11, 6], [9, 7.5], [12, 3.5]]) { g.beginPath(); g.arc(hx + dx, hy + dy, 0.8, 0, TAU); g.fill(); }
       g.fillStyle = '#1b1f2e'; g.beginPath(); g.ellipse(hx + 14.5, hy + 1.5, 2.2, 1.6, 0.3, 0, TAU); g.fill();
       g.strokeStyle = '#2a2f3d'; g.lineWidth = 1.1; g.beginPath(); g.moveTo(hx + 15, hy + 7.5); g.quadraticCurveTo(hx + 11, hy + 10, hx + 7, hy + 8.5); g.stroke();
-      const blink = !moving && Math.sin(t * 0.8) > 0.6; g.fillStyle = '#10131c'; if (blink) g.fillRect(hx + 1, hy - 4, 8, 1.8); else { g.beginPath(); g.ellipse(hx + 4.5, hy - 3, 4, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4.6, 1.4, 0, TAU); g.fill(); g.beginPath(); g.arc(hx + 3.5, hy - 1.5, 0.6, 0, TAU); g.fill(); }
+      const blink = (!moving && !u._show && Math.sin(t * 0.8) > 0.6) || yawnK > 0.35; g.fillStyle = '#10131c'; if (blink) g.fillRect(hx + 1, hy - 4, 8, 1.8); else { g.beginPath(); g.ellipse(hx + 4.5, hy - 3, 4, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4.6, 1.4, 0, TAU); g.fill(); g.beginPath(); g.arc(hx + 3.5, hy - 1.5, 0.6, 0, TAU); g.fill(); }
       g.lineCap = 'round'; for (const [ex, ey] of [[5, -12], [8, -5], [8, 6], [5, 13], [1, 15]]) { const ww = moving ? Math.sin(ph * 0.5 + ey) * 1 : br * 0.8; g.strokeStyle = 'rgba(30,35,50,0.55)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(hx + 9, hy + 5.5); g.quadraticCurveTo(hx + 9 + ex * 1.1, hy + 5.5 + ey * 0.45, hx + 9 + ex + ww * 0.5, hy + 5.5 + ey + ww); g.stroke(); g.strokeStyle = '#f3f1ea'; g.lineWidth = 0.9; g.stroke(); }
+      if (yawnK > 0.05) { g.fillStyle = '#3a1622'; g.beginPath(); g.ellipse(view === 'side' ? hx + 11 : 0, hy + (view === 'side' ? 10 : 11), 2.5 + yawnK * 2, 1 + yawnK * 5, 0, 0, TAU); g.fill(); }
       if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 11, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       if (SKS && (SKS.scarf || SKS.rainbow)) { g.fillStyle = scarf; g.strokeStyle = outline; g.lineWidth = 1.5; g.beginPath(); g.ellipse(hx - 9, hy + 15, 11, 5, 0.5, 0, TAU); g.fill(); g.stroke(); g.fillRect(hx - 17, hy + 16, 5, 12); } // scarf only with a skin, wrapped low on the neck
       if (SKS) { if (SKS.glasses) { g.fillStyle = SKS.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(hx + 5, hy - 3, 5.5, 4.5, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(hx, hy - 4); g.lineTo(hx - 9, hy - 6); g.stroke(); } if (SKS.hat) { g.save(); g.translate(hx + 1, hy - 11); g.scale(0.55, 0.55); g.rotate(0.12); g.translate(0, 22); drawHat(g, SKS.hat, t, null); g.restore(); } }
     } else { // front (coming at you) or back (going away): a round, fat seal seen head-on
       const front = view === 'front', sway = moving && !slide ? Math.sin(ph) * 0.12 : 0;
       g.rotate(sway); g.save(); g.scale(sq, 2 - sq + (slide ? -0.1 : 0));
-      for (const sd of [-1, 1]) { g.save(); g.translate(sd * 28, 14); g.rotate(sd * (0.9 + (moving && !slide ? Math.sin(ph + (sd > 0 ? 0 : Math.PI)) * 0.6 : 0.2))); g.fillStyle = greyD; g.beginPath(); g.ellipse(sd * 6, 0, 11, 5, 0, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 1.5; g.stroke(); g.restore(); }
+      for (const sd of [-1, 1]) { g.save(); g.translate(sd * 28, 14); g.rotate(sd * (0.9 - clapF * 1.1 + (sd > 0 ? -waveF * 1.2 : 0) + (moving && !slide ? Math.sin(ph + (sd > 0 ? 0 : Math.PI)) * 0.6 : 0.2))); g.fillStyle = greyD; g.beginPath(); g.ellipse(sd * 6, 0, 11, 5, 0, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 1.5; g.stroke(); g.restore(); }
       if (!front) { g.fillStyle = greyD; g.beginPath(); g.moveTo(0, 32); g.lineTo(-12, 44); g.lineTo(0, 39); g.lineTo(12, 44); g.closePath(); g.fill(); g.strokeStyle = outline; g.lineWidth = 2; g.stroke(); }
       const gr = g.createLinearGradient(0, -20, 0, 34); gr.addColorStop(0, grey); gr.addColorStop(1, '#7c8a99'); g.fillStyle = gr;
       g.beginPath(); g.ellipse(0, 8, 30 + br * 1.5, 30, 0, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
@@ -23173,9 +23179,10 @@ class Renderer {
         for (const sd of [-1, 1]) { g.fillStyle = '#c3ccd6'; g.beginPath(); g.ellipse(sd * 4.2, hy + 6.5, 5, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = 'rgba(60,70,85,0.6)'; for (const [dx, dy] of [[3, 5.5], [5.5, 7], [3.5, 8.5], [6, 4.8]]) { g.beginPath(); g.arc(sd * dx, hy + dy, 0.75, 0, TAU); g.fill(); } }
         g.fillStyle = '#1b1f2e'; g.beginPath(); g.moveTo(-3, hy + 2); g.quadraticCurveTo(0, hy + 1, 3, hy + 2); g.quadraticCurveTo(0, hy + 5.5, -3, hy + 2); g.fill();
         g.strokeStyle = '#2a2f3d'; g.lineWidth = 1; g.beginPath(); g.moveTo(0, hy + 4.5); g.lineTo(0, hy + 8); g.moveTo(-3, hy + 9.5); g.quadraticCurveTo(0, hy + 7.5, 3, hy + 9.5); g.stroke();
-        const blink = !moving && Math.sin(t * 0.8) > 0.6; for (const ex of [-6.5, 6.5]) { g.fillStyle = '#10131c'; if (blink) g.fillRect(ex - 3.5, hy - 5, 7, 1.8); else { g.beginPath(); g.ellipse(ex, hy - 4, 4, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ex + 1.4, hy - 5.6, 1.4, 0, TAU); g.fill(); g.beginPath(); g.arc(ex - 1, hy - 2.5, 0.6, 0, TAU); g.fill(); } }
+        const blink = (!moving && !u._show && Math.sin(t * 0.8) > 0.6) || yawnK > 0.35; for (const ex of [-6.5, 6.5]) { g.fillStyle = '#10131c'; if (blink) g.fillRect(ex - 3.5, hy - 5, 7, 1.8); else { g.beginPath(); g.ellipse(ex, hy - 4, 4, 4.4, 0, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ex + 1.4, hy - 5.6, 1.4, 0, TAU); g.fill(); g.beginPath(); g.arc(ex - 1, hy - 2.5, 0.6, 0, TAU); g.fill(); } }
         g.lineCap = 'round'; for (const sd of [-1, 1]) for (const [k, L] of [[-3.5, 15], [0, 17], [3.5, 14]]) { const ww = moving ? Math.sin(ph * 0.5 + k) : br * 0.8; g.strokeStyle = 'rgba(30,35,50,0.55)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(sd * 6, hy + 6.5); g.quadraticCurveTo(sd * (6 + L * 0.6), hy + 6 + k * 0.5, sd * (6 + L), hy + 6 + k + ww); g.stroke(); g.strokeStyle = '#f3f1ea'; g.lineWidth = 0.9; g.stroke(); }
-        if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(0, hy + 12, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
+        if (yawnK > 0.05) { g.fillStyle = '#3a1622'; g.beginPath(); g.ellipse(view === 'side' ? hx + 11 : 0, hy + (view === 'side' ? 10 : 11), 2.5 + yawnK * 2, 1 + yawnK * 5, 0, 0, TAU); g.fill(); }
+      if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(0, hy + 12, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       }
       if (SKS && (SKS.scarf || SKS.rainbow)) { g.fillStyle = scarf; g.strokeStyle = outline; g.lineWidth = 1.5; g.beginPath(); g.ellipse(0, hy + 19, 15, 5.5, 0, 0, TAU); g.fill(); g.stroke(); g.fillRect(front ? 6 : -10, hy + 20, 5, 12); }
       if (SKS) { if (SKS.glasses && front) { g.fillStyle = SKS.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.5; for (const ex of [-6.5, 6.5]) { g.beginPath(); g.ellipse(ex, hy - 4, 5.5, 4.5, 0, 0, TAU); g.fill(); g.stroke(); } } if (SKS.hat) { g.save(); g.translate(0, hy - 11); g.scale(0.55, 0.55); g.translate(0, 22); drawHat(g, SKS.hat, t, null); g.restore(); } }
@@ -24408,13 +24415,18 @@ class Net {
     click('#fitL', () => { fitAng -= 45; }); click('#fitR', () => { fitAng += 45; }); click('#fitWalk', () => { fitWalk = !fitWalk; $('#fitWalk').textContent = fitWalk ? '🧍' : '🚶'; });
     fc.addEventListener('pointerdown', e => { fitDrag = [e.clientX, fitAng]; fc.setPointerCapture(e.pointerId); }); fc.addEventListener('pointermove', e => { if (fitDrag) fitAng = fitDrag[1] - (e.clientX - fitDrag[0]) * 1.2; }); fc.addEventListener('pointerup', () => { fitDrag = null; });
     animSkins(); }
-  const prevsSk = []; let skRaf = 0;
-  function heroFake(ang, walk, t, owner, map) { return { alive: true, order: walk ? { type: 'move', x: 0, y: 0 } : null, paused: false, glide: false, walkPhase: walk ? t * (map === 'shroom25' ? 3.2 : 9) : 0, handle: 3, facing: ang, _rf: ang, owner, x: walk ? t * 50 : 0, y: 0, t: {}, inv: false, abil: {}, items: [], _tired: 0.2 }; }
+  const prevsSk = []; let skRaf = 0, showT0 = performance.now() / 1000;
+  function heroFake(ang, walk, t, owner, map) { return { alive: true, order: walk ? { type: 'move', x: 0, y: 0 } : null, paused: false, glide: false, walkPhase: walk ? t * (map === 'shroom25' ? 3.2 : 9) : 0, handle: 3, facing: ang, owner, x: walk ? t * 50 : 0, y: 0, t: {}, inv: false, abil: {}, items: [], _tired: 0.2 }; }
   const skinFakes = {};
   function animSkins() { cancelAnimationFrame(skRaf); if (typeof Renderer === 'undefined') return; const RP = Renderer.prototype;
     const step = ts => { if ($('#shop').classList.contains('hidden') || $('#shopGrid').classList.contains('hidden') || !$('#fitCv')) { skRaf = requestAnimationFrame(step); return; } const t = ts / 1000;
       const draw = (cv, skin, ang, walk, sc, cy, key) => { const owner = { id: 0, skins: { [skCat]: skin } }; const R = Object.create(RP); R.W = { time: t, local: null, profile: { id: skCat }, tileTypeAt: () => 'grass' }; R._dt = 0.016; R.puff = () => {}; R.drawAura = () => {}; R.drawDeathAura = () => {};
-        const k = key + skCat + skin; const u = skinFakes[k] = Object.assign(skinFakes[k] || {}, heroFake(ang, walk, t, owner, skCat)); const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none'; g.fillStyle = '#3a2f44'; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(cv.width / 2, cy + 4, 34 * sc, 10 * sc, 0, 0, 6.3); g.fill(); g.translate(cv.width / 2, cy); g.scale(sc, -sc);
+        const k = key + skCat + skin; const u = skinFakes[k] = Object.assign(skinFakes[k] || {}, heroFake(ang, walk, t, owner, skCat));
+        if (!walk && key === 'F') { // showcase: looks around, waves, yawns, hops... (only here in the shop; in the game they move as usual)
+          const SEQ = { shroom25: [['mirar', -55], ['saludo', 'show_saludo'], ['mirar', 55], ['bostezo', 'show_bostezo'], ['quieto'], ['salto', 'show_salto']], kitty5: [['mirar', -60], ['bostezo'], ['mirar', 60], ['sacudir'], ['quieto'], ['salto']], bob: [['mirar', -60], ['saludo'], ['mirar', 60], ['aplauso'], ['bostezo'], ['salto']] }[skCat];
+          const st = 2.4, tt = (t - showT0) / st, n = Math.floor(tt) % SEQ.length, q = tt % 1, A = SEQ[n];
+          u._show = { a: A[0], p: q, d: typeof A[1] === 'string' ? A[1] : null }; if (A[0] === 'mirar') u.facing = ang + A[1] * Math.sin(q * Math.PI); if (skCat === 'shroom25' && A[0] === 'mirar') u._show.d = null; }
+        else u._show = walk ? null : { a: 'quieto', p: 0 }; const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none'; g.fillStyle = '#3a2f44'; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(cv.width / 2, cy + 4, 34 * sc, 10 * sc, 0, 0, 6.3); g.fill(); g.translate(cv.width / 2, cy); g.scale(sc, -sc);
         try { if (skCat === 'shroom25') RP.drawHero.call(R, g, u); else if (skCat === 'kitty5') RP.drawKitty.call(R, g, u); else RP.drawPuffer.call(R, g, u); } catch (e) {} g.filter = 'none'; };
       const big = skCat === 'shroom25' ? 1.8 : skCat === 'kitty5' ? 1.05 : 1.1, small = skCat === 'shroom25' ? 1.05 : skCat === 'kitty5' ? 0.6 : 0.62;
       draw($('#fitCv'), fitSkin, fitAng, fitWalk, big, 160, 'F');
