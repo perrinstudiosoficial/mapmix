@@ -71,6 +71,16 @@ body[data-fam=run] #tox, body[data-fam=run] #abil, body[data-fam=run] #bGive, bo
 #abil.deadoff .ab{filter:grayscale(1) brightness(.6);opacity:.5;pointer-events:none}
 #bJump{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 70px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 12px);width:72px;height:72px;font-size:32px;pointer-events:auto;z-index:5;border-color:#ffd34d}
 #bInvis{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 236px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#9fe6ff}
+#bStun{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 74px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 160px);width:60px;height:60px;font-size:26px;pointer-events:auto;z-index:5;border-color:#ffe34d}
+#bDash{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 74px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 232px);width:60px;height:60px;font-size:26px;pointer-events:auto;z-index:5;border-color:#78dcff}
+#kitBar{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 228px);display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:14px;background:rgba(20,8,30,.75);border:1px solid var(--line);z-index:6;pointer-events:auto}
+#kGold{font-weight:900;color:#ffe27a;min-width:52px}#kInv{display:flex;gap:4px}#kInv .ks{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:grid;place-items:center;font-size:19px;cursor:pointer}
+#bKShop{font:inherit;font-weight:900;border:0;border-radius:10px;padding:6px 10px;background:linear-gradient(#ffb020,#d06a00);color:#fff}
+#kShop{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.55);display:grid;place-items:center;pointer-events:auto}#kShop.hidden{display:none}
+#kShop .kcard{width:min(94vw,420px);max-height:78vh;overflow:auto;background:#1c0d27;border:1px solid var(--line);border-radius:18px;padding:12px}
+#kShop .khead{display:flex;align-items:center;gap:10px;margin-bottom:8px}#kShop .khead b{flex:1;font-size:18px}#kShopGold{font-weight:900;color:#ffe27a}#kShopX{font:inherit;border:0;background:#3a1f4a;color:#fff;border-radius:10px;width:34px;height:34px}
+.krow{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;padding:8px;border-radius:12px;background:#28133a;margin-bottom:6px}.krow .ic{font-size:28px;text-align:center}.krow b{display:block}.krow small{opacity:.8;line-height:1.2;display:block}
+.krow button{font:inherit;font-weight:900;border:0;border-radius:10px;padding:8px 10px;background:linear-gradient(#5ad66b,#2b8a3b);color:#fff;min-width:70px}.krow button:disabled{background:#4a3a55;color:#aaa}.khint{font-size:12px;opacity:.75;margin-top:6px}
 #bRoar{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 160px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#ff9a3d}
 body[data-fam=run] #danceWrap{display:none!important}
 #bDance.off{filter:grayscale(1) brightness(.7);opacity:.45}
@@ -263,6 +273,10 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="ab hidden" id="bJump">🐾<small>Saltar</small></div>
   <div class="ab hidden" id="bRoar">😾<small>Gruñido</small></div>
   <div class="ab hidden" id="bInvis">👻<small>Invisible</small></div>
+  <div class="ab hidden" id="bStun">💫<small>Aturdir</small></div>
+  <div class="ab hidden" id="bDash">⚡<small>Dash</small></div>
+  <div id="kitBar" class="hidden"><div id="kGold">🪙 0</div><div id="kInv"></div><button id="bKShop" class="hidden">🛒 Tienda</button></div>
+  <div id="kShop" class="hidden"><div class="kcard"><div class="khead"><b>🛒 Tienda del Gatito</b><span id="kShopGold"></span><button id="kShopX">✕</button></div><div id="kShopList"></div><div class="khint">Junta monedas 🪙 por el mapa. Los objetos que no se usan funcionan solo con llevarlos (máximo 6).</div></div></div>
   <div id="danceWrap"><div id="dancePick" class="hidden"></div><div class="ab" id="bDance"><span id="danceIcon"></span><small>Baile</small></div></div>
   <div id="sprayWrap"><div id="sprayPick" class="hidden"></div><div class="ab locked" id="bSpray"><span>🎨</span><small>Grafiti</small></div></div>
   <div id="emoteWrap"><div id="emotePick" class="hidden"></div><div class="ab" id="bEmote"><span id="emoteIcon"></span><small>Emote</small></div></div>
@@ -19992,6 +20006,7 @@ class World {
       if (u.cd > 0) u.cd -= dt;
       if (u.hero) { u.mana = Math.min(u.maxMana, u.mana + dt * 1.0); for (const k in u.abil) if (u.abil[k].cd > 0) u.abil[k].cd -= dt; }
       if (u.paused) continue;
+      if (u.hero && u.cdBoost) { const k = dt * u.cdBoost; for (const f of ['jumpReady', 'roarReady', 'invisReady', 'stunReady', 'dashReady']) if (u[f] > this.time) u[f] -= k; }
       if (u.hero && this.profile.id === 'bob') { // keep your momentum when you slide off the ice onto the grass
         const onIce = this.tileTypeAt(u.x, u.y) === 'Nice';
         if (u._wasIce && !onIce && !u.order && !u.jump) { const f = u.facing * Math.PI / 180; const tx = u.x + Math.cos(f) * 500, ty = u.y + Math.sin(f) * 500; const q = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 200); if (q) this.issueOrder(u, 851986, q.x, q.y); }
@@ -20012,6 +20027,7 @@ class World {
         if (u.cd <= 0) { this.fireMortar(u, o.x, o.y); u.cd = u.t.cd; }
         continue;
       }
+      if (u.stunUntil > this.time) continue;
       if (!o && u.t.wander && !u.paused) {
         u.wanderT -= dt;
         if (u.wanderT <= 0) { u.wanderT = u.t.wanderFast ? 0.15 + this.rand() * 0.9 : 2 + this.rand() * 4; const a = this.rand() * 6.283, r = u.t.wanderFast ? 250 + this.rand() * 450 : 150 + this.rand() * 250; const tx = u.x + Math.cos(a) * r, ty = u.y + Math.sin(a) * r; if (this.walkable(tx, ty) && this.lineClear(u.x, u.y, tx, ty)) { u.order = { type: 'move', x: tx, y: ty, wander: true }; u.path = null; } }
@@ -20066,6 +20082,7 @@ class World {
     for (const u of this.units) if (!u.alive && !u.removed && !u.hero && this.time - u.deathTime > 3) u.removed = true;
     if (this.units.length > 200 && (this.tickN = (this.tickN || 0) + 1) % 50 === 0) this.units = this.units.filter(u => !u.removed);
     this.effects = this.effects.filter(e => this.time - e.t0 < e.dur);
+    this.kittyPickups();
     if (this.onTick) this.onTick(dt);
   }
   moveUnit(u, dt) {
@@ -20073,7 +20090,8 @@ class World {
     const o = u.order;
     const tx = o.type === 'patrol' && o.leg === 1 ? o.ax : o.x, ty = o.type === 'patrol' && o.leg === 1 ? o.ay : o.y;
     if (!u.path) { u.path = this.findPath(u, tx, ty); u.pi = 0; if (!u.path.length) { u.order = null; return; } }
-    let step = u.speed * dt;
+    if (u.stunUntil > this.time) return; // stunned: frozen in place
+    let step = u.speed * dt * (u.dashUntil > this.time ? 1.6 : 1) * (u.spdBoost || 1);
     while (step > 0 && u.path && u.pi < u.path.length) {
       const wp = u.path[u.pi]; const dx = wp.x - u.x, dy = wp.y - u.y; const d = Math.hypot(dx, dy);
       if (d > 0.01) u.facing = Math.atan2(dy, dx) * 180 / Math.PI;
@@ -20215,9 +20233,39 @@ class World {
     const L = Math.hypot(dx, dy) || 1; h.jump = { t0: this.time, dur: 0.75, dx: dx / L, dy: dy / L, spd: ice ? 1600 : Math.max(700, h.speed * 1.2) * 0.8 }; // longer hang time, same distance
     h.jumpReady = this.time + (this.profile.id === 'bob' ? 10 : 12); /* jump cooldown (shorter in the ice map) */ this.emit('sound', { name: 'coil' }); this.emit('jump', h); return true;
   }
+  cmdStun(p) { // kitty map: every wolf near you is stunned for 5 s (they still hurt if you walk into them)
+    const h = this.heroOf(p); if (!h || !h.alive || this.profile.id !== 'kitty5' || this.time < (h.stunReady || 0)) return false; h.stunReady = this.time + 30;
+    for (const w of this.units) if (w.alive && !w.removed && w.t.kind === 'wolf' && Math.hypot(w.x - h.x, w.y - h.y) < 700) { w.stunUntil = this.time + 5; w.order = null; w.path = null; }
+    const ef = this.addEffect(h.x, h.y, 'stunwave'); ef.dur = 0.7; this.emit('sound', { name: 'stun' }); return true;
+  }
+  cmdDash(p) { // kitty map: a burst of extra speed for 3 s
+    const h = this.heroOf(p); if (!h || !h.alive || this.profile.id !== 'kitty5' || this.time < (h.dashReady || 0)) return false; h.dashReady = this.time + 18; h.dashUntil = this.time + 3 + (h.durBonus || 0); this.emit('sound', { name: 'dash' }); return true;
+  }
+  // ---- kitty map: coins and items lying around, shop items (coin values tuned so 5-7 coins buy the first item) ----
+  kittySetupLoot(round) {
+    if (this.profile.id !== 'kitty5') return; let sd = (round * 9973 + 77) >>> 0; const rnd = () => { sd = (sd + 0x6D2B79F5) >>> 0; let t = sd; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; // same coins for everybody in the room
+    this.coins = []; this.loot = this.loot && round > 1 ? this.loot.filter(l => !l.taken) : [];
+    const park = this.script && this.script.gget.gg_rct_Players && this.script.gget.gg_rct_Players(), inPark = (x, y) => park && x >= park.x0 - 200 && x <= park.x1 + 200 && y >= park.y0 - 200 && y <= park.y1 + 200;
+    let tries = 0; while (this.coins.length < 70 && tries++ < 6000) { const x = -4000 + rnd() * 8000, y = -4000 + rnd() * 8000; if (!this.walkable(x, y) || inPark(x, y) || this.coins.some(c => Math.hypot(c.x - x, c.y - y) < 260)) continue; this.coins.push({ x, y, v: 10, id: this.coins.length }); }
+    const ids = ['potE', 'potEM', 'sobi', 'sobiU', 'colE', 'colM', 'tomo']; let n = 0; tries = 0;
+    while (n < 6 && tries++ < 3000) { const x = -4000 + rnd() * 8000, y = -4000 + rnd() * 8000; if (!this.walkable(x, y) || inPark(x, y)) continue; this.loot.push({ x, y, it: ids[Math.floor(rnd() * (rnd() < 0.6 ? 2 : ids.length))], id: 'L' + round + '_' + n }); n++; }
+  }
+  kittyPickups() {
+    if (this.profile.id !== 'kitty5' || !this.coins) return;
+    for (const p of this.players) { const h = this.heroOf(p); if (!h || !h.alive || h.paused) continue;
+      for (const c of this.coins) if (!c.taken && Math.hypot(c.x - h.x, c.y - h.y) < 60) { c.taken = true; h.gold = (h.gold || 0) + c.v; this.emit('coin', h, c); }
+      for (const l of this.loot) if (!l.taken && Math.hypot(l.x - h.x, l.y - h.y) < 60 && (h.kinv || []).length < 6) { l.taken = true; this.kittyGive(h, l.it); this.emit('loot', h, l); } }
+  }
+  kittyGive(h, it) { (h.kinv = h.kinv || []).push(it); this.kittyApply(h); }
+  kittyApply(h) { const inv = h.kinv || []; const has = k => inv.filter(x => x === k).length;
+    h.cdBoost = Math.min(1.5, has('sobi') * 0.25 + has('sobiU') * 0.5); h.durBonus = Math.min(4, has('colE') * 1 + has('colM') * 2); h.spdBoost = 1 + Math.min(0.3, (h.tomos || 0) * 0.1); }
+  kittyUse(h, slot) { const inv = h.kinv || []; const it = inv[slot]; if (!it) return false;
+    if (it === 'potE') { h.jumpReady = this.time; } else if (it === 'potEM') { h.jumpReady = h.roarReady = h.invisReady = h.stunReady = h.dashReady = this.time; } else if (it === 'tomo') { h.tomos = (h.tomos || 0) + 1; } else return false; // passive items stay in the bag
+    inv.splice(slot, 1); this.kittyApply(h); this.emit('sound', { name: 'rescue' }); return true; }
+  kittyBuy(h, it) { const P = { potE: 50, potEM: 80, sobi: 120, colE: 150, sobiU: 220, colM: 260, tomo: 350 }[it]; if (P == null || (h.gold || 0) < P || (h.kinv || []).length >= 6) return false; h.gold -= P; this.kittyGive(h, it); this.emit('sound', { name: 'coin' }); return true; }
   cmdInvis(p) { // kitty map only: 6 s nearly invisible (wolves still kill you if they walk over you)
     const h = this.heroOf(p); if (!h || !h.alive || this.profile.id !== 'kitty5') return false; if (this.time < (h.invisReady || 0)) return false;
-    h.invisReady = this.time + 22; h.invisUntil = this.time + 6; this.emit('sound', { name: 'invis' }); return true;
+    h.invisReady = this.time + 22; h.invisUntil = this.time + 6 + (h.durBonus || 0); this.emit('sound', { name: 'invis' }); return true;
   }
   cmdUseItem(p, slot) {
     const h = this.heroOf(p); if (!h || !h.alive) return;
@@ -21441,6 +21489,7 @@ class KittyBots {
         const prog = (cur - f) * 32; const keep = b.dx != null && !(x === h.x && y === h.y) ? ((x - h.x) * b.dx + (y - h.y) * b.dy) / R * 12 : 0;
         const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 0.9 + keep + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
       if (!pick) continue;
+      if (W.profile.id === 'kitty5' && typeof window !== 'undefined') { if (window.botStun && W.time >= (h.stunReady || 0) && near.filter(w => Math.hypot(w.x - h.x, w.y - h.y) < 450).length >= 3) window.botStun(h); else if (window.botDash && W.time >= (h.dashReady || 0) && b.wait > 2) window.botDash(h); } // bots freeze crowds of wolves and dash when stuck
       if (W.profile.id === 'kitty5' && W.time >= (h.invisReady || 0) && typeof window !== 'undefined' && window.botInvis && near.length >= 3 && Math.random() < 0.15) window.botInvis(h);
       if (W.profile.id === 'kitty5' && W.time >= (h.roarReady || 0) && typeof window !== 'undefined' && window.botRoar && near.filter(w => Math.hypot(w.x - h.x, w.y - h.y) < 300).length >= 2) { window.botRoar(h); }
       // jump over the wolves when cornered (10 s cooldown, like the player's button)
@@ -21614,6 +21663,9 @@ class Sfx {
     else if (n === 'dx_luz') { this.tone(400, 1800, 0.7, 'sine', 0.15); this.tone(600, 2400, 0.7, 'triangle', 0.08, 0.05); this.noise(0.6, 0.12, 6000, 0.5); const A = [900, 1400, 3000]; this.voice(620, 420, 0.6, [A, A], 0.25, 0.05); }
     else if (n === 'dx_fuegos') { for (let r = 0; r < 3; r++) { this.tone(600, 2400, 0.25, 'sine', 0.06, r * 0.18); this.noise(0.35, 0.35, 900, 0.7, 0.3 + r * 0.18); this.tone(120, 50, 0.3, 'sine', 0.3, 0.3 + r * 0.18); } const O = [600, 1000, 2700]; this.voice(700, 400, 0.4, [O, O], 0.25); }
     else if (n === 'dx_flor') { [1047, 1319, 1568, 2093, 1568].forEach((f, i) => this.tone(f, f, 0.3, 'sine', 0.1, i * 0.08)); const O = [600, 1000, 2700], U = [370, 900, 2600]; this.voice(560, 380, 0.6, [O, U], 0.28, 0.1); }
+    else if (n === 'coin') { this.tone(1320, 1320, 0.07, 'square', 0.08); this.tone(1760, 1760, 0.12, 'square', 0.08, 0.06); }
+    else if (n === 'stun') { this.tone(1800, 900, 0.3, 'square', 0.1); this.tone(2400, 1200, 0.3, 'triangle', 0.08, 0.08); this.noise(0.3, 0.2, 3000, 2); }
+    else if (n === 'dash') { this.noise(0.4, 0.3, 1800, 0.6); this.tone(300, 1400, 0.3, 'sawtooth', 0.06); }
     else if (n === 'invis') { this.tone(1400, 300, 0.5, 'sine', 0.14); this.tone(2000, 600, 0.5, 'triangle', 0.06, 0.05); this.noise(0.4, 0.1, 6000, 1); }
     else if (n === 'spray') { this.noise(0.35, 0.25, 5000, 0.6); this.noise(0.25, 0.18, 5500, 0.6, 0.4); this.tone(1800, 1700, 0.04, 'square', 0.04, 0.0); }
     else if (n === 'dx_fundador') { // royal fall: a choir chord, bells and a proud "¡Volveré!"
@@ -21862,7 +21914,7 @@ class Renderer {
     const vx0 = this.cam.x - half, vx1 = this.cam.x + half, vy0 = this.cam.y - half, vy1 = this.cam.y + half;
     this.view = { vx0, vx1, vy0, vy1 };
     this.drawTerrain(g, vx0, vy0, vx1, vy1);
-    this.drawGraffiti(g);
+    this.drawGraffiti(g); this.drawLoot(g);
     this.drawDests(g, vx0, vy0, vx1, vy1);
     this.drawDoodads(g, vx0, vy0, vx1, vy1, false);
     this.drawItems(g);
@@ -22081,6 +22133,8 @@ class Renderer {
       if (dead && !u.hero) { g.globalAlpha *= Math.max(0, 1 - (W.time - u.deathTime) / 1.5); g.scale(1, 0.4); }
       const code = u.t.code;
       const kind = u.t.kind;
+      if (u.stunUntil > W.time && u.alive) { g.save(); g.translate(0, 70); for (let i = 0; i < 3; i++) { const a = W.time * 5 + i * 2.1; g.fillStyle = '#ffe34d'; g.save(); g.translate(Math.cos(a) * 22, Math.sin(a) * 7); g.scale(1, -1); g.font = '16px system-ui'; g.textAlign = 'center'; g.fillText('★', 0, 0); g.restore(); } g.restore(); } // stunned: stars over the head
+      if (u.dashUntil > W.time && u.alive && Math.random() < 0.6) this.puff(u.x, u.y + 20, { r0: 6, r1: 18, life: 0.35, col: '120,220,255', a: 0.5, vx: 0, vy: 0 });
       if (kind === 'kitty') this.drawKitty(g, u); else if (kind === 'wolf') this.drawWolf(g, u); else if (kind === 'circle') this.drawKittyCircle(g, u); else if (kind === 'shop') this.drawKittyShop(g, u); else if (kind === 'swimmer') this.drawPuffer(g, u); else if (kind === 'crab') this.drawCrab(g, u); else if (kind === 'hidden') {}
       else if (code === 'H003') this.drawHero(g, u);
       else if (code === 'h000' || code === 'h007' || code === 'h008' || code === 'h009') this.drawClown(g, u, code);
@@ -22212,6 +22266,7 @@ class Renderer {
       else if (m === 'shroomdeath') { this.drawShroomDeath(g, e, p); }
       else if (m === 'dfx') { this.drawDeathFx(g, e, p); }
       else if (m === 'sfx') { this.drawSpawnFx(g, e, p); }
+      else if (m === 'stunwave') { g.save(); g.scale(1, 0.5); g.strokeStyle = `rgba(255,230,80,${1 - p})`; g.lineWidth = 10 * (1 - p) + 2; g.beginPath(); g.arc(0, 0, 40 + p * 660, 0, 7); g.stroke(); g.restore(); }
       else if (m === 'explosion') {
         const R = e.r || 116;
         g.fillStyle = `rgba(255,${160 - p * 120},40,${0.85 * (1 - p)})`; g.beginPath(); g.arc(0, 0, R * (0.75 + 0.25 * Math.min(1, p * 4)), 0, 7); g.fill();
@@ -22401,7 +22456,7 @@ class Renderer {
   };
 
   // facing helper for upright (3/4 view) sprites: mirror left/right, back view when walking up
-  function view(u) { const f = u.facing * Math.PI / 180; const fx = Math.cos(f), fy = Math.sin(f); return { dir: fx < -0.2 ? -1 : 1, back: fy > 0.55, front: fy < -0.55, fx, fy, side: Math.abs(fx) > 0.45 }; }
+  function view(u) { const f = (u._rf ?? u.facing) * Math.PI / 180; const fx = Math.cos(f), fy = Math.sin(f); return { dir: fx < -0.2 ? -1 : 1, back: fy > 0.55, front: fy < -0.55, fx, fy, side: Math.abs(fx) > 0.45 }; }
   function limb(g, x0, y0, x1, y1, w, col) { g.strokeStyle = 'rgba(20,5,25,0.85)'; g.lineCap = 'round'; g.lineWidth = w + 3; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); }
   function ik(x0, y0, x1, y1, l1, l2, bend) {
     let dx = x1 - x0, dy = y1 - y0, d = Math.hypot(dx, dy) || 0.001; const dm = Math.min(d, l1 + l2 - 0.01);
@@ -22446,9 +22501,10 @@ class Renderer {
     const moving = !!u.order && !u.paused && !u.glide; const ph = u.walkPhase * 2.6; const sw = moving ? Math.sin(ph) : 0;
     const t = W.time + u.handle * 0.37;
     const nowR = performance.now(); u._mv = u._px == null ? 0 : Math.hypot(u.x - u._px, u.y - u._py); u._px = u.x; u._py = u.y; if (u.dance && (moving || u.glide || (u.order && !u.paused) || Math.hypot(u.x - u.dance.x, u.y - u.dance.y) > 3 || nowR > u.dance.until)) u.dance = null; // any movement (walk, glide, slide, push) stops the dance
+    { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; const d = ((u.facing - u._rf) % 360 + 540) % 360 - 180, st = 540 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; } // turn smoothly through every angle (no snapping)
     const dz = u.dance ? { id: u.dance.id, p: (nowR - u.dance.t0) / 1000 } : null; // dancing (front view, hands and hips scripted)
     const D = dz ? dancePose(dz.id, dz.p) : null;
-    const bob = D ? D.bob : moving ? -Math.abs(Math.cos(ph)) * 5 : Math.sin(t * 2.2) * 1.2;
+    const bob = D ? D.bob : moving ? -Math.abs(Math.cos(ph)) * 6 : Math.sin(t * 2.2) * 1.2;
     const col = this.heroColor(u); const v = D ? { dir: 1, back: false, front: true, side: false } : view(u); const f = u.facing * Math.PI / 180;
     if (D && D.note && Math.random() < 0.05) this.puff((Math.random() - 0.5) * 50 + u.x, u.y + 60, { r0: 3, r1: 7, life: 0.8, col: '255,220,120', a: 0.8, vx: 0, vy: 40 });
     if (moving && Math.random() < 0.22) this.puff(u.x - Math.cos(f) * 14, u.y - 24 - Math.sin(f) * 14, { r0: 4, r1: 14, life: 0.45, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 25, vy: -Math.sin(f) * 25 });
@@ -22456,12 +22512,12 @@ class Renderer {
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -20, 24 - (moving ? Math.abs(Math.cos(ph)) * 3 : 0), 8, 0, 0, TAU); g.fill();
     this.drawAura(g, u, col, t);
     if (u.inv && !u.t.inv) { g.strokeStyle = `rgba(255,240,120,${0.6 + 0.3 * Math.sin(W.time * 12)})`; g.lineWidth = 5; g.beginPath(); g.arc(0, 10, 58, 0, TAU); g.stroke(); }
-    g.save(); g.scale(1, -1); g.translate(0, -2 + (D ? D.jump : 0)); g.scale(v.dir * 0.95 * (D ? D.sx : 1), 0.95 * (D ? D.sy : 1));
+    g.save(); g.scale(1, -1); g.translate(0, -2 + (D ? D.jump : 0)); g.scale(v.dir * 0.95 * (D ? D.sx : 1) * (!D && v.side ? 0.72 + 0.28 * Math.min(1, (Math.abs(v.fx) - 0.45) / 0.5) : 1), 0.95 * (D ? D.sy : 1)); if (!D && !v.side) g.transform(1, 0, v.fx * 0.18, 1, 0, 0); // foreshortened while turning, leaning toward the exact angle
     const amp = moving ? 1 : 0, breathe = moving ? 0 : Math.sin(t * 2.2);
     const pants = '#3a2448', boot = '#6b3f1f', skin = '#f1dfc2', tunic = '#6a34c9', leather = '#7a4a24';
     const leg = (hx, p2, far) => {
       const c2 = Math.cos(p2), s2 = Math.sin(p2); let fx, fy, bend;
-      if (v.side) { fx = hx + s2 * 12 * amp; fy = 30 - Math.max(0, c2) * 8 * amp; bend = -1; } else { fx = hx + s2 * 2 * amp; fy = 30 - Math.max(0, c2) * 7 * amp; bend = hx < 0 ? 1 : -1; }
+      if (v.side) { fx = hx + s2 * 15 * amp; fy = 30 - Math.max(0, c2) * 10 * amp; bend = -1; } else { fx = hx + s2 * 3 * amp; fy = 30 - Math.max(0, c2) * 9 * amp + Math.max(0, -c2) * 1.5 * amp; bend = hx < 0 ? 1 : -1; } // a real walk: long stride, the lifted foot clears the ground, the planted one presses
       if (D) { fx = hx + (hx < 0 ? -2 : 2) * D.wide; fy = 30 - (hx < 0 ? D.liftL : D.liftR); hx += D.hip; }
       const hy = 10 + bob * 0.5; const k = ik(hx, hy, fx, fy, 11, 11, bend); const c = far ? shade(pants, -0.3) : pants;
       limb(g, hx, hy, k[0], k[1], 7, c); limb(g, k[0], k[1], fx, fy, 6.5, c);
@@ -22928,6 +22984,14 @@ class Renderer {
       const cy = 150 - Math.min(1, p * 2) * 40; g.save(); g.translate(0, cy); g.scale(1, -1); g.globalAlpha *= fade; g.fillStyle = '#ffd23a'; g.strokeStyle = '#7a4a00'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-20, 10); g.lineTo(-23, -12); g.lineTo(-10, -2); g.lineTo(0, -18); g.lineTo(10, -2); g.lineTo(23, -12); g.lineTo(20, 10); g.closePath(); g.fill(); g.stroke(); for (const [x, c] of [[-11, '#ff3b6b'], [0, '#4dfcff'], [11, '#7dff9a']]) { g.fillStyle = c; g.beginPath(); g.arc(x, 4, 3, 0, TAU); g.fill(); } g.restore();
       for (let i = 0; i < 22; i++) { const q = (p * 1.3 + i * 0.045) % 1, x = Math.sin(i * 7.1) * 90, y = 260 * (1 - q); g.fillStyle = `rgba(255,${210 + (i % 3) * 15},90,${(1 - q) * fade})`; star4(g, x, y, 3 + (i % 3)); } }
   };
+  const LOOT_ICON = { potE: '🧪', potEM: '⚗️', sobi: '🎭', sobiU: '👺', colE: '📿', colM: '💠', tomo: '📕' };
+  P.drawLoot = function (g) { const W = this.W; if (!W.coins) return; const t = W.time, v = this.view || { vx0: -1e9, vx1: 1e9, vy0: -1e9, vy1: 1e9 };
+    for (const c of W.coins) { if (c.taken || c.x < v.vx0 || c.x > v.vx1 || c.y < v.vy0 || c.y > v.vy1) continue; const sp = Math.cos(t * 4 + c.id), hy = 26 + Math.sin(t * 3 + c.id) * 4;
+      g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(c.x, c.y - 4, 12, 4, 0, 0, TAU); g.fill();
+      g.save(); g.translate(c.x, c.y + hy); g.scale(Math.max(0.15, Math.abs(sp)), 1); const cg = g.createLinearGradient(-14, 0, 14, 0); cg.addColorStop(0, '#b47a0c'); cg.addColorStop(0.5, '#ffe27a'); cg.addColorStop(1, '#c78a12'); g.fillStyle = cg; g.beginPath(); g.arc(0, 0, 14, 0, TAU); g.fill(); g.strokeStyle = '#7a4d00'; g.lineWidth = 2; g.stroke(); g.fillStyle = '#a86a00'; g.font = 'bold 14px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.scale(1, -1); g.fillText('$', 0, 1); g.restore(); }
+    for (const l of W.loot || []) { if (l.taken || l.x < v.vx0 || l.x > v.vx1 || l.y < v.vy0 || l.y > v.vy1) continue; const hy = 30 + Math.sin(t * 2.5 + l.x) * 5, pul = 0.5 + 0.5 * Math.sin(t * 4);
+      g.save(); g.translate(l.x, l.y); g.scale(1, 0.5); const gl = g.createRadialGradient(0, 0, 0, 0, 0, 40); gl.addColorStop(0, `rgba(160,240,255,${0.5 + 0.3 * pul})`); gl.addColorStop(1, 'rgba(160,240,255,0)'); g.fillStyle = gl; g.beginPath(); g.arc(0, 0, 40, 0, TAU); g.fill(); g.restore();
+      g.save(); g.translate(l.x, l.y + hy); g.scale(1, -1); g.font = '30px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(LOOT_ICON[l.it] || '🎁', 0, 0); g.restore(); } };
   P.drawKittyShop = function (g, u) {
     g.save(); g.scale(1.6, -1.6); // bigger shops
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(4, 26, 46, 12, 0, 0, TAU); g.fill();
@@ -23198,6 +23262,21 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   function doJump() { if (!W || W.profile.family !== 'run') return; const h = W.heroOf(W.local); if (!h) return; let dx = null, dy = null; if (stick.active && Math.hypot(stick.dx, stick.dy) > 0.2) { dx = stick.dx; dy = stick.dy; }
     if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
   function doRoar() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
+  // ---------- tiger map: stun, dash, coins, bag and the shop ----------
+  const KITEMS = { potE: ['🧪', 'Poción de Energía', 50, 'Úsala: recarga al instante tu Salto.'], potEM: ['⚗️', 'Poción de Energía Mayor', 80, 'Úsala: recarga al instante todos tus poderes.'], sobi: ['🎭', 'Máscara Sobi', 120, 'Llévala: tus poderes se recargan 25% más rápido.'],
+    colE: ['📿', 'Colgante de Energía', 150, 'Llévalo: Invisible y Dash duran 1 segundo más.'], sobiU: ['👺', 'Máscara Sobi Ultra', 220, 'Llévala: tus poderes se recargan 50% más rápido.'], colM: ['💠', 'Colgante de Maná', 260, 'Llévalo: Invisible y Dash duran 2 segundos más (el doble del de Energía).'], tomo: ['📕', 'Tomo de Poder', 350, 'Úsalo: +10% de velocidad para el resto de la partida.'] };
+  function doStun() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdStun(W.local) && online) online.net.pushEvent('stun'); }
+  function doDash() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdDash(W.local) && online) online.net.pushEvent('dash'); }
+  window.botStun = u => { if (W.cmdStun(u.owner) && online && online.host) online.net.pushEvent('bstun', u.owner.id); };
+  window.botDash = u => { if (W.cmdDash(u.owner) && online && online.host) online.net.pushEvent('bdash', u.owner.id); };
+  function nearShop(h) { return W.units.some(u => u.t.kind === 'shop' && !u.removed && Math.hypot(u.x - h.x, u.y - h.y) < 320); }
+  function renderKShop() { const h = W && W.heroOf(W.local); if (!h) return; $('#kShopGold').textContent = '🪙 ' + (h.gold || 0);
+    $('#kShopList').innerHTML = Object.entries(KITEMS).map(([id, [ic, n, pr, d]]) => `<div class="krow"><div class="ic">${ic}</div><div><b>${n}</b><small>${d}</small></div><button data-buy="${id}" ${(h.gold || 0) < pr || (h.kinv || []).length >= 6 ? 'disabled' : ''}>🪙 ${pr}</button></div>`).join('');
+    $('#kShopList').querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { if (W.kittyBuy(h, b.dataset.buy)) { if (online) online.net.pushEvent('kbuy', b.dataset.buy); showText('🛒 Compraste: ' + KITEMS[b.dataset.buy][1]); } renderKShop(); })); }
+  function kittyHud(h) { const on = W.profile.id === 'kitty5'; $('#kitBar').classList.toggle('hidden', !on); if (!on) return;
+    $('#kGold').textContent = '🪙 ' + (h.gold || 0); const inv = h.kinv || []; const key = inv.join(','); if ($('#kInv').dataset.k !== key) { $('#kInv').dataset.k = key; $('#kInv').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `<div class="ks" data-i="${i}" title="${inv[i] ? KITEMS[inv[i]][1] : ''}">${inv[i] ? KITEMS[inv[i]][0] : ''}</div>`).join('');
+      $('#kInv').querySelectorAll('.ks').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.i, it = inv[i]; if (!it) return; if (W.kittyUse(h, i)) { if (online) online.net.pushEvent('kuse', i); showText('✨ Usaste: ' + KITEMS[it][1]); } else showText(KITEMS[it][0] + ' ' + KITEMS[it][1] + ': ' + KITEMS[it][3]); })); }
+    $('#bKShop').classList.toggle('hidden', !(h.alive && nearShop(h))); }
   function doInvis() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdInvis(W.local) && online) online.net.pushEvent('invis'); }
   window.botInvis = u => { if (W.cmdInvis(u.owner) && online && online.host) online.net.pushEvent('binvis', u.owner.id); };
   window.botRoar = u => { if (W.cmdRoar(u.owner) && online && online.host) online.net.pushEvent('broar', u.owner.id); };
@@ -23374,6 +23453,12 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'ping' && slot != null && typeof a === 'number') doPing(a, e[3], W.players[slot], e[4] === 1);
       if (kind === 'roar' && slot != null) W.cmdRoar(W.players[slot]);
       if (kind === 'invis' && slot != null) W.cmdInvis(W.players[slot]);
+      if (kind === 'stun' && slot != null) W.cmdStun(W.players[slot]);
+      if (kind === 'dash' && slot != null) W.cmdDash(W.players[slot]);
+      if (kind === 'bstun' && typeof a === 'number' && !online.owned.includes(a)) W.cmdStun(W.players[a]);
+      if (kind === 'bdash' && typeof a === 'number' && !online.owned.includes(a)) W.cmdDash(W.players[a]);
+      if (kind === 'kbuy' && slot != null && typeof a === 'string') { const hh = W.heroOf(W.players[slot]); if (hh) W.kittyBuy(hh, a); }
+      if (kind === 'kuse' && slot != null && typeof a === 'number') { const hh = W.heroOf(W.players[slot]); if (hh) W.kittyUse(hh, a); }
       if (kind === 'binvis' && typeof a === 'number' && !online.owned.includes(a)) W.cmdInvis(W.players[a]);
       if (kind === 'broar' && typeof a === 'number' && !online.owned.includes(a)) W.cmdRoar(W.players[a]);
       if (kind === 'jump' && slot != null && typeof a === 'number') W.cmdJump(W.players[slot], a / 100, e[3] / 100);
@@ -23512,12 +23597,12 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       { const left = Math.max(0, tpReadyAt - W.time); const ready = left <= 0 && hero.items.length > 0; $('#bItem0').classList.toggle('has', !!ready); $('#bItem0').classList.toggle('cool', !ready); $('#bItem0').style.setProperty('--cd', (left <= 0 ? 0 : left / TP_CD * 360) + 'deg'); }
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
-      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / (W.profile.id === 'bob' ? 10 : 12) * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); const bi = $('#bInvis'); bi.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const li = Math.max(0, (hero.invisReady || 0) - W.time); bi.classList.toggle('cool', li > 0 || !hero.alive); bi.style.setProperty('--cd', (li / 22 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); $('#bInvis').classList.add('hidden'); }
+      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / (W.profile.id === 'bob' ? 10 : 12) * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); kittyHud(hero); for (const [id, rk, cd] of [['#bStun', 'stunReady', 30], ['#bDash', 'dashReady', 18]]) { const bb = $(id); bb.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lf = Math.max(0, (hero[rk] || 0) - W.time); bb.classList.toggle('cool', lf > 0 || !hero.alive); bb.style.setProperty('--cd', (lf / cd * 360) + 'deg'); } const bi = $('#bInvis'); bi.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const li = Math.max(0, (hero.invisReady || 0) - W.time); bi.classList.toggle('cool', li > 0 || !hero.alive); bi.style.setProperty('--cd', (li / 22 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); $('#bInvis').classList.add('hidden'); $('#bStun').classList.add('hidden'); $('#bDash').classList.add('hidden'); $('#kitBar').classList.add('hidden'); }
       botChatter();
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
         let st = 1; W._endTrigs.forEach((t, i) => { if (t && t.execs > 0) st = Math.max(st, i + 2); }); setText('#stats .ver', 'Etapa ' + Math.min(12, st) + '/12'); }
-      { const pr = W.profile.family === 'run' ? ((W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1) || 1) : (W._endTrigs ? W._endTrigs.filter(t => t && t.execs > 0).length + 1 : 1); if (W._xpPr == null) W._xpPr = pr; if (pr > W._xpPr) { addPassXP(40 * (pr - W._xpPr)); W._xpPr = pr; if (W.profile.family === 'run') setTimeout(spawnFxAll, 350); } if (!W._spawned && W.time > 0.6) { W._spawned = true; spawnFxAll(); } const mn = Math.floor(W.time / 60); if (W._xpMin == null) W._xpMin = mn; if (mn > W._xpMin) { addPassXP(10); W._xpMin = mn; } } // battle pass XP
+      { const pr = W.profile.family === 'run' ? ((W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1) || 1) : (W._endTrigs ? W._endTrigs.filter(t => t && t.execs > 0).length + 1 : 1); if (W._xpPr == null) W._xpPr = pr; if (pr > W._xpPr) { addPassXP(40 * (pr - W._xpPr)); W._xpPr = pr; if (W.profile.family === 'run') setTimeout(spawnFxAll, 350); if (W.kittySetupLoot) W.kittySetupLoot(pr); } if (!W._spawned && W.time > 0.6) { W._spawned = true; spawnFxAll(); if (W.kittySetupLoot) W.kittySetupLoot(1); W.on('coin', h => { if (h.owner === W.local) sfx.play('coin'); }); W.on('loot', (h, l) => { if (h.owner === W.local) { sfx.play('rescue'); showText('🎁 Encontraste: ' + KITEMS[l.it][0] + ' ' + KITEMS[l.it][1]); } }); } const mn = Math.floor(W.time / 60); if (W._xpMin == null) W._xpMin = mn; if (mn > W._xpMin) { addPassXP(10); W._xpMin = mn; } } // battle pass XP
       { const still = hero.alive && !hero.glide && !(hero.order && !hero.paused) && !(hero._mv > 0.5); const nw = performance.now(); if (!still) hero._still0 = nw; else if (hero._still0 == null) hero._still0 = nw; hero._stillT = (nw - hero._still0) / 1000; if (!still && sendDance.next > nw) { sendDance.next = 0; $('#bDance').classList.remove('cool'); } $('#bDance').classList.toggle('off', !still || hero._stillT < 0.05); $('#danceWrap').classList.toggle('hidden', !hero.alive || !$('#bBlink').classList.contains('hidden')); if (!hero.alive) $('#dancePick').classList.add('hidden'); } // gray while moving
       $('#bGive').classList.toggle('hidden', !(hero.alive && hero.items.length && nearFriend(hero, 220)));
       $('#mana').style.width = (hero.mana / hero.maxMana * 100) + '%';
@@ -23684,7 +23769,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   btn('#bResume', () => { paused = false; $('#pause').classList.add('hidden'); });
   btn('#bAgain', () => { if (online) { const o = online; stopGame(); if (o.host) o.net.endGame(); window.Lobby && Lobby.showWait(); } else start(); });
   function addPassXP(n) { const lv0 = Math.floor((settings.passXP || 0) / 100); settings.passXP = (settings.passXP || 0) + n; saveSettings(); if (Math.floor(settings.passXP / 100) > lv0 && lv0 < 29) { try { showText('🎖️ ¡Subiste al nivel ' + (lv0 + 2) + ' del Pase de Batalla!'); } catch (e) {} } }
-  function stopGame() { $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
+  function stopGameKShop() { try { $('#kShop').classList.add('hidden'); } catch (e) {} }
+  function stopGame() { stopGameKShop(); $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
   btn('#bMenuBack', () => { const o = online; stopGame(); if (o) o.net.leave(); $('#menu').classList.remove('hidden'); });
   btn('#bQuit', () => { if (!confirmQuit()) return; const o = online; stopGame(); if (o) o.net.leave(); $('#menu').classList.remove('hidden'); });
   let quitArm = 0; function confirmQuit() { const now = performance.now(); if (now - quitArm < 3000) return true; quitArm = now; $('#bQuit').textContent = '¿Seguro? Toca otra vez para abandonar'; setTimeout(() => { $('#bQuit').textContent = '🚪 Abandonar partida'; }, 3000); return false; }
@@ -23692,7 +23778,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   btn('#bWatch', watchNext);
   if (!settings.kSongV2) { settings.kittySong = 'sinfreno'; settings.kSongV2 = 1; saveSettings(); } // the owner picked Sin Freno as the theme
   { const ks = $('#optKSong'); ks.value = settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
-  btn('#bRoar', doRoar); btn('#bInvis', doInvis);
+  btn('#bRoar', doRoar); btn('#bInvis', doInvis); btn('#bStun', doStun); btn('#bDash', doDash);
+  btn('#bKShop', () => { renderKShop(); $('#kShop').classList.remove('hidden'); }); btn('#kShopX', () => $('#kShop').classList.add('hidden'));
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
