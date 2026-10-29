@@ -22657,6 +22657,7 @@ class Renderer {
   P.drawKitty = function (g, u) {
     const W = this.W; if (!u.alive) return;
     if (kArt()) {
+      if ((!!u.order && !u.paused) || u.jump) u._movedAt = W.time;
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3;
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
@@ -22672,7 +22673,8 @@ class Renderer {
         const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
         if (k === 26) kTrot(g, 26, 1.56, ph); else { const B = Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * 6; g.save(); g.translate(0, bob); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
-      else kBlit(g, k, k === 26 ? -1.56 : -1.2, 0.5, 0.92); // standing still: the planted pose (all four paws on the ground)
+      else { const br = Math.sin(W.time * 3.2 + u.handle), still = W.time - (u._movedAt || 0); g.save(); if (still > 0.4) { g.translate(0, 1.5 * Math.max(0, br)); g.scale(1 + 0.022 * br, 1 - 0.03 * br); } kBlit(g, k, k === 26 ? -1.56 : -1.2, 0.5, 0.92); g.restore();
+        if (still > 0.4 && br > 0.92 && Math.random() < 0.25) { const f = u._rf * Math.PI / 180; this.puff(u.x + Math.cos(f) * 40, u.y + 70 + Math.sin(f) * 10, { r0: 3, r1: 10, life: 0.6, col: '255,255,255', a: 0.5, vx: Math.cos(f) * 30, vy: 20 }); } } // standing still: paws planted, tired breathing in a loop
       return;
     }
     const moving = !!u.order && !u.paused; const ph = u.walkPhase * 2.2; const t = W.time + u.handle * 0.3;
@@ -22741,29 +22743,39 @@ class Renderer {
   };
 
   // ===================== Fuga Bajo el Mar (ice map) =====================
-  P.drawPuffer = function (g, u) { // original hero: a round little pufferfish in your team colour, wearing a scarf
-    const W = this.W; if (!u.alive) return; const t = W.time + u.handle * 0.4; const col = this.heroColor(u), body = col === '#000000' ? '#555566' : col;
-    const moving = !!u.order || (u.walkPhase !== u._lwp); u._lwp = u.walkPhase; const fx = Math.cos(u.facing * Math.PI / 180), dir = fx < -0.1 ? -1 : 1;
-    const puff = 1 + Math.sin(t * 3) * 0.03, wig = Math.sin(t * 14) * (moving ? 0.25 : 0.08);
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(0, -16, 24, 8, 0, 0, TAU); g.fill();
-    g.save(); g.scale(dir, -1); g.translate(0, -24 + Math.sin(t * 4) * 2);
-    // tail fin
-    g.save(); g.translate(-22, 0); g.rotate(wig); g.fillStyle = kShade(body, -0.15); g.beginPath(); g.moveTo(0, 0); g.lineTo(-14, -10); g.lineTo(-12, 0); g.lineTo(-14, 10); g.closePath(); g.fill(); g.strokeStyle = 'rgba(20,20,40,0.8)'; g.lineWidth = 2; g.stroke(); g.restore();
-    // body with little spikes
-    g.save(); g.scale(puff, puff);
-    g.fillStyle = kShade(body, 0.1); for (let k = 0; k < 14; k++) { const a = k * TAU / 14; g.beginPath(); g.moveTo(Math.cos(a - 0.12) * 20, Math.sin(a - 0.12) * 20); g.lineTo(Math.cos(a) * 26, Math.sin(a) * 26); g.lineTo(Math.cos(a + 0.12) * 20, Math.sin(a + 0.12) * 20); g.fill(); }
-    const gr = g.createRadialGradient(-6, -8, 2, 0, 0, 22); gr.addColorStop(0, kShade(body, 0.45)); gr.addColorStop(1, kShade(body, -0.1)); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 21, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,20,40,0.85)'; g.lineWidth = 2.5; g.stroke();
-    g.fillStyle = 'rgba(255,255,255,0.75)'; g.beginPath(); g.ellipse(4, 8, 12, 7, 0, 0, TAU); g.fill();
+  P.drawPuffer = function (g, u) { // the ice map hero: a little seal in your team colour scarf
+    const W = this.W; if (!u.alive) return; const t = W.time + u.handle * 0.4; const col = this.heroColor(u);
+    const mv = Math.hypot(u.x - (u._sx ?? u.x), u.y - (u._sy ?? u.y)); u._sx = u.x; u._sy = u.y; if (mv > 0.5 || u.jump) u._movedAt = W.time;
+    const moving = W.time - (u._movedAt || 0) < 0.15, onIce = W.tileTypeAt(u.x, u.y) === 'Nice';
+    const fx = Math.cos(u.facing * Math.PI / 180), dir = fx < -0.1 ? -1 : 1, ph = t * (moving ? 10 : 3.2);
+    const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 40 : 0;
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(0, -14, 30, 9, 0, 0, TAU); g.fill();
+    g.save(); g.scale(dir, -1); g.translate(0, -18 - lift);
+    const slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? Math.sin(ph) : 0; // breathing when resting
+    g.save(); g.scale(1 + 0.05 * wave + 0.03 * br, 1 - 0.05 * wave - 0.04 * br + (slide ? -0.12 : 0));
+    // tail flippers
+    g.save(); g.translate(-30, 6); g.rotate(0.3 + wave * 0.4 + br * 0.08); g.fillStyle = '#6f7d8c'; g.beginPath(); g.moveTo(0, 0); g.lineTo(-14, -9); g.lineTo(-11, 0); g.lineTo(-14, 9); g.closePath(); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2; g.stroke(); g.restore();
+    // body
+    const gr = g.createLinearGradient(0, -16, 0, 18); gr.addColorStop(0, '#a9b6c4'); gr.addColorStop(1, '#7c8a99'); g.fillStyle = gr;
+    g.beginPath(); g.ellipse(-4, 4, 30, 15, slide ? 0 : -0.12, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2.5; g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.45)'; g.beginPath(); g.ellipse(0, 11, 20, 6, 0, 0, TAU); g.fill();
+    for (const [sx, sy] of [[-14, -2], [-4, -6], [-20, 6]]) { g.fillStyle = 'rgba(70,80,95,0.45)'; g.beginPath(); g.arc(sx, sy, 2.2, 0, TAU); g.fill(); }
+    // front flipper
+    g.save(); g.translate(4, 12); g.rotate(0.5 + (moving && !slide ? Math.sin(ph + 1) * 0.7 : slide ? -0.9 : br * 0.1)); g.fillStyle = '#6f7d8c'; g.beginPath(); g.ellipse(6, 0, 10, 4, 0, 0, TAU); g.fill(); g.restore();
     g.restore();
-    // side fin
-    g.save(); g.translate(-2, 6); g.rotate(-0.4 + wig); g.fillStyle = kShade(body, -0.2); g.beginPath(); g.ellipse(0, 0, 8, 4, 0, 0, TAU); g.fill(); g.restore();
-    // eye + mouth
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(10, -6, 6.5, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,20,40,0.8)'; g.lineWidth = 1.5; g.stroke();
-    g.fillStyle = '#18183a'; g.beginPath(); g.arc(11.5, -6, 3.2, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(12.5, -7.2, 1.1, 0, TAU); g.fill();
-    g.fillStyle = '#ff7b9a'; g.beginPath(); g.ellipse(19, 3, 3, 2.4, 0, 0, TAU); g.fill();
-    // winter scarf
-    g.fillStyle = '#e8414d'; g.beginPath(); g.ellipse(2, -16, 13, 4, -0.15, 0, TAU); g.fill(); g.fillStyle = '#ffffff'; g.fillRect(-2, -18, 3, 4); g.fillRect(6, -19, 3, 4);
+    // head
+    const hy = slide ? 0 : -10 + br * 1.5, hx = slide ? 24 : 20;
+    g.fillStyle = '#a9b6c4'; g.beginPath(); g.arc(hx, hy, 14, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2.5; g.stroke();
+    g.fillStyle = '#cdd6df'; g.beginPath(); g.ellipse(hx + 8, hy + 4, 8, 6, 0, 0, TAU); g.fill();
+    g.fillStyle = '#1b1f2e'; g.beginPath(); g.arc(hx + 14, hy + 2, 2.6, 0, TAU); g.fill();
+    const blink = !moving && Math.sin(t * 0.8) > 0.6; // sleepy, tired eyes when resting
+    g.fillStyle = '#1b1f2e'; if (blink) { g.fillRect(hx + 2, hy - 4, 7, 1.8); } else { g.beginPath(); g.arc(hx + 5, hy - 3, 3.2, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4, 1, 0, TAU); g.fill(); }
+    g.strokeStyle = 'rgba(30,35,50,0.7)'; g.lineWidth = 1; for (const k of [-1, 1]) { g.beginPath(); g.moveTo(hx + 12, hy + 5); g.lineTo(hx + 22, hy + 3 + k * 3); g.stroke(); }
+    if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 10, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); } // panting tongue
+    // team scarf
+    g.fillStyle = col === '#000000' ? '#444' : col; g.beginPath(); g.ellipse(hx - 6, hy + 10, 9, 4, 0.5, 0, TAU); g.fill(); g.fillRect(hx - 14, hy + 10, 4, 10);
     g.restore();
+    if (!moving && br > 0.95 && Math.random() < 0.2) this.puff(u.x + dir * 30, u.y + 40, { r0: 3, r1: 9, life: 0.6, col: '255,255,255', a: 0.55, vx: dir * 25, vy: 20 });
   };
   P.drawCrab = function (g, u) {
     const W = this.W; const t = W.time + u.handle * 0.31; const moving = !!u.order && !u.paused; const ph = u.walkPhase * 2.4; const s = 1.05;
@@ -23021,7 +23033,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   // the bots chat by themselves now and then, so the room feels alive
   const CHATTER = {
     shroom25: ['vamos!', 'cuidado con los payasos', 'esperenme', 'jaja casi', 'por aqui', 'voy por la palanca', 'que dificil esta', 'xd', 'corran', 'ya casi', 'ese cañon da miedo', 'nadie se muera porfa', 'buena!', 'sigan sigan', 'alguien tiene hongo?', 'uff', 'me encanta este mapa', 'jajaja', 'lento pero seguro', 'vamos equipo'],
-    bob: ['cuidado los cangrejos', 'resbala mucho xd', 'vamos peces', 'glu glu', 'casi me pellizcan', 'esperenme', 'que frio', 'voy a salvarlos', 'corran!', 'jajaja', 'uff por poco', 'sigan sigan', 'vamos equipo'],
+    bob: ['cuidado los cangrejos', 'resbala mucho xd', 'vamos focas', 'arf arf', 'casi me pellizcan', 'esperenme', 'que frio', 'voy a salvarlos', 'corran!', 'jajaja', 'uff por poco', 'sigan sigan', 'vamos equipo'],
     kitty5: ['cuidado los perros', 'vamos gatitos', 'miau', 'esperenme', 'casi me pillan', 'voy a salvarlos', 'ya casi llegamos', 'corran!', 'jajaja', 'xd', 'buenaaa', 'que rapido son', 'miau miau', 'sigan sigan', 'uff por poco', 'vamos equipo'],
   };
   let chatterAt = 0;
