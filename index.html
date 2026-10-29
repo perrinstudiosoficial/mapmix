@@ -104,7 +104,7 @@ body[data-fam=run] #danceWrap{display:none!important}
 .ab.item.has{opacity:1;border-style:solid;border-color:var(--gold)}
 #manaw{grid-column:1/4;height:6px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden}
 #mana{height:100%;width:100%;background:linear-gradient(90deg,#5ff2ff,#4b7bff)}
-#dead{position:absolute;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);padding:6px 14px;font-weight:800;font-size:13px;text-align:center;max-width:46vw}
+#dead{position:absolute;left:50%;top:calc(max(12px,env(safe-area-inset-top)) + 70px);transform:translateX(-50%);padding:10px 16px;font-weight:800;font-size:13px;text-align:center;max-width:78vw;background:linear-gradient(135deg,rgba(120,20,60,.92),rgba(60,10,90,.92));border:2px solid #ff6fb0;border-radius:16px;box-shadow:0 0 18px rgba(255,80,160,.55);animation:deadPulse 1.6s ease-in-out infinite;pointer-events:none}#dead .big{font-size:22px;letter-spacing:2px;color:#ffe14d;text-shadow:0 2px 0 #000}#deadMsg{white-space:pre-line;line-height:1.35;margin-top:4px}@keyframes deadPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
 #dead .big{font-family:Bungee,sans-serif;color:var(--pink);font-size:16px}
 /* stick */
 #stick{position:fixed;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);pointer-events:none}
@@ -291,7 +291,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div id="glideTag" class="pill hidden">🛼 Planeando · joystick = girar · toca 🛼 para parar</div>
   <div id="dead" class="pill hidden"><div class="big">¡CAÍSTE!</div><div id="deadMsg"></div></div>
   <div class="ab hidden" id="bGive">🎁<kbd>D</kbd><small>Dar hongo</small></div>
-  <div class="ab hidden" id="bBlink">📍<small>Blink tumba</small></div>
+  <div class="ab hidden" id="bBlink">📍<small>Pedir ayuda</small></div>
   <div class="ab hidden" id="bJump">🐾<small>Saltar</small></div>
   <div class="ab hidden" id="bRoar">😾<small>Gruñido</small></div>
   <div class="ab hidden" id="bInvis">👻<small>Invisible</small></div>
@@ -526,6 +526,13 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
     <h2 id="askT" style="font-family:Bungee,sans-serif;font-weight:400;color:var(--lime);margin:0 0 10px"></h2>
     <div class="opts"><input id="askA" autocomplete="off" style="width:100%"><label id="askBrow">Contraseña (vacía si no tiene) <input id="askB" autocomplete="off"></label></div>
     <div class="row2"><button class="big-btn" id="askOk">OK</button><button class="big-btn ghost" id="askNo">Cancelar</button></div>
+  </div>
+</div>
+<div id="quitAsk" class="screen hidden" style="z-index:31">
+  <div class="card">
+    <h2 style="font-family:Bungee,sans-serif;font-weight:400;color:var(--lime);margin:0 0 10px">¿Salir de MapMix?</h2>
+    <div class="hint">Para cerrar del todo también puedes usar el botón ▢ del celular y deslizar el juego.</div>
+    <div class="row2"><button class="big-btn" id="quitYes">SALIR</button><button class="big-btn ghost" id="quitNo">Seguir jugando</button></div>
   </div>
 </div>
 <script>
@@ -19892,6 +19899,7 @@ class World {
   killUnit(u, by) {
     if (!u || !u.alive || u.removed) return;
     if (u.hero && u.graceUntil && this.time < u.graceUntil) return;
+    if (u.hero && u.owner.ai && this.rescue && this.rescue.until > this.time && this.rescue.p !== u.owner) { const rh = this.heroOf(this.rescue.p); if (rh && !rh.alive) return; } // rescue mode: the bots can't fall until they save you
     if (u.jump) return; // in the air
     if (this.isRemoteUnit(u) && !u._netKill) return;
     u.alive = false; u.deathTime = this.time; u.order = null; u.path = null; u.killer = by || null;
@@ -21320,7 +21328,10 @@ class BotManager {
     const W = this.W;
     // 1) revive fallen friends (the closest two bots go)
     let target = null, best = Infinity;
-    for (const u of W.units) {
+    const RS = W.rescue && W.rescue.until > W.time ? W.rescue : null; if (RS) { const rh = W.heroOf(RS.p); if (!rh || rh.alive) W.rescue = null; }
+    const rmk = W.rescue && W.units.find(u => !u.removed && u.alive && u.t.code === 'n001' && u.owner === W.rescue.p);
+    if (rmk && rmk.owner !== b.p) { target = { x: rmk.x, y: rmk.y, revive: true, marker: rmk }; if (b.unreach) b.unreach.delete(rmk); b.revW = null; } // somebody called for help: everybody goes
+    else for (const u of W.units) {
       if (u.removed || !u.alive || u.t.code !== 'n001' || u.owner === b.p) continue;
       if (b.unreach && b.unreach.get(u) > W.time) continue;
       const d = Math.hypot(u.x - h.x, u.y - h.y); if (d > 6000) continue;
@@ -21330,7 +21341,7 @@ class BotManager {
     }
     b.field = null;
     /* revive watchdog: if a bot can't get closer to a tomb for a while (narrow spot, blocked), it gives up on it for a bit and keeps playing */
-    if (target) {
+    if (target && !rmk) {
       const mk = target.marker, d = Math.hypot(mk.x - h.x, mk.y - h.y);
       if (!b.revW || b.revW.mk !== mk) b.revW = { mk, best: d, t: W.time };
       else if (d < b.revW.best - 40) { b.revW.best = d; b.revW.t = W.time; }
@@ -21524,6 +21535,7 @@ class KittyBots {
       for (const c of circles) { const owner = W.heroOf(c.owner); if (owner && owner.alive) continue; if (Math.abs(c.x - h.x) > 3500 || Math.abs(c.y - h.y) > 3500) continue;
         const d = this.fAt(this.field(c.x, c.y), h.x, h.y) * 32; const behind = this.fAt(Dg, c.x, c.y) >= here - 4; const lim = (behind ? 1100 : 3200) * (b.target === c ? 1.4 : 1); // stick to the friend you chose
         if (d < bd && d < lim) { bd = d; best = c; } }
+      if (W.rescue && W.rescue.until > W.time) { const rh = W.heroOf(W.rescue.p); if (!rh || rh.alive) W.rescue = null; else { const rc = circles.find(c => c.owner === W.rescue.p); if (rc && rc.owner !== b.p) best = rc; } } // a friend called for help: go save them
       b.target = best;
       if (best) { gx = best.x; gy = best.y; }
       const D = best ? this.field(gx, gy) : Dg; const cur = this.fAt(D, h.x, h.y);
@@ -22555,7 +22567,7 @@ class Renderer {
     return o;
   }
   // ---------- outfits (skins) for the mushroom kid: clothes colours + a hat on top of the cap ----------
-  const HERO_SKINS = { base: { tunic: '#6a34c9', pants: '#3a2448', boot: '#6b3f1f', leather: '#7a4a24' },
+  const HERO_SKINS = { base: { tunic: '#34303c', pants: '#5a4634', boot: '#6b3f1f', leather: '#7a4a24', scarf: '#c81e2b' }, alien: { tunic: '#3a2a7a', pants: '#e4e6ee', boot: '#cfe8e0', leather: '#7a3fd0' }, // the boy's / alien's clothes (used while dancing)
     ninja: { tunic: '#22222e', pants: '#14141c', boot: '#1a1a22', leather: '#3a1010', hat: 'ninja', scarf: '#c81e2b' }, pirata: { tunic: '#9a1c1c', pants: '#22305e', boot: '#3a2410', leather: '#5a3a18', hat: 'pirata' },
     rapero: { tunic: '#1a1a1a', pants: '#2a4a9a', boot: '#f2f2f2', leather: '#ffd23a', hat: 'gorro', glasses: '#111', scarf: '#ffd23a' }, invierno: { tunic: '#2a6ab0', pants: '#22305e', boot: '#5a3a18', leather: '#7a4a24', hat: 'gorro', scarf: '#e02828' }, fiesta: { tunic: '#ff4fd8', pants: '#3a2448', boot: '#4dfcff', leather: '#ffe14d', hat: 'fiesta', glasses: '#4dfcff' },
     mago: { tunic: '#2a3ac9', pants: '#18206a', boot: '#3a2a5a', leather: '#c9a020', hat: 'mago' }, rey: { tunic: '#d4a017', pants: '#7a1414', boot: '#5a1010', leather: '#8a5a10', hat: 'rey' },
@@ -22566,7 +22578,10 @@ class Renderer {
   P.skinOf = function (p, map) { if (!p) return 'base'; map = map || (this.W && this.W.profile && this.W.profile.id) || 'shroom25'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (this.W && p === this.W.local) return (S && S.skins && S.skins[map]) || 'base'; return (p.skins && p.skins[map]) || p.skin || 'base'; };
   const TIGER_SKINS = { dorado: { f: 'sepia(0.9) saturate(2.2) hue-rotate(-12deg) brightness(1.05)', hat: 'rey' }, sombra: { f: 'brightness(0.55) contrast(1.3) saturate(0.6)', hat: 'mago' },
     fuego: { f: 'sepia(1) saturate(4) hue-rotate(-30deg) brightness(0.95)' }, hielo: { f: 'saturate(0.4) hue-rotate(170deg) brightness(1.1)', hat: 'gorro' }, jade: { f: 'sepia(0.8) saturate(3) hue-rotate(70deg)', hat: 'safari' },
-    vaquero: { hat: 'vaquero' }, pirata: { hat: 'pirata' }, fiesta: { hat: 'fiesta' } };
+    vaquero: { hat: 'vaquero' }, pirata: { hat: 'pirata' }, fiesta: { hat: 'fiesta' },
+    puma: { f: 'sepia(0.75) saturate(1.3) hue-rotate(-6deg) brightness(0.98)' }, leon: { f: 'sepia(0.95) saturate(1.7) hue-rotate(-8deg) brightness(1.08)' }, tigresa: { f: 'sepia(1) saturate(3.2) hue-rotate(-24deg) brightness(1.04)' },
+    jaguar: { f: 'sepia(1) saturate(2.4) hue-rotate(-14deg) brightness(0.82) contrast(1.25)' }, leopardo: { f: 'sepia(0.9) saturate(1.9) hue-rotate(-2deg) brightness(1.12) contrast(1.18)' }, gato: { f: 'grayscale(0.7) brightness(1.18) contrast(1.05)' },
+    lince: { f: 'sepia(0.55) saturate(1.1) hue-rotate(12deg) brightness(1.16) contrast(0.95)' }, llama: { f: 'sepia(1) saturate(4.5) hue-rotate(-28deg) brightness(1.08) contrast(1.1)', fire: true } };
   const SEAL_SKINS = { dorada: { c: ['#e0b84a', '#a8802a'], hat: 'rey' }, negra: { c: ['#4a4f5a', '#2a2e36'], scarf: '#c81e2b' }, rosa: { c: ['#f0a8c8', '#c07898'], hat: 'fiesta' }, pinguino: { c: ['#2a2e3a', '#14161c'], hat: 'gorro', scarf: '#ffd23a' }, arcoiris: { rainbow: true }, pirata: { hat: 'pirata', scarf: '#1a1a1a' }, vaquera: { hat: 'vaquero', scarf: '#c8602a' } };
   if (typeof window !== 'undefined') { window.TIGER_SKINS = TIGER_SKINS; window.SEAL_SKINS = SEAL_SKINS; }
   function drawHat(g, h, t, v) { g.save(); g.lineJoin = 'round'; const O = 'rgba(20,5,25,0.85)';
@@ -22641,6 +22656,8 @@ class Renderer {
     else if (!v.back) { arm(-12, -6, Math.sin(ph), false); arm(12, -6, -Math.sin(ph), false); }
     // head
     g.translate(0, -16); g.rotate(D ? D.head : moving ? Math.sin(ph * 2) * 0.05 : Math.sin(t * 0.9) * 0.05); g.translate(0, 16);
+    if (u._boyHead) { const BH = u._boyHead, r = BH.r, cw = r[2], ch = r[3] * 0.44, w2 = 54, h2 = w2 * ch / cw; g.drawImage(BH.im, r[0], r[1], cw, ch, -w2 / 2, -10 - h2, w2, h2); } // dancing boy: his own head on the dancing body
+    else {
     ball(g, 0, -24, 15, '#f3dcc0');
     if (!v.back) {
       const ox = v.side ? 6 : 0; const blink = Math.sin(t * 1.3 + u.handle * 7) > 0.985 ? 0.2 : 1;
@@ -22661,7 +22678,7 @@ class Renderer {
     const wob = moving ? Math.cos(ph * 2) * 0.05 : Math.sin(t * 3) * 0.02; const capC = '#7b3fe4';
     g.save(); g.translate(0, -33); g.scale(1 + wob, 1 - wob); g.rotate(moving ? -sw * 0.04 : 0);
     { const fr = Math.floor(((t * 25) % 360) / 15) % 24, img = capSprite(fr, (Math.floor(t * 8 + u.handle) % 8)); g.drawImage(img, -36, -34, 72, 48); if (SKD.hat) drawHat(g, SKD.hat, t, v); } // pre-rendered cap (shared by every hero)
-    g.restore();
+    g.restore(); }
     g.restore();
     g.restore();
   };
@@ -22847,6 +22864,8 @@ class Renderer {
       if (sd > 0 && sd < 1) { const dx = sd * w, r = dx * 0.62; for (const ex of [-dx, dx]) { g.beginPath(); g.ellipse(ex, 0, r, r * 0.7, 0, 0, TAU); g.fill(); g.stroke(); } g.beginPath(); g.moveTo(-dx + r, 0); g.lineTo(dx - r, 0); g.stroke(); g.fillStyle = 'rgba(255,255,255,0.55)'; for (const ex of [-dx, dx]) g.fillRect(ex - r * 0.5, -r * 0.4, r * 0.35, r * 0.25); }
       else { const r = 0.045 * w * (kk >= 16 ? 0.7 : 1) + 2; g.beginPath(); g.ellipse(0, 0, r, r * 0.7, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(-sd * r, -1); g.lineTo(-sd * r * 3, -2); g.stroke(); }
       g.restore(); }
+    if (A.fire) { const op = g.globalCompositeOperation; g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 7; i++) { const fx = x0 + w * (0.18 + i * 0.11), fy = y0 + h * (0.18 + Math.abs(i - 3) * 0.03), hh = h * (0.16 + 0.1 * Math.abs(Math.sin(kAccT * 9 + i * 1.7))), ww = w * 0.05;
+        const fg = g.createLinearGradient(fx, fy, fx, fy - hh); fg.addColorStop(0, 'rgba(255,120,20,0.85)'); fg.addColorStop(0.6, 'rgba(255,200,60,0.55)'); fg.addColorStop(1, 'rgba(255,240,160,0)'); g.fillStyle = fg; g.beginPath(); g.moveTo(fx - ww, fy); g.quadraticCurveTo(fx - ww * 0.6, fy - hh * 0.6, fx + Math.sin(kAccT * 12 + i) * ww, fy - hh); g.quadraticCurveTo(fx + ww * 0.6, fy - hh * 0.5, fx + ww, fy); g.fill(); } g.globalCompositeOperation = op; } // a mane and back of flames
     if (A.hat && K_HEAD[kk]) { const [fx, fy, hw] = K_HEAD[kk], sc = hw * w / 56; g.save(); g.translate(x0 + fx * w, y0 + fy * h); g.scale(sc, sc); if (kk >= 16 || kk === 5 || kk === 6) g.rotate(0.18); else if (kk === 1 || kk === 2) g.rotate(-0.18); g.translate(0, 24); if (kAccMv) g.rotate(Math.sin(kAccT * 15) * 0.07); drawHat(g, A.hat, kAccT, null); g.restore(); } // the hat bounces a little with each stride // brim sits a bit into the fur, so the hat is worn, not floating
     g.restore(); };
   let kAccT = 0, kAccMv = 0;
@@ -22875,7 +22894,7 @@ class Renderer {
       W._rdt = this._dt; if ((!!u.order && !u.paused) || u.jump) { u._movedAt = W.time; fatigue(W, u, true); }
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3; if (u._wasMv && !moving) u._foot = !u._foot; u._wasMv = moving; // each stop ends with the other front paw ahead
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
-      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); { const TS = TIGER_SKINS[this.skinOf(u.owner, 'kitty5')]; if (TS && TS.f) g.filter = TS.f; kAccU = TS && (TS.hat || TS.scarf || TS.glasses) ? TS : null; kAccT = W.time; kAccMv = (!!u.order && !u.paused) || !!u.jump; } /* tiger skin: colour + accessories */ // your aura under your tiger (the same one you leave when you fall)
+      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); { const TS = TIGER_SKINS[this.skinOf(u.owner, 'kitty5')]; if (TS && TS.f) g.filter = TS.f; kAccU = TS && (TS.hat || TS.scarf || TS.glasses || TS.fire) ? TS : null; kAccT = W.time; kAccMv = (!!u.order && !u.paused) || !!u.jump; } /* tiger skin: colour + accessories */ // your aura under your tiger (the same one you leave when you fall)
       { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; if (Math.abs(d) > 150 && !(u._turnD > 1)) { const c0 = u._rf * Math.PI / 180; if (Math.abs(Math.cos(c0)) > 0.5) { const up = Math.sin(c0 + Math.PI / 2) > Math.sin(c0 - Math.PI / 2) ? 1 : -1; d = up * Math.abs(d); } } /* left<->right reversal: always sweep over the top (right, up-right, up, up-left, left) */ const st = 420 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
       let a = ((u._rf % 360) + 360) % 360; const dirs = u._turnD > 8 ? [[22.5, 5], [67.5, 3], [112.5, 'N'], [157.5, 4], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]] : [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // while turning every view gets the same share (so all 8 show); settled: wide left/right sectors = full profile
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
@@ -23176,7 +23195,7 @@ class Renderer {
       g.lineCap = 'round'; for (const [ex, ey] of [[5, -12], [8, -5], [8, 6], [5, 13], [1, 15]]) { const ww = moving ? Math.sin(ph * 0.5 + ey) * 1 : br * 0.8; g.strokeStyle = 'rgba(30,35,50,0.55)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(hx + 9, hy + 5.5); g.quadraticCurveTo(hx + 9 + ex * 1.1, hy + 5.5 + ey * 0.45, hx + 9 + ex + ww * 0.5, hy + 5.5 + ey + ww); g.stroke(); g.strokeStyle = '#f3f1ea'; g.lineWidth = 0.9; g.stroke(); }
       if (yawnK > 0.05) { g.fillStyle = '#3a1622'; g.beginPath(); g.ellipse(view === 'side' ? hx + 11 : 0, hy + (view === 'side' ? 10 : 11), 2.5 + yawnK * 2, 1 + yawnK * 5, 0, 0, TAU); g.fill(); }
       if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 11, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
-      if (SKS && (SKS.scarf || SKS.rainbow)) { g.fillStyle = scarf; g.strokeStyle = outline; g.lineWidth = 1.5; g.beginPath(); g.ellipse(hx - 9, hy + 15, 11, 5, 0.5, 0, TAU); g.fill(); g.stroke(); g.fillRect(hx - 17, hy + 16, 5, 12); } // scarf only with a skin, wrapped low on the neck
+      if (false) { g.fillStyle = scarf; g.strokeStyle = outline; g.lineWidth = 1.5; g.beginPath(); g.ellipse(hx - 9, hy + 15, 11, 5, 0.5, 0, TAU); g.fill(); g.stroke(); g.fillRect(hx - 17, hy + 16, 5, 12); } // scarf only with a skin, wrapped low on the neck
       if (SKS) { if (SKS.glasses) { g.fillStyle = SKS.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(hx + 5, hy - 3, 5.5, 4.5, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(hx, hy - 4); g.lineTo(hx - 9, hy - 6); g.stroke(); } if (SKS.hat) { g.save(); g.translate(hx + 1, hy - 11); g.scale(0.55, 0.55); g.rotate(0.12); g.translate(0, 22); drawHat(g, SKS.hat, t, null); g.restore(); } }
     } else { // front (coming at you) or back (going away): a round, fat seal seen head-on
       const front = view === 'front', sway = moving && !slide ? Math.sin(ph) * 0.12 : 0;
@@ -23198,7 +23217,7 @@ class Renderer {
         if (yawnK > 0.05) { g.fillStyle = '#3a1622'; g.beginPath(); g.ellipse(view === 'side' ? hx + 11 : 0, hy + (view === 'side' ? 10 : 11), 2.5 + yawnK * 2, 1 + yawnK * 5, 0, 0, TAU); g.fill(); }
       if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(0, hy + 12, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       }
-      if (SKS && (SKS.scarf || SKS.rainbow)) { g.fillStyle = scarf; g.strokeStyle = outline; g.lineWidth = 1.5; g.beginPath(); g.ellipse(0, hy + 19, 15, 5.5, 0, 0, TAU); g.fill(); g.stroke(); g.fillRect(front ? 6 : -10, hy + 20, 5, 12); }
+      if (false) { g.fillStyle = scarf; g.strokeStyle = outline; g.lineWidth = 1.5; g.beginPath(); g.ellipse(0, hy + 19, 15, 5.5, 0, 0, TAU); g.fill(); g.stroke(); g.fillRect(front ? 6 : -10, hy + 20, 5, 12); }
       if (SKS) { if (SKS.glasses && front) { g.fillStyle = SKS.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.5; for (const ex of [-6.5, 6.5]) { g.beginPath(); g.ellipse(ex, hy - 4, 5.5, 4.5, 0, 0, TAU); g.fill(); g.stroke(); } } if (SKS.hat) { g.save(); g.translate(0, hy - 11); g.scale(0.55, 0.55); g.translate(0, 22); drawHat(g, SKS.hat, t, null); g.restore(); } }
     }
     g.restore();
@@ -23320,10 +23339,11 @@ class Renderer {
     const moving = !!u.order && !u.paused && !u.glide, col = this.heroColor(u); let d = dirOf(u._rf);
     if (u.dance && (moving || u.glide || (u.order && !u.paused) || Math.hypot(u.x - (u.dance.x ?? u.x), u.y - (u.dance.y ?? u.y)) > 3)) u.dance = null; // moving always stops the dance
     const show = u._show; let kind = 'idle', bob = 0, rot = 0, sx = 1, sy = 1, dx = 0, lift = 0;
-    if (u.dance) { const p = (performance.now() - u.dance.t0) / 1000, beat = Math.floor(p * 2.2); d = [0, 1, 0, 7][beat % 4]; bob = Math.abs(Math.sin(p * 2.2 * Math.PI)) * 7; rot = Math.sin(p * 2.2 * Math.PI) * 0.08; kind = beat % 2 ? 'walk' : 'idle'; }
-    else if (u.glide) { kind = 'run'; rot = 0.12 * (d >= 1 && d <= 3 ? -1 : 1); lift = 6; }
-    else if (moving) { const ph = u.walkPhase * 1.3; kind = Math.floor(ph / Math.PI) % 2 ? 'run' : 'walk'; bob = Math.abs(Math.sin(ph)) * 5; sy = 1 + Math.abs(Math.cos(ph)) * 0.02; }
-    else if (show) { const q = show.p; if (show.a === 'salto') lift = Math.max(0, Math.sin(q * TAU)) * 18; else if (show.a === 'paso') { kind = Math.floor(q * 6) % 2 ? 'run' : 'walk'; bob = Math.abs(Math.sin(q * 6 * Math.PI)) * 4; } else if (show.a === 'bostezo') { sy = 1 + Math.sin(q * Math.PI) * 0.06; sx = 1 - Math.sin(q * Math.PI) * 0.03; }
+    if (u.dance) { u._boyHead = { im, r: A.rects.idle[0] }; const r0 = this.drawHero(g, u); u._boyHead = null; return r0; } // the original dances (Columpio & co.) with the boy's head
+    const cyc = ['walk', 'idle', 'run', 'idle']; // a 4-beat stride: one leg forward, passing, the other leg forward, passing
+    if (u.glide) { const ph = (u._gp = (u._gp || 0) + dt * 16); kind = cyc[Math.floor(ph / (Math.PI / 2)) % 4]; if (kind === 'idle') kind = 'walk'; bob = Math.abs(Math.sin(ph)) * 6; rot = 0.16 * (d >= 1 && d <= 3 ? -1 : d >= 5 && d <= 7 ? 1 : 0); lift = 4; } // the G push: running legs, fast, leaning into the slide
+    else if (moving) { const ph = u.walkPhase * 1.3; kind = cyc[Math.floor(ph / (Math.PI / 2)) % 4]; bob = Math.abs(Math.sin(ph * 2)) * 3.5; sy = 1 + Math.abs(Math.cos(ph * 2)) * 0.015; }
+    else if (show) { const q = show.p; if (show.a === 'salto') lift = Math.max(0, Math.sin(q * TAU)) * 18;  else if (show.a === 'bostezo') { sy = 1 + Math.sin(q * Math.PI) * 0.06; sx = 1 - Math.sin(q * Math.PI) * 0.03; }
       rot = Math.sin(t * 1.3) * 0.02; dx = Math.sin(t * 0.9) * 1.5; const br = Math.sin(t * 2.2); sy *= 1 + br * 0.014; sx *= 1 - br * 0.007; } // in the shop: calm sway, weight shift and natural breathing, like a living portrait
     else { const br = Math.sin(t * 2.4); sy = 1 + br * 0.012; sx = 1 - br * 0.006; } // in game: gentle breathing
     const L = A.rects[kind] && A.rects[kind][d] ? A.rects[kind] : A.rects.idle, r = L[d], base = A.rects.idle[d] || r, H = 84, s = H / base[3]; // every pose scaled by its idle drawing: one size for all
@@ -23531,7 +23551,11 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   function doPing(x, y, who, tomb) { const p = who || W.local; const u = W.heroOf(p); const col = R.heroColor(u || { owner: p }); R.addPing(x, y, col); sfx.play('ping'); if (tomb) showBlink(p, col); if (!who && online) online.net.pushEvent('ping', Math.round(x), Math.round(y), tomb ? 1 : 0); }
   function showBlink(p, col) { const name = p === W.local ? (settings.nick || 'Tú') : (p.name || 'Jugador'); let hex = (col || '#ffd34d').replace('#', ''); if (hex === '000000') hex = 'cccccc'; showText(`|cff${hex}📍 Blink de ${name}|r`); }
   let blinkAt = 0; function blinkTomb() { if (!W) return; const nowB = performance.now(); if (nowB - blinkAt < 1500) return; blinkAt = nowB; 
-    const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) doPing(mk.x, mk.y, null, true); } // the camera stays where you are looking (watching a friend or free look)
+    const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) { doPing(mk.x, mk.y, null, true); callRescue(); } } // the camera stays where you are looking (watching a friend or free look)
+  // calling for help while dead: every bot comes to rescue you (and they can't fall on the way) until you are back
+  function callRescue() { if (!W) return; const h = W.heroOf(W.local); if (!h || h.alive) return; const first = !(W.rescue && W.rescue.p === W.local && W.rescue.until > W.time); W.rescue = { p: W.local, until: W.time + 30 };
+    if (online) online.net.pushEvent('rescue'); if (first) { chatFrom(W.local, '🆘 ¡Ayuda! ¡Vengan a rescatarme!', true); if (online) online.net.pushEvent('chat', '🆘 ¡Ayuda! ¡Vengan a rescatarme!');
+      if (W.ai && W.ai.bots) W.ai.bots.slice(0, 3).forEach((b, i) => setTimeout(() => { const bh = W && W.heroOf(b.p); if (bh && bh.alive && window.botChat) window.botChat(bh, ['voy!!', 'aguanta, ya voy', 'te salvo!', 'voy por ti', 'ahí voy 🏃'][Math.floor(Math.random() * 5)]); }, 500 + i * 700)); } }
   function doJump() { if (!W || W.profile.family !== 'run') return; const h = W.heroOf(W.local); if (!h) return; let dx = null, dy = null; if (stick.active && Math.hypot(stick.dx, stick.dy) > 0.2) { dx = stick.dx; dy = stick.dy; }
     if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
   function doRoar() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
@@ -23733,6 +23757,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const hostTk = net.receive(W, (peer, e) => {
       const [seq, kind, a] = e; const slot = online.game.slots[peer.peer];
       if (kind === 'chat' && slot != null && typeof a === 'string') chatFrom(W.players[slot], a);
+      if (kind === 'rescue' && slot != null) W.rescue = { p: W.players[slot], until: W.time + 30 };
       if (kind === 'bchat' && typeof a === 'number' && typeof e[3] === 'string' && !online.owned.includes(a)) chatFrom(W.players[a], e[3]);
       if (kind === 'give' && slot != null && typeof a === 'number') { const from = W.heroOf(W.players[slot]), to = W.heroOf(W.players[a]); if (from && to) { moveItem(from, to); if (to.owner === W.local) { sfx.play('pickup'); showText(`|cff9fffa0${from.owner.name || 'Un compañero'} te pasó un hongo de teletransporte.|r`); } } }
       if (kind === 'pause' && slot != null) setPause(!!a, (W.players[slot] && W.players[slot].name) || 'Alguien');
@@ -23898,7 +23923,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     updateTeam();
     if (hero && !hero.alive) {
       const alive = W.units.filter(u => u.hero && u.alive && !u.removed).length;
-      setText('#deadMsg', alive ? `Espera a que un compañero toque tu marca (${alive} vivos)` : (W.practice ? 'Todos cayeron… volviendo al checkpoint' : 'Todos cayeron…'));
+      setText('#deadMsg', alive ? `👀 Desliza el dedo para mover la cámara y mirar a tus amigos\n🆘 Toca 📍 para pedir ayuda: ¡todos vendrán a rescatarte! (${alive} vivos)` : (W.practice ? 'Todos cayeron… volviendo al checkpoint' : 'Todos cayeron…'));
     }
   }
   function setCd(sel, A, ok) {
@@ -24050,7 +24075,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   const btn = (sel, fn) => { const el = $(sel); el.addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); sfx.init(); sfx.play('click'); fn(); }); };
   btn('#bGlide', () => W && W.cmdCast(W.local, 'A005'));
   btn('#bMix', () => W && W.cmdCast(W.local, 'A003'));
-  btn('#bCoil', () => { if (!W) return; setTargeting(targeting === 'A001' ? null : 'A001'); });
+  btn('#bCoil', () => { if (!W) return; setTargeting(targeting === 'A001' ? null : 'A001'); if (targeting === 'A001') showText('|cffffd34d🎯 Toca a un enemigo para desterrarlo|r'); }); // the hint shows the moment you press it
   btn('#bStop', () => W && W.cmdStop(W.local));
   btn('#bItem0', () => itemButton());
   btn('#bMenu', () => { $('#pause').classList.remove('hidden'); syncSettingsUI(); }); // no pausing: the game keeps going (like online)
@@ -24059,8 +24084,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   function addPassXP(n) { const lv0 = Math.floor((settings.passXP || 0) / 100); settings.passXP = (settings.passXP || 0) + n; saveSettings(); if (Math.floor(settings.passXP / 100) > lv0 && lv0 < 29) { try { showText('🎖️ ¡Subiste al nivel ' + (lv0 + 2) + ' del Pase de Batalla!'); } catch (e) {} } }
   function stopGameKShop() { try { $('#kShop').classList.add('hidden'); } catch (e) {} }
   function stopGame() { stopGameKShop(); $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
-  btn('#bMenuBack', () => { const o = online; stopGame(); if (o) o.net.leave(); $('#menu').classList.remove('hidden'); });
-  btn('#bQuit', () => { if (!confirmQuit()) return; const o = online; stopGame(); if (o) o.net.leave(); $('#menu').classList.remove('hidden'); });
+  btn('#bMenuBack', () => { const o = online; stopGame(); if (o) o.net.leave(); if (window.Lobby && Lobby.backFromGame) Lobby.backFromGame(!!o); else $('#menu').classList.remove('hidden'); /* back to the menu you came from */ });
+  btn('#bQuit', () => { if (!confirmQuit()) return; const o = online; stopGame(); if (o) o.net.leave(); if (window.Lobby && Lobby.backFromGame) Lobby.backFromGame(!!o); else $('#menu').classList.remove('hidden'); /* back to the menu you came from */ });
   let quitArm = 0; function confirmQuit() { const now = performance.now(); if (now - quitArm < 3000) return true; quitArm = now; $('#bQuit').textContent = '¿Seguro? Toca otra vez para abandonar'; setTimeout(() => { $('#bQuit').textContent = '🚪 Abandonar partida'; }, 3000); return false; }
   btn('#bCenter', () => { if (R) R.freeCam = false; camWatch = null; });
   btn('#bWatch', watchNext);
@@ -24336,7 +24361,20 @@ class Net {
   const $ = s => document.querySelector(s);
   const net = new Net();
   const S = SW.settings;
-  const show = id => { for (const s of document.querySelectorAll('.screen')) if (!['pause', 'end', 'powers'].includes(s.id)) s.classList.toggle('hidden', s.id !== id); };
+  const scrStack = []; let curScr = 'menu';
+  const show = (id, fromBack) => { if (!fromBack && id !== curScr) { if (id === 'menu') scrStack.length = 0; else { scrStack.push(curScr); try { history.pushState({ mm: 1 }, ''); } catch (e) {} } } curScr = id;
+    for (const s of document.querySelectorAll('.screen')) if (!['pause', 'end', 'powers', 'quitAsk', 'ask'].includes(s.id)) s.classList.toggle('hidden', s.id !== id); };
+  // the phone's back button: in a game it opens the exit menu, in menus it goes back one screen, on the main menu it asks before leaving
+  try { history.pushState({ mm: 1 }, ''); } catch (e) {}
+  window.addEventListener('popstate', () => {
+    const again = () => { try { history.pushState({ mm: 1 }, ''); } catch (e) {} };
+    if (window.SW && SW.W) { const pz = $('#pause'); pz.classList.toggle('hidden'); again(); return; }
+    if (!$('#quitAsk').classList.contains('hidden')) { $('#quitAsk').classList.add('hidden'); again(); return; }
+    if (curScr === 'shop' && shopBackStep && shopBackStep()) { again(); return; }
+    if (curScr !== 'menu') { const prev = scrStack.pop() || 'menu'; show(prev, true); again(); return; }
+    $('#quitAsk').classList.remove('hidden'); again(); });
+  setTimeout(() => { click('#quitNo', () => $('#quitAsk').classList.add('hidden')); click('#quitYes', () => { $('#quitAsk').classList.add('hidden'); try { history.go(-2); } catch (e) {} try { window.close(); } catch (e) {} }); }, 0);
+  let shopBackStep = null;
   const click = (sel, fn) => { const el = $(sel); if (el) el.addEventListener('click', e => { e.preventDefault(); try { SW.sfx.init(); SW.sfx.play('click'); } catch (x) {} fn(e); }); };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const nick = () => (($('#nick').value || '').trim() || 'Jugador').slice(0, 14);
@@ -24385,10 +24423,11 @@ class Net {
     ['#tabSpray', '#sprayGrid', 'Pinta el piso con el botón 🎨 (tócalo para pintar, mantenlo para elegir entre tus 5). Dura 40 segundos, todos lo ven, y sirve en todos los juegos.'], ['#tabPass', '#passBox', 'Juega cualquier mapa para subir de nivel: ganas XP por cada ronda o etapa que pasa tu equipo y por cada minuto jugado.'], ['#tabCoins', '#coinGrid', 'Las monedas servirán para comprar skins, emotes, efectos y auras.']];
   const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 5) drawSprays(); if (n === 0) renderSkins(); if (n === 6) renderPass(); };
   let curTab = 0; const shopHist = []; const shopTab0 = shopTab;
-  const goTab = (i, push = true) => { if (push && i !== curTab) shopHist.push(['tab', curTab]); curTab = i; shopTab0(i); };
+  const goTab = (i, push = true) => { if (push && i !== curTab) { shopHist.length = 0; shopHist.push(['tab', curTab]); } curTab = i; shopTab0(i); };
   TABS.forEach(([tb], i) => click(tb, () => goTab(i)));
   // the back arrow inside the shop goes back to where you were (previous tab / game), and only leaves the shop at the start
-  document.querySelector('#shop .back').addEventListener('click', e => { const h = shopHist.pop(); if (!h) return; e.stopImmediatePropagation(); if (h[0] === 'tab') goTab(h[1], false); else if (h[0] === 'cat') { skCat = h[1]; fitSkin = 'base'; renderSkins(); } }, true);
+  shopBackStep = () => { const h = shopHist.pop(); shopHist.length = 0; if (!h) return false; if (h[0] === 'tab') goTab(h[1], false); else if (h[0] === 'cat') { skCat = h[1]; fitSkin = 'base'; renderSkins(); } return true; };
+  document.querySelector('#shop .back').addEventListener('click', e => { if (shopBackStep()) e.stopImmediatePropagation(); }, true);
   click('#goShop', () => { shopHist.length = 0; });
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
@@ -24457,7 +24496,7 @@ class Net {
   // skins = outfits for your character; a fitting room on top where you can turn the player around (drag or arrows)
   const SKIN_CATS = [['shroom25', '🍄 Escape Hongo'], ['kitty5', '🐯 Corre Gatito Corre'], ['bob', '🦭 Corre Foca Gorda'], ['orc', '⚔️ Gladiadores', 1], ['ck', '🏃 Corre o Te Pillan', 1], ['kitty', '🐈 Corre Gatito', 1]];
   const SKIN_ITEMS = { shroom25: [['alien', 'Alien Galáctico', 1299]],
-    kitty5: [['dorado', 'Tigre Dorado', 1299], ['sombra', 'Tigre Sombra', 999], ['fuego', 'Tigre de Fuego', 1499], ['hielo', 'Tigre de Hielo', 999], ['jade', 'Tigre de Jade', 899], ['vaquero', 'Tigre Vaquero', 899], ['pirata', 'Tigre Pirata', 999], ['fiesta', 'Tigre Fiestero', 1099]],
+    kitty5: [['dorado', 'Tigre Dorado', 1299], ['sombra', 'Tigre Sombra', 999], ['fuego', 'Tigre de Fuego', 1499], ['hielo', 'Tigre de Hielo', 999], ['jade', 'Tigre de Jade', 899], ['vaquero', 'Tigre Vaquero', 899], ['pirata', 'Tigre Pirata', 999], ['fiesta', 'Tigre Fiestero', 1099], ['puma', 'Puma', 899], ['leon', 'León', 1199], ['tigresa', 'Tigresa', 999], ['jaguar', 'Jaguar', 1099], ['leopardo', 'Leopardo', 1099], ['gato', 'Gato Montés', 699], ['lince', 'Lince', 899], ['llama', 'Tigre Llamarada', 1999]],
     bob: [['dorada', 'Foca Dorada', 999], ['negra', 'Foca Noche', 699], ['rosa', 'Foca Chicle', 699], ['pinguino', 'Foca Pingüino', 799], ['arcoiris', 'Foca Multicolor', 1199], ['pirata', 'Foca Pirata', 899], ['vaquera', 'Foca Vaquera', 799]] };
   if (S.skin && !S.skins) { S.skins = { shroom25: S.skin }; SW.saveSettings(); }
   let skCat = 'shroom25', fitSkin = 'base', fitAng = 270, fitWalk = false, fitDrag = null;
@@ -24467,7 +24506,7 @@ class Net {
       (SKIN_CATS.find(c => c[0] === skCat)[2] ? `<div class="sknext">🔒 Este mapa llega pronto. Sus skins estarán disponibles cuando se abra el mapa.</div>` :
       `<div class="fitroom"><canvas id="fitCv" width="240" height="190"></canvas><div class="fitbar"><button id="fitL">⟲</button><b id="fitName"></b><button id="fitR">⟳</button><button id="fitWalk">🚶</button></div><small>Desliza sobre el personaje para girarlo</small></div>` +
       [['base', 'Básico', 0]].concat(items).map(([id, n, pr]) => { const own = id === 'base' || ownsSkin(skCat, id); return `<div class="item tap sk${fitSkin === id ? ' sel' : ''}" data-skin="${id}"><canvas class="apv" width="120" height="120"></canvas><b>${esc(n)}</b>${id === 'base' ? '<div class="price owned" style="text-decoration:none">INCLUIDA</div>' : `<div class="price${own ? ' owned' : ''}">🪙 ${pr}</div>`}${tagTxt(cur === id, own)}</div>`; }).join(''));
-    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat) shopHist.push(['cat', skCat]); skCat = b.dataset.cat; fitSkin = 'base'; renderSkins(); }));
+    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat && !SKIN_CATS.find(c => c[0] === skCat)[2]) { shopHist.length = 0; shopHist.push(['cat', skCat]); } skCat = b.dataset.cat; fitSkin = 'base'; renderSkins(); }));
     $('#shopGrid').querySelectorAll('[data-skin]').forEach(el => { prevsSk.push([el.querySelector('canvas'), el.dataset.skin]); el.addEventListener('click', () => { fitSkin = el.dataset.skin; if (fitSkin === 'base' || ownsSkin(skCat, fitSkin)) { S.skins = S.skins || {}; S.skins[skCat] = fitSkin; SW.saveSettings(); } renderSkins(); }); });
     const fc = $('#fitCv'); if (!fc) return;
     $('#fitName').textContent = fitSkin === 'base' ? 'Básico' : ((items.find(x => x[0] === fitSkin) || [])[1] || '');
@@ -24482,7 +24521,7 @@ class Net {
       const draw = (cv, skin, ang, walk, sc, cy, key) => { const owner = { id: 0, skins: { [skCat]: skin } }; const R = Object.create(RP); R.W = { time: t, local: null, profile: { id: skCat }, tileTypeAt: () => 'grass' }; R._dt = 0.016; R.puff = () => {}; R.drawAura = () => {}; R.drawDeathAura = () => {};
         const k = key + skCat + skin; const u = skinFakes[k] = Object.assign(skinFakes[k] || {}, heroFake(ang, walk, t, owner, skCat));
         if (!walk && key === 'F') { // showcase: looks around, waves, yawns, hops... (only here in the shop; in the game they move as usual)
-          const SEQ = { shroom25: [['quieto'], ['paso'], ['quieto'], ['bostezo'], ['quieto'], ['salto']], kitty5: [['quieto'], ['bostezo'], ['quieto'], ['sacudir'], ['quieto'], ['salto']], bob: [['saludo'], ['quieto'], ['aplauso'], ['bostezo'], ['quieto'], ['salto']] }[skCat]; // they stay facing where you turned them
+          const SEQ = { shroom25: [['quieto'], ['bostezo'], ['quieto'], ['quieto'], ['salto'], ['quieto']], kitty5: [['quieto'], ['bostezo'], ['quieto'], ['sacudir'], ['quieto'], ['salto']], bob: [['saludo'], ['quieto'], ['aplauso'], ['bostezo'], ['quieto'], ['salto']] }[skCat]; // they stay facing where you turned them
           const st = 2.4, tt = (t - showT0) / st, n = Math.floor(tt) % SEQ.length, q = tt % 1, A = SEQ[n];
           u._show = { a: A[0], p: q, d: typeof A[1] === 'string' ? A[1] : null }; if (A[0] === 'mirar') u.facing = ang + A[1] * Math.sin(q * Math.PI); u._show.d = null; }
         else u._show = walk ? null : { a: 'quieto', p: 0 }; const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none'; g.fillStyle = '#3a2f44'; g.fillRect(0, 0, cv.width, cv.height); if (skCat !== 'bob') { g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(cv.width / 2, cy + 4, 34 * sc, 10 * sc, 0, 0, 6.3); g.fill(); } g.translate(cv.width / 2, cy); g.scale(sc, -sc);
@@ -24724,7 +24763,7 @@ class Net {
       if (net.role === 'client' && net.hostPeer() && !net.currentGame() && SW.W && !SW.W.ended) { SW.W.ended = { win: false, msg: '' }; }
     }, 1000);
   }
-  window.Lobby = { showWait() { show('wait'); startedGame = null; autoAt = 0; clearInterval(waitTimer); waitTimer = setInterval(waitTick, 300); }, net };
+  window.Lobby = { backFromGame(wasOnline) { const to = wasOnline ? 'online' : (curScr === 'pre' ? 'solo' : curScr === 'menu' ? 'menu' : 'solo'); scrStack.length = 0; if (to !== 'menu') scrStack.push('menu'); show(to, true); if (to === 'online') openOnline(); }, showWait() { show('wait'); startedGame = null; autoAt = 0; clearInterval(waitTimer); waitTimer = setInterval(waitTick, 300); }, net };
   // solo play
   // dropdowns that open right there (no system pop-up window over the game)
   function inlineSelect(sel) { if (!sel || sel._dd) return; sel._dd = true; sel.style.display = 'none';
