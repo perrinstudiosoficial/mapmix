@@ -58,6 +58,9 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #bGive{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 146px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px);width:56px;height:56px;font-size:24px;pointer-events:auto;z-index:5;border-color:#7fff9f}
 #bBlink{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 156px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#ffd34d;box-shadow:0 0 14px rgba(255,211,77,.55),0 4px 0 rgba(0,0,0,.4);animation:blinkPulse 1.2s ease-in-out infinite}
 @keyframes blinkPulse{50%{transform:scale(1.08)}}
+#sprayWrap{position:absolute;left:max(12px,env(safe-area-inset-left));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 205px);pointer-events:none;z-index:5}
+#bSpray{pointer-events:auto;width:52px;height:52px;font-size:24px;user-select:none;-webkit-user-select:none;touch-action:none}#bSpray.locked{filter:grayscale(1) brightness(.6);opacity:.75}#bSpray.locked::after{content:'🔒';position:absolute;right:-4px;top:-6px;font-size:14px}
+#sprayPick{pointer-events:auto;position:absolute;left:0;bottom:62px;display:flex;gap:6px;padding:6px;border-radius:16px;background:rgba(20,8,30,.85);border:1px solid var(--line)}#sprayPick .eslot canvas{width:46px;height:46px}
 #emoteWrap{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px);pointer-events:none;z-index:5}
 #bEmote{pointer-events:auto;width:56px;height:56px;font-size:26px;user-select:none;-webkit-user-select:none;touch-action:none}
 #danceWrap{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 148px);pointer-events:none;z-index:5}
@@ -259,6 +262,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="ab hidden" id="bJump">🐾<small>Saltar</small></div>
   <div class="ab hidden" id="bRoar">😾<small>Gruñido</small></div>
   <div id="danceWrap"><div id="dancePick" class="hidden"></div><div class="ab" id="bDance"><span id="danceIcon"></span><small>Baile</small></div></div>
+  <div id="sprayWrap"><div id="sprayPick" class="hidden"></div><div class="ab locked" id="bSpray"><span>🎨</span><small>Grafiti</small></div></div>
   <div id="emoteWrap"><div id="emotePick" class="hidden"></div><div class="ab" id="bEmote"><span id="emoteIcon"></span><small>Emote</small></div></div>
   <div id="abil">
     <div class="ab item" id="bItem0">🍄<kbd>S</kbd><small>Teleport</small><em id="itemCount"></em></div>
@@ -354,11 +358,12 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 <div id="shop" class="screen hidden">
   <div class="card wide">
     <div class="tbar"><button class="back" data-back="menu">‹</button><h2>TIENDA</h2></div>
-    <div class="shoptabs"><button id="tabSkins" class="on">🎨 Skins</button><button id="tabEmotes">😎 Emotes</button><button id="tabDfx">💥 Muerte</button><button id="tabAura">⭕ Auras</button><button id="tabSpray">🖌️ Grafitis</button><button id="tabPass">🎖️ Pase T1</button><button id="tabCoins">🪙 Monedas</button></div>
+    <div class="shoptabs"><button id="tabSkins" class="on">🎨 Skins</button><button id="tabEmotes">😎 Emotes</button><button id="tabDfx">💥 Muerte</button><button id="tabSpawn">✨ Aparición</button><button id="tabAura">⭕ Auras</button><button id="tabSpray">🖌️ Grafitis</button><button id="tabPass">🎖️ Pase T1</button><button id="tabCoins">🪙 Monedas</button></div>
     <div class="hint" id="shopHint">Las skins sirven en todos los mapas del juego.</div>
     <div class="shopgrid" id="shopGrid"></div>
     <div class="shopgrid hidden" id="emoteGrid"></div>
     <div class="shopgrid hidden" id="dfxGrid"></div>
+    <div class="shopgrid hidden" id="spawnGrid"></div>
     <div class="shopgrid hidden" id="auraGrid"></div>
     <div class="shopgrid hidden" id="sprayGrid"></div>
     <div class="hidden" id="passBox"></div>
@@ -371,6 +376,8 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
     <div class="opts">
       <label>Controles en el celular
         <select id="ctlMenu"><option value="stick">Joystick</option><option value="tap">Tocar / mantener para moverte</option></select></label>
+      <label>Código de creador <span style="display:flex;gap:6px"><input id="vipIn" maxlength="20" placeholder="Escribe tu código" autocomplete="off" style="width:150px"><button id="vipBtn" class="buy" style="background:#7a3fb8;color:#fff">Activar</button></span></label>
+      <div class="hint" id="vipMsg"></div>
     </div>
     <div class="help">Muévete con el <b>joystick</b> de la izquierda · usa los botones de la derecha para los poderes · pellizca la pantalla para acercar o alejar la cámara.</div>
   </div>
@@ -21601,6 +21608,17 @@ class Sfx {
     else if (n === 'dx_fuegos') { for (let r = 0; r < 3; r++) { this.tone(600, 2400, 0.25, 'sine', 0.06, r * 0.18); this.noise(0.35, 0.35, 900, 0.7, 0.3 + r * 0.18); this.tone(120, 50, 0.3, 'sine', 0.3, 0.3 + r * 0.18); } const O = [600, 1000, 2700]; this.voice(700, 400, 0.4, [O, O], 0.25); }
     else if (n === 'dx_flor') { [1047, 1319, 1568, 2093, 1568].forEach((f, i) => this.tone(f, f, 0.3, 'sine', 0.1, i * 0.08)); const O = [600, 1000, 2700], U = [370, 900, 2600]; this.voice(560, 380, 0.6, [O, U], 0.28, 0.1); }
     else if (n === 'spray') { this.noise(0.35, 0.25, 5000, 0.6); this.noise(0.25, 0.18, 5500, 0.6, 0.4); this.tone(1800, 1700, 0.04, 'square', 0.04, 0.0); }
+    else if (n === 'dx_fundador') { // royal fall: a choir chord, bells and a proud "¡Volveré!"
+      [523, 659, 784, 1047].forEach((f, i) => { this.tone(f, f, 1.4, 'triangle', 0.09, i * 0.05); this.tone(f * 2, f * 2, 0.5, 'sine', 0.04, 0.3 + i * 0.12); });
+      const A = [800, 1200, 2600], O = [500, 850, 2500], E = [500, 1800, 2500]; this.voice(260, 300, 0.18, [O, E], 0.34, 0.15); this.voice(300, 360, 0.2, [E, E], 0.34, 0.34); this.voice(360, 240, 0.55, [E, A], 0.36, 0.55); this.tone(90, 45, 0.8, 'sine', 0.35, 0.05); }
+    else if (n === 'sp_estandar') { this.tone(500, 1000, 0.18, 'sine', 0.12); this.tone(750, 1500, 0.18, 'triangle', 0.06, 0.06); }
+    else if (n === 'sp_portal') { this.tone(200, 1200, 0.6, 'sine', 0.14); this.noise(0.5, 0.12, 2500, 1.5); }
+    else if (n === 'sp_meteoro') { this.noise(0.4, 0.2, 3000, 0.8); this.tone(900, 200, 0.4, 'sawtooth', 0.06); this.noise(0.5, 0.45, 300, 0.7, 0.4); this.tone(80, 35, 0.5, 'sine', 0.4, 0.4); }
+    else if (n === 'sp_humo') { this.noise(0.5, 0.3, 1200, 0.6); this.tone(300, 120, 0.2, 'square', 0.08); }
+    else if (n === 'sp_arcoiris') { [784, 988, 1175, 1319, 1568, 1976].forEach((f, i) => this.tone(f, f, 0.25, 'triangle', 0.08, i * 0.06)); }
+    else if (n === 'sp_fundador') { // royal fanfare
+      [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.42]].forEach(([f, d]) => { this.tone(f, f, 0.32, 'square', 0.06, d); this.tone(f / 2, f / 2, 0.32, 'triangle', 0.1, d); });
+      [1047, 1319, 1568].forEach(f => this.tone(f, f, 1.1, 'triangle', 0.07, 0.6)); this.noise(1.0, 0.08, 7000, 0.5, 0.6); this.tone(70, 40, 0.6, 'sine', 0.35, 0.6); }
     else if (n === 'dx_epico') { // a long dramatic "NOOOOOO!" with an echo and a boom
       const k = 0.9 + Math.random() * 0.2, O = [500, 850, 2500], U = [350, 700, 2400];
       this.voice(420 * k, 180 * k, 1.3, [O, U], 0.42); this.voice(420 * k, 180 * k, 1.3, [O, U], 0.12, 0.25); this.tone(90, 35, 0.9, 'sine', 0.45, 0.05); this.noise(0.6, 0.2, 300, 0.8, 0.05); }
@@ -22185,6 +22203,7 @@ class Renderer {
       if (m === 'roar') { g.save(); g.scale(1, 0.5); for (let k = 0; k < 3; k++) { const q = Math.min(1, p * 1.3 - k * 0.15); if (q <= 0) continue; g.strokeStyle = `rgba(255,170,60,${(1 - q) * 0.9})`; g.lineWidth = 10 - k * 2; g.beginPath(); g.arc(0, 0, 60 + q * 460, 0, 7); g.stroke(); } g.restore(); }
       else if (m === 'shroomdeath') { this.drawShroomDeath(g, e, p); }
       else if (m === 'dfx') { this.drawDeathFx(g, e, p); }
+      else if (m === 'sfx') { this.drawSpawnFx(g, e, p); }
       else if (m === 'explosion') {
         const R = e.r || 116;
         g.fillStyle = `rgba(255,${160 - p * 120},40,${0.85 * (1 - p)})`; g.beginPath(); g.arc(0, 0, R * (0.75 + 0.25 * Math.min(1, p * 4)), 0, 7); g.fill();
@@ -22779,8 +22798,8 @@ class Renderer {
   // ===================== death auras (instead of tombs) and death effects =====================
   // Style chosen in the shop (settings.aura / settings.deathFx); bots wear a random one so you see them all.
   const AURAS = ['piedra', 'oro', 'fuego', 'hielo', 'galaxia', 'toxico'], DFX = ['clasico', 'ko', 'calavera', 'luz', 'fuegos', 'flor', 'epico', 'rayo', 'confeti', 'fantasma'];
-  P.auraOf = function (p) { if (!p) return 'piedra'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (p === this.W.local) return (S && S.aura) || 'piedra'; if (p.aura) return p.aura; if (p.ai) return AURAS[(p.id * 7 + 3) % AURAS.length]; return 'piedra'; };
-  P.deathFxOf = function (p) { if (!p) return 'clasico'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (p === this.W.local) return (S && S.deathFx) || 'clasico'; if (p.deathFx) return p.deathFx; if (p.ai) return DFX[(p.id * 5 + 1) % DFX.length]; return 'clasico'; };
+  P.auraOf = function (p) { if (!p) return 'piedra'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (p === this.W.local) return (S && S.aura) || 'piedra'; return p.aura || 'piedra'; }; // bots wear the standard look everybody starts with
+  P.deathFxOf = function (p) { if (!p) return 'clasico'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (p === this.W.local) { const v = (S && S.deathFx) || 'clasico'; return v === 'fundador' && !(window.SW.isVip && window.SW.isVip()) ? 'clasico' : v; } return p.deathFx || 'clasico'; };
   const star4 = (g, x, y, r) => { g.beginPath(); g.moveTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.quadraticCurveTo(x, y, x, y - r); g.quadraticCurveTo(x, y, x - r, y); g.quadraticCurveTo(x, y, x, y + r); g.fill(); };
   const AUR = { piedra: { a: '#d9dde4', b: '#6d737e', plate: '#2a2d35', glow: '#ffd98a', mark: '#f4f6fa' }, oro: { a: '#fff1a8', b: '#b07a12', plate: '#5a3a06', glow: '#ffe27a', mark: '#fffbe6' },
     fuego: { a: '#5a4a44', b: '#24160f', plate: '#120a06', glow: '#ff7a1a', mark: '#ffb347' }, hielo: { a: '#f2fbff', b: '#7fb8d8', plate: '#2c5d7a', glow: '#9fe6ff', mark: '#ffffff' },
@@ -22849,6 +22868,13 @@ class Renderer {
       g.save(); g.translate(0, 50); g.globalAlpha *= fade; const o = Math.min(1, p * 3); for (let ring = 0; ring < 2; ring++) for (let i = 0; i < 8; i++) { const a = i * TAU / 8 + ring * 0.4 + p * 0.6, L = (ring ? 26 : 40) * o; g.save(); g.rotate(a); g.fillStyle = ring ? '#ffd1f0' : '#ff7ad9'; g.beginPath(); g.ellipse(L * 0.55, 0, L * 0.55, L * 0.22, 0, 0, TAU); g.fill(); g.restore(); }
       g.fillStyle = '#ffe680'; g.beginPath(); g.arc(0, 0, 7 * o, 0, TAU); g.fill(); g.restore();
       for (let i = 0; i < 16; i++) { const q = Math.max(0, p - 0.3) / 0.7, a = i * 2.39, x = Math.cos(a) * (40 + q * 110), y = 50 + Math.sin(a) * (20 + q * 60) + q * 40; g.save(); g.translate(x, y); g.rotate(t * 3 + i); g.fillStyle = `rgba(255,${130 + i * 6},220,${(1 - q) * fade})`; g.beginPath(); g.ellipse(0, 0, 6, 3, 0, 0, TAU); g.fill(); g.restore(); } }
+    else if (k === 'fundador') { // founder (exclusive): a golden phoenix of light rises with a crown, a royal seal burns on the ground and gold rains down
+      g.save(); g.scale(1, 0.5); g.globalAlpha *= fade; g.rotate(t * 0.6); g.strokeStyle = 'rgba(255,215,90,0.95)'; g.lineWidth = 4; g.beginPath(); g.arc(0, 0, 70, 0, TAU); g.stroke(); g.beginPath(); for (let i = 0; i <= 10; i++) { const a = i * TAU / 5 * 2, x = Math.cos(a) * 62, y = Math.sin(a) * 62; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); const sg = g.createRadialGradient(0, 0, 0, 0, 0, 80); sg.addColorStop(0, 'rgba(255,240,180,0.7)'); sg.addColorStop(1, 'rgba(255,180,60,0)'); g.fillStyle = sg; g.beginPath(); g.arc(0, 0, 80, 0, TAU); g.fill(); g.restore();
+      const rise = 40 + Math.min(1, p * 1.6) * 110, wo = Math.min(1, p * 2.5) * fade, flap = Math.sin(t * 9) * 0.18; g.save(); g.translate(0, rise);
+      for (const sd of [-1, 1]) { g.save(); g.scale(sd, 1); g.rotate(flap); for (let f = 0; f < 7; f++) { const a = -0.2 + f * 0.22, L = (55 + f * 9) * wo; const wg = g.createLinearGradient(0, 0, Math.cos(a) * L, Math.sin(a) * L); wg.addColorStop(0, 'rgba(255,250,210,0.95)'); wg.addColorStop(0.6, hexA(col, 0.7)); wg.addColorStop(1, 'rgba(255,160,40,0)'); g.fillStyle = wg; g.beginPath(); g.moveTo(4, 0); g.quadraticCurveTo(Math.cos(a - 0.25) * L * 0.6, Math.sin(a - 0.25) * L * 0.6, Math.cos(a) * L, Math.sin(a) * L); g.quadraticCurveTo(Math.cos(a + 0.12) * L * 0.5, Math.sin(a + 0.12) * L * 0.5, 4, 0); g.fill(); } g.restore(); }
+      const og = g.createRadialGradient(0, 0, 0, 0, 0, 22); og.addColorStop(0, `rgba(255,255,255,${fade})`); og.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = og; g.beginPath(); g.arc(0, 0, 22, 0, TAU); g.fill();
+      g.save(); g.translate(0, 26); g.scale(1, -1); g.globalAlpha *= fade; g.fillStyle = '#ffd23a'; g.strokeStyle = '#7a4a00'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-16, 8); g.lineTo(-19, -10); g.lineTo(-8, -2); g.lineTo(0, -15); g.lineTo(8, -2); g.lineTo(19, -10); g.lineTo(16, 8); g.closePath(); g.fill(); g.stroke(); g.restore(); g.restore();
+      for (let i = 0; i < 26; i++) { const q = (p * 1.2 + i * 0.039) % 1, x = Math.sin(i * 5.3) * 100, y = 280 * (1 - q); g.fillStyle = `rgba(255,${200 + (i % 4) * 12},80,${(1 - q) * fade})`; star4(g, x, y, 2.5 + (i % 3) * 1.5); } }
     else if (k === 'fantasma') { const y = 30 + p * 150, sw = Math.sin(t * 6) * 12; g.save(); g.translate(sw, y); g.globalAlpha *= fade * 0.9; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(0, 8, 18, Math.PI, 0, true); g.lineTo(18, -16); for (let i = 0; i < 4; i++) { const x = 18 - (i + 1) * 9; g.quadraticCurveTo(x + 4.5, -10 + (i % 2) * -6, x, -16); } g.closePath(); g.fill(); g.strokeStyle = col; g.lineWidth = 2.5; g.stroke(); g.fillStyle = '#1a2233'; g.beginPath(); g.ellipse(-6, 10, 3, 4.5, 0, 0, TAU); g.ellipse(6, 10, 3, 4.5, 0, 0, TAU); g.fill(); g.beginPath(); g.ellipse(0, 1, 3.5, 4.5, 0, 0, TAU); g.fill(); g.restore(); }
   };
   // ===================== graffiti sprayed on the floor (original designs) =====================
@@ -22858,6 +22884,11 @@ class Renderer {
     const drip = (x, y, L, c) => { g.strokeStyle = c; g.lineWidth = 3; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + L); g.stroke(); g.fillStyle = c; g.beginPath(); g.arc(x, y + L, 2.6, 0, TAU); g.fill(); };
     const word = (txt, size, c1, c2) => { g.font = `900 ${size}px system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 10; g.strokeStyle = '#151020'; g.strokeText(txt, 0, 0); g.lineWidth = 4; g.strokeStyle = '#ffffff'; g.strokeText(txt, 0, 0); const gr = g.createLinearGradient(0, -size / 2, 0, size / 2); gr.addColorStop(0, c1); gr.addColorStop(1, c2); g.fillStyle = gr; g.fillText(txt, 0, 0); };
     if (id === 'gg') { spray(0, 0, 60, col); word('GG', 64, '#7dff9a', '#14b85a'); drip(-18, 26, 14, '#14b85a'); drip(24, 26, 22, '#14b85a'); }
+    else if (id === 'perrin') { // the creator's tag: gold "Perrin" with a crown and a star burst
+      g.save(); g.fillStyle = 'rgba(255,200,60,0.35)'; for (let i = 0; i < 12; i++) { const a = i * TAU / 12; g.beginPath(); g.moveTo(Math.cos(a - 0.12) * 20, Math.sin(a - 0.12) * 20); g.lineTo(Math.cos(a) * 72, Math.sin(a) * 40); g.lineTo(Math.cos(a + 0.12) * 20, Math.sin(a + 0.12) * 20); g.fill(); } g.restore();
+      spray(0, 0, 66, '#ffd54a'); g.save(); g.rotate(-0.08); word('Perrin', 40, '#fff3a0', '#ff9a1f'); g.restore();
+      g.fillStyle = '#ffd23a'; g.strokeStyle = '#151020'; g.lineWidth = 3; g.beginPath(); g.moveTo(-22, -24); g.lineTo(-25, -42); g.lineTo(-12, -32); g.lineTo(-2, -46); g.lineTo(8, -32); g.lineTo(21, -42); g.lineTo(18, -24); g.closePath(); g.fill(); g.stroke();
+      for (const [x, c] of [[-12, '#ff3b6b'], [-2, '#4dfcff'], [8, '#7dff9a']]) { g.fillStyle = c; g.beginPath(); g.arc(x, -29, 2.6, 0, TAU); g.fill(); } drip(30, 18, 16, '#ff9a1f'); drip(-34, 18, 10, '#ff9a1f'); }
     else if (id === 'xd') { spray(0, 0, 60, '#ffd54a'); word('XD', 60, '#fff36b', '#ff9a1f'); drip(-8, 26, 18, '#ff9a1f'); }
     else if (id === 'corazon') { spray(0, 0, 55, '#ff4d8d'); g.fillStyle = '#ff3d7f'; g.strokeStyle = '#151020'; g.lineWidth = 6; g.beginPath(); g.moveTo(0, 30); g.bezierCurveTo(-60, -8, -30, -46, 0, -18); g.bezierCurveTo(30, -46, 60, -8, 0, 30); g.fill(); g.stroke(); g.fillStyle = 'rgba(255,255,255,0.8)'; g.beginPath(); g.ellipse(-18, -16, 8, 5, -0.6, 0, TAU); g.fill(); drip(10, 26, 16, '#ff3d7f'); }
     else if (id === 'huella') { spray(0, 0, 55, col); g.fillStyle = col === '#000000' ? '#555' : col; g.strokeStyle = '#151020'; g.lineWidth = 4; g.beginPath(); g.ellipse(0, 12, 22, 18, 0, 0, TAU); g.fill(); g.stroke(); for (const [x, y] of [[-24, -14], [-9, -28], [9, -28], [24, -14]]) { g.beginPath(); g.ellipse(x, y, 8, 10, 0, 0, TAU); g.fill(); g.stroke(); } }
@@ -22869,6 +22900,24 @@ class Renderer {
   };
   P.drawGraffiti = function (g) { const W = this.W, L = W.graffiti; if (!L || !L.length) return; const now = W.time;
     for (let i = L.length - 1; i >= 0; i--) { const s = L[i], age = now - s.t0; if (age > 40) { L.splice(i, 1); continue; } const al = (age < 0.35 ? age / 0.35 : 1) * (age > 37 ? (40 - age) / 3 : 1) * 0.92; g.save(); g.translate(s.x, s.y); this.drawGraffitiArt(g, s.id, s.col, al); g.restore(); } };
+  // ===================== spawn effects (start of every round) =====================
+  P.spawnFxOf = function (p) { if (!p) return 'estandar'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (p === this.W.local) { const v = (S && S.spawnFx) || 'estandar'; return v === 'fundador' && !(window.SW.isVip && window.SW.isVip()) ? 'estandar' : v; } return p.spawnFx || 'estandar'; };
+  P.drawSpawnFx = function (g, e, p) {
+    const col = e.col || '#ffffff', k = e.kind || 'estandar', t = this.W.time, fade = p > 0.75 ? (1 - p) / 0.25 : 1;
+    if (k === 'estandar') { g.save(); g.scale(1, 0.5); g.strokeStyle = hexA(col, 0.9 * (1 - p)); g.lineWidth = 5; g.beginPath(); g.arc(0, 0, 20 + p * 60, 0, TAU); g.stroke(); g.restore(); for (let i = 0; i < 8; i++) { const a = i * TAU / 8; g.fillStyle = `rgba(255,255,255,${0.7 * (1 - p)})`; g.beginPath(); g.arc(Math.cos(a) * (20 + p * 50), 10 + Math.sin(a) * (10 + p * 25) + p * 30, 5, 0, TAU); g.fill(); } }
+    else if (k === 'portal') { const o = Math.min(1, p * 4) * fade; g.save(); g.scale(1, 0.5); for (let r = 0; r < 3; r++) { g.strokeStyle = `rgba(${80 + r * 40},${180 + r * 20},255,${0.8 * o})`; g.lineWidth = 6 - r * 1.5; g.beginPath(); g.arc(0, 0, (60 - r * 14) * o, t * (2 + r) , t * (2 + r) + 4.6); g.stroke(); } const pg = g.createRadialGradient(0, 0, 0, 0, 0, 60 * o); pg.addColorStop(0, 'rgba(200,240,255,0.8)'); pg.addColorStop(1, 'rgba(60,120,255,0)'); g.fillStyle = pg; g.beginPath(); g.arc(0, 0, 60 * o, 0, TAU); g.fill(); g.restore(); }
+    else if (k === 'meteoro') { if (p < 0.35) { const q = p / 0.35, y = 500 * (1 - q), x = 220 * (1 - q); g.strokeStyle = 'rgba(255,170,60,0.8)'; g.lineWidth = 10; g.beginPath(); g.moveTo(x + 60, y + 140); g.lineTo(x, y); g.stroke(); g.fillStyle = '#ffe2a0'; g.beginPath(); g.arc(x, y, 14, 0, TAU); g.fill(); } else { const q = (p - 0.35) / 0.65; g.save(); g.scale(1, 0.5); g.fillStyle = `rgba(255,140,40,${0.6 * (1 - q)})`; g.beginPath(); g.arc(0, 0, 30 + q * 90, 0, TAU); g.fill(); g.restore(); for (let i = 0; i < 12; i++) { const a = i * 0.52; g.fillStyle = `rgba(255,${120 + i * 10},40,${1 - q})`; g.beginPath(); g.arc(Math.cos(a) * q * 110, 10 + Math.abs(Math.sin(a)) * q * 90 - q * q * 60, 5, 0, TAU); g.fill(); } } }
+    else if (k === 'humo') { for (let i = 0; i < 12; i++) { const a = i * TAU / 12, r = 20 + p * 60; g.fillStyle = `rgba(210,210,220,${0.55 * fade})`; g.beginPath(); g.arc(Math.cos(a) * r, 25 + Math.sin(a) * r * 0.5 + p * 20, 24 - p * 8, 0, TAU); g.fill(); } }
+    else if (k === 'arcoiris') { const o = Math.min(1, p * 3); for (let i = 0; i < 6; i++) { g.strokeStyle = `hsla(${i * 50},100%,62%,${0.85 * fade})`; g.lineWidth = 7; g.beginPath(); g.arc(0, 0, (90 - i * 8) * o, 0.15, Math.PI - 0.15); g.stroke(); } }
+    else if (k === 'fundador') { // founder's arrival (exclusive): a golden portal opens, a pillar of light comes down with a crown, wings of light open and golden rain falls
+      const o = Math.min(1, p * 3) * fade; g.save(); g.scale(1, 0.5); const N = 16;
+      for (let r = 0; r < 2; r++) { g.save(); g.rotate((r ? -1 : 1) * t * 0.9); g.strokeStyle = `rgba(255,${210 - r * 30},90,${0.9 * o})`; g.lineWidth = 4; g.beginPath(); g.arc(0, 0, (78 - r * 18) * o, 0, TAU); g.stroke(); for (let i = 0; i < N; i++) { const a = i * TAU / N; g.fillStyle = `rgba(255,240,170,${o})`; star4(g, Math.cos(a) * (78 - r * 18) * o, Math.sin(a) * (78 - r * 18) * o, 4); } g.restore(); }
+      const pg = g.createRadialGradient(0, 0, 0, 0, 0, 90 * o); pg.addColorStop(0, 'rgba(255,250,220,0.95)'); pg.addColorStop(0.5, hexA(col, 0.35)); pg.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = pg; g.beginPath(); g.arc(0, 0, 90 * o, 0, TAU); g.fill(); g.restore();
+      const bw = 34 * o; const bg = g.createLinearGradient(0, 0, 0, 600); bg.addColorStop(0, `rgba(255,248,210,${0.95 * fade})`); bg.addColorStop(1, 'rgba(255,215,120,0)'); g.fillStyle = bg; g.fillRect(-bw, 0, bw * 2, 600);
+      for (const sd of [-1, 1]) { g.save(); g.translate(0, 60); g.scale(sd, 1); const wo = Math.min(1, Math.max(0, (p - 0.15) * 3)) * fade; for (let f = 0; f < 6; f++) { const a = 0.15 + f * 0.2, L = (70 + f * 8) * wo; const wg = g.createLinearGradient(0, 0, Math.cos(a) * L, Math.sin(a) * L); wg.addColorStop(0, 'rgba(255,240,180,0.9)'); wg.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = wg; g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(Math.cos(a - 0.2) * L * 0.6, Math.sin(a - 0.2) * L * 0.6, Math.cos(a) * L, Math.sin(a) * L); g.quadraticCurveTo(Math.cos(a + 0.15) * L * 0.5, Math.sin(a + 0.15) * L * 0.5, 0, 0); g.fill(); } g.restore(); }
+      const cy = 150 - Math.min(1, p * 2) * 40; g.save(); g.translate(0, cy); g.scale(1, -1); g.globalAlpha *= fade; g.fillStyle = '#ffd23a'; g.strokeStyle = '#7a4a00'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-20, 10); g.lineTo(-23, -12); g.lineTo(-10, -2); g.lineTo(0, -18); g.lineTo(10, -2); g.lineTo(23, -12); g.lineTo(20, 10); g.closePath(); g.fill(); g.stroke(); for (const [x, c] of [[-11, '#ff3b6b'], [0, '#4dfcff'], [11, '#7dff9a']]) { g.fillStyle = c; g.beginPath(); g.arc(x, 4, 3, 0, TAU); g.fill(); } g.restore();
+      for (let i = 0; i < 22; i++) { const q = (p * 1.3 + i * 0.045) % 1, x = Math.sin(i * 7.1) * 90, y = 260 * (1 - q); g.fillStyle = `rgba(255,${210 + (i % 3) * 15},90,${(1 - q) * fade})`; star4(g, x, y, 3 + (i % 3)); } }
+  };
   P.drawKittyShop = function (g, u) {
     g.save(); g.scale(1.6, -1.6); // bigger shops
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(4, 26, 46, 12, 0, 0, TAU); g.fill();
@@ -23142,10 +23191,18 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   window.botRoar = u => { if (W.cmdRoar(u.owner) && online && online.host) online.net.pushEvent('broar', u.owner.id); };
   window.botJump = (u, dx, dy) => { if (W.cmdJump(u.owner, dx, dy) && online && online.host) online.net.pushEvent('bjump', u.owner.id, Math.round(dx * 100), Math.round(dy * 100)); };
   // graffiti: sprayed on the floor where you stand (from the emote wheel), lasts 40 s
-  const SPRAY_CD = 8; const SPRAY_IDS = ['gg', 'huella', 'corazon', 'xd', 'calavera', 'hongo', 'corona', 'rayo'];
+  const SPRAY_CD = 8; const SPRAY_IDS = ['gg', 'huella', 'corazon', 'xd', 'calavera', 'hongo', 'corona', 'rayo', 'perrin'];
+  // the creator's code unlocks his exclusive items on this device (only a hash of the code lives in the game)
+  const VIP_H = '557405f325ebd6f3';
+  function vipHash(c) { let x = 2166136261, y = 5381; for (let i = 0; i < c.length; i++) { const ch = c.charCodeAt(i); x = Math.imul(x ^ ch, 16777619) >>> 0; y = ((Math.imul(y, 33) >>> 0) ^ ch) >>> 0; } return x.toString(16).padStart(8, '0') + y.toString(16).padStart(8, '0'); }
+  const isVip = () => !!settings.vipCode && vipHash(String(settings.vipCode).trim().toUpperCase()) === VIP_H;
+  const sprayOwned = () => (isVip() ? ['perrin'] : []).concat((settings.sprayBought || []).filter(id => SPRAY_IDS.includes(id))); // nobody can buy yet, so the button stays grey for everybody else
+  function spraySlots() { const own = sprayOwned(); let sl = (settings.spraySlots || []).filter(id => own.includes(id)).slice(0, 5); if (!sl.length) sl = own.slice(0, 5); return sl; }
+  function refreshSprayBtn() { const b = $('#bSpray'); if (!b) return; const own = sprayOwned(); b.classList.toggle('locked', !own.length); }
   function addSpray(p, id, x, y) { if (!W || !R || !p) return; const u = W.heroOf(p); if (!u) return; (W.graffiti = W.graffiti || []).push({ x: x ?? u.x, y: y ?? u.y, id: SPRAY_IDS.includes(id) ? id : 'gg', col: R.heroColor(u), t0: W.time }); if (W.graffiti.length > 40) W.graffiti.shift(); sfx.play('spray'); }
-  function doSpray() { if (!W) return; const now = performance.now(); if (now < (doSpray.next || 0)) { showText('🎨 Grafiti listo en ' + Math.ceil((doSpray.next - now) / 1000) + ' s'); return; } const u = W.heroOf(W.local); if (!u) return; doSpray.next = now + SPRAY_CD * 1000; const id = settings.spray || 'gg'; addSpray(W.local, id, u.x, u.y); if (online) online.net.pushEvent('spray', id, Math.round(u.x), Math.round(u.y)); }
+  function doSpray(pick) { if (!W) return; const own = spraySlots(); if (!own.length) { showText('🔒 Compra tu primer grafiti en la tienda para activar este botón'); return; } const now = performance.now(); if (now < (doSpray.next || 0)) { showText('🎨 Grafiti listo en ' + Math.ceil((doSpray.next - now) / 1000) + ' s'); return; } const u = W.heroOf(W.local); if (!u) return; doSpray.next = now + SPRAY_CD * 1000; const id = pick && own.includes(pick) ? pick : own.includes(settings.spray) ? settings.spray : own[0]; settings.spray = id; addSpray(W.local, id, u.x, u.y); if (online) online.net.pushEvent('spray', id, Math.round(u.x), Math.round(u.y)); }
   window.botSpray = u => { if (!W || !u || !u.owner) return; const id = SPRAY_IDS[(u.owner.id * 3 + Math.floor(W.time / 50)) % SPRAY_IDS.length]; addSpray(u.owner, id, u.x, u.y); if (online && online.host) online.net.pushEvent('bspray', u.owner.id, id, Math.round(u.x), Math.round(u.y)); };
+  function spawnFxAll() { if (!W || !R) return; let played = false; for (const p of W.players) { const u = W.heroOf(p); if (!u || !u.alive || u.removed) continue; const k = R.spawnFxOf(p); const ef = W.addEffect(u.x, u.y, 'sfx'); ef.kind = k; ef.col = R.heroColor(u); ef.dur = k === 'fundador' ? 2.3 : 1.5; if (p === W.local) { sfx.play('sp_' + k); played = true; } } if (!played) sfx.play('sp_estandar'); }
   window.botEmote = (u, id) => { sendEmote(id, u); if (online && online.host && u && u.owner) online.net.pushEvent('bemote', u.owner.id, id); }; // the bots use this too
   // ---------- dances (original moves; hold the button to pick one) ----------
   const DANCES = { columpio: ['🕺', 'Columpio'], robot: ['🤖', 'Robot'], saltitos: ['🐰', 'Saltitos'], molino: ['🌀', 'Molino'], pollito: ['🐔', 'Pollito'], ola: ['🌊', 'La Ola'] };
@@ -23168,8 +23225,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     b.addEventListener('pointerleave', () => clearTimeout(holdTm));
     document.addEventListener('pointerdown', e => { if (!e.target.closest || !e.target.closest('#danceWrap')) pk.classList.add('hidden'); }, true); }
   function renderPick() {
-    $('#emotePick').innerHTML = settings.emoteSlots.map((id, i) => id ? `<div class="eslot${id === settings.emoteLast ? ' sel' : ''}" data-e="${id}">${emoteHTML(id)}</div>` : `<div class="eslot empty">vacío</div>`).join('') + `<div class="eslot spray" data-spray="1">🎨<small>Grafiti</small></div>`;
-    const sp = document.querySelector('#emotePick .eslot.spray'); if (sp) sp.addEventListener('pointerup', ev => { ev.stopPropagation(); $('#emotePick').classList.add('hidden'); doSpray(); });
+    $('#emotePick').innerHTML = settings.emoteSlots.map((id, i) => id ? `<div class="eslot${id === settings.emoteLast ? ' sel' : ''}" data-e="${id}">${emoteHTML(id)}</div>` : `<div class="eslot empty">vacío</div>`).join('');
     for (const el of document.querySelectorAll('#emotePick .eslot[data-e]')) el.addEventListener('pointerup', ev => { ev.stopPropagation(); settings.emoteLast = el.dataset.e; saveSettings(); $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast); $('#emotePick').classList.add('hidden'); sendEmote(settings.emoteLast); });
   }
   { const b = $('#bEmote'); let holdTm = null, held = false; $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast);
@@ -23177,6 +23233,14 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     b.addEventListener('pointerup', e => { e.stopPropagation(); clearTimeout(holdTm); if (!held) { $('#emotePick').classList.add('hidden'); sendEmote(settings.emoteLast); } });
     b.addEventListener('pointerleave', () => clearTimeout(holdTm));
     document.addEventListener('pointerdown', e => { if (!e.target.closest || !e.target.closest('#emoteWrap')) $('#emotePick').classList.add('hidden'); }, true); }
+  { const b = $('#bSpray'); let holdTm = null, held = false;
+    const renderSP = () => { $('#sprayPick').innerHTML = spraySlots().map(id => `<div class="eslot${id === settings.spray ? ' sel' : ''}" data-s="${id}"><canvas width="96" height="96"></canvas></div>`).join('');
+      $('#sprayPick').querySelectorAll('[data-s]').forEach(el => { const cv = el.querySelector('canvas'), g = cv.getContext('2d'); g.translate(48, 48); g.scale(0.62, -0.62 / 0.62); try { Renderer.prototype.drawGraffitiArt.call({ W: { time: 0 } }, g, el.dataset.s, '#ff3b3b', 1); } catch (e) {}
+        el.addEventListener('pointerup', ev => { ev.stopPropagation(); settings.spray = el.dataset.s; saveSettings(); $('#sprayPick').classList.add('hidden'); doSpray(el.dataset.s); }); }); };
+    b.addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); sfx.init(); held = false; if (!sprayOwned().length) return; holdTm = setTimeout(() => { held = true; renderSP(); $('#sprayPick').classList.remove('hidden'); }, 380); });
+    b.addEventListener('pointerup', e => { e.stopPropagation(); clearTimeout(holdTm); if (!held) { $('#sprayPick').classList.add('hidden'); doSpray(); } });
+    b.addEventListener('pointerleave', () => clearTimeout(holdTm));
+    document.addEventListener('pointerdown', e => { if (!e.target.closest || !e.target.closest('#sprayWrap')) $('#sprayPick').classList.add('hidden'); }, true); }
   // ---------- chat (left side, fades out) ----------
   function addChat(name, color, text) {
     const el = document.createElement('div'); el.className = 'cmsg'; const b = document.createElement('b'); b.textContent = name + ': '; b.style.color = color; el.appendChild(b); el.appendChild(document.createTextNode(text));
@@ -23208,7 +23272,6 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let botBlinkAt = 0;
   function botBlinks() {
     if (!W || !W.ai || !W.ai.bots || (online && !online.host)) return; const now = performance.now(); if (now < botBlinkAt) return; botBlinkAt = now + 2500;
-    for (const b of W.ai.bots) { const h = W.heroOf(b.p); if (h && h.alive && !h.removed && Math.random() < 0.03) window.botSpray(h); } // bots paint the floor now and then
     for (const b of W.ai.bots) { const h = W.heroOf(b.p); if (!h || h.alive || h.removed) { b._blinkN = 0; continue; } if ((b._blinkN || 0) >= 3 || Math.random() > 0.35) continue; b._blinkN = (b._blinkN || 0) + 1;
       const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === b.p); if (!mk) continue;
       doPing(mk.x, mk.y, b.p, true); if (online && online.host) online.net.pushEvent('bping', b.p.id, Math.round(mk.x), Math.round(mk.y)); }
@@ -23245,7 +23308,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     online = onl || null;
     $('#menu').classList.add('hidden'); $('#end').classList.add('hidden'); $('#hud').classList.remove('hidden');
     for (const s of document.querySelectorAll('.screen')) if (s.id !== 'pause' && s.id !== 'end' && s.id !== 'powers') s.classList.add('hidden');
-    sfx.init(); sfx.muted = !settings.sound; startMusic();
+    sfx.init(); sfx.muted = !settings.sound; startMusic(); refreshSprayBtn();
     const mode = online ? online.game.mode : settings.mode, speed = online ? online.game.speed : settings.speed;
     let opts = { bots: settings.bots, maxFade: 3, playerName: settings.nick || 'Tú' };
     if (online) {
@@ -23306,10 +23369,12 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'emote' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendEmote(a, u); }
       if (kind === 'dance' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendDance(a, u); }
       if (kind === 'bdance' && typeof a === 'number' && typeof e[3] === 'string') { const u = W.heroOf(W.players[a]); if (u && !online.owned.includes(a)) sendDance(e[3], u); }
+      if (kind === 'cos' && slot != null && W.players[slot]) { const pl = W.players[slot]; if (typeof a === 'string') pl.aura = a; if (typeof e[3] === 'string') pl.deathFx = e[3]; if (typeof e[4] === 'string') pl.spawnFx = e[4]; }
       if (kind === 'spray' && slot != null && typeof a === 'string') addSpray(W.players[slot], a, e[3], e[4]);
       if (kind === 'bspray' && typeof a === 'number' && typeof e[3] === 'string' && !online.owned.includes(a)) addSpray(W.players[a], e[3], e[4], e[5]);
       if (kind === 'bemote' && typeof a === 'number' && typeof e[3] === 'string') { const u = W.heroOf(W.players[a]); if (u && !online.owned.includes(a)) sendEmote(e[3], u); }
     });
+    if (!online._cosAt || performance.now() - online._cosAt > 15000) { online._cosAt = performance.now(); online.net.pushEvent('cos', settings.aura || 'piedra', R.deathFxOf(W.local), R.spawnFxOf(W.local)); }
     if (performance.now() - online.lastSend > 66) { online.lastSend = performance.now(); net.sendState(W, online.owned); }
     if (!online.host) {
       if (!net.hostPeer()) { online.hostGoneT += dt; if (online.hostGoneT > 6 && !W.ended) { W.ended = { win: false, msg: 'host' }; showEnd(W.ended); } } else online.hostGoneT = 0;
@@ -23438,7 +23503,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
         let st = 1; W._endTrigs.forEach((t, i) => { if (t && t.execs > 0) st = Math.max(st, i + 2); }); setText('#stats .ver', 'Etapa ' + Math.min(12, st) + '/12'); }
-      { const pr = W.profile.family === 'run' ? ((W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1) || 1) : (W._endTrigs ? W._endTrigs.filter(t => t && t.execs > 0).length + 1 : 1); if (W._xpPr == null) W._xpPr = pr; if (pr > W._xpPr) { addPassXP(40 * (pr - W._xpPr)); W._xpPr = pr; } const mn = Math.floor(W.time / 60); if (W._xpMin == null) W._xpMin = mn; if (mn > W._xpMin) { addPassXP(10); W._xpMin = mn; } } // battle pass XP
+      { const pr = W.profile.family === 'run' ? ((W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1) || 1) : (W._endTrigs ? W._endTrigs.filter(t => t && t.execs > 0).length + 1 : 1); if (W._xpPr == null) W._xpPr = pr; if (pr > W._xpPr) { addPassXP(40 * (pr - W._xpPr)); W._xpPr = pr; if (W.profile.family === 'run') setTimeout(spawnFxAll, 350); } if (!W._spawned && W.time > 0.6) { W._spawned = true; spawnFxAll(); } const mn = Math.floor(W.time / 60); if (W._xpMin == null) W._xpMin = mn; if (mn > W._xpMin) { addPassXP(10); W._xpMin = mn; } } // battle pass XP
       { const still = hero.alive && !hero.glide && !(hero.order && !hero.paused) && !(hero._mv > 0.5); const nw = performance.now(); if (!still) hero._still0 = nw; else if (hero._still0 == null) hero._still0 = nw; hero._stillT = (nw - hero._still0) / 1000; if (!still && sendDance.next > nw) { sendDance.next = 0; $('#bDance').classList.remove('cool'); } $('#bDance').classList.toggle('off', !still || hero._stillT < 0.05); $('#danceWrap').classList.toggle('hidden', !hero.alive || !$('#bBlink').classList.contains('hidden')); if (!hero.alive) $('#dancePick').classList.add('hidden'); } // gray while moving
       $('#bGive').classList.toggle('hidden', !(hero.alive && hero.items.length && nearFriend(hero, 220)));
       $('#mana').style.width = (hero.mana / hero.maxMana * 100) + '%';
@@ -23666,7 +23731,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
 
   requestAnimationFrame(frame);
   if (location.hash.includes('autostart')) start();
-  window.SW = { start, stopGame, get W() { return W; }, get R() { return R; }, get online() { return online; }, settings, saveSettings, sfx };
+  window.SW = { isVip, vipHash, refreshSprayBtn, sprayOwned, start, stopGame, get W() { return W; }, get R() { return R; }, get online() { return online; }, settings, saveSettings, sfx };
 })();
 
 // Online play: lobby of rooms + game rooms, over the page's live "room" (or a local mock for testing)
@@ -23923,22 +23988,31 @@ class Net {
   const pvOf = (id, emo) => { const u = window.EmoteArt && window.EmoteArt(id); return u ? `<img src="${u}" alt="">` : emo; };
   $('#emoteGrid').innerHTML = `<div class="item"><div class="pv">${pvOf('nero', '😎')}</div><b>El Ñero</b><small>Emote</small><div class="price owned">GRATIS</div><div class="lockd eq">EQUIPADO</div></div>` + SHOP_EMOTES.map(([id, emo, n]) => `<div class="item"><div class="pv">${pvOf(id, emo)}</div><b>${esc(n)}</b><small>Emote</small><div class="price">$0.99</div><div class="lockd">PRÓXIMAMENTE</div></div>`).join('');
   const TABS = [['#tabSkins', '#shopGrid', 'Las skins sirven en todos los mapas del juego.'], ['#tabEmotes', '#emoteGrid', 'Los emotes se usan sin límite en todos los mapas. Comprados se agregan a tus 5 casillas.'],
-    ['#tabDfx', '#dfxGrid', 'Tu efecto al caer, con su propio grito. Toca uno para escucharlo; los gratis se equipan al tocarlos.'], ['#tabAura', '#auraGrid', 'El círculo que queda donde caes, en todos los mapas. Tus amigos te reviven pasando cerca o encima.'],
-    ['#tabSpray', '#sprayGrid', 'Pinta el piso: mantén apretado el botón Emote y toca 🎨 Grafiti. Dura 40 segundos y todos lo ven.'], ['#tabPass', '#passBox', 'Juega cualquier mapa para subir de nivel: ganas XP por cada ronda o etapa que pasa tu equipo y por cada minuto jugado.'], ['#tabCoins', '#coinGrid', 'Las monedas servirán para comprar skins, emotes, efectos y auras.']];
-  const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 3) animAuras(); if (n === 4) drawSprays(); if (n === 5) renderPass(); };
+    ['#tabDfx', '#dfxGrid', 'Tu efecto al caer, con su propio grito, en todos los juegos. Toca uno para escucharlo; los gratis se equipan al tocarlos.'], ['#tabSpawn', '#spawnGrid', 'Tu efecto al aparecer al empezar cada ronda, en todos los juegos.'], ['#tabAura', '#auraGrid', 'El círculo que queda donde caes, en todos los mapas. Tus amigos te reviven pasando cerca o encima.'],
+    ['#tabSpray', '#sprayGrid', 'Pinta el piso con el botón 🎨 (tócalo para pintar, mantenlo para elegir entre tus 5). Dura 40 segundos, todos lo ven, y sirve en todos los juegos.'], ['#tabPass', '#passBox', 'Juega cualquier mapa para subir de nivel: ganas XP por cada ronda o etapa que pasa tu equipo y por cada minuto jugado.'], ['#tabCoins', '#coinGrid', 'Las monedas servirán para comprar skins, emotes, efectos y auras.']];
+  const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 4) animAuras(); if (n === 5) drawSprays(); if (n === 6) renderPass(); };
   TABS.forEach(([tb], i) => click(tb, () => shopTab(i)));
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
-  const DFX_ITEMS = [['clasico', '💨', 'Clásico', true], ['luz', '💠', 'Destello Azul', true], ['ko', '💥', '¡KO!', true], ['epico', '🗣️', 'Grito Épico', true], ['calavera', '💀', 'Calavera Neón', false], ['fuegos', '🎆', 'Fuegos Artificiales', false], ['flor', '🌸', 'Flor de Despedida', false], ['rayo', '⚡', 'Rayo Final', false], ['confeti', '🎉', 'Fiesta de Confeti', false], ['fantasma', '👻', 'Fantasma Llorón', false]];
-  const SPRAY_ITEMS = [['gg', 'GG', true], ['huella', 'Huella', true], ['corazon', 'Corazón', true], ['xd', 'XD', false], ['calavera', 'Calavera Punk', false], ['hongo', 'Hongo Loco', false], ['corona', 'Corona', false], ['rayo', 'Rayo', false]];
-  const AURA_ITEMS = [['piedra', 'Círculo de Poder', true], ['oro', 'Sello Dorado', true], ['fuego', 'Anillo de Fuego', false], ['hielo', 'Escarcha', false], ['galaxia', 'Galaxia', false], ['toxico', 'Tóxico', false]];
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
   const PASS_FREE = { 3: ['aura', 'hielo', 'Aura Escarcha'], 6: ['dfx', 'fantasma', 'Efecto Fantasma Llorón'], 10: ['emote', '', 'Emote Guiño'], 15: ['aura', 'toxico', 'Aura Tóxico'], 20: ['dfx', 'confeti', 'Efecto Fiesta de Confeti'], 25: ['coin', '', '100 monedas'], 30: ['aura', 'galaxia', 'Aura Galaxia'] };
   const PASS_PREM = { 1: ['aura', 'fuego', 'Aura Anillo de Fuego'], 2: ['coin', '', '50 monedas'], 4: ['dfx', 'rayo', 'Efecto Rayo Final'], 5: ['skin', '', 'Skin Tigre Dorado'], 8: ['emote', '', 'Emote Rey'], 12: ['skin', '', 'Skin Foca Pirata'], 16: ['coin', '', '150 monedas'], 18: ['ping', '', 'Ping Fuegos Artificiales'], 22: ['skin', '', 'Skin Hongo Galaxia'], 26: ['coin', '', '200 monedas'], 30: ['skin', '', 'Skin Tigre de Fuego (legendaria)'] };
   const passOwns = (kind, id) => Object.entries(PASS_FREE).some(([l, r]) => r[0] === kind && r[1] === id && passLv() >= +l);
+  const VIP = () => !!(SW.isVip && SW.isVip());
+  // death effects: id, icon, name, free?  ('vip' = only the creator has it)
+  const DFX_ITEMS = [['fundador', '👑', 'Caída del Fundador', 'vip'], ['clasico', '💨', 'Clásico', true], ['luz', '💠', 'Destello Azul', true], ['ko', '💥', '¡KO!', true], ['epico', '🗣️', 'Grito Épico', true], ['calavera', '💀', 'Calavera Neón', false], ['fuegos', '🎆', 'Fuegos Artificiales', false], ['flor', '🌸', 'Flor de Despedida', false], ['rayo', '⚡', 'Rayo Final', false], ['confeti', '🎉', 'Fiesta de Confeti', false], ['fantasma', '👻', 'Fantasma Llorón', false]];
+  const SPAWN_ITEMS = [['fundador', '👑', 'Llegada del Fundador', 'vip'], ['estandar', '✨', 'Estándar', true], ['portal', '🌀', 'Portal Azul', false], ['meteoro', '☄️', 'Meteoro', false], ['humo', '💨', 'Bomba de Humo', false], ['arcoiris', '🌈', 'Arcoíris', false]];
+  const SPRAY_ITEMS = [['perrin', 'Perrin', 'vip'], ['gg', 'GG', false], ['huella', 'Huella', false], ['corazon', 'Corazón', false], ['xd', 'XD', false], ['calavera', 'Calavera Punk', false], ['hongo', 'Hongo Loco', false], ['corona', 'Corona', false], ['rayo', 'Rayo', false]];
+  const AURA_ITEMS = [['piedra', 'Círculo de Poder', true], ['oro', 'Sello Dorado', true], ['fuego', 'Anillo de Fuego', false], ['hielo', 'Escarcha', false], ['galaxia', 'Galaxia', false], ['toxico', 'Tóxico', false]];
+  const shown = list => list.filter(it => it[it.length - 1] !== 'vip' || VIP());
+  const priceTag = (free, p) => free === 'vip' ? '<div class="price owned" style="text-decoration:none;opacity:1;color:#ffd23a">EXCLUSIVO</div>' : `<div class="price${free ? ' owned' : ''}">${free ? 'GRATIS' : p}</div>`;
+  const tagTxt = (eq, free) => `<div class="lockd${eq ? ' eq' : ''}">${eq ? 'EQUIPADO' : free ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div>`;
+  const grid = (sel, list, key, cur, kindTxt, price, ownFn, onPick, sound) => {
+    $(sel).innerHTML = shown(list).map(it => { const [id, emo, n, f0] = it; const free = f0 === 'vip' ? 'vip' : (f0 || ownFn(id)); return `<div class="item tap" data-k="${id}"><div class="pv">${emo}</div><b>${esc(n)}</b><small>${kindTxt}</small>${priceTag(free, price)}${tagTxt(cur() === id, free)}</div>`; }).join('');
+    $(sel).querySelectorAll('[data-k]').forEach(el => el.addEventListener('click', () => { const it = list.find(x => x[0] === el.dataset.k); try { SW.sfx.init(); SW.sfx.play(sound + it[0]); } catch (e) {} if (it[3] || ownFn(it[0])) { onPick(it[0]); renderDA(); } })); };
   const renderDA = () => {
-    $('#dfxGrid').innerHTML = DFX_ITEMS.map(([id, emo, n, free0]) => { const free = free0 || passOwns('dfx', id); return `<div class="item tap" data-dfx="${id}"><div class="pv">${emo}</div><b>${esc(n)}</b><small>Efecto + grito</small><div class="price${free ? ' owned' : ''}">${free ? 'GRATIS' : '$0.99'}</div><div class="lockd${(S.deathFx || 'clasico') === id ? ' eq' : ''}">${(S.deathFx || 'clasico') === id ? 'EQUIPADO' : free ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div></div>`; }).join('');
-    $('#auraGrid').innerHTML = AURA_ITEMS.map(([id, n, free0]) => { const free = free0 || passOwns('aura', id); return `<div class="item tap" data-aura="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Aura de muerte</small><div class="price${free ? ' owned' : ''}">${free ? 'GRATIS' : '$0.99'}</div><div class="lockd${(S.aura || 'piedra') === id ? ' eq' : ''}">${(S.aura || 'piedra') === id ? 'EQUIPADO' : free ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div></div>`; }).join('');
-    $('#dfxGrid').querySelectorAll('[data-dfx]').forEach(el => el.addEventListener('click', () => { const it = DFX_ITEMS.find(x => x[0] === el.dataset.dfx); try { SW.sfx.init(); SW.sfx.play('dx_' + it[0]); } catch (e) {} if (it[3] || passOwns('dfx', it[0])) { S.deathFx = it[0]; SW.saveSettings(); renderDA(); } }));
+    grid('#dfxGrid', DFX_ITEMS, 'dfx', () => S.deathFx || 'clasico', 'Efecto + grito', '$0.99', id => passOwns('dfx', id), id => { S.deathFx = id; SW.saveSettings(); }, 'dx_');
+    grid('#spawnGrid', SPAWN_ITEMS, 'spawn', () => S.spawnFx || 'estandar', 'Aparición', '$0.99', () => false, id => { S.spawnFx = id; SW.saveSettings(); }, 'sp_');
+    $('#auraGrid').innerHTML = AURA_ITEMS.map(([id, n, free0]) => { const free = free0 || passOwns('aura', id); return `<div class="item tap" data-aura="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Aura</small>${priceTag(free, '$0.99')}${tagTxt((S.aura || 'piedra') === id, free)}</div>`; }).join('');
     $('#auraGrid').querySelectorAll('[data-aura]').forEach(el => el.addEventListener('click', () => { const it = AURA_ITEMS.find(x => x[0] === el.dataset.aura); if (it[2] || passOwns('aura', it[0])) { S.aura = it[0]; SW.saveSettings(); renderDA(); animAuras(); } }));
   };
   let auraRaf = 0;
@@ -23948,11 +24022,14 @@ class Net {
       auraRaf = requestAnimationFrame(step); };
     if (draw) auraRaf = requestAnimationFrame(step); }
   renderDA();
-  function drawSprays() { const draw = typeof Renderer !== 'undefined' && Renderer.prototype.drawGraffitiArt; if (!draw) return;
-    $('#sprayGrid').innerHTML = SPRAY_ITEMS.map(([id, n, free]) => `<div class="item tap" data-spray="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Grafiti</small><div class="price${free ? ' owned' : ''}">${free ? 'GRATIS' : '$0.49'}</div><div class="lockd${(S.spray || 'gg') === id ? ' eq' : ''}">${(S.spray || 'gg') === id ? 'EQUIPADO' : free ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div></div>`).join('');
-    $('#sprayGrid').querySelectorAll('canvas.apv').forEach((cv, i) => { const g = cv.getContext('2d'); g.fillStyle = '#5b5f66'; g.fillRect(0, 0, 192, 192); g.translate(96, 96); g.scale(1.25, -1.25 / 0.62); try { draw.call({ W: { time: 0 } }, g, SPRAY_ITEMS[i][0], '#ff3b3b', 1); } catch (e) {} });
-    $('#sprayGrid').querySelectorAll('[data-spray]').forEach(el => el.addEventListener('click', () => { const it = SPRAY_ITEMS.find(x => x[0] === el.dataset.spray); try { SW.sfx.init(); SW.sfx.play('spray'); } catch (e) {} if (it[2]) { S.spray = it[0]; SW.saveSettings(); drawSprays(); } })); }
-  // ---------- battle pass, season 1 (free track works now; premium and coins need the Play Store version) ----------
+  // graffiti: none are free; once you own some, pick up to 5 for the in-game button
+  function drawSprays() { const draw = typeof Renderer !== 'undefined' && Renderer.prototype.drawGraffitiArt; if (!draw) return; const own = SW.sprayOwned ? SW.sprayOwned() : []; const slots = (S.spraySlots || []).filter(id => own.includes(id)); const list = shown(SPRAY_ITEMS);
+    $('#sprayGrid').innerHTML = `<div class="coinbal" style="font-size:14px">Tus casillas: ${slots.length || Math.min(5, own.length)}/5 · ${own.length ? 'toca un grafiti tuyo para ponerlo o sacarlo' : 'compra tu primer grafiti para activar el botón 🎨'}</div>` + list.map(([id, n, free]) => { const mine = own.includes(id), inSlot = slots.includes(id) || (!slots.length && own.indexOf(id) > -1 && own.indexOf(id) < 5); return `<div class="item tap" data-spray="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Grafiti</small>${priceTag(free === 'vip' ? 'vip' : mine, '$0.49')}<div class="lockd${inSlot ? ' eq' : ''}">${inSlot ? 'EN TU BOTÓN' : mine ? 'TOCA PARA AGREGAR' : 'PRÓXIMAMENTE'}</div></div>`; }).join('');
+    $('#sprayGrid').querySelectorAll('canvas.apv').forEach((cv, i) => { const g = cv.getContext('2d'); g.fillStyle = '#5b5f66'; g.fillRect(0, 0, 192, 192); g.translate(96, 96); g.scale(1.25, -1.25 / 0.62); try { draw.call({ W: { time: 0 } }, g, list[i][0], '#ff3b3b', 1); } catch (e) {} });
+    $('#sprayGrid').querySelectorAll('[data-spray]').forEach(el => el.addEventListener('click', () => { const id = el.dataset.spray; try { SW.sfx.init(); SW.sfx.play('spray'); } catch (e) {} if (!own.includes(id)) return; let sl = slots.length ? slots.slice() : own.slice(0, 5); if (sl.includes(id)) { if (sl.length > 1) sl = sl.filter(x => x !== id); } else { if (sl.length >= 5) sl.shift(); sl.push(id); } S.spraySlots = sl; S.spray = id; SW.saveSettings(); drawSprays(); })); }
+  // creator code (settings)
+  { const msg = () => { $('#vipMsg').textContent = VIP() ? '👑 Modo creador activo: Caída y Llegada del Fundador y el grafiti Perrin.' : ''; }; msg();
+    click('#vipBtn', () => { const c = String($('#vipIn').value || '').trim().toUpperCase(); if (SW.vipHash && SW.vipHash(c) === '557405f325ebd6f3') { S.vipCode = c; S.deathFx = 'fundador'; S.spawnFx = 'fundador'; S.spraySlots = ['perrin']; S.spray = 'perrin'; SW.saveSettings(); $('#vipIn').value = ''; renderDA(); msg(); } else { $('#vipMsg').textContent = 'Código incorrecto.'; } }); }
   function renderPass() { const xp = S.passXP || 0, lv = passLv(), inLv = lv >= 30 ? 100 : xp % 100; let h = `<div class="ph"><b>🎖️ Pase de Batalla · Temporada 1</b>Nivel ${lv}/30 · ${xp} XP<div class="bar"><i style="width:${inLv}%"></i></div><small>${lv >= 30 ? '¡Pase completo!' : (100 - inLv) + ' XP para el nivel ' + (lv + 1)}</small><div style="margin-top:8px"><button class="buy" disabled>⭐ Pase Premium $4.99 · Próximamente</button></div></div><div class="hd"><span>Nv</span><span>Gratis</span><span>⭐ Premium</span></div>`;
     for (let l = 1; l <= 30; l++) { const f = PASS_FREE[l], pm = PASS_PREM[l], got = lv >= l; h += `<div class="lv${got ? ' got' : ''}"><div class="n">${l}</div><div class="rw${f ? (got ? ' got' : '') : ' none'}">${f ? (got ? '✅ ' : '🔒 ') + esc(f[2]) : '—'}</div><div class="rw pr${pm ? '' : ' none'}">${pm ? '🔒 ' + esc(pm[2]) : '—'}</div></div>`; }
     $('#passBox').innerHTML = h; }
