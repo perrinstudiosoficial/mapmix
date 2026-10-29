@@ -79,6 +79,7 @@ body[data-fam=run] #tox, body[data-fam=run] #abil, body[data-fam=run] #bGive, bo
 #kShop{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.55);display:grid;place-items:center;pointer-events:auto}#kShop.hidden{display:none}
 #kShop .kcard{width:min(94vw,420px);max-height:78vh;overflow:auto;background:#1c0d27;border:1px solid var(--line);border-radius:18px;padding:12px}
 #kShop .khead{display:flex;align-items:center;gap:10px;margin-bottom:8px}#kShop .khead b{flex:1;font-size:18px}#kShopGold{font-weight:900;color:#ffe27a}#kShopX{font:inherit;border:0;background:#3a1f4a;color:#fff;border-radius:10px;width:34px;height:34px}
+.ktabs{display:flex;gap:6px;margin-bottom:8px}.ktabs button{flex:1;font:inherit;font-weight:900;border:0;border-radius:10px;padding:8px;background:#3a1f4a;color:#fff}.ktabs button.on{background:linear-gradient(#7a3fb8,#4b2378)}#kInv .ks sup{font-size:9px;margin-left:-4px}
 .krow{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;padding:8px;border-radius:12px;background:#28133a;margin-bottom:6px}.krow .ic{font-size:28px;text-align:center}.krow b{display:block}.krow small{opacity:.8;line-height:1.2;display:block}
 .krow button{font:inherit;font-weight:900;border:0;border-radius:10px;padding:8px 10px;background:linear-gradient(#5ad66b,#2b8a3b);color:#fff;min-width:70px}.krow button:disabled{background:#4a3a55;color:#aaa}.khint{font-size:12px;opacity:.75;margin-top:6px}
 #bRoar{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 160px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#ff9a3d}
@@ -178,6 +179,10 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .hint{color:var(--dim);font-size:13px;margin:8px 0}
 .winfo{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-weight:800;font-size:13px;color:var(--dim)}
 .winfo span{background:#24102f;border-radius:9px;padding:4px 9px}
+.lslots{display:flex;flex-direction:column;gap:4px;margin:8px 0}.lteam{color:#ffd23a;font-weight:900;font-size:13px;margin-top:4px}
+.lrow{text-align:left;display:grid;grid-template-columns:18px 1fr auto auto;gap:8px;align-items:center;background:linear-gradient(#2a3a8a,#1a2560);border:1px solid #5a6ad0;border-radius:8px;padding:6px 8px;font-size:13px}.lrow.me{outline:2px solid #ffd23a}.lrow.bot{background:linear-gradient(#2c2f3a,#1c1e26);border-color:#555}.lrow.open{background:linear-gradient(#1e2a6a,#141c48);opacity:.85}.lrow.tap{cursor:pointer}
+.lrow .lc{width:16px;height:16px;border-radius:4px;border:1px solid #000}.lrow small{opacity:.75;font-size:11px}.lrow .lt{font-size:11px;opacity:.7}
+.wprev{display:grid;grid-template-columns:64px 1fr;gap:4px 10px;background:#1a2040;border:1px solid #5a6ad0;border-radius:12px;padding:8px;margin-top:8px}.wprev .pvic{grid-row:span 3;font-size:48px;text-align:center}.wprev b{color:#ffd23a}.wprev .pvd{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px}.wprev small{opacity:.8;font-size:11px;line-height:1.25}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:10px 0;text-align:left}
 .slot{background:#24102f;border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-weight:800;font-size:13px;display:flex;gap:6px;align-items:center}
 .slot.bot{opacity:.6}.slot.me{border-color:var(--lime)}
@@ -276,7 +281,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="ab hidden" id="bStun">💫<small>Aturdir</small></div>
   <div class="ab hidden" id="bDash">⚡<small>Dash</small></div>
   <div id="kitBar" class="hidden"><div id="kGold">🪙 0</div><div id="kInv"></div><button id="bKShop" class="hidden">🛒 Tienda</button></div>
-  <div id="kShop" class="hidden"><div class="kcard"><div class="khead"><b>🛒 Tienda del Gatito</b><span id="kShopGold"></span><button id="kShopX">✕</button></div><div id="kShopList"></div><div class="khint">Junta monedas 🪙 por el mapa. Los objetos que no se usan funcionan solo con llevarlos (máximo 6).</div></div></div>
+  <div id="kShop" class="hidden"><div class="kcard"><div class="khead"><b>🛒 Tienda</b><span id="kShopGold"></span><button id="kShopX">✕</button></div><div id="kShopList"></div><div class="khint">Junta monedas 🪙 por el mapa. Los objetos que no se usan funcionan solo con llevarlos (máximo 6).</div></div></div>
   <div id="danceWrap"><div id="dancePick" class="hidden"></div><div class="ab" id="bDance"><span id="danceIcon"></span><small>Baile</small></div></div>
   <div id="sprayWrap"><div id="sprayPick" class="hidden"></div><div class="ab locked" id="bSpray"><span>🎨</span><small>Grafiti</small></div></div>
   <div id="emoteWrap"><div id="emotePick" class="hidden"></div><div class="ab" id="bEmote"><span id="emoteIcon"></span><small>Emote</small></div></div>
@@ -364,8 +369,9 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="card wide">
     <div class="tbar"><button class="back" id="wLeave">‹</button><h2 id="wName">SALA</h2></div>
     <div class="winfo"><span id="wMap"></span><span id="wCode"></span><span id="wMode"></span></div>
-    <div id="wSlots" class="slots"></div>
-    <div id="wHost" class="opts"><label>Bots en la partida <span class="stepper"><button id="wBotsMinus">−</button><b id="wBots">11</b><button id="wBotsPlus">+</button></span></label></div>
+    <div id="wPrev" class="wprev"></div>
+    <div id="wSlots" class="lslots"></div>
+    <div id="wHost" class="opts"><label>Bots para completar <span class="stepper"><button id="wBotsMinus">−</button><b id="wBots">11</b><button id="wBotsPlus">+</button></span></label><div style="display:flex;gap:6px"><button class="buy" id="wFill" style="background:#2b8a3b;color:#fff">Llenar con bots</button><button class="buy" id="wNoBots" style="background:#7a2a3a;color:#fff">Sin bots</button></div></div>
     <div id="wMsg" class="hint"></div>
     <div class="mchat"><div class="mlog" id="rLog"><div class="mnone">Chat de la sala</div></div><div class="mrow"><input id="rIn" maxlength="90" placeholder="Escribe a la sala…" autocomplete="off"><button id="rSend">ENVIAR</button></div></div>
     <button class="big-btn" id="wStart">EMPEZAR</button>
@@ -393,6 +399,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
       <label>Controles en el celular
         <select id="ctlMenu"><option value="stick">Joystick</option><option value="tap">Tocar / mantener para moverte</option></select></label>
       <label>Código de creador <span style="display:flex;gap:6px"><input id="vipIn" maxlength="20" placeholder="Escribe tu código" autocomplete="off" style="width:150px"><button id="vipBtn" class="buy" style="background:#7a3fb8;color:#fff">Activar</button></span></label>
+      <label>Tigre en 3D (prueba) <input type="checkbox" id="opt3d"></label>
       <div class="hint" id="vipMsg"></div>
     </div>
     <div class="help">Muévete con el <b>joystick</b> de la izquierda · usa los botones de la derecha para los poderes · pellizca la pantalla para acercar o alejar la cámara.</div>
@@ -20006,7 +20013,7 @@ class World {
       if (u.cd > 0) u.cd -= dt;
       if (u.hero) { u.mana = Math.min(u.maxMana, u.mana + dt * 1.0); for (const k in u.abil) if (u.abil[k].cd > 0) u.abil[k].cd -= dt; }
       if (u.paused) continue;
-      if (u.hero && u.cdBoost) { const k = dt * u.cdBoost; for (const f of ['jumpReady', 'roarReady', 'invisReady', 'stunReady', 'dashReady']) if (u[f] > this.time) u[f] -= k; }
+      if (u.hero && (u.cdBoost || u._auraCd)) { const k = dt * ((u.cdBoost || 0) + (u._auraCd || 0)); for (const f of ['jumpReady', 'roarReady', 'invisReady', 'stunReady', 'dashReady']) if (u[f] > this.time) u[f] -= k; }
       if (u.hero && this.profile.id === 'bob') { // keep your momentum when you slide off the ice onto the grass
         const onIce = this.tileTypeAt(u.x, u.y) === 'Nice';
         if (u._wasIce && !onIce && !u.order && !u.jump) { const f = u.facing * Math.PI / 180; const tx = u.x + Math.cos(f) * 500, ty = u.y + Math.sin(f) * 500; const q = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 200); if (q) this.issueOrder(u, 851986, q.x, q.y); }
@@ -20091,7 +20098,7 @@ class World {
     const tx = o.type === 'patrol' && o.leg === 1 ? o.ax : o.x, ty = o.type === 'patrol' && o.leg === 1 ? o.ay : o.y;
     if (!u.path) { u.path = this.findPath(u, tx, ty); u.pi = 0; if (!u.path.length) { u.order = null; return; } }
     if (u.stunUntil > this.time) return; // stunned: frozen in place
-    let step = u.speed * dt * (u.dashUntil > this.time ? 1.6 : 1) * (u.spdBoost || 1);
+    let step = u.speed * dt * this.heroSpeedMul(u);
     while (step > 0 && u.path && u.pi < u.path.length) {
       const wp = u.path[u.pi]; const dx = wp.x - u.x, dy = wp.y - u.y; const d = Math.hypot(dx, dy);
       if (d > 0.01) u.facing = Math.atan2(dy, dx) * 180 / Math.PI;
@@ -20241,31 +20248,49 @@ class World {
   cmdDash(p) { // kitty map: a burst of extra speed for 3 s
     const h = this.heroOf(p); if (!h || !h.alive || this.profile.id !== 'kitty5' || this.time < (h.dashReady || 0)) return false; h.dashReady = this.time + 18; h.dashUntil = this.time + 3 + (h.durBonus || 0); this.emit('sound', { name: 'dash' }); return true;
   }
-  // ---- kitty map: coins and items lying around, shop items (coin values tuned so 5-7 coins buy the first item) ----
+  // ---- run maps (tiger and seal): coins and items lying around, a shop and learnable skills ----
+  // coins are worth 10 each, so 5-7 coins buy the first item; prices are proportional to the original map's
+  lootItems() { return this.profile.id === 'bob'
+    ? { potE: 40, potEM: 70, sobi: 120, sobiU: 240, colE: 120, colM: 280, tomo: 380 }
+    : { potV: 60, potM: 100, sobi: 160, botas: 120, colE: 120, minas: 180, tomo: 400 }; }
+  lootSkills() { return this.profile.id === 'kitty5' ? { aRes: [150, 250, 350], aBri: [150, 250, 350], viento: [120, 220, 320] } : {}; }
   kittySetupLoot(round) {
-    if (this.profile.id !== 'kitty5') return; let sd = (round * 9973 + 77) >>> 0; const rnd = () => { sd = (sd + 0x6D2B79F5) >>> 0; let t = sd; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; // same coins for everybody in the room
-    this.coins = []; this.loot = this.loot && round > 1 ? this.loot.filter(l => !l.taken) : [];
+    if (this.profile.id !== 'kitty5' && this.profile.id !== 'bob') return;
+    let sd = (round * 9973 + 77) >>> 0; const rnd = () => { sd = (sd + 0x6D2B79F5) >>> 0; let t = sd; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; // same coins for everybody in the room
     const park = this.script && this.script.gget.gg_rct_Players && this.script.gget.gg_rct_Players(), inPark = (x, y) => park && x >= park.x0 - 200 && x <= park.x1 + 200 && y >= park.y0 - 200 && y <= park.y1 + 200;
+    this.coins = []; this.loot = this.loot && round > 1 ? this.loot.filter(l => !l.taken) : []; this.mines = this.mines || [];
     let tries = 0; while (this.coins.length < 70 && tries++ < 6000) { const x = -4000 + rnd() * 8000, y = -4000 + rnd() * 8000; if (!this.walkable(x, y) || inPark(x, y) || this.coins.some(c => Math.hypot(c.x - x, c.y - y) < 260)) continue; this.coins.push({ x, y, v: 10, id: this.coins.length }); }
-    const ids = ['potE', 'potEM', 'sobi', 'sobiU', 'colE', 'colM', 'tomo']; let n = 0; tries = 0;
-    while (n < 6 && tries++ < 3000) { const x = -4000 + rnd() * 8000, y = -4000 + rnd() * 8000; if (!this.walkable(x, y) || inPark(x, y)) continue; this.loot.push({ x, y, it: ids[Math.floor(rnd() * (rnd() < 0.6 ? 2 : ids.length))], id: 'L' + round + '_' + n }); n++; }
+    const ids = Object.keys(this.lootItems()); let n = 0; tries = 0;
+    while (n < 6 && tries++ < 3000) { const x = -4000 + rnd() * 8000, y = -4000 + rnd() * 8000; if (!this.walkable(x, y) || inPark(x, y)) continue; this.loot.push({ x, y, it: ids[Math.floor(rnd() * (rnd() < 0.6 ? 3 : ids.length))], id: 'L' + round + '_' + n }); n++; }
   }
   kittyPickups() {
-    if (this.profile.id !== 'kitty5' || !this.coins) return;
-    for (const p of this.players) { const h = this.heroOf(p); if (!h || !h.alive || h.paused) continue;
+    if (!this.coins) return; const heroes = this.players.map(p => this.heroOf(p)).filter(h => h && h.alive && !h.removed);
+    for (const h of heroes) { if (h.paused) continue;
       for (const c of this.coins) if (!c.taken && Math.hypot(c.x - h.x, c.y - h.y) < 60) { c.taken = true; h.gold = (h.gold || 0) + c.v; this.emit('coin', h, c); }
       for (const l of this.loot) if (!l.taken && Math.hypot(l.x - h.x, l.y - h.y) < 60 && (h.kinv || []).length < 6) { l.taken = true; this.kittyGive(h, l.it); this.emit('loot', h, l); } }
+    // auras of the tiger skills reach friends within 600
+    for (const h of heroes) { let sp = 0, cd = 0; for (const o of heroes) { if (Math.hypot(o.x - h.x, o.y - h.y) > 600) continue; sp = Math.max(sp, [0, 0.1, 0.2, 0.3][(o.skills || {}).aRes || 0]); cd = Math.max(cd, [0, 0.2, 0.4, 0.6][(o.skills || {}).aBri || 0]); } h._auraSpd = sp; h._auraCd = cd; }
+    // goblin mines: a wolf that walks on one is blown away (stunned 6 s)
+    if (this.mines && this.mines.length) for (const m of this.mines) { if (m.done) continue; for (const w of this.units) if (w.alive && !w.removed && (w.t.kind === 'wolf' || w.t.kind === 'crab') && Math.hypot(w.x - m.x, w.y - m.y) < 90) { m.done = true; const ef = this.addEffect(m.x, m.y, 'explosion'); ef.r = 160; ef.dur = 0.4; this.emit('sound', { name: 'boom', x: m.x, y: m.y }); for (const v of this.units) if (v.alive && !v.removed && (v.t.kind === 'wolf' || v.t.kind === 'crab') && Math.hypot(v.x - m.x, v.y - m.y) < 220) { v.stunUntil = this.time + 6; v.order = null; v.path = null; } break; } }
   }
+  heroSpeedMul(u) { if (!u.hero) return 1; const inv = u.kinv || []; let k = 1 + inv.filter(x => x === 'botas').length * 0.15 + Math.min(0.3, (u.tomos || 0) * 0.1) + (u._auraSpd || 0);
+    if (u.dashUntil > this.time) k *= 1.6; if (u.potVUntil > this.time) k *= 1.6; if (u.invisUntil > this.time) k *= 1 + [0, 0.1, 0.4, 0.7][(u.skills || {}).viento || 0]; return k; }
   kittyGive(h, it) { (h.kinv = h.kinv || []).push(it); this.kittyApply(h); }
   kittyApply(h) { const inv = h.kinv || []; const has = k => inv.filter(x => x === k).length;
-    h.cdBoost = Math.min(1.5, has('sobi') * 0.25 + has('sobiU') * 0.5); h.durBonus = Math.min(4, has('colE') * 1 + has('colM') * 2); h.spdBoost = 1 + Math.min(0.3, (h.tomos || 0) * 0.1); }
+    h.cdBoost = Math.min(1.5, has('sobi') * (this.profile.id === 'bob' ? 0.25 : 0.5) + has('sobiU') * 0.5); h.durBonus = Math.min(4, has('colE') * (this.profile.id === 'bob' ? 1 : 2) + has('colM') * 2); }
   kittyUse(h, slot) { const inv = h.kinv || []; const it = inv[slot]; if (!it) return false;
-    if (it === 'potE') { h.jumpReady = this.time; } else if (it === 'potEM') { h.jumpReady = h.roarReady = h.invisReady = h.stunReady = h.dashReady = this.time; } else if (it === 'tomo') { h.tomos = (h.tomos || 0) + 1; } else return false; // passive items stay in the bag
+    if (it === 'potE') h.jumpReady = this.time;
+    else if (it === 'potEM' || it === 'potM') h.jumpReady = h.roarReady = h.invisReady = h.stunReady = h.dashReady = this.time;
+    else if (it === 'potV') h.potVUntil = this.time + 15;
+    else if (it === 'tomo') h.tomos = (h.tomos || 0) + 1;
+    else if (it === 'minas') { (this.mines = this.mines || []).push({ x: h.x, y: h.y, owner: h.owner }); h.mineCharges = (h.mineCharges ?? 3) - 1; this.emit('sound', { name: 'click' }); if (h.mineCharges > 0) return true; h.mineCharges = 3; }
+    else return false; // passive items stay in the bag
     inv.splice(slot, 1); this.kittyApply(h); this.emit('sound', { name: 'rescue' }); return true; }
-  kittyBuy(h, it) { const P = { potE: 50, potEM: 80, sobi: 120, colE: 150, sobiU: 220, colM: 260, tomo: 350 }[it]; if (P == null || (h.gold || 0) < P || (h.kinv || []).length >= 6) return false; h.gold -= P; this.kittyGive(h, it); this.emit('sound', { name: 'coin' }); return true; }
+  kittyBuy(h, it) { const P = this.lootItems()[it]; if (P == null || (h.gold || 0) < P || (h.kinv || []).length >= 6) return false; h.gold -= P; this.kittyGive(h, it); this.emit('sound', { name: 'coin' }); return true; }
+  kittyLearn(h, sk) { const L = this.lootSkills()[sk]; if (!L) return false; const lv = (h.skills = h.skills || {})[sk] || 0; if (lv >= 3 || (h.gold || 0) < L[lv]) return false; h.gold -= L[lv]; h.skills[sk] = lv + 1; this.emit('sound', { name: 'revive' }); return true; }
   cmdInvis(p) { // kitty map only: 6 s nearly invisible (wolves still kill you if they walk over you)
     const h = this.heroOf(p); if (!h || !h.alive || this.profile.id !== 'kitty5') return false; if (this.time < (h.invisReady || 0)) return false;
-    h.invisReady = this.time + 22; h.invisUntil = this.time + 6 + (h.durBonus || 0); this.emit('sound', { name: 'invis' }); return true;
+    h.invisReady = this.time + 22; h.invisUntil = this.time + [6, 8, 10, 12][(h.skills || {}).viento || 0] + (h.durBonus || 0); this.emit('sound', { name: 'invis' }); return true;
   }
   cmdUseItem(p, slot) {
     const h = this.heroOf(p); if (!h || !h.alive) return;
@@ -22135,7 +22160,8 @@ class Renderer {
       const kind = u.t.kind;
       if (u.stunUntil > W.time && u.alive) { g.save(); g.translate(0, 70); for (let i = 0; i < 3; i++) { const a = W.time * 5 + i * 2.1; g.fillStyle = '#ffe34d'; g.save(); g.translate(Math.cos(a) * 22, Math.sin(a) * 7); g.scale(1, -1); g.font = '16px system-ui'; g.textAlign = 'center'; g.fillText('★', 0, 0); g.restore(); } g.restore(); } // stunned: stars over the head
       if (u.dashUntil > W.time && u.alive && Math.random() < 0.6) this.puff(u.x, u.y + 20, { r0: 6, r1: 18, life: 0.35, col: '120,220,255', a: 0.5, vx: 0, vy: 0 });
-      if (kind === 'kitty') this.drawKitty(g, u); else if (kind === 'wolf') this.drawWolf(g, u); else if (kind === 'circle') this.drawKittyCircle(g, u); else if (kind === 'shop') this.drawKittyShop(g, u); else if (kind === 'swimmer') this.drawPuffer(g, u); else if (kind === 'crab') this.drawCrab(g, u); else if (kind === 'hidden') {}
+      if (kind === 'kitty' && W.profile.id === 'kitty5' && this.drawTiger3D && !(window.SW && window.SW.settings && window.SW.settings.tiger3d !== true)) { if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); } this.drawTiger3D(g, u); }
+      else if (kind === 'kitty') this.drawKitty(g, u); else if (kind === 'wolf') this.drawWolf(g, u); else if (kind === 'circle') this.drawKittyCircle(g, u); else if (kind === 'shop') this.drawKittyShop(g, u); else if (kind === 'swimmer') this.drawPuffer(g, u); else if (kind === 'crab') this.drawCrab(g, u); else if (kind === 'hidden') {}
       else if (code === 'H003') this.drawHero(g, u);
       else if (code === 'h000' || code === 'h007' || code === 'h008' || code === 'h009') this.drawClown(g, u, code);
       else if (u.t.mortar) this.drawMortar(g, u);
@@ -22984,11 +23010,12 @@ class Renderer {
       const cy = 150 - Math.min(1, p * 2) * 40; g.save(); g.translate(0, cy); g.scale(1, -1); g.globalAlpha *= fade; g.fillStyle = '#ffd23a'; g.strokeStyle = '#7a4a00'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-20, 10); g.lineTo(-23, -12); g.lineTo(-10, -2); g.lineTo(0, -18); g.lineTo(10, -2); g.lineTo(23, -12); g.lineTo(20, 10); g.closePath(); g.fill(); g.stroke(); for (const [x, c] of [[-11, '#ff3b6b'], [0, '#4dfcff'], [11, '#7dff9a']]) { g.fillStyle = c; g.beginPath(); g.arc(x, 4, 3, 0, TAU); g.fill(); } g.restore();
       for (let i = 0; i < 22; i++) { const q = (p * 1.3 + i * 0.045) % 1, x = Math.sin(i * 7.1) * 90, y = 260 * (1 - q); g.fillStyle = `rgba(255,${210 + (i % 3) * 15},90,${(1 - q) * fade})`; star4(g, x, y, 3 + (i % 3)); } }
   };
-  const LOOT_ICON = { potE: '🧪', potEM: '⚗️', sobi: '🎭', sobiU: '👺', colE: '📿', colM: '💠', tomo: '📕' };
+  const LOOT_ICON = { potE: '🧪', potEM: '⚗️', sobi: '🎭', sobiU: '👺', colE: '📿', colM: '💠', tomo: '📕', potV: '🥤', potM: '🔵', botas: '👢', minas: '💣' };
   P.drawLoot = function (g) { const W = this.W; if (!W.coins) return; const t = W.time, v = this.view || { vx0: -1e9, vx1: 1e9, vy0: -1e9, vy1: 1e9 };
     for (const c of W.coins) { if (c.taken || c.x < v.vx0 || c.x > v.vx1 || c.y < v.vy0 || c.y > v.vy1) continue; const sp = Math.cos(t * 4 + c.id), hy = 26 + Math.sin(t * 3 + c.id) * 4;
       g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(c.x, c.y - 4, 12, 4, 0, 0, TAU); g.fill();
       g.save(); g.translate(c.x, c.y + hy); g.scale(Math.max(0.15, Math.abs(sp)), 1); const cg = g.createLinearGradient(-14, 0, 14, 0); cg.addColorStop(0, '#b47a0c'); cg.addColorStop(0.5, '#ffe27a'); cg.addColorStop(1, '#c78a12'); g.fillStyle = cg; g.beginPath(); g.arc(0, 0, 14, 0, TAU); g.fill(); g.strokeStyle = '#7a4d00'; g.lineWidth = 2; g.stroke(); g.fillStyle = '#a86a00'; g.font = 'bold 14px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.scale(1, -1); g.fillText('$', 0, 1); g.restore(); }
+    for (const m of W.mines || []) { if (m.done) continue; g.fillStyle = m.owner === W.local ? 'rgba(255,80,60,0.8)' : 'rgba(255,80,60,0.12)'; g.beginPath(); g.ellipse(m.x, m.y, 12, 6, 0, 0, TAU); g.fill(); } // hidden mines (you see your own)
     for (const l of W.loot || []) { if (l.taken || l.x < v.vx0 || l.x > v.vx1 || l.y < v.vy0 || l.y > v.vy1) continue; const hy = 30 + Math.sin(t * 2.5 + l.x) * 5, pul = 0.5 + 0.5 * Math.sin(t * 4);
       g.save(); g.translate(l.x, l.y); g.scale(1, 0.5); const gl = g.createRadialGradient(0, 0, 0, 0, 0, 40); gl.addColorStop(0, `rgba(160,240,255,${0.5 + 0.3 * pul})`); gl.addColorStop(1, 'rgba(160,240,255,0)'); g.fillStyle = gl; g.beginPath(); g.arc(0, 0, 40, 0, TAU); g.fill(); g.restore();
       g.save(); g.translate(l.x, l.y + hy); g.scale(1, -1); g.font = '30px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(LOOT_ICON[l.it] || '🎁', 0, 0); g.restore(); } };
@@ -23073,6 +23100,92 @@ class Renderer {
     for (const ex of [-6, 6]) { g.strokeStyle = dark; g.lineWidth = 2; g.beginPath(); g.moveTo(ex, -10); g.lineTo(ex, -18); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ex, -20, 4, 0, TAU); g.fill(); g.fillStyle = '#111'; g.beginPath(); g.arc(ex + 1, -20, 2, 0, TAU); g.fill(); }
     g.strokeStyle = 'rgba(40,10,10,0.8)'; g.lineWidth = 1.6; g.beginPath(); g.arc(0, 2, 5, 0.2, Math.PI - 0.2); g.stroke();
     g.restore();
+  };
+})();
+
+// MapMix: a real-time 3D white tiger for "Corre Gatito Corre", drawn with Canvas 2D.
+// A small skeleton (spine, neck, head, 4 legs with 2-bone IK, tail) is posed every frame, rotated to the exact
+// facing angle and projected with the game camera tilt, then its parts are painted back to front.
+// So it turns through every angle like a 3D model, never changes size, and gallops with real legs.
+'use strict';
+(function () {
+  const P = Renderer.prototype, TAU = Math.PI * 2;
+  const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = v => Math.max(0, Math.min(255, Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k)))); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; };
+  const FUR = '#f2f3f7', FUR_D = '#9aa0ae', STRIPE = '#2a2433', ARMOR = '#c81e2b', GOLD = '#e8b33a';
+  P.drawTiger3D = function (g, u) {
+    const W = this.W; if (!u.alive) return;
+    const dt = Math.min(0.1, this._dt || 0.016), t = W.time + u.handle * 0.37;
+    if (u._rf == null) u._rf = u.facing; { let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 620 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
+    const moving = (!!u.order && !u.paused) || !!u.jump; if (u._wasMv && !moving) u._foot = !u._foot; u._wasMv = moving;
+    u._mvb = (u._mvb || 0) + ((moving ? 1 : 0) - (u._mvb || 0)) * Math.min(1, dt * 7); const mv = u._mvb;
+    const fast = u.dashUntil > W.time ? 1.35 : 1; u._gph = (u._gph || 0) + dt * 11 * fast * (0.15 + 0.85 * mv) * (moving ? 1 : 0.2); const ph = u._gph;
+    // tired breathing when standing still after running
+    if (moving) { u._run = Math.min(6, (u._run || 0) + dt); u._tired = Math.min(1, u._run / 2.5); } else { u._run = 0; u._tired = Math.max(0.2, (u._tired ?? 0.2) - dt / 14); }
+    u._bph = (u._bph || 0) + dt * (2.2 + 3 * u._tired) * TAU; const br = Math.sin(u._bph) * (1 - mv);
+    const col = this.heroColor(u);
+    const jp = u.jump ? Math.min(1, (W.time - u.jump.t0) / u.jump.dur) : 0, lift = u.jump ? Math.sin(jp * Math.PI) * 120 : 0;
+    // ground: shadow + aura
+    const sh = Math.max(0.4, 1 - lift / 300); g.fillStyle = `rgba(0,0,0,${0.3 * sh})`; g.beginPath(); g.ellipse(0, -4, 52 * sh, 17 * sh, 0, 0, TAU); g.fill();
+    g.save(); g.translate(0, -4); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 44); g.restore();
+    const f = u._rf * Math.PI / 180, cf = Math.cos(f), sf = Math.sin(f), S = 1.25;
+    // local (a forward, s left, z up) -> screen (x, y up) and depth (bigger = farther from the camera)
+    const pr = (a, s, z) => { a *= S; s *= S; z *= S; const dx = a * cf - s * sf, dy = a * sf + s * cf; return [dx, dy * 0.5 + z * 0.86 + lift, dy * 0.87 - z * 0.5]; };
+    const items = [];
+    const ball = (a, s, z, r, c1, c2, dd = 0) => { const p = pr(a, s, z); items.push([p[2] + dd, () => { const R = r * S, gr = g.createRadialGradient(p[0] - R * 0.35, p[1] + R * 0.4, R * 0.1, p[0], p[1], R); gr.addColorStop(0, c1); gr.addColorStop(1, c2); g.fillStyle = gr; g.beginPath(); g.arc(p[0], p[1], R, 0, TAU); g.fill(); }]); return p; };
+    const bone = (A, B, r, c, dd = 0, outline = true) => { const p = pr(...A), q = pr(...B); items.push([(p[2] + q[2]) / 2 + dd, () => { g.lineCap = 'round'; if (outline) { g.strokeStyle = 'rgba(25,20,35,0.75)'; g.lineWidth = r * 2 * S + 2.5; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); } g.strokeStyle = c; g.lineWidth = r * 2 * S; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = r * 0.7 * S; g.beginPath(); g.moveTo(p[0] - 1, p[1] + r * 0.5); g.lineTo(q[0] - 1, q[1] + r * 0.5); g.stroke(); }]); };
+    // camera direction in local space (to know which side of the body faces us)
+    const camA = -0.5 * sf * 0.87, camS = -0.5 * cf * 0.87; // world (0,-0.87*..,0.5) rotated back
+    // ---- spine (flexes with the gallop) ----
+    const flex = Math.sin(ph) * 0.13 * mv * fast, bob = mv * Math.abs(Math.sin(ph)) * 5 + (1 - mv) * br * 0.8, lean = u.dashUntil > W.time ? -4 : 0;
+    const spine = [];
+    for (let i = 0; i <= 6; i++) { const k = i / 6, a = (-34 + 70 * k) * (1 + flex * (k - 0.5) * 2), arch = Math.sin(k * Math.PI) * (3 - 6 * flex), z = 43 + bob + arch + (k > 0.5 ? lean * (k - 0.5) : 0); spine.push([a, 0, z, [22, 22.5, 23, 22.5, 23.5, 24.5, 24][i] * (1 + (i >= 4 ? br * 0.035 : 0))]); }
+    spine.forEach(([a, s, z, r], i) => { ball(a, s, z, r, FUR, FUR_D);
+      // stripes: arcs around the spine on the side we can see
+      for (const off of [-4, 4]) { if ((i + (off > 0 ? 1 : 0)) % 2) continue; const pts = []; for (let th = 0.25; th <= Math.PI - 0.25; th += 0.18) { const ss = Math.cos(th) * r * 1.0, zz = Math.sin(th) * r * 0.98; const vis = (Math.cos(th) * camS) + Math.sin(th) * 0.5; if (vis > 0.05) pts.push(pr(a + off, ss, z + zz)); else pts.push(null); }
+        const p0 = pr(a, s, z); items.push([p0[2] - 0.5, () => { g.strokeStyle = STRIPE; g.lineWidth = 2.6; g.lineCap = 'round'; g.beginPath(); let on = false; for (const p of pts) { if (!p) { on = false; continue; } if (!on) { g.moveTo(p[0], p[1]); on = true; } else g.lineTo(p[0], p[1]); } g.stroke(); }]); }
+    });
+    // armour: red saddle with gold trim on the back
+    for (const [a, r] of [[-10, 15], [4, 16], [18, 15]]) { const z = 43 + bob + 19 + Math.sin((a + 34) / 70 * Math.PI) * 3; ball(a, 0, z, r, '#ff4a52', ARMOR, -2); }
+    { const p = pr(4, 0, 43 + bob + 22), q = pr(-14, 0, 43 + bob + 19), w = pr(22, 0, 43 + bob + 19); items.push([p[2] - 3, () => { g.strokeStyle = GOLD; g.lineWidth = 3; g.beginPath(); g.moveTo(q[0], q[1]); g.quadraticCurveTo(p[0], p[1] + 6, w[0], w[1]); g.stroke(); }]); }
+    // ---- head and neck ----
+    const hz = 53 + bob * 0.6 + (moving ? Math.sin(ph * 2) * 1.5 : br * 1.2), ha = 50 + (spine[6][0] - 36) * 0.6, look = moving ? 0 : Math.sin(t * 0.7) * 4;
+    ball(ha - 6, 0, hz - 4, 15, FUR, FUR_D);
+    ball(ha + 8, look * 0.4, hz + 4, 16.5, FUR, '#b6bbc7');
+    ball(ha + 20, look * 0.6, hz - 1, 9.5, '#ffffff', '#c9ccd4');
+    ball(ha + 27, look * 0.7, hz + 1, 3.6, '#3a2a33', '#1a1218', -1);
+    for (const sd of [-1, 1]) { ball(ha + 3, sd * 10 + look * 0.4, hz + 18, 6, '#e9eaf0', '#6b6f7a'); ball(ha + 3.5, sd * 10 + look * 0.4, hz + 19, 3, '#3a3040', '#241c2a', -0.5); // ears
+      ball(ha + 17, sd * 6.5 + look * 0.5, hz + 8, 3, '#7fd6ff', '#2e86c8', -0.8); ball(ha + 18.6, sd * 6.5 + look * 0.5, hz + 8, 1.4, '#0b0b12', '#0b0b12', -1.2); // eyes
+      ball(ha + 12, sd * 9 + look * 0.4, hz + 11, 2.2, STRIPE, STRIPE, -0.6); }
+    ball(ha + 6, 0, hz + 15, 9, '#ffd25a', '#b8861a', -1.5); // golden helmet plate
+    if (!moving && (u._tired || 0) > 0.3) { const L = 4 + 7 * u._tired * (1 + 0.25 * br); bone([ha + 23, look * 0.6, hz - 6], [ha + 24, look * 0.6, hz - 6 - L], 2.6, '#e8687f', -2, false); }
+    // ---- legs: gallop (front pair then back pair), 2-bone IK, paws on the ground ----
+    const legs = [[30, 11, 0, 'f'], [30, -11, 0.45, 'f'], [-28, 11, Math.PI, 'b'], [-28, -11, Math.PI + 0.45, 'b']];
+    for (const [ha0, s, off, kind] of legs) {
+      const hipA = ha0 * (1 + flex * Math.sign(ha0) * 1.2), hipZ = 38 + bob, ph2 = ph + off + (u._foot ? Math.PI : 0);
+      const stride = (kind === 'f' ? 24 : 22) * mv * fast, sw = Math.sin(ph2);
+      let fa = hipA + Math.cos(ph2) * stride + (kind === 'f' ? 4 : -2), fz = Math.max(0, sw) * 16 * mv;
+      if (!moving) { const idleStep = (s > 0) === !!u._foot ? 5 : -3; fa = hipA + (kind === 'f' ? 4 : -2) + idleStep; fz = 0; }
+      if (u.jump) { fa = hipA * 0.6; fz = hipZ - 18; }
+      const L1 = kind === 'f' ? 21 : 23, L2 = kind === 'f' ? 22 : 24, dA = fa - hipA, dZ = fz - hipZ, D = Math.min(L1 + L2 - 0.5, Math.hypot(dA, dZ));
+      const base = Math.atan2(dZ, dA), cosK = (L1 * L1 + D * D - L2 * L2) / (2 * L1 * D), ang = Math.acos(Math.max(-1, Math.min(1, cosK))) * (kind === 'f' ? -1 : 1);
+      const kA = hipA + Math.cos(base + ang) * L1, kZ = hipZ + Math.sin(base + ang) * L1;
+      const far = s * camS < 0 ? -0.18 : 0, c1 = shade(FUR, far - 0.04), cDark = shade('#c9ccd6', far);
+      bone([hipA, s, hipZ + 4], [kA, s, kZ], kind === 'f' ? 7.5 : 9.5, c1);
+      bone([kA, s, kZ], [fa, s, fz + 3], kind === 'f' ? 5.5 : 6, cDark);
+      ball(fa + 2, s, fz + 3, 6.2, '#ffffff', '#b9bdc8', -0.3);
+      // leg stripes
+      const m = [(hipA + kA) / 2, s, (hipZ + kZ) / 2 + 2]; ball(m[0], s * 1.05, m[2], 2.6, STRIPE, STRIPE, -1);
+      if (kind === 'f') { ball(kA - 1, s * 1.02, kZ + 4, 4.5, GOLD, '#9a6a10', -0.9); } // gold bracer
+    }
+    // ---- tail: a curve that swings and lifts when running ----
+    { let pa = spine[0][0] - 14, pz = spine[0][2] + 4, ps = 0;
+      for (let i = 1; i <= 8; i++) { const k = i / 8, na = pa - 8.5 * (1 - 0.25 * mv), nz = pz + (mv * 2.5 - 1.2) + Math.sin(t * 3 - i * 0.7) * 1.4 * (1 + mv), ns = Math.sin(t * (moving ? 6 : 2.2) - i * 0.55) * i * (moving ? 1.6 : 2.2);
+        bone([pa, ps, pz], [na, ns, nz], 4.8 - k * 2, i % 2 ? FUR : '#3a3242', 0, i === 1); pa = na; pz = nz; ps = ns; }
+      ball(pa - 2, ps, pz, 3.6, '#ffffff', '#c9ccd4'); }
+    items.sort((x, y) => y[0] - x[0]); for (const it of items) it[1]();
+    if (!moving && u._tired > 0.4 && Math.random() < 0.08) { const p = pr(ha + 26, 0, hz - 2); this.puff(u.x + p[0], u.y + p[1] - lift, { r0: 3, r1: 9, life: 0.6, col: '255,255,255', a: 0.5, vx: cf * 25, vy: 18 }); }
+    if (moving && mv > 0.6 && Math.random() < 0.3) this.puff(u.x - cf * 40, u.y - 4 - sf * 40, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -cf * 40, vy: -sf * 40 });
   };
 })();
 
@@ -23263,19 +23376,29 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
   function doRoar() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
   // ---------- tiger map: stun, dash, coins, bag and the shop ----------
-  const KITEMS = { potE: ['🧪', 'Poción de Energía', 50, 'Úsala: recarga al instante tu Salto.'], potEM: ['⚗️', 'Poción de Energía Mayor', 80, 'Úsala: recarga al instante todos tus poderes.'], sobi: ['🎭', 'Máscara Sobi', 120, 'Llévala: tus poderes se recargan 25% más rápido.'],
-    colE: ['📿', 'Colgante de Energía', 150, 'Llévalo: Invisible y Dash duran 1 segundo más.'], sobiU: ['👺', 'Máscara Sobi Ultra', 220, 'Llévala: tus poderes se recargan 50% más rápido.'], colM: ['💠', 'Colgante de Maná', 260, 'Llévalo: Invisible y Dash duran 2 segundos más (el doble del de Energía).'], tomo: ['📕', 'Tomo de Poder', 350, 'Úsalo: +10% de velocidad para el resto de la partida.'] };
+  const KITEMS = { potE: ['🧪', 'Poción de Energía', 'Úsala: recarga al instante tu Salto.'], potEM: ['⚗️', 'Poción de Energía Mayor', 'Úsala: recarga al instante todos tus poderes.'], sobiU: ['👺', 'Máscara Sobi Ultra', 'Llévala: tus poderes se recargan 50% más rápido.'], colM: ['💠', 'Colgante de Maná', 'Llévalo: tus poderes duran 2 segundos más (el doble del de Energía).'],
+    potV: ['🥤', 'Poción de Velocidad', 'Úsala: +60% de velocidad por 15 segundos.'], potM: ['🔵', 'Poción de Maná', 'Úsala: recarga al instante todos tus poderes.'], sobi: ['🎭', 'Máscara Sobi', 'Llévala: tus poderes se recargan más rápido (50% en el tigre, 25% en la foca).'], botas: ['👢', 'Botas de Velocidad', 'Llévalas: +15% de velocidad.'],
+    colE: ['📿', 'Colgante de Energía', 'Llévalo: Invisible y Dash duran más (2 s en el tigre, 1 s en la foca).'], minas: ['💣', 'Minas Goblin', 'Úsalas: dejas una mina escondida donde estás; el lobo que la pise sale volando y queda aturdido 6 s. 3 cargas.'], tomo: ['📕', 'Tomo de Poder', 'Úsalo: sube un nivel, +10% de velocidad para el resto de la partida.'] };
+  const KSKILLS = { aRes: ['🌀', 'Aura de Resistencia', 'Tú y los amigos cerca corren más rápido: +10% / +20% / +30%.'], aBri: ['✨', 'Aura de Brillo', 'Tú y los amigos cerca recargan los poderes más rápido: +20% / +40% / +60%.'], viento: ['🌬️', 'Viento Andante', 'Mejora tu Invisible: dura 8 / 10 / 12 s y corres +10% / +40% / +70% mientras estás invisible.'] };
   function doStun() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdStun(W.local) && online) online.net.pushEvent('stun'); }
   function doDash() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdDash(W.local) && online) online.net.pushEvent('dash'); }
   window.botStun = u => { if (W.cmdStun(u.owner) && online && online.host) online.net.pushEvent('bstun', u.owner.id); };
   window.botDash = u => { if (W.cmdDash(u.owner) && online && online.host) online.net.pushEvent('bdash', u.owner.id); };
   function nearShop(h) { return W.units.some(u => u.t.kind === 'shop' && !u.removed && Math.hypot(u.x - h.x, u.y - h.y) < 320); }
-  function renderKShop() { const h = W && W.heroOf(W.local); if (!h) return; $('#kShopGold').textContent = '🪙 ' + (h.gold || 0);
-    $('#kShopList').innerHTML = Object.entries(KITEMS).map(([id, [ic, n, pr, d]]) => `<div class="krow"><div class="ic">${ic}</div><div><b>${n}</b><small>${d}</small></div><button data-buy="${id}" ${(h.gold || 0) < pr || (h.kinv || []).length >= 6 ? 'disabled' : ''}>🪙 ${pr}</button></div>`).join('');
-    $('#kShopList').querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { if (W.kittyBuy(h, b.dataset.buy)) { if (online) online.net.pushEvent('kbuy', b.dataset.buy); showText('🛒 Compraste: ' + KITEMS[b.dataset.buy][1]); } renderKShop(); })); }
-  function kittyHud(h) { const on = W.profile.id === 'kitty5'; $('#kitBar').classList.toggle('hidden', !on); if (!on) return;
-    $('#kGold').textContent = '🪙 ' + (h.gold || 0); const inv = h.kinv || []; const key = inv.join(','); if ($('#kInv').dataset.k !== key) { $('#kInv').dataset.k = key; $('#kInv').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `<div class="ks" data-i="${i}" title="${inv[i] ? KITEMS[inv[i]][1] : ''}">${inv[i] ? KITEMS[inv[i]][0] : ''}</div>`).join('');
-      $('#kInv').querySelectorAll('.ks').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.i, it = inv[i]; if (!it) return; if (W.kittyUse(h, i)) { if (online) online.net.pushEvent('kuse', i); showText('✨ Usaste: ' + KITEMS[it][1]); } else showText(KITEMS[it][0] + ' ' + KITEMS[it][1] + ': ' + KITEMS[it][3]); })); }
+  let kTab = 'items';
+  function renderKShop() { const h = W && W.heroOf(W.local); if (!h) return; const wallet = settings.coins || 0; $('#kShopGold').innerHTML = '🪙 ' + (h.gold || 0) + ` <small style="opacity:.8">· billetera 💰 ${wallet}</small>`;
+    const items = W.lootItems(), skills = W.lootSkills(), hasSk = Object.keys(skills).length; const full = (h.kinv || []).length >= 6;
+    let html = hasSk ? `<div class="ktabs"><button data-kt="items" class="${kTab === 'items' ? 'on' : ''}">🎒 Objetos</button><button data-kt="skills" class="${kTab === 'skills' ? 'on' : ''}">⭐ Habilidades</button></div>` : '';
+    if (kTab === 'skills' && hasSk) html += Object.entries(skills).map(([id, L]) => { const lv = (h.skills || {})[id] || 0, [ic, n, d] = KSKILLS[id]; return `<div class="krow"><div class="ic">${ic}</div><div><b>${n} <span style="color:#ffe27a">Nv ${lv}/3</span></b><small>${d}</small></div><button data-learn="${id}" ${lv >= 3 || (h.gold || 0) < L[lv] ? 'disabled' : ''}>${lv >= 3 ? 'MÁX' : '🪙 ' + L[lv]}</button></div>`; }).join('');
+    else html += Object.entries(items).map(([id, pr]) => { const [ic, n, d] = KITEMS[id]; return `<div class="krow"><div class="ic">${ic}</div><div><b>${n}</b><small>${d}</small></div><button data-buy="${id}" ${(h.gold || 0) < pr || full ? 'disabled' : ''}>🪙 ${pr}</button></div>`; }).join('');
+    html += `<div class="krow"><div class="ic">💰</div><div><b>¿Te faltan monedas?</b><small>Consigue más monedas en la tienda del menú (fuera de la sala).</small></div><button data-more="1" disabled>Próximamente</button></div>`;
+    $('#kShopList').innerHTML = html;
+    $('#kShopList').querySelectorAll('[data-kt]').forEach(b => b.addEventListener('click', () => { kTab = b.dataset.kt; renderKShop(); }));
+    $('#kShopList').querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { if (W.kittyBuy(h, b.dataset.buy)) { if (online) online.net.pushEvent('kbuy', b.dataset.buy); showText('🛒 Compraste: ' + KITEMS[b.dataset.buy][1]); } renderKShop(); }));
+    $('#kShopList').querySelectorAll('[data-learn]').forEach(b => b.addEventListener('click', () => { if (W.kittyLearn(h, b.dataset.learn)) { if (online) online.net.pushEvent('klearn', b.dataset.learn); showText('⭐ Aprendiste: ' + KSKILLS[b.dataset.learn][1] + ' nivel ' + h.skills[b.dataset.learn]); } renderKShop(); })); }
+  function kittyHud(h) { const on = W.profile.family === 'run'; $('#kitBar').classList.toggle('hidden', !on); if (!on) return;
+    $('#kGold').textContent = '🪙 ' + (h.gold || 0); const inv = h.kinv || []; const key = inv.join(',') + '|' + (h.mineCharges ?? 3); if ($('#kInv').dataset.k !== key) { $('#kInv').dataset.k = key; $('#kInv').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `<div class="ks" data-i="${i}">${inv[i] ? KITEMS[inv[i]][0] + (inv[i] === 'minas' ? `<sup>${h.mineCharges ?? 3}</sup>` : '') : ''}</div>`).join('');
+      $('#kInv').querySelectorAll('.ks').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.i, it = inv[i]; if (!it) return; if (W.kittyUse(h, i)) { if (online) online.net.pushEvent('kuse', i); showText('✨ Usaste: ' + KITEMS[it][1]); } else showText(KITEMS[it][0] + ' ' + KITEMS[it][1] + ': ' + KITEMS[it][2]); })); }
     $('#bKShop').classList.toggle('hidden', !(h.alive && nearShop(h))); }
   function doInvis() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdInvis(W.local) && online) online.net.pushEvent('invis'); }
   window.botInvis = u => { if (W.cmdInvis(u.owner) && online && online.host) online.net.pushEvent('binvis', u.owner.id); };
@@ -23458,6 +23581,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'bstun' && typeof a === 'number' && !online.owned.includes(a)) W.cmdStun(W.players[a]);
       if (kind === 'bdash' && typeof a === 'number' && !online.owned.includes(a)) W.cmdDash(W.players[a]);
       if (kind === 'kbuy' && slot != null && typeof a === 'string') { const hh = W.heroOf(W.players[slot]); if (hh) W.kittyBuy(hh, a); }
+      if (kind === 'klearn' && slot != null && typeof a === 'string') { const hh = W.heroOf(W.players[slot]); if (hh) W.kittyLearn(hh, a); }
       if (kind === 'kuse' && slot != null && typeof a === 'number') { const hh = W.heroOf(W.players[slot]); if (hh) W.kittyUse(hh, a); }
       if (kind === 'binvis' && typeof a === 'number' && !online.owned.includes(a)) W.cmdInvis(W.players[a]);
       if (kind === 'broar' && typeof a === 'number' && !online.owned.includes(a)) W.cmdRoar(W.players[a]);
@@ -23602,7 +23726,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
         let st = 1; W._endTrigs.forEach((t, i) => { if (t && t.execs > 0) st = Math.max(st, i + 2); }); setText('#stats .ver', 'Etapa ' + Math.min(12, st) + '/12'); }
-      { const pr = W.profile.family === 'run' ? ((W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1) || 1) : (W._endTrigs ? W._endTrigs.filter(t => t && t.execs > 0).length + 1 : 1); if (W._xpPr == null) W._xpPr = pr; if (pr > W._xpPr) { addPassXP(40 * (pr - W._xpPr)); W._xpPr = pr; if (W.profile.family === 'run') setTimeout(spawnFxAll, 350); if (W.kittySetupLoot) W.kittySetupLoot(pr); } if (!W._spawned && W.time > 0.6) { W._spawned = true; spawnFxAll(); if (W.kittySetupLoot) W.kittySetupLoot(1); W.on('coin', h => { if (h.owner === W.local) sfx.play('coin'); }); W.on('loot', (h, l) => { if (h.owner === W.local) { sfx.play('rescue'); showText('🎁 Encontraste: ' + KITEMS[l.it][0] + ' ' + KITEMS[l.it][1]); } }); } const mn = Math.floor(W.time / 60); if (W._xpMin == null) W._xpMin = mn; if (mn > W._xpMin) { addPassXP(10); W._xpMin = mn; } } // battle pass XP
+      { const pr = W.profile.family === 'run' ? ((W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1) || 1) : (W._endTrigs ? W._endTrigs.filter(t => t && t.execs > 0).length + 1 : 1); if (W._xpPr == null) W._xpPr = pr; if (pr > W._xpPr) { addPassXP(40 * (pr - W._xpPr)); W._xpPr = pr; if (W.profile.family === 'run') setTimeout(spawnFxAll, 350); if (W.kittySetupLoot) W.kittySetupLoot(pr); } if (!W._spawned && W.time > 0.6) { W._spawned = true; spawnFxAll(); if (W.kittySetupLoot) W.kittySetupLoot(1); W.on('coin', h => { if (h.owner === W.local) sfx.play('coin'); }); W.on('loot', (h, l) => { if (h.owner === W.local) { sfx.play('rescue'); showText('🎁 Encontraste: ' + KITEMS[l.it][0] + ' ' + KITEMS[l.it][1] + ' (tócalo en tu bolso)'); } }); } const mn = Math.floor(W.time / 60); if (W._xpMin == null) W._xpMin = mn; if (mn > W._xpMin) { addPassXP(10); W._xpMin = mn; } } // battle pass XP
       { const still = hero.alive && !hero.glide && !(hero.order && !hero.paused) && !(hero._mv > 0.5); const nw = performance.now(); if (!still) hero._still0 = nw; else if (hero._still0 == null) hero._still0 = nw; hero._stillT = (nw - hero._still0) / 1000; if (!still && sendDance.next > nw) { sendDance.next = 0; $('#bDance').classList.remove('cool'); } $('#bDance').classList.toggle('off', !still || hero._stillT < 0.05); $('#danceWrap').classList.toggle('hidden', !hero.alive || !$('#bBlink').classList.contains('hidden')); if (!hero.alive) $('#dancePick').classList.add('hidden'); } // gray while moving
       $('#bGive').classList.toggle('hidden', !(hero.alive && hero.items.length && nearFriend(hero, 220)));
       $('#mana').style.width = (hero.mana / hero.maxMana * 100) + '%';
@@ -23886,7 +24010,7 @@ const MAPS = [
   { id: 'estupido1', name: 'Mapa Absurdo 1', icon: '🤪' }, { id: 'estupido2', name: 'Mapa Absurdo 2', icon: '🤪' }, { id: 'estupido3', name: 'Mapa Absurdo 3', icon: '🤪' }, { id: 'estupido4', name: 'Mapa Absurdo 4', icon: '🤪' },
 ];
 const MAP_LORE = {
-  shroom25: { t: 'Escape Hongo', lore: 'En lo más profundo del Bosque Psicodélico, un grupo de hongos mareados despertó dentro de un laberinto encantado. Payasos de feria, carritos sin frenos, fuegos que saltan de zona en zona y espinas escondidas bajo las palancas vigilan cada pasillo. Nadie escapa solo: el que cae deja su tumba y solo un compañero puede traerlo de vuelta.', how: '12 etapas · llega a cada punto de control · tocar la tumba de un amigo lo revive · si caen todos, pierden · 🛼 planear, 🌀 disparar a los payasos y 🍄 teletransportarte con los hongos escondidos.' },
+  shroom25: { t: 'Escape Hongo', lore: 'En lo más profundo del Bosque Psicodélico, un grupo de hongos mareados despertó dentro de un laberinto encantado. Payasos de feria, carritos sin frenos, fuegos que saltan de zona en zona y espinas escondidas bajo las palancas vigilan cada pasillo. Nadie escapa solo: el que cae deja su círculo de poder y solo un compañero puede traerlo de vuelta.', how: '12 etapas · llega a cada punto de control · tocar la tumba de un amigo lo revive · si caen todos, pierden · 🛼 planear, 🌀 disparar a los payasos y 🍄 teletransportarte con los hongos escondidos.' },
   kitty5: { t: 'Corre Gatito Corre', lore: 'En la Selva de Cristal, una manada de tigres blancos con armadura quedó atrapada en un laberinto de murallas que gira en espiral. Los lobos del Rey Aullido patrullan cada pasillo sin descanso, y la única salida está en el centro. Corren tan rápido que el pasto echa humo: el que cae deja su círculo y solo un compañero puede rescatarlo tocándolo.', how: '5 rondas · corre por la espiral hasta el centro · un lobo te toca y caes · toca el círculo de un amigo para revivirlo · 🐾 Saltar por encima de los lobos (cuidado al caer) y 😾 Gruñido para espantarlos.' },
   bob: { t: '¡Corre Foca Gorda!', lore: 'Un grupo de focas gordas y glotonas se escapó del Gran Acuario Polar rumbo al mar. El camino es un espiral de hielo resbaloso donde no hay frenos: una vez que agarras vuelo, solo puedes doblar en curva. Los cangrejos gruñones del puerto cuidan cada orilla y pellizcan fuerte. Ninguna foca llega sola: las que caen esperan a que otra las rescate.', how: '5 rondas · en el hielo te deslizas sin frenar y para volver debes dar media vuelta · en el pasto caminas · un cangrejo te quita 500 de vida · toca a una amiga caída para revivirla · 🐾 Saltar alto sobre los cangrejos.' },
   shroom27: { t: 'Escape Hongo: Noche Eterna', lore: 'La luna nunca se fue. El bosque se volvió más oscuro y los hongos brillan para encontrarse entre las sombras.', how: 'Próximamente: nuevas etapas más difíciles.' },
@@ -24128,6 +24252,7 @@ class Net {
     $('#sprayGrid').innerHTML = `<div class="coinbal" style="font-size:14px">Tus casillas: ${slots.length || Math.min(5, own.length)}/5 · ${own.length ? 'toca un grafiti tuyo para ponerlo o sacarlo' : 'compra tu primer grafiti para activar el botón 🎨'}</div>` + list.map(([id, n, free]) => { const mine = own.includes(id), inSlot = slots.includes(id) || (!slots.length && own.indexOf(id) > -1 && own.indexOf(id) < 5); return `<div class="item tap" data-spray="${id}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(n)}</b><small>Grafiti</small>${priceTag(free === 'vip' ? 'vip' : mine, '$0.49')}<div class="lockd${inSlot ? ' eq' : ''}">${inSlot ? 'EN TU BOTÓN' : mine ? 'TOCA PARA AGREGAR' : 'PRÓXIMAMENTE'}</div></div>`; }).join('');
     $('#sprayGrid').querySelectorAll('canvas.apv').forEach((cv, i) => { const g = cv.getContext('2d'); g.fillStyle = '#5b5f66'; g.fillRect(0, 0, 192, 192); g.translate(96, 96); g.scale(1.25, -1.25 / 0.62); try { draw.call({ W: { time: 0 } }, g, list[i][0], '#ff3b3b', 1); } catch (e) {} });
     $('#sprayGrid').querySelectorAll('[data-spray]').forEach(el => el.addEventListener('click', () => { const id = el.dataset.spray; try { SW.sfx.init(); SW.sfx.play('spray'); } catch (e) {} if (!own.includes(id)) return; let sl = slots.length ? slots.slice() : own.slice(0, 5); if (sl.includes(id)) { if (sl.length > 1) sl = sl.filter(x => x !== id); } else { if (sl.length >= 5) sl.shift(); sl.push(id); } S.spraySlots = sl; S.spray = id; SW.saveSettings(); drawSprays(); })); }
+  { const c = $('#opt3d'); c.checked = S.tiger3d === true; c.addEventListener('change', () => { S.tiger3d = c.checked; SW.saveSettings(); }); }
   // creator code (settings)
   { const msg = () => { $('#vipMsg').textContent = VIP() ? '👑 Modo creador activo: Caída y Llegada del Fundador y el grafiti Perrin.' : ''; }; msg();
     click('#vipBtn', () => { const c = String($('#vipIn').value || '').trim().toUpperCase(); if (SW.vipHash && SW.vipHash(c) === '557405f325ebd6f3') { S.vipCode = c; S.deathFx = 'fundador'; S.spawnFx = 'fundador'; S.spraySlots = ['perrin']; S.spray = 'perrin'; SW.saveSettings(); $('#vipIn').value = ''; renderDA(); msg(); } else { $('#vipMsg').textContent = 'Código incorrecto.'; } }); }
@@ -24314,12 +24439,20 @@ class Net {
     $('#wMode').textContent = cfg.mode === 'practice' ? 'Práctica' : '1 vida';
     const hs = net.humans(); const me = net.me();
     const nb = Math.max(0, Math.min(12 - hs.length, cfg.bots | 0));
-    let html = '';
-    hs.forEach((p, i) => { html += `<div class="slot${p.sameTab ? ' me' : ''}">${i === 0 ? '👑' : '👤'} ${esc(p.presence.nick || 'Jugador')}${p.sameTab ? ' (tú)' : ''}</div>`; });
-    for (let i = 0; i < nb; i++) html += `<div class="slot bot">🤖 ${esc(BOT_NAMES12[i] || 'Bot')}</div>`;
-    for (let i = hs.length + nb; i < 12; i++) html += `<div class="slot bot">· libre</div>`;
+    // a lobby like the classic one: 12 coloured slots (player / bot / open) and the enemy team below
+    const isHost = net.role === 'host'; const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
+    const TEAM = { kitty5: ['Gatitos', 'Lobos del Rey Aullido'], bob: ['Focas', 'Cangrejos del puerto'], shroom25: ['Hongos', 'Payasos de feria'] }[cfg.map] || ['Jugadores', 'Enemigos'];
+    let html = `<div class="lteam">${TEAM[0]}</div>`;
+    for (let i = 0; i < 12; i++) { const p = hs[i - 0]; let who, kind, cls = '';
+      if (i < hs.length) { who = (i === 0 ? '👑 ' : '👤 ') + esc(p.presence.nick || 'Jugador') + (p.sameTab ? ' (tú)' : ''); kind = i === 0 ? 'Anfitrión' : 'Jugador'; cls = p.sameTab ? ' me' : ''; }
+      else if (i < hs.length + nb) { who = '🤖 ' + esc(BOT_NAMES12[i - hs.length] || 'Bot'); kind = 'Bot (IA)'; cls = ' bot'; }
+      else { who = 'Abierto'; kind = isHost ? 'toca para poner bot' : 'esperando jugador'; cls = ' open'; }
+      html += `<div class="lrow${cls}${isHost && i >= hs.length ? ' tap' : ''}" data-slot="${i}"><span class="lc" style="background:${COLS[i]}"></span><b>${who}</b><small>${kind}</small><span class="lt">Equipo 1</span></div>`; }
+    html += `<div class="lteam">${TEAM[1]}</div><div class="lrow bot"><span class="lc" style="background:#8b5a2b"></span><b>🖥️ Computadora</b><small>${TEAM[1]}</small><span class="lt">Equipo 2</span></div>`;
     $('#wSlots').innerHTML = html;
-    const isHost = net.role === 'host';
+    if (isHost) $('#wSlots').querySelectorAll('.lrow.tap').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot, n = net.cfg.bots | 0; net.setCfg({ bots: i < hs.length + n ? Math.max(0, i - hs.length) : Math.min(12 - hs.length, i - hs.length + 1), auto: false }); }));
+    { const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[cfg.map]) || {}; const m = MAPS.find(x => x.id === cfg.map) || MAPS[0];
+      $('#wPrev').innerHTML = `<div class="pvic">${m.icon || '🗺'}</div><b>${esc(mapName(cfg.map))}</b><div class="pvd"><span>Jugadores: ${hs.length + nb}/12</span><span>Creada por: ${esc((hs[0] && hs[0].presence.nick) || 'Anfitrión')}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
     $('#wHost').classList.toggle('hidden', !isHost); $('#wBots').textContent = cfg.bots | 0;
     $('#wStart').classList.toggle('hidden', !isHost);
     if (isHost) {
@@ -24336,6 +24469,8 @@ class Net {
   click('#wBotsMinus', () => { if (net.role === 'host') net.setCfg({ bots: Math.max(0, (net.cfg.bots | 0) - 1), auto: false }); });
   click('#wBotsPlus', () => { if (net.role === 'host') net.setCfg({ bots: Math.min(12 - net.humans().length, (net.cfg.bots | 0) + 1), auto: false }); });
   click('#wStart', () => { if (net.role === 'host') net.startGame(); });
+  click('#wFill', () => { if (net.role === 'host') net.setCfg({ bots: 12 - net.humans().length, auto: false }); });
+  click('#wNoBots', () => { if (net.role === 'host') net.setCfg({ bots: 0, auto: false }); });
   click('#wLeave', async () => { clearInterval(waitTimer); await net.leave(); show('online'); openOnline(); });
   // after a game ends, the room goes back to waiting
   function watchGame() {
