@@ -20180,7 +20180,7 @@ class World {
     if (this.time < (h.jumpReady || 0)) return false;
     let dx = dirX, dy = dirY; if (dx == null) { const f = h.facing * Math.PI / 180; dx = Math.cos(f); dy = Math.sin(f); }
     const L = Math.hypot(dx, dy) || 1; h.jump = { t0: this.time, dur: 0.55, dx: dx / L, dy: dy / L, spd: Math.max(700, h.speed * 1.2) };
-    h.jumpReady = this.time + 12; // ~10 real seconds at the usual game speed this.emit('sound', { name: 'coil' }); this.emit('jump', h); return true;
+    h.jumpReady = this.time + (this.profile.id === 'bob' ? 10 : 12); // jump cooldown (shorter in the ice map) this.emit('sound', { name: 'coil' }); this.emit('jump', h); return true;
   }
   cmdUseItem(p, slot) {
     const h = this.heroOf(p); if (!h || !h.alive) return;
@@ -23268,7 +23268,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       { const left = Math.max(0, tpReadyAt - W.time); const ready = left <= 0 && hero.items.length > 0; $('#bItem0').classList.toggle('has', !!ready); $('#bItem0').classList.toggle('cool', !ready); $('#bItem0').style.setProperty('--cd', (left <= 0 ? 0 : left / TP_CD * 360) + 'deg'); }
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
-      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / 12 * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); }
+      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / (W.profile.id === 'bob' ? 10 : 12) * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); }
       botChatter();
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
