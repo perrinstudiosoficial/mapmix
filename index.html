@@ -24053,7 +24053,9 @@ function aiRooms(now = Date.now()) {
     const playFrom = 0.45 + r2 * 0.2, playing = f > playFrom && f < 0.92;
     const base = 1 + Math.floor(r2 * 4), fill = Math.min(1, f / playFrom);
     let n = playing ? Math.min(12, base + 6 + Math.floor(r1 * 5)) : Math.max(1, Math.min(11, base + Math.floor(fill * (5 + r1 * 6)) + (Math.floor(min * 2 + k) % 3 === 0 ? -1 : 0)));
-    out.push({ code: 'ai-' + k + '-' + ep, name: AI_ROOM_NAMES[ni], map: 'shroom25', pub: true, lock: r2 > 0.86, n, st: playing ? 'play' : 'wait', ai: true, mode: r1 > 0.7 ? 'practice' : 'original' });
+    const mp = ['shroom25', 'kitty5', 'bob'][Math.floor(aiHash(k + 31, ep) * 3)]; const themed = { kitty5: ['tigres veloces', 'corre gatito!!', 'team tigre', 'los lobos me odian', 'speedrun gatito'], bob: ['focas gordas', 'patinando xd', 'team foca', 'cuidado cangrejos', 'hielo resbaloso'] }[mp];
+    const nm = themed && aiHash(k + 5, ep) < 0.5 ? themed[Math.floor(aiHash(k + 9, ep) * themed.length)] : AI_ROOM_NAMES[ni];
+    out.push({ code: 'ai-' + k + '-' + ep, name: nm, map: mp, pub: true, lock: r2 > 0.86, n, st: playing ? 'play' : 'wait', ai: true, mode: r1 > 0.7 ? 'practice' : 'original' });
   }
   return out;
 }
@@ -24428,7 +24430,7 @@ class Net {
     let pw = typeof codePw === 'string' ? codePw : null;
     if (r.lock && pw == null) { pw = await ask('Esta sala tiene contraseña', 'contraseña'); if (pw == null) return; }
     if (r.ai && r.lock) { toast('Contraseña incorrecta'); return; }
-    await enterRoom(r, pw, r.ai ? { name: r.name, auto: true, bots: Math.max(1, Math.min(11, r.n || 1)), mode: r.mode || 'original' } : null);
+    await enterRoom(r, pw, r.ai ? { name: r.name, map: r.map || 'shroom25', auto: true, bots: Math.max(1, Math.min(11, r.n || 1)), mode: r.mode || 'original' } : null);
   }
   let waitTimer = null, autoAt = 0, startedGame = null, myRoomPw = null;
   async function enterRoom(info, pw, createCfg) {
