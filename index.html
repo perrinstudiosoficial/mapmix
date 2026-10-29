@@ -22376,12 +22376,8 @@ class Renderer {
   P.drawAura = function (g, u, col, t) {
     // glowing ring under the feet in the player's colour (world space, y up)
     const mine = u.owner === this.W.local; const pul = 1 + Math.sin(t * 3) * 0.04;
-    g.save(); g.translate(0, -20); g.scale(1, 0.45);
-    const gr = cachedG('aura' + col, () => { const q = g.createRadialGradient(0, 0, 10, 0, 0, 46); q.addColorStop(0, 'rgba(0,0,0,0)'); q.addColorStop(0.62, hexA(col, 0.05)); q.addColorStop(0.85, hexA(col, 0.45)); q.addColorStop(1, hexA(col, 0)); return q; });
-    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 48 * pul, 0, TAU); g.fill();
-    g.strokeStyle = hexA(col, 0.35); g.lineWidth = mine ? 12 : 9; g.beginPath(); g.arc(0, 0, 38 * pul, 0, TAU); g.stroke(); // soft glow without shadowBlur (slow on phones)
-    g.strokeStyle = hexA(shadeHex(col, 0.35), 0.95); g.lineWidth = mine ? 5 : 3.5; g.beginPath(); g.arc(0, 0, 38 * pul, 0, TAU); g.stroke();
-    if (mine) { g.strokeStyle = hexA('#ffffff', 0.7); g.lineWidth = 1.5; g.setLineDash([8, 10]); g.lineDashOffset = -t * 30; g.beginPath(); g.arc(0, 0, 44 * pul, 0, TAU); g.stroke(); g.setLineDash([]); }
+    g.save(); g.translate(0, -20); this.drawDeathAura(g, col, this.auraOf(u.owner), t, u.handle % 7, 40); // same aura alive and fallen
+    if (mine) { g.scale(1, 0.5); g.strokeStyle = hexA('#ffffff', 0.7); g.lineWidth = 1.5; g.setLineDash([8, 10]); g.lineDashOffset = -t * 30; g.beginPath(); g.arc(0, 0, 50 * pul, 0, TAU); g.stroke(); g.setLineDash([]); }
     g.restore();
   };
   // dances: hand offsets from each shoulder [dx, dy, flipElbow] (y down, reach <= 17), hips, bob, jump, squash
@@ -22683,8 +22679,7 @@ class Renderer {
       W._rdt = this._dt; if ((!!u.order && !u.paused) || u.jump) { u._movedAt = W.time; fatigue(W, u, true); }
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3;
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
-      g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
-      g.fillStyle = hexA(col, 0.18); g.fill();
+      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); // your aura under your tiger (the same one you leave when you fall)
       { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 300 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
       let a = ((u._rf % 360) + 360) % 360; const dirs = [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // wide left/right sectors: full profile
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
@@ -22838,7 +22833,7 @@ class Renderer {
     const fa = u._rf * Math.PI / 180, fx = Math.cos(fa), fy = Math.sin(fa); // fy > 0: going up (away from camera)
     const jp = u.jump ? Math.min(1, (W.time - u.jump.t0) / u.jump.dur) : 0, lift = u.jump ? Math.sin(jp * Math.PI) * 230 : 0;
     W._rdt = this._dt; const FT = fatigue(W, u, moving, 0.4), ph = t * (moving ? 10 : 3.2), slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? FT.s * (FT.amp / 0.035) : 0; // panting: deep and fast after running
-    const sh = Math.max(0.35, 1 - lift / 330); g.fillStyle = `rgba(0,0,0,${0.3 * sh})`; g.beginPath(); g.ellipse(0, -16, 52 * sh, 15 * sh, 0, 0, TAU); g.fill();
+    g.save(); g.translate(0, -16); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 50); g.restore(); const sh = Math.max(0.35, 1 - lift / 330); g.fillStyle = `rgba(0,0,0,${0.3 * sh})`; g.beginPath(); g.ellipse(0, -16, 52 * sh, 15 * sh, 0, 0, TAU); g.fill();
     const view = fy > 0.8 ? 'back' : fy < -0.8 ? 'front' : 'side', dir = fx < 0 ? -1 : 1, fore = 0.55 + 0.45 * Math.abs(fx); // turning toward/away from the camera the body gets shorter, so a circle looks continuous
     const js = 1 + (u.jump ? Math.sin(jp * Math.PI) * 0.3 : 0); // a little bigger in the air: reads as high up
     g.save(); g.translate(0, lift); g.scale((view === 'side' ? dir * fore : 1) * 1.55 * js, -1.55 * js); g.translate(0, -20);
