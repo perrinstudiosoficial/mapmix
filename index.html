@@ -16202,14 +16202,16 @@ class Renderer {
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
       g.fillStyle = hexA(col, 0.18); g.fill();
-      let a = ((u.facing % 360) + 360) % 360; const dirs = [[22.5, 5], [90, 4], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 0], [337.5, 6], [360, 5]];
+      let a = ((u.facing % 360) + 360) % 360; const dirs = [[22.5, 5], [67.5, 4], [112.5, 'N'], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]];
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
+      const straight = k === 'N' || k === 'S', step = Math.floor(u.walkPhase * 0.75 / Math.PI) % 2; // straight up/down: swap the two mirrored views each step, so it reads as running straight
+      if (k === 'N') k = (moving || u.jump) ? (step ? 4 : 3) : 4; else if (k === 'S') k = (moving || u.jump) ? (step ? 7 : 0) : 0;
       const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 46 : 0; if (lift) g.translate(0, lift);
       if ((moving || u.jump) && (k === 5 || k === 2 || k === 1 || k === 6)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2 || k === 1); } // run frames without the red slash ones
       else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
         const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
-        kTrot(g, k + (Math.floor(ph / (2 * Math.PI)) % 2 ? 8 : 0), 1.2, ph); }
+        kTrot(g, straight ? k : k + (Math.floor(ph / (2 * Math.PI)) % 2 ? 8 : 0), 1.2, ph); }
       else { const alt = Math.sin(t * 1.5) > 0.6 ? 1 : 0; kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); }
       return;
     }
@@ -16917,6 +16919,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let quitArm = 0; function confirmQuit() { const now = performance.now(); if (now - quitArm < 3000) return true; quitArm = now; $('#bQuit').textContent = '¿Seguro? Toca otra vez para abandonar'; setTimeout(() => { $('#bQuit').textContent = '🚪 Abandonar partida'; }, 3000); return false; }
   btn('#bCenter', () => { if (R) R.freeCam = false; camWatch = null; });
   btn('#bWatch', watchNext);
+  if (!settings.kSongV2) { settings.kittySong = 'sinfreno'; settings.kSongV2 = 1; saveSettings(); } // the owner picked Sin Freno as the theme
   { const ks = $('#optKSong'); ks.value = settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
