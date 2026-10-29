@@ -16366,9 +16366,10 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     sfx.play('emote');
     if (!who && online) online.net.pushEvent('emote', id);
   }
-  function doPing(x, y, who) { const u = who ? W.heroOf(who) : W.heroOf(W.local); R.addPing(x, y, R.heroColor(u || { owner: who || W.local })); sfx.play('ping'); if (!who && online) online.net.pushEvent('ping', Math.round(x), Math.round(y)); }
+  function doPing(x, y, who, tomb) { const p = who || W.local; const u = W.heroOf(p); const col = R.heroColor(u || { owner: p }); R.addPing(x, y, col); sfx.play('ping'); if (tomb) showBlink(p, col); if (!who && online) online.net.pushEvent('ping', Math.round(x), Math.round(y), tomb ? 1 : 0); }
+  function showBlink(p, col) { const name = p === W.local ? (settings.nick || 'Tú') : (p.name || 'Jugador'); let hex = (col || '#ffd34d').replace('#', ''); if (hex === '000000') hex = 'cccccc'; showText(`|cff${hex}📍 Blink de ${name}|r`); }
   let blinkAt = 0; function blinkTomb() { if (!W) return; const nowB = performance.now(); if (nowB - blinkAt < 1500) return; blinkAt = nowB; 
-    const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) { doPing(mk.x, mk.y); showText('|cffffd34d📍 Blink en tu tumba|r'); } } // the camera stays where you are looking (watching a friend or free look)
+    const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === W.local); if (mk) doPing(mk.x, mk.y, null, true); } // the camera stays where you are looking (watching a friend or free look)
   window.botEmote = (u, id) => { sendEmote(id, u); if (online && online.host && u && u.owner) online.net.pushEvent('bemote', u.owner.id, id); }; // the bots use this too
   // ---------- dances (original moves; hold the button to pick one) ----------
   const DANCES = { columpio: ['🕺', 'Columpio'], robot: ['🤖', 'Robot'], saltitos: ['🐰', 'Saltitos'], molino: ['🌀', 'Molino'], pollito: ['🐔', 'Pollito'], ola: ['🌊', 'La Ola'] };
@@ -16426,7 +16427,15 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     kitty5: ['cuidado los perros', 'vamos gatitos', 'miau', 'esperenme', 'casi me pillan', 'voy a salvarlos', 'ya casi llegamos', 'corran!', 'jajaja', 'xd', 'buenaaa', 'que rapido son', 'miau miau', 'sigan sigan', 'uff por poco', 'vamos equipo'],
   };
   let chatterAt = 0;
+  let botBlinkAt = 0;
+  function botBlinks() {
+    if (!W || !W.ai || !W.ai.bots || (online && !online.host)) return; const now = performance.now(); if (now < botBlinkAt) return; botBlinkAt = now + 2500;
+    for (const b of W.ai.bots) { const h = W.heroOf(b.p); if (!h || h.alive || h.removed) { b._blinkN = 0; continue; } if ((b._blinkN || 0) >= 3 || Math.random() > 0.35) continue; b._blinkN = (b._blinkN || 0) + 1;
+      const mk = W.units.find(u => ((W.profile.id === 'shroom25' && u.typeId === 1848651825) || u.t.kind === 'circle') && u.alive && !u.removed && u.owner === b.p); if (!mk) continue;
+      doPing(mk.x, mk.y, b.p, true); if (online && online.host) online.net.pushEvent('bping', b.p.id, Math.round(mk.x), Math.round(mk.y)); }
+  }
   function botChatter() {
+    botBlinks();
     if (!W || !W.ai || !W.ai.bots || !W.ai.bots.length || (online && !online.host)) return; const now = performance.now();
     if (!chatterAt) { chatterAt = now + 3000 + Math.random() * 3000; return; } if (now < chatterAt) return; chatterAt = now + 4000 + Math.random() * 7000;
     const list = CHATTER[W.profile.id] || CHATTER.shroom25; const alive = W.ai.bots.map(b => W.heroOf(b.p)).filter(u => u && !u.removed);
@@ -16506,7 +16515,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'bchat' && typeof a === 'number' && typeof e[3] === 'string' && !online.owned.includes(a)) chatFrom(W.players[a], e[3]);
       if (kind === 'give' && slot != null && typeof a === 'number') { const from = W.heroOf(W.players[slot]), to = W.heroOf(W.players[a]); if (from && to) { moveItem(from, to); if (to.owner === W.local) { sfx.play('pickup'); showText(`|cff9fffa0${from.owner.name || 'Un compañero'} te pasó un hongo de teletransporte.|r`); } } }
       if (kind === 'pause' && slot != null) setPause(!!a, (W.players[slot] && W.players[slot].name) || 'Alguien');
-      if (kind === 'ping' && slot != null && typeof a === 'number') doPing(a, e[3], W.players[slot]);
+      if (kind === 'ping' && slot != null && typeof a === 'number') doPing(a, e[3], W.players[slot], e[4] === 1);
+      if (kind === 'bping' && typeof a === 'number' && !online.owned.includes(a)) { const p = W.players[a]; if (p) doPing(e[3], e[4], p, true); }
       if (kind === 'kill') { const u = W.units.find(v => v.handle === a && !v.hero); if (u) W.killUnit(u); }
       if (kind === 'emote' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendEmote(a, u); }
       if (kind === 'dance' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendDance(a, u); }
@@ -17042,7 +17052,7 @@ class Net {
     out.sort((a, b) => a.t - b.t); return out.slice(-40);
   }
   // ---- in-game sync ----
-  pushEvent(kind, a, b) { this.myEvents.push([++this.evSeq, kind, a, b]); if (this.myEvents.length > 12) this.myEvents.shift(); }
+  pushEvent(kind, ...args) { this.myEvents.push([++this.evSeq, kind, ...args]); if (this.myEvents.length > 12) this.myEvents.shift(); }
   sendState(W, owned) {
     if (!this.room) return;
     const h = []; for (const pid of owned) { const u = W.heroOf(W.players[pid]); if (u && !u.removed) h.push(W.heroState(u)); }
