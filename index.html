@@ -14893,7 +14893,7 @@ function F_Trig_Master_Slide_Actions(){
 }
 function F_InitTrig_Master_Slide(){
   G_gg_trg_Master_Slide=N.CreateTrigger();
-  N.TriggerRegisterTimerEventPeriodic(G_gg_trg_Master_Slide,0.1);
+  N.TriggerRegisterTimerEventPeriodic(G_gg_trg_Master_Slide,0.02); // MapMix: start/stop sliding right away
   N.TriggerAddAction(G_gg_trg_Master_Slide,F_Trig_Master_Slide_Actions);
 }
 function F_Trig_Master_Turn_Point_Conditions(){
@@ -19970,6 +19970,11 @@ class World {
       if (u.cd > 0) u.cd -= dt;
       if (u.hero) { u.mana = Math.min(u.maxMana, u.mana + dt * 1.0); for (const k in u.abil) if (u.abil[k].cd > 0) u.abil[k].cd -= dt; }
       if (u.paused) continue;
+      if (u.hero && this.profile.id === 'bob') { // keep your momentum when you slide off the ice onto the grass
+        const onIce = this.tileTypeAt(u.x, u.y) === 'Nice';
+        if (u._wasIce && !onIce && !u.order && !u.jump) { const f = u.facing * Math.PI / 180; const tx = u.x + Math.cos(f) * 500, ty = u.y + Math.sin(f) * 500; const q = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 200); if (q) this.issueOrder(u, 851986, q.x, q.y); }
+        u._wasIce = onIce;
+      }
       if (u.jump) { // kitty jump: a short leap forward, wolves can't touch you in the air
         const J = u.jump, k = (this.time - J.t0) / J.dur;
         if (k >= 1) { u.jump = null; for (const reg of this.rangeRegs) if (reg.unit === u) reg.seen.clear(); } // land: wolves still on you count again
@@ -21392,7 +21397,7 @@ class KittyBots {
       if (Math.hypot(gx - h.x, gy - h.y) < 130 && this.clear(h.x, h.y, gx, gy)) { W.issueOrder(h, 851986, gx, gy); continue; }
       // candidate steps: score progress minus predicted danger
       const slide = W.profile.id === 'bob' && W.tileTypeAt(h.x, h.y) === 'Nice'; // on ice you can't stop: you slide at 700
-      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 1600 : (h.speed || 350);
+      const sp = slide ? 1600 : (h.speed || 350), VR = Math.max(700, sp * 0.75), near = wolves.filter(w => Math.abs(w.x - h.x) < VR && Math.abs(w.y - h.y) < VR);
       // danger of walking from here towards (x, y): kitty and wolves both move, the kill range is 70
       const danger = (x, y) => { let s = 0; const dx = x - h.x, dy = y - h.y, L = Math.hypot(dx, dy) || 1;
         for (const tau of [0, 0.12, 0.25, 0.4, 0.6, 0.85]) { const m = Math.min(L, sp * tau), kx = h.x + dx / L * m, ky = h.y + dy / L * m, hold = sp * tau > L ? 1 : 0;
@@ -22750,39 +22755,58 @@ class Renderer {
   };
 
   // ===================== Fuga Bajo el Mar (ice map) =====================
-  P.drawPuffer = function (g, u) { // the ice map hero: a little seal in your team colour scarf
-    const W = this.W; if (!u.alive) return; const t = W.time + u.handle * 0.4; const col = this.heroColor(u);
+  P.drawPuffer = function (g, u) { // the ice map hero: a big chubby seal in your team colour scarf, seen from the side, front or back
+    const W = this.W; if (!u.alive) return; const t = W.time + u.handle * 0.4; const col = this.heroColor(u), scarf = col === '#000000' ? '#444' : col;
     const mv = Math.hypot(u.x - (u._sx ?? u.x), u.y - (u._sy ?? u.y)); u._sx = u.x; u._sy = u.y; if (mv > 0.5 || u.jump) u._movedAt = W.time;
     const moving = W.time - (u._movedAt || 0) < 0.15, onIce = W.tileTypeAt(u.x, u.y) === 'Nice';
-    const fx = Math.cos(u.facing * Math.PI / 180), dir = fx < -0.1 ? -1 : 1, ph = t * (moving ? 10 : 3.2);
-    const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 40 : 0;
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(0, -16, 48, 13, 0, 0, TAU); g.fill();
-    g.save(); g.scale(dir * 1.45, -1.45); g.translate(0, -20 - lift / 1.45); // a big chubby seal
-    const slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? Math.sin(ph) : 0; // breathing when resting
-    g.save(); g.scale(1 + 0.05 * wave + 0.03 * br, 1 - 0.05 * wave - 0.04 * br + (slide ? -0.12 : 0));
-    // tail flippers
-    g.save(); g.translate(-30, 6); g.rotate(0.3 + wave * 0.4 + br * 0.08); g.fillStyle = '#6f7d8c'; g.beginPath(); g.moveTo(0, 0); g.lineTo(-14, -9); g.lineTo(-11, 0); g.lineTo(-14, 9); g.closePath(); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2; g.stroke(); g.restore();
-    // body
-    const gr = g.createLinearGradient(0, -16, 0, 18); gr.addColorStop(0, '#a9b6c4'); gr.addColorStop(1, '#7c8a99'); g.fillStyle = gr;
-    g.beginPath(); g.ellipse(-4, 6, 32, 22 + br * 1.5, slide ? 0 : -0.1, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2.5; g.stroke();
-    { const bg = g.createRadialGradient(2, 14, 2, 2, 14, 22); bg.addColorStop(0, '#f2efe6'); bg.addColorStop(1, '#cfcabd'); g.fillStyle = bg; g.beginPath(); g.ellipse(2, 15, 24 + br * 2, 13 + br * 2, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(80,80,70,0.35)'; g.lineWidth = 1.5; g.stroke(); } // huge round belly
-    for (const [sx, sy] of [[-14, -2], [-4, -6], [-20, 6]]) { g.fillStyle = 'rgba(70,80,95,0.45)'; g.beginPath(); g.arc(sx, sy, 2.2, 0, TAU); g.fill(); }
-    // front flipper
-    g.save(); g.translate(4, 12); g.rotate(0.5 + (moving && !slide ? Math.sin(ph + 1) * 0.7 : slide ? -0.9 : br * 0.1)); g.fillStyle = '#6f7d8c'; g.beginPath(); g.ellipse(6, 0, 10, 4, 0, 0, TAU); g.fill(); g.restore();
+    { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 480 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
+    const fa = u._rf * Math.PI / 180, fx = Math.cos(fa), fy = Math.sin(fa); // fy > 0: going up (away from camera)
+    const jp = u.jump ? Math.min(1, (W.time - u.jump.t0) / u.jump.dur) : 0, lift = u.jump ? Math.sin(jp * Math.PI) * 110 : 0;
+    const ph = t * (moving ? 10 : 3.2), slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? Math.sin(ph) : 0;
+    const sh = 1 - lift / 260; g.fillStyle = `rgba(0,0,0,${0.3 * sh})`; g.beginPath(); g.ellipse(0, -16, 52 * sh, 15 * sh, 0, 0, TAU); g.fill();
+    const view = fy > 0.72 ? 'back' : fy < -0.72 ? 'front' : 'side', dir = fx < 0 ? -1 : 1;
+    const js = 1 + (u.jump ? Math.sin(jp * Math.PI) * 0.18 : 0); // a little bigger in the air: reads as high up
+    g.save(); g.translate(0, lift); g.scale((view === 'side' ? dir : 1) * 1.55 * js, -1.55 * js); g.translate(0, -20);
+    if (view === 'side') g.rotate(-fy * 0.35 * dir); // diagonals: the body tilts toward where it goes
+    const outline = 'rgba(20,25,40,0.85)', grey = '#a9b6c4', greyD = '#6f7d8c';
+    const belly = (cx, cy, rx, ry) => { const bg = g.createRadialGradient(cx, cy, 2, cx, cy, Math.max(rx, ry)); bg.addColorStop(0, '#f6f2e8'); bg.addColorStop(1, '#cfc9ba'); g.fillStyle = bg; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(80,80,70,0.35)'; g.lineWidth = 1.5; g.stroke(); };
+    const sq = 1 + 0.05 * wave + 0.035 * br;
+    if (view === 'side') {
+      g.save(); g.scale(sq, 2 - sq + (slide ? -0.12 : 0));
+      g.save(); g.translate(-32, 8); g.rotate(0.3 + wave * 0.4 + br * 0.08); g.fillStyle = greyD; g.beginPath(); g.moveTo(0, 0); g.lineTo(-15, -10); g.lineTo(-12, 0); g.lineTo(-15, 10); g.closePath(); g.fill(); g.strokeStyle = outline; g.lineWidth = 2; g.stroke(); g.restore();
+      const gr = g.createLinearGradient(0, -20, 0, 26); gr.addColorStop(0, grey); gr.addColorStop(1, '#7c8a99'); g.fillStyle = gr;
+      g.beginPath(); g.ellipse(-4, 7, 34, 27 + br * 1.5, slide ? 0 : -0.08, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
+      belly(2, 17, 27 + br * 2, 16 + br * 2);
+      for (const [sx, sy] of [[-16, -6], [-5, -11], [-22, 4]]) { g.fillStyle = 'rgba(70,80,95,0.45)'; g.beginPath(); g.arc(sx, sy, 2.4, 0, TAU); g.fill(); }
+      g.save(); g.translate(6, 18); g.rotate(0.5 + (moving && !slide ? Math.sin(ph + 1) * 0.7 : slide ? -0.9 : br * 0.1)); g.fillStyle = greyD; g.beginPath(); g.ellipse(7, 0, 11, 4.5, 0, 0, TAU); g.fill(); g.restore();
+      g.restore();
+      const hy = slide ? -2 : -14 + br * 1.5, hx = slide ? 27 : 22;
+      g.fillStyle = grey; g.beginPath(); g.arc(hx, hy, 15, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
+      g.fillStyle = '#cdd6df'; g.beginPath(); g.ellipse(hx + 8, hy + 5, 8.5, 6.5, 0, 0, TAU); g.fill(); g.fillStyle = '#1b1f2e'; g.beginPath(); g.arc(hx + 15, hy + 3, 2.8, 0, TAU); g.fill();
+      const blink = !moving && Math.sin(t * 0.8) > 0.6; g.fillStyle = '#1b1f2e'; if (blink) g.fillRect(hx + 2, hy - 4, 7, 1.8); else { g.beginPath(); g.arc(hx + 5, hy - 3, 3.4, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4, 1.1, 0, TAU); g.fill(); }
+      g.strokeStyle = 'rgba(30,35,50,0.7)'; g.lineWidth = 1; for (const k of [-1, 1]) { g.beginPath(); g.moveTo(hx + 12, hy + 6); g.lineTo(hx + 23, hy + 4 + k * 3); g.stroke(); }
+      if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 11, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
+      g.fillStyle = scarf; g.beginPath(); g.ellipse(hx - 7, hy + 11, 10, 4.5, 0.5, 0, TAU); g.fill(); g.fillRect(hx - 15, hy + 11, 4, 11);
+    } else { // front (coming at you) or back (going away): a round, fat seal seen head-on
+      const front = view === 'front', sway = moving && !slide ? Math.sin(ph) * 0.12 : 0;
+      g.rotate(sway); g.save(); g.scale(sq, 2 - sq + (slide ? -0.1 : 0));
+      for (const sd of [-1, 1]) { g.save(); g.translate(sd * 28, 14); g.rotate(sd * (0.9 + (moving && !slide ? Math.sin(ph + (sd > 0 ? 0 : Math.PI)) * 0.6 : 0.2))); g.fillStyle = greyD; g.beginPath(); g.ellipse(sd * 6, 0, 11, 5, 0, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 1.5; g.stroke(); g.restore(); }
+      if (!front) { g.fillStyle = greyD; g.beginPath(); g.moveTo(0, 32); g.lineTo(-12, 44); g.lineTo(0, 39); g.lineTo(12, 44); g.closePath(); g.fill(); g.strokeStyle = outline; g.lineWidth = 2; g.stroke(); }
+      const gr = g.createLinearGradient(0, -20, 0, 34); gr.addColorStop(0, grey); gr.addColorStop(1, '#7c8a99'); g.fillStyle = gr;
+      g.beginPath(); g.ellipse(0, 8, 30 + br * 1.5, 30, 0, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
+      if (front) belly(0, 14, 22 + br * 2, 20 + br * 2); else for (const [sx, sy] of [[-10, 0], [8, 6], [-4, 16], [12, -6]]) { g.fillStyle = 'rgba(70,80,95,0.45)'; g.beginPath(); g.arc(sx, sy, 2.6, 0, TAU); g.fill(); }
+      g.restore();
+      const hy = -20 + br * 1.5; g.fillStyle = grey; g.beginPath(); g.arc(0, hy, 15, 0, TAU); g.fill(); g.strokeStyle = outline; g.lineWidth = 2.5; g.stroke();
+      if (front) {
+        g.fillStyle = '#cdd6df'; g.beginPath(); g.ellipse(0, hy + 6, 9, 6.5, 0, 0, TAU); g.fill(); g.fillStyle = '#1b1f2e'; g.beginPath(); g.ellipse(0, hy + 3, 3.2, 2.4, 0, 0, TAU); g.fill();
+        const blink = !moving && Math.sin(t * 0.8) > 0.6; for (const ex of [-6, 6]) { g.fillStyle = '#1b1f2e'; if (blink) g.fillRect(ex - 3, hy - 5, 6, 1.8); else { g.beginPath(); g.arc(ex, hy - 4, 3.4, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(ex + 1, hy - 5, 1.1, 0, TAU); g.fill(); } }
+        g.strokeStyle = 'rgba(30,35,50,0.7)'; g.lineWidth = 1; for (const sd of [-1, 1]) for (const k of [-1, 1]) { g.beginPath(); g.moveTo(sd * 5, hy + 7); g.lineTo(sd * 16, hy + 5 + k * 3); g.stroke(); }
+        if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(0, hy + 12, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
+      }
+      g.fillStyle = scarf; g.beginPath(); g.ellipse(0, hy + 13, 13, 4.5, 0, 0, TAU); g.fill(); g.fillRect(front ? 5 : -9, hy + 13, 4, 11);
+    }
     g.restore();
-    // head
-    const hy = slide ? 0 : -10 + br * 1.5, hx = slide ? 24 : 20;
-    g.fillStyle = '#a9b6c4'; g.beginPath(); g.arc(hx, hy, 14, 0, TAU); g.fill(); g.strokeStyle = 'rgba(20,25,40,0.85)'; g.lineWidth = 2.5; g.stroke();
-    g.fillStyle = '#cdd6df'; g.beginPath(); g.ellipse(hx + 8, hy + 4, 8, 6, 0, 0, TAU); g.fill();
-    g.fillStyle = '#1b1f2e'; g.beginPath(); g.arc(hx + 14, hy + 2, 2.6, 0, TAU); g.fill();
-    const blink = !moving && Math.sin(t * 0.8) > 0.6; // sleepy, tired eyes when resting
-    g.fillStyle = '#1b1f2e'; if (blink) { g.fillRect(hx + 2, hy - 4, 7, 1.8); } else { g.beginPath(); g.arc(hx + 5, hy - 3, 3.2, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx + 6, hy - 4, 1, 0, TAU); g.fill(); }
-    g.strokeStyle = 'rgba(30,35,50,0.7)'; g.lineWidth = 1; for (const k of [-1, 1]) { g.beginPath(); g.moveTo(hx + 12, hy + 5); g.lineTo(hx + 22, hy + 3 + k * 3); g.stroke(); }
-    if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 10, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); } // panting tongue
-    // team scarf
-    g.fillStyle = col === '#000000' ? '#444' : col; g.beginPath(); g.ellipse(hx - 6, hy + 10, 9, 4, 0.5, 0, TAU); g.fill(); g.fillRect(hx - 14, hy + 10, 4, 10);
-    g.restore();
-    if (!moving && br > 0.95 && Math.random() < 0.2) this.puff(u.x + dir * 30, u.y + 40, { r0: 3, r1: 9, life: 0.6, col: '255,255,255', a: 0.55, vx: dir * 25, vy: 20 });
+    if (!moving && br > 0.95 && Math.random() < 0.2) this.puff(u.x + (view === 'side' ? dir * 36 : 0), u.y + 46, { r0: 3, r1: 9, life: 0.6, col: '255,255,255', a: 0.55, vx: dir * 25, vy: 20 });
   };
   P.drawCrab = function (g, u) {
     const W = this.W; const t = W.time + u.handle * 0.31; const moving = !!u.order && !u.paused; const ph = u.walkPhase * 2.4; const s = 1.05;
