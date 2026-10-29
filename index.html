@@ -13504,7 +13504,7 @@ function F_InitGlobals(){
   G_udg_teleportSize=0;
   G_udg_loopGuard=false;
   G_udg_minTeleport=0;
-  G_udg_speedMultiplier=11.0; // MapMix: very fast slide on ice
+  G_udg_speedMultiplier=16.0; // MapMix: super fast slide on ice (1600 per second)
   G_udg_REALSPD1=0;
   G_udg_REALSPD2=0;
   G_udg_REALSPD4=0;
@@ -19586,6 +19586,7 @@ function buildUnitTypes(md) {
     if ((m.uabi || '').includes('Apiv')) b.invis = true;
     if ((m.uabi || '').includes('Awan')) b.wander = true;
     b.scale = m.usca || 1;
+    if (prof.id === 'bob' && id === 'E000') b.speed = 1000; // MapMix: fast seals on the grass
     if (prof.id === 'kitty5' && id === 'E000') b.speed = 820; // MapMix: super fast kitties, faster than the glide of Escape Shroom (550)
     if (run && from === 'ncop') { b.speed = 0; b.r = 26; b.kind = 'circle'; b.inv = true; if (prof.id === 'bob' && id === 'n00C') b.kind = 'hidden'; }
     b.name = md.strings[m.unam] || id;
@@ -21391,7 +21392,7 @@ class KittyBots {
       if (Math.hypot(gx - h.x, gy - h.y) < 130 && this.clear(h.x, h.y, gx, gy)) { W.issueOrder(h, 851986, gx, gy); continue; }
       // candidate steps: score progress minus predicted danger
       const slide = W.profile.id === 'bob' && W.tileTypeAt(h.x, h.y) === 'Nice'; // on ice you can't stop: you slide at 700
-      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 1100 : (h.speed || 350);
+      const near = wolves.filter(w => Math.abs(w.x - h.x) < 700 && Math.abs(w.y - h.y) < 700), sp = slide ? 1600 : (h.speed || 350);
       // danger of walking from here towards (x, y): kitty and wolves both move, the kill range is 70
       const danger = (x, y) => { let s = 0; const dx = x - h.x, dy = y - h.y, L = Math.hypot(dx, dy) || 1;
         for (const tau of [0, 0.12, 0.25, 0.4, 0.6, 0.85]) { const m = Math.min(L, sp * tau), kx = h.x + dx / L * m, ky = h.y + dy / L * m, hold = sp * tau > L ? 1 : 0;
@@ -22223,7 +22224,7 @@ class Renderer {
       const c = this.minimap.getContext('2d'); const img = c.createImageData(T.w, T.h);
       for (let j = 0; j < T.h; j++) for (let i = 0; i < T.w; i++) {
         const idx = j * T.w + i; const k = this.tileKind(W.tileIds[W.tex[idx]]);
-        const col = k === 'toxic' ? [58, 33, 64] : k === 'stone' ? [207, 198, 242] : k === 'pink' ? [240, 143, 208] : [95, 191, 74];
+        const col = k === 'toxic' ? [58, 33, 64] : k === 'stone' ? [207, 198, 242] : k === 'pink' ? [240, 143, 208] : k === 'ice' ? [150, 210, 245] : k === 'snow' ? [236, 242, 250] : [95, 191, 74];
         const o = ((T.h - 1 - j) * T.w + i) * 4; img.data[o] = col[0]; img.data[o + 1] = col[1]; img.data[o + 2] = col[2]; img.data[o + 3] = 255;
       }
       c.putImageData(img, 0, 0); this.mmVersion = W.terrainVersion;
