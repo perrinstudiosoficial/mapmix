@@ -22553,15 +22553,18 @@ class Renderer {
   }
   // ---------- outfits (skins) for the mushroom kid: clothes colours + a hat on top of the cap ----------
   const HERO_SKINS = { base: { tunic: '#6a34c9', pants: '#3a2448', boot: '#6b3f1f', leather: '#7a4a24' },
-    ninja: { tunic: '#22222e', pants: '#14141c', boot: '#1a1a22', leather: '#3a1010', hat: 'ninja' }, pirata: { tunic: '#9a1c1c', pants: '#22305e', boot: '#3a2410', leather: '#5a3a18', hat: 'pirata' },
+    ninja: { tunic: '#22222e', pants: '#14141c', boot: '#1a1a22', leather: '#3a1010', hat: 'ninja', scarf: '#c81e2b' }, pirata: { tunic: '#9a1c1c', pants: '#22305e', boot: '#3a2410', leather: '#5a3a18', hat: 'pirata' },
+    rapero: { tunic: '#1a1a1a', pants: '#2a4a9a', boot: '#f2f2f2', leather: '#ffd23a', hat: 'gorro', glasses: '#111', scarf: '#ffd23a' }, invierno: { tunic: '#2a6ab0', pants: '#22305e', boot: '#5a3a18', leather: '#7a4a24', hat: 'gorro', scarf: '#e02828' }, fiesta: { tunic: '#ff4fd8', pants: '#3a2448', boot: '#4dfcff', leather: '#ffe14d', hat: 'fiesta', glasses: '#4dfcff' },
     mago: { tunic: '#2a3ac9', pants: '#18206a', boot: '#3a2a5a', leather: '#c9a020', hat: 'mago' }, rey: { tunic: '#d4a017', pants: '#7a1414', boot: '#5a1010', leather: '#8a5a10', hat: 'rey' },
-    explorador: { tunic: '#7a8a3a', pants: '#6a5a32', boot: '#4a3018', leather: '#5a3a18', hat: 'safari' }, vaquero: { tunic: '#b0602a', pants: '#2a3a6a', boot: '#5a3018', leather: '#7a4a24', hat: 'vaquero' },
+    explorador: { tunic: '#7a8a3a', pants: '#6a5a32', boot: '#4a3018', leather: '#5a3a18', hat: 'safari', glasses: '#3a2a10' }, vaquero: { tunic: '#b0602a', pants: '#2a3a6a', boot: '#5a3018', leather: '#7a4a24', hat: 'vaquero', scarf: '#c81e2b' },
     futbol: { tunic: '#e02828', pants: '#f2f2f2', boot: '#111111', leather: '#ffffff', hat: null }, astronauta: { tunic: '#e8e8f0', pants: '#c4c4d4', boot: '#8a8aa0', leather: '#ff7a1a', hat: 'casco' } };
   if (typeof window !== 'undefined') window.HERO_SKINS = HERO_SKINS;
   // the skin chosen for each game: settings.skins = { shroom25: 'ninja', kitty5: 'dorado', bob: 'rosa' }
   P.skinOf = function (p, map) { if (!p) return 'base'; map = map || (this.W && this.W.profile && this.W.profile.id) || 'shroom25'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (this.W && p === this.W.local) return (S && S.skins && S.skins[map]) || 'base'; return (p.skins && p.skins[map]) || p.skin || 'base'; };
-  const TIGER_SKINS = { dorado: 'sepia(0.9) saturate(2.2) hue-rotate(-12deg) brightness(1.05)', sombra: 'brightness(0.55) contrast(1.3) saturate(0.6)', fuego: 'sepia(1) saturate(4) hue-rotate(-30deg) brightness(0.95)', hielo: 'saturate(0.4) hue-rotate(170deg) brightness(1.1)', jade: 'sepia(0.8) saturate(3) hue-rotate(70deg)' };
-  const SEAL_SKINS = { dorada: ['#e0b84a', '#a8802a'], negra: ['#4a4f5a', '#2a2e36'], rosa: ['#f0a8c8', '#c07898'], pinguino: ['#2a2e3a', '#14161c'], arcoiris: null };
+  const TIGER_SKINS = { dorado: { f: 'sepia(0.9) saturate(2.2) hue-rotate(-12deg) brightness(1.05)', hat: 'rey', scarf: '#7a1414' }, sombra: { f: 'brightness(0.55) contrast(1.3) saturate(0.6)', hat: 'ninja', glasses: '#111' },
+    fuego: { f: 'sepia(1) saturate(4) hue-rotate(-30deg) brightness(0.95)', scarf: '#ffb020', glasses: '#ff3b1a' }, hielo: { f: 'saturate(0.4) hue-rotate(170deg) brightness(1.1)', hat: 'gorro', scarf: '#7fd6ff' }, jade: { f: 'sepia(0.8) saturate(3) hue-rotate(70deg)', hat: 'safari' },
+    vaquero: { hat: 'vaquero', scarf: '#c81e2b' }, pirata: { hat: 'pirata', glasses: '#111' }, fiesta: { hat: 'fiesta', glasses: '#ff4fd8', scarf: '#4dfcff' } };
+  const SEAL_SKINS = { dorada: { c: ['#e0b84a', '#a8802a'], hat: 'rey' }, negra: { c: ['#4a4f5a', '#2a2e36'], glasses: '#111', scarf: '#c81e2b' }, rosa: { c: ['#f0a8c8', '#c07898'], hat: 'fiesta' }, pinguino: { c: ['#2a2e3a', '#14161c'], hat: 'gorro', scarf: '#ffd23a' }, arcoiris: { rainbow: true, glasses: '#ff4fd8' }, pirata: { hat: 'pirata', scarf: '#1a1a1a' }, vaquera: { hat: 'vaquero', scarf: '#c8602a' } };
   if (typeof window !== 'undefined') { window.TIGER_SKINS = TIGER_SKINS; window.SEAL_SKINS = SEAL_SKINS; }
   function drawHat(g, h, t, v) { g.save(); g.lineJoin = 'round'; const O = 'rgba(20,5,25,0.85)';
     if (h === 'ninja') { g.fillStyle = '#c81e2b'; g.fillRect(-30, -6, 60, 8); g.strokeStyle = O; g.lineWidth = 2; g.strokeRect(-30, -6, 60, 8); const fl = Math.sin(t * 8) * 4; g.beginPath(); g.moveTo(28, -2); g.lineTo(44, -8 + fl); g.lineTo(42, 2 + fl); g.closePath(); g.fill(); }
@@ -22570,6 +22573,8 @@ class Renderer {
     else if (h === 'rey') { g.fillStyle = '#ffd23a'; g.strokeStyle = '#7a4a00'; g.lineWidth = 2; g.beginPath(); g.moveTo(-18, -22); g.lineTo(-20, -42); g.lineTo(-9, -32); g.lineTo(0, -46); g.lineTo(9, -32); g.lineTo(20, -42); g.lineTo(18, -22); g.closePath(); g.fill(); g.stroke(); for (const [x, c] of [[-10, '#ff3b6b'], [0, '#4dfcff'], [10, '#7dff9a']]) { g.fillStyle = c; g.beginPath(); g.arc(x, -27, 2.6, 0, TAU); g.fill(); } }
     else if (h === 'safari') { g.fillStyle = '#c8b07a'; g.beginPath(); g.ellipse(0, -20, 38, 7, 0, 0, TAU); g.fill(); g.strokeStyle = O; g.lineWidth = 2; g.stroke(); g.beginPath(); g.moveTo(-18, -20); g.quadraticCurveTo(0, -42, 18, -20); g.fill(); g.stroke(); g.fillStyle = '#6a4a20'; g.fillRect(-18, -24, 36, 4); }
     else if (h === 'vaquero') { g.fillStyle = '#7a4a24'; g.beginPath(); g.moveTo(-40, -18); g.quadraticCurveTo(-30, -26, -16, -22); g.quadraticCurveTo(-14, -44, 0, -40); g.quadraticCurveTo(14, -44, 16, -22); g.quadraticCurveTo(30, -26, 40, -18); g.quadraticCurveTo(0, -14, -40, -18); g.fill(); g.strokeStyle = O; g.lineWidth = 2; g.stroke(); g.fillStyle = '#d9a441'; g.fillRect(-16, -25, 32, 3); }
+    else if (h === 'gorro') { g.fillStyle = '#3a8ad0'; g.beginPath(); g.moveTo(-26, -18); g.quadraticCurveTo(0, -52, 26, -18); g.closePath(); g.fill(); g.strokeStyle = O; g.lineWidth = 2; g.stroke(); g.fillStyle = '#e8f4ff'; g.fillRect(-28, -22, 56, 7); g.beginPath(); g.arc(0, -44, 6, 0, TAU); g.fill(); }
+    else if (h === 'fiesta') { g.fillStyle = '#ff4fd8'; g.beginPath(); g.moveTo(-16, -20); g.lineTo(0, -62); g.lineTo(16, -20); g.closePath(); g.fill(); g.strokeStyle = O; g.lineWidth = 2; g.stroke(); g.fillStyle = '#ffe14d'; for (const y of [-30, -42, -52]) { g.beginPath(); g.arc(0, y, 2.5, 0, TAU); g.fill(); } g.fillStyle = '#4dfcff'; g.beginPath(); g.arc(0, -63, 5, 0, TAU); g.fill(); }
     else if (h === 'casco') { const gg = g.createRadialGradient(-10, -10, 4, 0, -4, 44); gg.addColorStop(0, 'rgba(255,255,255,0.55)'); gg.addColorStop(1, 'rgba(160,210,255,0.12)'); g.fillStyle = gg; g.beginPath(); g.arc(0, 4, 44, Math.PI, 0); g.closePath(); g.fill(); g.strokeStyle = 'rgba(200,220,240,0.9)'; g.lineWidth = 3; g.stroke(); }
     g.restore(); }
   P.drawHero = function (g, u) {
@@ -22628,6 +22633,7 @@ class Renderer {
     if (!v.back) { g.strokeStyle = leather; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-9, -11); g.lineTo(8, 4); g.stroke(); } // satchel strap
     g.restore();
     if (v.back) { g.save(); g.translate(0, -1); bag(); g.restore(); }
+    if (SKD.scarf) { g.fillStyle = SKD.scarf; g.strokeStyle = 'rgba(20,5,25,0.85)'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, -12, 13, 4.5, 0, 0, TAU); g.fill(); g.stroke(); const fl = moving ? Math.sin(ph * 2) * 3 : 0; g.beginPath(); g.moveTo(v.side ? -8 : 5, -11); g.lineTo(v.side ? -20 + fl : 9, v.side ? -6 : 4); g.lineTo(v.side ? -15 + fl : 3, v.side ? -3 : 3); g.closePath(); g.fill(); g.stroke(); } // scarf
     if (v.side) leg(1, ph, false), arm(-1, -6, -Math.sin(ph), false);
     else if (!v.back) { arm(-12, -6, Math.sin(ph), false); arm(12, -6, -Math.sin(ph), false); }
     // head
@@ -22645,6 +22651,7 @@ class Renderer {
       }
       g.fillStyle = 'rgba(255,120,150,0.35)'; g.beginPath(); g.arc(v.side ? ox + 9 : -10, -17, 3, 0, TAU); if (!v.side) g.arc(10, -17, 3, 0, TAU); g.fill();
       g.strokeStyle = '#6a2a2a'; g.lineWidth = 1.7; g.beginPath(); g.arc(v.side ? ox + 5 : 0, -13.5, 3.5, Math.PI + 0.5, TAU - 0.5); g.stroke(); // small unimpressed mouth
+      if (SKD.glasses) { g.fillStyle = SKD.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.6; for (const ex of v.side ? [ox + 3] : [-6, 6]) { g.beginPath(); if (g.roundRect) g.roundRect(ex - 5.5, -27, 11, 7.5, 3); else g.rect(ex - 5.5, -27, 11, 7.5); g.fill(); g.stroke(); } if (!v.side) { g.beginPath(); g.moveTo(-0.5, -24); g.lineTo(0.5, -24); g.stroke(); } g.fillStyle = 'rgba(255,255,255,0.55)'; g.fillRect(v.side ? ox : -9, -26, 3, 2); }
     }
     // cap: violet with glowing multicolour spots, jelly wobble
     const wob = moving ? Math.cos(ph * 2) * 0.05 : Math.sin(t * 3) * 0.02; const capC = '#7b3fe4';
@@ -22824,7 +22831,20 @@ class Renderer {
   const kShade = (hex, k) => { const n = parseInt(hex.slice(1), 16); let r = n >> 16, gg = (n >> 8) & 255, b = n & 255; const f = k < 0 ? 0 : 255, a = Math.abs(k); r = Math.round(r + (f - r) * a); gg = Math.round(gg + (f - gg) * a); b = Math.round(b + (f - b) * a); return `rgb(${r},${gg},${b})`; };
   // white tiger sprites (art provided by Perrin Studios): 0-7 directions pose A, 8-15 pose B, 16-20 run (facing right), 21-25 circles
   let kImg = null; const kArt = () => { if (kImg === null && typeof window !== 'undefined' && window.KITTY_ART) { kImg = new Image(); kImg.src = window.KITTY_ART.src; } return kImg && kImg.complete && kImg.naturalWidth ? kImg : null; };
-  const kBlit = (g, k, h, ax = 0.5, ay = 0.86, flip = false) => { const img = kArt(); const r = window.KITTY_ART.rects[k]; const nm = (window.KITTY_ART.norm && window.KITTY_ART.norm[k]) || 1; const s = h < 0 ? -h * nm : h / r[3]; /* h < 0: fixed factor, times a per-drawing correction so the tiger always looks the same size */ g.save(); g.scale(flip ? -1 : 1, -1); g.drawImage(img, r[0], r[1], r[2], r[3], -r[2] * s * ax, -r[3] * s * ay, r[2] * s, r[3] * s); g.restore(); };
+  // tiger accessories (hat, scarf, glasses) pinned to the head/neck of each drawing of the sheet (fractions of the frame, y from the top)
+  const K_HEAD = { 0: [0.5, 0.15], 1: [0.13, 0.33], 2: [0.12, 0.33], 3: [0.5, 0.05], 4: [0.45, 0.05], 5: [0.88, 0.33], 6: [0.82, 0.44], 7: [0.5, 0.15], 16: [0.86, 0.3], 17: [0.86, 0.36], 18: [0.87, 0.4], 26: [0.5, 0.05] };
+  const K_NECK = { 0: [0.5, 0.62], 1: [0.32, 0.56], 2: [0.32, 0.56], 5: [0.68, 0.56], 6: [0.64, 0.62], 7: [0.5, 0.62], 16: [0.69, 0.5], 17: [0.7, 0.54], 18: [0.72, 0.58] };
+  const K_EYES = { 0: [0.5, 0.28, 0], 1: [0.14, 0.45, -1], 2: [0.14, 0.45, -1], 5: [0.86, 0.45, 1], 6: [0.84, 0.55, 1], 16: [0.88, 0.4, 1], 17: [0.88, 0.47, 1], 18: [0.89, 0.5, 1] };
+  let kAccU = null;
+  const kAcc = (g, k, x0, y0, w, h) => { const A = kAccU; if (!A) return; const kk = k >= 8 && k <= 15 ? k - 8 : k > 18 && k < 21 ? 18 : k; const hh = h, sz = Math.min(w, hh) / 100; g.save(); g.filter = 'none'; // accessories keep their own colours
+    if (A.scarf && K_NECK[kk]) { const [fx, fy] = K_NECK[kk]; g.save(); g.translate(x0 + fx * w, y0 + fy * hh); g.fillStyle = A.scarf; g.strokeStyle = 'rgba(20,10,20,0.8)'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 0, 12 * sz, 4.5 * sz, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(-4 * sz, 2 * sz); g.lineTo(-8 * sz, 15 * sz); g.lineTo(0, 14 * sz); g.closePath(); g.fill(); g.stroke(); g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(-10 * sz, -1 * sz, 20 * sz, 1.4 * sz); g.restore(); }
+    if (A.glasses && K_EYES[kk]) { const [fx, fy, sd] = K_EYES[kk]; g.save(); g.translate(x0 + fx * w, y0 + fy * hh); g.fillStyle = A.glasses; g.strokeStyle = '#111'; g.lineWidth = 2;
+      if (sd === 0) { for (const ex of [-8, 8]) { g.beginPath(); g.ellipse(ex * sz, 0, 7 * sz, 5 * sz, 0, 0, TAU); g.fill(); g.stroke(); } g.beginPath(); g.moveTo(-1 * sz, 0); g.lineTo(1 * sz, 0); g.stroke(); }
+      else { g.beginPath(); g.ellipse(0, 0, 8 * sz, 5 * sz, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(-sd * 7 * sz, -1 * sz); g.lineTo(-sd * 20 * sz, -3 * sz); g.stroke(); }
+      g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(-3 * sz, -3 * sz, 3 * sz, 2 * sz); g.restore(); }
+    if (A.hat && K_HEAD[kk]) { const [fx, fy] = K_HEAD[kk]; g.save(); g.translate(x0 + fx * w, y0 + fy * hh + 4 * sz); const sc = 0.62 * sz * 1.25; g.scale(sc, sc); g.translate(0, 18); drawHat(g, A.hat, kAccT, null); g.restore(); } g.restore(); };
+  let kAccT = 0;
+  const kBlit = (g, k, h, ax = 0.5, ay = 0.86, flip = false) => { const img = kArt(); const r = window.KITTY_ART.rects[k]; const nm = (window.KITTY_ART.norm && window.KITTY_ART.norm[k]) || 1; const s = h < 0 ? -h * nm : h / r[3]; /* h < 0: fixed factor, times a per-drawing correction so the tiger always looks the same size */ g.save(); g.scale(flip ? -1 : 1, -1); g.drawImage(img, r[0], r[1], r[2], r[3], -r[2] * s * ax, -r[3] * s * ay, r[2] * s, r[3] * s); kAcc(g, k, -r[2] * s * ax, -r[3] * s * ay, r[2] * s, r[3] * s); g.restore(); };
   // trot: draw the body bobbing and the legs (bottom of the picture) in two halves that lift in turns
   // trot like a real four-legged animal: diagonal pairs move together (front-left with back-right, then front-right with back-left).
   // The legs part of the drawing is cut in four: near legs (bottom) and far legs (above them), left and right.
@@ -22835,7 +22855,7 @@ class Renderer {
     const half = (hf, p) => { const sn = Math.sin(ph + p), lift = Math.max(0, sn), sx = r[0] + hf * w / 2, dx = -W2 / 2 + hf * W2 / 2, dh = lh * F * (1 - 0.45 * lift), reach = (hf ? 1 : -1) * Math.max(0, -sn) * 2.5 * F;
       g.drawImage(img, sx, r[1] + cut - 3, w / 2 + (hf ? 0 : 1), lh + 3, dx + reach, top + cut * F + bob - 3 * F, W2 / 2 + (hf ? 0 : F), dh + 3 * F - bob); };
     half(0, 0); half(1, Math.PI);
-    g.save(); g.translate(0, top + cut * F + bob); g.rotate(roll); g.scale(push, 2 - push); g.drawImage(img, r[0], r[1], w, cut + 1, -W2 / 2, -cut * F, W2, (cut + 1) * F); g.restore(); // body: rolls on the shoulders and stretches with each push
+    g.save(); g.translate(0, top + cut * F + bob); g.rotate(roll); g.scale(push, 2 - push); g.drawImage(img, r[0], r[1], w, cut + 1, -W2 / 2, -cut * F, W2, (cut + 1) * F); kAcc(g, k, -W2 / 2, -cut * F, W2, h * F); g.restore(); // body: rolls on the shoulders and stretches with each push
     g.restore();
   };
   // out of breath after running: fast, deep breathing of the whole body that slowly calms down
@@ -22843,13 +22863,13 @@ class Renderer {
     if (moving) { u._run = Math.min(6, (u._run || 0) + dt); u._tired = Math.min(1, u._run / 2.5); } else { u._run = 0; u._tired = Math.max(0.25, (u._tired ?? 0.25) - dt / 14); }
     const rate = (2.6 + 4.2 * u._tired) * rm; u._bph = (u._bph || 0) + dt * rate * Math.PI * 2; return { amp: 0.018 + 0.05 * u._tired, s: Math.sin(u._bph) }; };
   P.drawKitty = function (g, u) {
-    const W = this.W; if (!u.alive) return;
+    const W = this.W; kAccU = null; if (!u.alive) return;
     if (kArt()) {
       if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); } // invisible: only a faint shimmer
       W._rdt = this._dt; if ((!!u.order && !u.paused) || u.jump) { u._movedAt = W.time; fatigue(W, u, true); }
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3; if (u._wasMv && !moving) u._foot = !u._foot; u._wasMv = moving; // each stop ends with the other front paw ahead
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
-      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); { const tf = TIGER_SKINS[this.skinOf(u.owner, 'kitty5')]; if (tf) g.filter = tf; } /* tiger skin: colour treatment of the art */ // your aura under your tiger (the same one you leave when you fall)
+      g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); { const TS = TIGER_SKINS[this.skinOf(u.owner, 'kitty5')]; if (TS && TS.f) g.filter = TS.f; kAccU = TS && (TS.hat || TS.scarf || TS.glasses) ? TS : null; kAccT = W.time; } /* tiger skin: colour + accessories */ // your aura under your tiger (the same one you leave when you fall)
       { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; if (Math.abs(d) > 150 && !(u._turnD > 1)) { const c0 = u._rf * Math.PI / 180; if (Math.abs(Math.cos(c0)) > 0.5) { const up = Math.sin(c0 + Math.PI / 2) > Math.sin(c0 - Math.PI / 2) ? 1 : -1; d = up * Math.abs(d); } } /* left<->right reversal: always sweep over the top (right, up-right, up, up-left, left) */ const st = 420 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
       let a = ((u._rf % 360) + 360) % 360; const dirs = u._turnD > 8 ? [[22.5, 5], [67.5, 3], [112.5, 'N'], [157.5, 4], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]] : [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // while turning every view gets the same share (so all 8 show); settled: wide left/right sectors = full profile
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
@@ -22878,6 +22898,7 @@ class Renderer {
           g.drawImage(img, r[0], r[1], r[2], cutP + 1, x0, y0, w, (cutP + 1) * sc); }
         else g.drawImage(img, r[0], r[1], r[2], r[3], x0, y0, w, h);
         g.save(); g.translate(0, y0 + h * cut); g.scale(1 + e * 0.9, 1 + e * 1.3); g.drawImage(img, r[0], r[1], r[2], r[3] * cut, x0, -h * cut, w, h * cut + 0.5); g.restore();
+        kAcc(g, kk, x0, y0, w, h);
         const M = { 0: [0.47, 0.6], 1: [0.08, 0.58], 6: [0.9, 0.58], 16: [0.94, 0.45] }[kk]; const tired = u._tired || 0;
         if (M && tired > 0.3) { const tx = (x0 + M[0] * w) * (1 + e * 0.9), ty = y0 + h * cut - (cut - M[1]) * h * (1 + e * 1.3), L = (4 + 9 * tired) * (1 + 0.25 * F2.s), side = kk === 0 ? 0 : (kk === 1 ? -1 : 1);
           g.fillStyle = '#e8687f'; g.strokeStyle = '#a83a50'; g.lineWidth = 1; g.beginPath(); g.moveTo(tx - 3.5, ty); g.quadraticCurveTo(tx - 4 + side * 2, ty + L, tx + side * 2.5, ty + L + 1.5); g.quadraticCurveTo(tx + 4 + side * 2, ty + L, tx + 3.5, ty); g.closePath(); g.fill(); g.stroke();
@@ -23099,7 +23120,7 @@ class Renderer {
 
   // ===================== Fuga Bajo el Mar (ice map) =====================
   P.drawPuffer = function (g, u) { // the ice map hero: a big chubby seal in your team colour scarf, seen from the side, front or back
-    const W = this.W; if (!u.alive) return; const t = W.time + u.handle * 0.4; const col = this.heroColor(u), scarf = col === '#000000' ? '#444' : col;
+    const W = this.W; if (!u.alive) return; const t = W.time + u.handle * 0.4; const col = this.heroColor(u); let scarf = col === '#000000' ? '#444' : col;
     const mv = Math.hypot(u.x - (u._sx ?? u.x), u.y - (u._sy ?? u.y)); u._sx = u.x; u._sy = u.y; if (mv > 0.5 || u.jump) u._movedAt = W.time;
     const moving = W.time - (u._movedAt || 0) < 0.15, onIce = W.tileTypeAt(u.x, u.y) === 'Nice';
     { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 480 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
@@ -23111,7 +23132,7 @@ class Renderer {
     const js = 1 + (u.jump ? Math.sin(jp * Math.PI) * 0.3 : 0); // a little bigger in the air: reads as high up
     g.save(); g.translate(0, lift); g.scale((view === 'side' ? dir * fore : 1) * 1.55 * js, -1.55 * js); g.translate(0, -20);
     if (view === 'side') g.rotate(-fy * 0.35 * dir); // diagonals: the body tilts toward where it goes
-    const SSK = this.skinOf(u.owner, 'bob'), SC = SSK === 'arcoiris' ? [`hsl(${(t * 80) % 360},70%,72%)`, `hsl(${(t * 80 + 30) % 360},60%,52%)`] : SEAL_SKINS[SSK]; const outline = 'rgba(20,25,40,0.85)', grey = SC ? SC[0] : '#a9b6c4', greyD = SC ? SC[1] : '#6f7d8c';
+    const SSK = this.skinOf(u.owner, 'bob'), SKS = SEAL_SKINS[SSK] || null, SC = SKS && SKS.rainbow ? [`hsl(${(t * 120) % 360},85%,70%)`, `hsl(${(t * 120 + 60) % 360},80%,50%)`] : SKS && SKS.c; if (SKS && SKS.rainbow) scarf = `hsl(${(t * 120 + 180) % 360},90%,55%)`; else if (SKS && SKS.scarf) scarf = SKS.scarf; /* multicolour seal: the whole body cycles through the rainbow forever */ const outline = 'rgba(20,25,40,0.85)', grey = SC ? SC[0] : '#a9b6c4', greyD = SC ? SC[1] : '#6f7d8c';
     const belly = (cx, cy, rx, ry) => { const bg = g.createRadialGradient(cx, cy, 2, cx, cy, Math.max(rx, ry)); bg.addColorStop(0, '#f6f2e8'); bg.addColorStop(1, '#cfc9ba'); g.fillStyle = bg; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(80,80,70,0.35)'; g.lineWidth = 1.5; g.stroke(); };
     const sq = 1 + 0.05 * wave + 0.035 * br;
     if (view === 'side') {
@@ -23134,6 +23155,7 @@ class Renderer {
       g.lineCap = 'round'; for (const [ex, ey] of [[5, -12], [8, -5], [8, 6], [5, 13], [1, 15]]) { const ww = moving ? Math.sin(ph * 0.5 + ey) * 1 : br * 0.8; g.strokeStyle = 'rgba(30,35,50,0.55)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(hx + 9, hy + 5.5); g.quadraticCurveTo(hx + 9 + ex * 1.1, hy + 5.5 + ey * 0.45, hx + 9 + ex + ww * 0.5, hy + 5.5 + ey + ww); g.stroke(); g.strokeStyle = '#f3f1ea'; g.lineWidth = 0.9; g.stroke(); }
       if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(hx + 12, hy + 11, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       g.fillStyle = scarf; g.beginPath(); g.ellipse(hx - 7, hy + 11, 10, 4.5, 0.5, 0, TAU); g.fill(); g.fillRect(hx - 15, hy + 11, 4, 11);
+      if (SKS) { if (SKS.glasses) { g.fillStyle = SKS.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(hx + 5, hy - 3, 5.5, 4.5, 0, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.moveTo(hx, hy - 4); g.lineTo(hx - 9, hy - 6); g.stroke(); } if (SKS.hat) { g.save(); g.translate(hx + 2, hy - 13); g.scale(0.5, 0.5); g.translate(0, 18); drawHat(g, SKS.hat, t, null); g.restore(); } }
     } else { // front (coming at you) or back (going away): a round, fat seal seen head-on
       const front = view === 'front', sway = moving && !slide ? Math.sin(ph) * 0.12 : 0;
       g.rotate(sway); g.save(); g.scale(sq, 2 - sq + (slide ? -0.1 : 0));
@@ -23154,6 +23176,7 @@ class Renderer {
         if (!moving && br > 0.3) { g.fillStyle = '#ff8fa3'; g.beginPath(); g.ellipse(0, hy + 12, 2.4, 3 + br * 1.5, 0, 0, TAU); g.fill(); }
       }
       g.fillStyle = scarf; g.beginPath(); g.ellipse(0, hy + 13, 13, 4.5, 0, 0, TAU); g.fill(); g.fillRect(front ? 5 : -9, hy + 13, 4, 11);
+      if (SKS) { if (SKS.glasses && front) { g.fillStyle = SKS.glasses; g.strokeStyle = '#111'; g.lineWidth = 1.5; for (const ex of [-6.5, 6.5]) { g.beginPath(); g.ellipse(ex, hy - 4, 5.5, 4.5, 0, 0, TAU); g.fill(); g.stroke(); } } if (SKS.hat) { g.save(); g.translate(0, hy - 13); g.scale(0.5, 0.5); g.translate(0, 18); drawHat(g, SKS.hat, t, null); g.restore(); } }
     }
     g.restore();
     if (!moving && br > 0.95 && Math.random() < 0.2) this.puff(u.x + (view === 'side' ? dir * 36 : 0), u.y + 46, { r0: 3, r1: 9, life: 0.6, col: '255,255,255', a: 0.55, vx: dir * 25, vy: 20 });
@@ -24293,7 +24316,12 @@ class Net {
     ['#tabDfx', '#dfxGrid', 'Tu efecto al caer, con su propio grito, en todos los juegos. Toca uno para escucharlo. Si no tienes ninguno, usas el Clásico.'], ['#tabSpawn', '#spawnGrid', 'Tu efecto al aparecer al empezar cada ronda, en todos los juegos.'], ['#tabAura', '#auraGrid', 'El círculo que queda donde caes, en todos los mapas. Tus amigos te reviven pasando cerca o encima.'],
     ['#tabSpray', '#sprayGrid', 'Pinta el piso con el botón 🎨 (tócalo para pintar, mantenlo para elegir entre tus 5). Dura 40 segundos, todos lo ven, y sirve en todos los juegos.'], ['#tabPass', '#passBox', 'Juega cualquier mapa para subir de nivel: ganas XP por cada ronda o etapa que pasa tu equipo y por cada minuto jugado.'], ['#tabCoins', '#coinGrid', 'Las monedas servirán para comprar skins, emotes, efectos y auras.']];
   const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 5) drawSprays(); if (n === 0) renderSkins(); if (n === 6) renderPass(); };
-  TABS.forEach(([tb], i) => click(tb, () => shopTab(i)));
+  let curTab = 0; const shopHist = []; const shopTab0 = shopTab;
+  const goTab = (i, push = true) => { if (push && i !== curTab) shopHist.push(['tab', curTab]); curTab = i; shopTab0(i); };
+  TABS.forEach(([tb], i) => click(tb, () => goTab(i)));
+  // the back arrow inside the shop goes back to where you were (previous tab / game), and only leaves the shop at the start
+  document.querySelector('#shop .back').addEventListener('click', e => { const h = shopHist.pop(); if (!h) return; e.stopImmediatePropagation(); if (h[0] === 'tab') goTab(h[1], false); else if (h[0] === 'cat') { skCat = h[1]; fitSkin = 'base'; renderSkins(); } }, true);
+  click('#goShop', () => { shopHist.length = 0; });
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
   const PASS_FREE = { 3: ['aura', 'hielo', 'Aura Escarcha'], 6: ['dfx', 'fantasma', 'Efecto Fantasma Llorón'], 10: ['emote', '', 'Emote Guiño'], 15: ['aura', 'toxico', 'Aura Tóxico'], 20: ['dfx', 'confeti', 'Efecto Fiesta de Confeti'], 25: ['coin', '', '100 monedas'], 30: ['aura', 'galaxia', 'Aura Galaxia'] };
@@ -24316,19 +24344,30 @@ class Net {
   const tagTxt = (eq, own) => `<div class="lockd${eq ? ' eq' : ''}">${eq ? 'EQUIPADO' : own ? 'TOCA PARA EQUIPAR' : 'PRÓXIMAMENTE'}</div>`;
   const prevs = []; // animated previews: [canvas, draw(g, t)]
   const grid = (sel, list, kind, key, base, kindTxt, sound, drawFn) => {
-    const L = shown(list);
-    $(sel).innerHTML = L.map(it => { const own = owns(kind, it); return `<div class="item tap" data-k="${it[0]}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(it[1])}</b><small>${kindTxt}</small>${priceTag(own, it[2], it[3] === 'vip' || it[3] === 'sell')}${tagTxt((S[key] || base) === it[0], own)}</div>`; }).join('');
+    const L = shown(list); if (!fxSel[sel] || !L.some(x => x[0] === fxSel[sel])) fxSel[sel] = (L.find(x => x[0] === S[key]) || L[0] || [])[0];
+    $(sel).innerHTML = `<div class="fitroom"><canvas class="fxfit" width="240" height="190"></canvas><div class="fitbar"><button class="fxL">⟲</button><b>${esc((L.find(x => x[0] === fxSel[sel]) || [, ''])[1])}</b><button class="fxR">⟳</button></div><small>Desliza sobre el personaje para girarlo</small></div>` + L.map(it => { const own = owns(kind, it); return `<div class="item tap${fxSel[sel] === it[0] ? ' sel' : ''}" data-k="${it[0]}"><canvas class="apv" width="192" height="192"></canvas><b>${esc(it[1])}</b><small>${kindTxt}</small>${priceTag(own, it[2], it[3] === 'vip' || it[3] === 'sell')}${tagTxt((S[key] || base) === it[0], own)}</div>`; }).join('');
     $(sel).querySelectorAll('[data-k]').forEach((el, i) => { const it = L[i]; prevs.push([el.querySelector('canvas'), sel, (g, t) => drawFn(g, it[0], t)]);
-      el.addEventListener('click', () => { try { SW.sfx.init(); if (sound) SW.sfx.play(sound + it[0]); } catch (e) {} if (!owns(kind, it)) return; S[key] = (S[key] === it[0]) ? base : it[0]; SW.saveSettings(); renderDA(); }); }); };
+      el.addEventListener('click', () => { try { SW.sfx.init(); if (sound) SW.sfx.play(sound + it[0]); } catch (e) {} fxSel[sel] = it[0]; fxT0 = performance.now() / 1000; if (!owns(kind, it)) { renderDA(); return; } S[key] = (S[key] === it[0]) ? base : it[0]; SW.saveSettings(); renderDA(); }); }); };
   const R0 = () => typeof Renderer !== 'undefined' && Renderer.prototype; const fake = { W: { time: 0 }, puff() {} };
+  // fitting room for auras / death / spawn: your character on the chosen effect, turned by hand
+  const fxSel = {}; let fxAng = 270, fxDrag = null, fxT0 = 0; const fxHero = { alive: true, order: null, paused: false, glide: false, walkPhase: 0, handle: 3, x: 0, y: 0, t: {}, inv: false, abil: {}, items: [] };
+  function wireFit(root) { const cv = root.querySelector('.fxfit'); if (!cv) return; root.querySelector('.fxL').addEventListener('click', () => { fxAng -= 45; }); root.querySelector('.fxR').addEventListener('click', () => { fxAng += 45; });
+    cv.addEventListener('pointerdown', e => { fxDrag = [e.clientX, fxAng]; cv.setPointerCapture(e.pointerId); }); cv.addEventListener('pointermove', e => { if (fxDrag) fxAng = fxDrag[1] - (e.clientX - fxDrag[0]) * 1.2; }); cv.addEventListener('pointerup', () => { fxDrag = null; }); }
+  function drawFit(cv, sel, t) { const RP = R0(); const id = fxSel[sel]; const owner = { id: 0, skins: S.skins || {}, aura: sel === '#auraGrid' ? id : (S.aura || 'piedra') }; const R = Object.create(RP); R.W = { time: t, local: null, profile: { id: 'shroom25' } }; R._dt = 0.016; R.puff = () => {};
+    const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#2e2438'; g.fillRect(0, 0, cv.width, cv.height); g.translate(cv.width / 2, 150); g.scale(1.25, -1.25);
+    const u = Object.assign(fxHero, { facing: fxAng, _rf: fxAng, owner }); const lt = t - fxT0;
+    if (sel === '#dfxGrid') { const d = { ko: 1.4, calavera: 1.8, fuegos: 1.9, flor: 1.5, epico: 1.5, confeti: 1.6 }[id] || 1.2, cyc = d + 1.2, ph = lt % cyc; if (ph < 0.7 || ph > d + 0.7) RP.drawHero.call(R, g, u); else RP.drawDeathFx.call(R, g, { kind: id, col: '#ff3b3b', t0: Math.floor(lt / cyc) }, (ph - 0.7) / d); }
+    else if (sel === '#spawnGrid') { const d = id === 'fundador' || id === 'fenix' ? 1.0 : 0.8, cyc = d + 1.0, ph = lt % cyc; RP.drawHero.call(R, g, u); if (ph < d) { g.save(); RP.drawSpawnFx.call(R, g, { kind: id, col: '#ff3b3b' }, ph / d); g.restore(); } }
+    else RP.drawHero.call(R, g, u); }
   const renderDA = () => { prevs.length = 0;
     grid('#dfxGrid', DFX_ITEMS, 'dfx', 'deathFx', 'clasico', 'Efecto + grito', 'dx_', (g, id, t) => { const d = { ko: 1.4, calavera: 1.8, fuegos: 1.9, flor: 1.5, epico: 1.5, confeti: 1.6 }[id] || 1.2, p = (t % (d + 0.5)) / d; if (p <= 1) R0().drawDeathFx.call(fake, g, { kind: id, col: '#ff3b3b', t0: Math.floor(t / (d + 0.5)) }, p); });
     grid('#spawnGrid', SPAWN_ITEMS, 'spawn', 'spawnFx', 'estandar', 'Aparición', 'sp_', (g, id, t) => { const d = id === 'fundador' || id === 'fenix' ? 1.0 : 0.8, p = (t % (d + 0.25)) / d; if (p <= 1) R0().drawSpawnFx.call(fake, g, { kind: id, col: '#ff3b3b' }, p); });
     grid('#auraGrid', AURA_ITEMS, 'aura', 'aura', 'piedra', 'Aura', null, (g, id, t) => R0().drawDeathAura.call(fake, g, '#ff3b3b', id, t, 1, 46));
-    animAuras(); };
+    ['#dfxGrid', '#spawnGrid', '#auraGrid'].forEach(id => wireFit($(id))); animAuras(); };
   let auraRaf = 0;
   function animAuras() { cancelAnimationFrame(auraRaf); if (!R0()) return;
     const step = ts => { if ($('#shop').classList.contains('hidden')) { auraRaf = requestAnimationFrame(step); return; } const t = ts / 1000; fake.W.time = t;
+      for (const cv of document.querySelectorAll('#shop .fxfit')) { const sel = '#' + cv.closest('.shopgrid').id; if ($(sel).classList.contains('hidden')) continue; try { drawFit(cv, sel, t); } catch (e) {} }
       for (const [cv, sel, fn] of prevs) { if ($(sel).classList.contains('hidden')) continue; const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#3a2f44'; g.fillRect(0, 0, 192, 192); const aura = sel === '#auraGrid'; g.translate(96, aura ? 104 : 150); g.scale(aura ? 1.65 : 0.62, aura ? -1.65 : -0.62); try { fn(g, t); } catch (e) {} }
       auraRaf = requestAnimationFrame(step); };
     auraRaf = requestAnimationFrame(step); }
@@ -24348,9 +24387,9 @@ class Net {
   $('#coinGrid').innerHTML = `<div class="coinbal">🪙 ${S.coins || 0} monedas</div>` + [[60, 0, '$0.99', 1], [180, 10, '$2.99', 2], [300, 25, '$4.99', 3], [600, 60, '$9.99', 4], [1200, 155, '$19.99', 5], [2500, 380, '$39.99', 6], [4000, 700, '$59.99', 7], [6500, 1300, '$89.99', 8]].map(([n, b, pr, lv]) => `<div class="cpack"><div class="ct">${n} monedas</div><div class="cart">${'🪙'.repeat(Math.min(5, Math.ceil(lv / 1.6)))}${lv >= 6 ? '<span class="chest">🧰</span>' : ''}</div>${b ? `<div class="cbon">+${b} monedas adicionales</div>` : '<div class="cbon none">paquete inicial</div>'}<button class="cbuy" disabled>${pr} · Próximamente</button></div>`).join('');
   // skins = outfits for your character; a fitting room on top where you can turn the player around (drag or arrows)
   const SKIN_CATS = [['shroom25', '🍄 Escape Hongo'], ['kitty5', '🐯 Corre Gatito Corre'], ['bob', '🦭 Corre Foca Gorda'], ['orc', '⚔️ Gladiadores', 1], ['ck', '🏃 Corre o Te Pillan', 1], ['kitty', '🐈 Corre Gatito', 1]];
-  const SKIN_ITEMS = { shroom25: [['ninja', 'Ninja de la Noche', 799], ['pirata', 'Pirata', 799], ['mago', 'Mago Estelar', 999], ['rey', 'Rey Hongo', 1299], ['explorador', 'Explorador', 599], ['vaquero', 'Vaquero', 599], ['futbol', 'Futbolista', 499], ['astronauta', 'Astronauta', 999]],
-    kitty5: [['dorado', 'Tigre Dorado', 1299], ['sombra', 'Tigre Sombra', 999], ['fuego', 'Tigre de Fuego', 1499], ['hielo', 'Tigre de Hielo', 999], ['jade', 'Tigre de Jade', 899]],
-    bob: [['dorada', 'Foca Dorada', 999], ['negra', 'Foca Noche', 699], ['rosa', 'Foca Chicle', 699], ['pinguino', 'Foca Pingüino', 799], ['arcoiris', 'Foca Arcoíris', 1199]] };
+  const SKIN_ITEMS = { shroom25: [['ninja', 'Ninja de la Noche', 799], ['pirata', 'Pirata', 799], ['mago', 'Mago Estelar', 999], ['rey', 'Rey Hongo', 1299], ['explorador', 'Explorador', 599], ['vaquero', 'Vaquero', 599], ['futbol', 'Futbolista', 499], ['astronauta', 'Astronauta', 999], ['rapero', 'Rapero', 899], ['invierno', 'Invierno', 699], ['fiesta', 'Fiestero', 799]],
+    kitty5: [['dorado', 'Tigre Dorado', 1299], ['sombra', 'Tigre Sombra', 999], ['fuego', 'Tigre de Fuego', 1499], ['hielo', 'Tigre de Hielo', 999], ['jade', 'Tigre de Jade', 899], ['vaquero', 'Tigre Vaquero', 899], ['pirata', 'Tigre Pirata', 999], ['fiesta', 'Tigre Fiestero', 1099]],
+    bob: [['dorada', 'Foca Dorada', 999], ['negra', 'Foca Noche', 699], ['rosa', 'Foca Chicle', 699], ['pinguino', 'Foca Pingüino', 799], ['arcoiris', 'Foca Multicolor', 1199], ['pirata', 'Foca Pirata', 899], ['vaquera', 'Foca Vaquera', 799]] };
   if (S.skin && !S.skins) { S.skins = { shroom25: S.skin }; SW.saveSettings(); }
   let skCat = 'shroom25', fitSkin = 'base', fitAng = 270, fitWalk = false, fitDrag = null;
   const ownsSkin = (cat, id) => (S.bought || []).includes('skin:' + cat + ':' + id);
@@ -24359,7 +24398,7 @@ class Net {
       (SKIN_CATS.find(c => c[0] === skCat)[2] ? `<div class="sknext">🔒 Este mapa llega pronto. Sus skins estarán disponibles cuando se abra el mapa.</div>` :
       `<div class="fitroom"><canvas id="fitCv" width="240" height="190"></canvas><div class="fitbar"><button id="fitL">⟲</button><b id="fitName"></b><button id="fitR">⟳</button><button id="fitWalk">🚶</button></div><small>Desliza sobre el personaje para girarlo</small></div>` +
       [['base', 'Básico', 0]].concat(items).map(([id, n, pr]) => { const own = id === 'base' || ownsSkin(skCat, id); return `<div class="item tap sk${fitSkin === id ? ' sel' : ''}" data-skin="${id}"><canvas class="apv" width="120" height="120"></canvas><b>${esc(n)}</b>${id === 'base' ? '<div class="price owned" style="text-decoration:none">INCLUIDA</div>' : `<div class="price${own ? ' owned' : ''}">🪙 ${pr}</div>`}${tagTxt(cur === id, own)}</div>`; }).join(''));
-    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { skCat = b.dataset.cat; fitSkin = 'base'; renderSkins(); }));
+    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat) shopHist.push(['cat', skCat]); skCat = b.dataset.cat; fitSkin = 'base'; renderSkins(); }));
     $('#shopGrid').querySelectorAll('[data-skin]').forEach(el => { prevsSk.push([el.querySelector('canvas'), el.dataset.skin]); el.addEventListener('click', () => { fitSkin = el.dataset.skin; if (fitSkin === 'base' || ownsSkin(skCat, fitSkin)) { S.skins = S.skins || {}; S.skins[skCat] = fitSkin; SW.saveSettings(); } renderSkins(); }); });
     const fc = $('#fitCv'); if (!fc) return;
     $('#fitName').textContent = fitSkin === 'base' ? 'Básico' : ((items.find(x => x[0] === fitSkin) || [])[1] || '');
