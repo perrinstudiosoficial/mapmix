@@ -327,7 +327,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 </div>
 <div id="solo" class="screen hidden">
   <div class="card wide">
-    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>JUGAR SOLO</h2></div>
+    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>JUGAR SOLO</h2><span class="wallet wcoins" style="margin-left:auto">🪙 0</span></div>
         <div class="lbl">Elige el mapa</div>
     <div class="maps" id="soloMaps"></div>
     <div class="opts">
@@ -341,7 +341,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 </div>
 <div id="online" class="screen hidden">
   <div class="card wide">
-    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>SALAS ONLINE</h2></div>
+    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>SALAS ONLINE</h2><span class="wallet wcoins" style="margin-left:auto">🪙 0</span></div>
     <div id="netStatus" class="netstatus">Conectando…</div>
     <div id="roomList" class="rooms"></div>
     <div class="row2"><button class="big-btn" id="goCreate">+ CREAR SALA</button><button class="big-btn ghost" id="goCode">Unirse con código</button></div>
@@ -360,18 +360,18 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
     <div class="opts">
       <label>Tipo
         <select id="cVis"><option value="pub">Pública (cualquiera entra)</option><option value="priv">Privada (con contraseña)</option></select></label>
-      <label id="cPwRow" class="hidden">Contraseña <input id="cPw" maxlength="16" autocomplete="off" placeholder="ej: hongo123"></label>
+      <label id="cPwRow" class="hidden">Contraseña <span style="display:flex;gap:6px"><input id="cPw" maxlength="16" autocomplete="off" style="width:110px;text-transform:uppercase;letter-spacing:2px;font-weight:900"><button id="cPwNew" class="buy" style="background:#7a3fb8;color:#fff">🎲</button></span></label>
       <label>Bots en la partida <span class="stepper"><button id="cBotsMinus">−</button><b id="cBots">11</b><button id="cBotsPlus">+</button></span></label>
       <label>Modo
         <select id="cMode"><option value="original">Original: si caen todos, pierden</option><option value="practice">Práctica: vuelven al checkpoint</option></select></label>
     </div>
-    <div class="hint">Los bots llenan los puestos libres. Si entran amigos, toman el lugar de un bot.</div>
+    <div class="hint" id="cVisHint"></div><div class="hint">En la sala puedes empezar cuando quieras: los puestos libres los llenan bots.</div>
     <button class="big-btn" id="bCreate">CREAR SALA</button>
   </div>
 </div>
 <div id="pre" class="screen hidden">
   <div class="card wide">
-    <div class="tbar"><button class="back" data-back="solo">‹</button><h2>PREPARAR PARTIDA</h2></div>
+    <div class="tbar"><button class="back" data-back="solo">‹</button><h2>PREPARAR PARTIDA</h2><span class="wallet wcoins" style="margin-left:auto">🪙 0</span></div>
     <div id="prePrev" class="wprev"></div>
     <div id="preSlots" class="lslots"></div>
     <div class="opts"><label>Bots para completar <span class="stepper"><button id="preMinus">−</button><b id="preBots">11</b><button id="prePlus">+</button></span></label><div style="display:flex;gap:6px"><button class="buy" id="preFill" style="background:#2b8a3b;color:#fff">Llenar con bots</button><button class="buy" id="preNone" style="background:#7a2a3a;color:#fff">Sin bots</button></div></div>
@@ -392,7 +392,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 </div>
 <div id="shop" class="screen hidden">
   <div class="card wide">
-    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>TIENDA</h2><span class="wallet" id="shopCoins" style="margin-left:auto">🪙 0</span></div>
+    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>TIENDA</h2><span id="shopCoins" class="wallet wcoins" style="margin-left:auto">🪙 0</span></div>
     <div class="shoptabs"><button id="tabSkins" class="on">🎨 Skins</button><button id="tabEmotes">😎 Emotes</button><button id="tabDfx">💥 Muerte</button><button id="tabSpawn">✨ Aparición</button><button id="tabAura">⭕ Auras</button><button id="tabSpray">🖌️ Grafitis</button><button id="tabPass">🎖️ Pase T1</button><button id="tabCoins">🪙 Monedas</button></div>
     <div class="hint" id="shopHint">Las skins sirven en todos los mapas del juego.</div>
     <div class="shopgrid" id="shopGrid"></div>
@@ -20599,6 +20599,7 @@ function startGame(md, opts) {
   const W = new World(md, opts);
   if (W.profile.family === 'run' || W.profile.id === 'kitty5') { if (typeof setupKittyAI === 'function') setupKittyAI(W, Math.max(0, Math.min(10, opts.bots | 0)), { botIds: opts.botIds, active: opts.botsActive !== false }); }
   else if (typeof setupAI === 'function') setupAI(W, Math.max(0, Math.min(12, opts.bots | 0)), { help: opts.botsHelp !== false, botIds: opts.botIds, active: opts.botsActive !== false });
+  for (const id in (opts.names || {})) if (W.players[id] && W.players[id].ai) W.players[id].name = opts.names[id]; // room 'people' keep their names in the game
   for (const id of opts.humanIds || []) if (id >= 11) W.ai && W.ai.extraIds.push(id);
   W.fadeAlpha = () => { const f = W.fade; if (!f.dur) return f.to; const p = Math.min(1, (W.time - f.t0) / f.dur); return f.from + (f.to - f.from) * p; };
   const N = makeNatives(W);
@@ -24113,7 +24114,7 @@ class Net {
   announce() {
     if (this.role !== 'host' || !this.lobby) return;
     const humans = this.humans().length;
-    this.lobby.presence({ lr: { code: this.code, name: this.cfg.name, map: this.cfg.map, pub: this.cfg.pub, lock: !!this.cfg.pwh, n: humans, max: MAX_PLAYERS, st: this.st, bots: this.cfg.bots } });
+    this.lobby.presence({ lr: { code: this.code, name: this.cfg.name, map: this.cfg.map, pub: this.cfg.pub, lock: !!this.cfg.pwh, n: humans + ((this.cfg.fake || []).length), max: MAX_PLAYERS, st: this.st, bots: this.cfg.bots } });
   }
   // the people in the room the host accepts (right password), host first
   humans() {
@@ -24133,6 +24134,7 @@ class Net {
     hs.forEach((p, i) => { slots[p.peer] = SLOT_ORDER[i]; names[SLOT_ORDER[i]] = String(p.presence.nick || 'Jugador').slice(0, 16); });
     const nb = Math.max(0, Math.min(MAX_PLAYERS - hs.length, this.cfg.bots | 0));
     const botIds = SLOT_ORDER.slice(hs.length, hs.length + nb);
+    (this.cfg.fake || []).slice(0, nb).forEach((n, k) => { names[botIds[k]] = String(n).slice(0, 16); }); // the AI 'players' who joined the waiting room
     const game = { seed: (Math.random() * 4294967296) >>> 0, slots, names, botIds, map: this.cfg.map || 'shroom25', mode: this.cfg.mode, speed: this.cfg.speed, at: Date.now() + 1200, id: Math.random().toString(36).slice(2, 8) };
     this.st = 'play';
     this.room.presence({ st: 'play', game });
@@ -24220,7 +24222,7 @@ class Net {
   // ---------- home ----------
   click('#goSolo', () => { S.nick = nick(); SW.saveSettings(); show('solo'); });
   click('#goOnline', () => { S.nick = nick(); SW.saveSettings(); show('online'); openOnline(); });
-  const showCoins = () => { const n = S.coins | 0; $('#menuCoins').textContent = '🪙 ' + n + ' monedas'; const sh = document.getElementById('shopCoins'); if (sh) sh.textContent = '🪙 ' + n; }; showCoins(); setInterval(showCoins, 2000);
+  const showCoins = () => { const n = S.coins | 0; $('#menuCoins').textContent = '🪙 ' + n + ' monedas'; document.querySelectorAll('.wcoins').forEach(e => { e.textContent = '🪙 ' + n; }); }; showCoins(); setInterval(showCoins, 2000);
   click('#goShop', () => { show('shop'); });
   click('#goSettings', () => show('settings'));
 
@@ -24405,13 +24407,16 @@ class Net {
   let cBots = 11;
   const setCB = v => { cBots = Math.max(0, Math.min(11, v)); $('#cBots').textContent = cBots; };
   click('#cBotsMinus', () => setCB(cBots - 1)); click('#cBotsPlus', () => setCB(cBots + 1));
-  $('#cVis').addEventListener('change', () => $('#cPwRow').classList.toggle('hidden', $('#cVis').value !== 'priv'));
+  const randPw = () => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let o = ''; for (let i = 0; i < 6; i++) o += A[Math.floor(Math.random() * A.length)]; return o; };
+  const visUI = () => { const priv = $('#cVis').value === 'priv'; $('#cPwRow').classList.toggle('hidden', !priv); if (priv && !$('#cPw').value) $('#cPw').value = randPw();
+    $('#cVisHint').textContent = priv ? '🔒 Privada: comparte el código de la sala y esta contraseña con tus amigos para que entren.' : '🌐 Pública: aparece en la lista y cualquiera puede entrar. Mientras esperas se irán uniendo jugadores.'; };
+  $('#cVis').addEventListener('change', visUI); click('#cPwNew', () => { $('#cPw').value = randPw(); }); setTimeout(visUI, 0);
   click('#bCreate', async () => {
-    const priv = $('#cVis').value === 'priv'; const pw = ($('#cPw').value || '').trim();
-    if (priv && !pw) { toast('Escribe una contraseña para la sala privada'); return; }
+    const priv = $('#cVis').value === 'priv'; let pw = ($('#cPw').value || '').trim().toUpperCase();
+    if (priv && !pw) pw = $('#cPw').value = randPw();
     const code = 'r-' + Math.random().toString(36).slice(2, 7);
-    const cfg = { name: ($('#cName').value || 'Sala').trim().slice(0, 22), map: createMap, pub: !priv, pw: priv ? pw : null, bots: cBots, mode: $('#cMode').value, auto: false };
-    await enterRoom({ code, name: cfg.name }, null, cfg);
+    const cfg = { name: ($('#cName').value || 'Sala').trim().slice(0, 22), map: createMap, pub: !priv, pw: priv ? pw : null, bots: priv ? cBots : 0, fake: [], mode: $('#cMode').value, auto: false, custom: true, t0: Date.now() };
+    myRoomPw = priv ? pw : null; await enterRoom({ code, name: cfg.name }, null, cfg);
   });
 
   // ---------- join / waiting room ----------
@@ -24421,7 +24426,7 @@ class Net {
     if (r.ai && r.lock) { toast('Contraseña incorrecta'); return; }
     await enterRoom(r, pw, r.ai ? { name: r.name, auto: true, bots: Math.max(1, Math.min(11, r.n || 1)), mode: r.mode || 'original' } : null);
   }
-  let waitTimer = null, autoAt = 0, startedGame = null;
+  let waitTimer = null, autoAt = 0, startedGame = null, myRoomPw = null;
   async function enterRoom(info, pw, createCfg) {
     show('wait'); $('#wName').textContent = info.name || 'SALA'; $('#wMsg').textContent = 'Entrando…'; $('#wSlots').innerHTML = '';
     try { await net.enter(info, nick(), pw, createCfg); }
@@ -24452,17 +24457,26 @@ class Net {
     if (net.rejected()) { $('#wMsg').textContent = '❌ Contraseña incorrecta.'; return; }
     $('#wName').textContent = cfg.name || 'SALA';
     $('#wMap').textContent = '🗺 ' + mapName(cfg.map);
-    $('#wCode').textContent = (cfg.pwh ? '🔒 ' : '') + 'Código: ' + net.code;
+    $('#wCode').textContent = (cfg.pwh ? '🔒 ' : '') + 'Código: ' + net.code + (net.role === 'host' && myRoomPw && cfg.pwh ? ' · Contraseña: ' + myRoomPw : '');
     $('#wMode').textContent = cfg.mode === 'practice' ? 'Práctica' : '1 vida';
     const hs = net.humans(); const me = net.me();
     const nb = Math.max(0, Math.min(12 - hs.length, cfg.bots | 0));
     // a lobby like the classic one: 12 coloured slots (player / bot / open) and the enemy team below
+    if (net.role === 'host' && cfg.custom && cfg.pub && !net.currentGame()) { // a public room fills up little by little with players (they are AI)
+      if ((cfg.fake || []).length + hs.length > 12) net.setCfg({ fake: cfg.fake.slice(0, 12 - hs.length), bots: 12 - hs.length }); // a real friend takes the seat of an AI player
+      const fake = cfg.fake || [], free = 12 - hs.length - fake.length, now = Date.now();
+      if (!cfg.nextJoin) cfg.nextJoin = now + 3000 + Math.random() * 4000;
+      if (free > 0 && now >= cfg.nextJoin) { const pool = ['Coni', 'Agus', 'Joaco', 'Isa', 'Martu', 'Benji', 'Vicho', 'Fran', 'Cata', 'Nacho', 'Sofi', 'Tomi', 'Javi', 'Pía', 'Lucas', 'Mati', 'Dani', 'Rocío', 'Seba', 'Amanda', 'xXGamerXx', 'ElPro99', 'kitty_lover', 'hongo_loco'].filter(n => !fake.includes(n) && !hs.some(p => p.presence.nick === n));
+        const n = pool[Math.floor(Math.random() * pool.length)]; const nf = fake.concat([n]); net.setCfg({ fake: nf, bots: nf.length, nextJoin: now + 4000 + Math.random() * 9000 * (1 + nf.length / 4) }); try { net.say('room', n, ['hola!', 'wena', 'holaa', 'buenas', 'vamos!', 'hola gente', 'listo', 'que onda'][Math.floor(Math.random() * 8)]); } catch (e) {} }
+      else if (free > 0 && !cfg.nextJoin) net.setCfg({ nextJoin: now + 5000 }); }
+    const fakeN = (cfg.fake || []).length;
     const isHost = net.role === 'host'; const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
     const TEAM = { kitty5: ['Gatitos', 'Lobos del Rey Aullido'], bob: ['Focas', 'Cangrejos del puerto'], shroom25: ['Hongos', 'Payasos de feria'] }[cfg.map] || ['Jugadores', 'Enemigos'];
     let html = `<div class="lteam">${TEAM[0]}</div>`;
     for (let i = 0; i < 12; i++) { const p = hs[i - 0]; let who, kind, cls = '';
       if (i < hs.length) { who = (i === 0 ? '👑 ' : '👤 ') + esc(p.presence.nick || 'Jugador') + (p.sameTab ? ' (tú)' : ''); kind = (i === 0 ? 'Anfitrión' : 'Jugador') + ' · 🪙 ' + ((p.presence.w | 0)); cls = p.sameTab ? ' me' : ''; }
-      else if (i < hs.length + nb) { who = '🤖 ' + esc(BOT_NAMES12[i - hs.length] || 'Bot'); kind = 'Bot (IA) · 🪙 0'; cls = ' bot'; }
+      else if (i < hs.length + Math.min(nb, fakeN)) { const nm = cfg.fake[i - hs.length]; who = '👤 ' + esc(nm); kind = 'Jugador · 🪙 ' + ((nm.length * 37) % 9 === 0 ? 0 : 0); cls = ''; }
+      else if (i < hs.length + nb) { who = '🤖 ' + esc(BOT_NAMES12[i - hs.length - fakeN] || 'Bot'); kind = 'Bot (IA) · 🪙 0'; cls = ' bot'; }
       else { who = 'Abierto'; kind = isHost ? 'toca para poner bot' : 'esperando jugador'; cls = ' open'; }
       html += `<div class="lrow${cls}${isHost && i >= hs.length ? ' tap' : ''}" data-slot="${i}"><span class="lc" style="background:${COLS[i]}"></span><b>${who}</b><small>${kind}</small><span class="lt">Equipo 1</span></div>`; }
     html += `<div class="lteam">${TEAM[1]}</div><div class="lrow bot"><span class="lc" style="background:#8b5a2b"></span><b>🖥️ Computadora</b><small>${TEAM[1]}</small><span class="lt">Equipo 2</span></div>`;
