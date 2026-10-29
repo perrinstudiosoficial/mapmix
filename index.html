@@ -95,6 +95,7 @@ body[data-fam=run] #danceWrap{display:none!important}
 .eslot.empty{border-style:dashed;opacity:.5;font-size:11px;font-weight:800;color:#cdb8dc;cursor:default}
 .mchat{margin-top:8px;background:rgba(10,3,16,.55);border:1px solid var(--line);border-radius:14px;padding:8px}.mlog{text-align:left;height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:700;padding:2px 4px}.mlog .ml b{color:#c8ff4d}.mlog .ml.me b{color:#ffd34d}.mnone{color:var(--dim);font-weight:600}.mrow{display:flex;gap:6px;margin-top:6px}.mrow input{flex:1;font:inherit;font-weight:700;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(20,8,30,.9);color:#fff;outline:none;min-width:0}.mrow button{font:inherit;font-weight:900;border:0;border-radius:10px;padding:0 12px;color:#1a0d24;background:linear-gradient(#c8ff4d,#7fd321);cursor:pointer}
 .minfo{position:absolute;right:8px;bottom:8px;width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(20,8,30,.7);color:#fff;font:900 13px Nunito,sans-serif;cursor:pointer;padding:0;z-index:2}.lorep{text-align:left;font-size:14px;line-height:1.45;color:#e9dcf5;margin:4px 0 12px}
+.wallet{display:inline-block;margin:6px auto 0;padding:5px 14px;border-radius:999px;background:linear-gradient(#5a3a08,#2e1d04);border:1px solid #d9a441;color:#ffe27a;font-weight:900}#stats .wal{color:#ffe27a;font-weight:900;font-size:11px}
 .shoptabs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.shoptabs button{font:inherit;font-weight:800;color:#fff;background:#2c1239;border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer}.shoptabs button.on{background:linear-gradient(#7a3fb8,#4b2378)}
 .ab.item.has{opacity:1;border-style:solid;border-color:var(--gold)}
 #manaw{grid-column:1/4;height:6px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden}
@@ -259,7 +260,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 <div id="hud" class="hidden">
   <div id="top">
     <div id="stats" class="pill">
-      <div class="t">ESCAPE HONGO</div><div class="ver">v1.0</div>
+      <div class="t">ESCAPE HONGO</div><div class="ver">v1.0</div><div class="wal" id="hudCoins">🪙 0</div>
       <div id="team"></div>
       <div id="tox" style="display:none">Toxicidad<div class="bar"><i id="toxbar"></i></div></div>
     </div>
@@ -311,6 +312,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
     <div class="sub">Minijuegos en equipo</div>
     <div class="brand">un juego de <b>PERRIN STUDIOS</b></div>
     <label class="nick">Tu nombre <input id="nick" maxlength="14" autocomplete="off" placeholder="Jugador"></label>
+    <div class="wallet" id="menuCoins">🪙 0 monedas</div>
     <div class="homebtns">
       <button class="big-btn" id="goSolo">JUGAR SOLO</button>
       <button class="big-btn cyan" id="goOnline">JUGAR ONLINE</button>
@@ -329,7 +331,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
         <div class="lbl">Elige el mapa</div>
     <div class="maps" id="soloMaps"></div>
     <div class="opts">
-      <label>Compañeros IA
+      <label style="display:none">Compañeros IA
         <select id="bots"><option value="0">Solo yo</option><option value="1">1 bot</option><option value="2">2 bots</option><option value="3">3 bots</option><option value="4">4 bots</option><option value="6">6 bots</option><option value="9">9 bots</option><option value="11">11 bots (sala de 12)</option><option value="12">12 bots</option></select></label>
       <label>Modo
         <select id="mode"><option value="original">Original: si caen todos, pierden</option><option value="practice">Práctica: vuelven al checkpoint</option></select></label>
@@ -390,7 +392,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 </div>
 <div id="shop" class="screen hidden">
   <div class="card wide">
-    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>TIENDA</h2></div>
+    <div class="tbar"><button class="back" data-back="menu">‹</button><h2>TIENDA</h2><span class="wallet" id="shopCoins" style="margin-left:auto">🪙 0</span></div>
     <div class="shoptabs"><button id="tabSkins" class="on">🎨 Skins</button><button id="tabEmotes">😎 Emotes</button><button id="tabDfx">💥 Muerte</button><button id="tabSpawn">✨ Aparición</button><button id="tabAura">⭕ Auras</button><button id="tabSpray">🖌️ Grafitis</button><button id="tabPass">🎖️ Pase T1</button><button id="tabCoins">🪙 Monedas</button></div>
     <div class="hint" id="shopHint">Las skins sirven en todos los mapas del juego.</div>
     <div class="shopgrid" id="shopGrid"></div>
@@ -23535,7 +23537,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     online = onl || null;
     $('#menu').classList.add('hidden'); $('#end').classList.add('hidden'); $('#hud').classList.remove('hidden');
     for (const s of document.querySelectorAll('.screen')) if (s.id !== 'pause' && s.id !== 'end' && s.id !== 'powers') s.classList.add('hidden');
-    sfx.init(); sfx.muted = !settings.sound; startMusic(); refreshSprayBtn();
+    sfx.init(); sfx.muted = !settings.sound; startMusic(); refreshSprayBtn(); $('#hudCoins').textContent = '🪙 ' + (settings.coins | 0);
     const mode = online ? online.game.mode : settings.mode, speed = online ? online.game.speed : settings.speed;
     let opts = { bots: settings.bots, maxFade: 3, playerName: settings.nick || 'Tú' };
     if (online) {
@@ -24218,6 +24220,7 @@ class Net {
   // ---------- home ----------
   click('#goSolo', () => { S.nick = nick(); SW.saveSettings(); show('solo'); });
   click('#goOnline', () => { S.nick = nick(); SW.saveSettings(); show('online'); openOnline(); });
+  const showCoins = () => { const n = S.coins | 0; $('#menuCoins').textContent = '🪙 ' + n + ' monedas'; const sh = document.getElementById('shopCoins'); if (sh) sh.textContent = '🪙 ' + n; }; showCoins(); setInterval(showCoins, 2000);
   click('#goShop', () => { show('shop'); });
   click('#goSettings', () => show('settings'));
 
@@ -24511,7 +24514,7 @@ class Net {
     $('#preSlots').querySelectorAll('.lrow.tap').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot; preBots = i <= preBots ? i - 1 : i; renderPre(); }));
     const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[soloMap]) || {}; const m = MAPS.find(x => x.id === soloMap) || MAPS[0];
     $('#prePrev').innerHTML = `<div class="pvic">${m.icon || '🗺'}</div><b>${esc(mapName(soloMap))}</b><div class="pvd"><span>Jugadores: ${preBots + 1}/12</span><span>Modo: ${$('#mode').value === 'practice' ? 'Práctica' : 'Original'}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
-  click('#bPlay', () => { preBots = Math.min(11, Math.max(0, +$('#bots').value)); renderPre(); show('pre'); });
+  click('#bPlay', () => { preBots = Math.min(11, Math.max(0, S.bots ?? 11)); renderPre(); show('pre'); });
   click('#preMinus', () => { preBots = Math.max(0, preBots - 1); renderPre(); }); click('#prePlus', () => { preBots = Math.min(11, preBots + 1); renderPre(); });
   click('#preFill', () => { preBots = 11; renderPre(); }); click('#preNone', () => { preBots = 0; renderPre(); });
   click('#preStart', () => { S.bots = preBots; S.mode = $('#mode').value; S.map = soloMap; SW.saveSettings(); SW.start(); });
