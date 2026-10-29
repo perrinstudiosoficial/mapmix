@@ -22662,12 +22662,16 @@ class Renderer {
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
       g.fillStyle = hexA(col, 0.18); g.fill();
-      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 900 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
+      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 420 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; } // turn smoothly (about half a second for a full turn)
       let a = ((u._rf % 360) + 360) % 360; const dirs = [[22.5, 5], [67.5, 4], [112.5, 'N'], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]];
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const straight = k === 'N' || k === 'S', step = Math.floor(u.walkPhase * 0.75 / Math.PI) % 2; // straight up/down: swap the two mirrored views each step, so it reads as running straight
       if (k === 'N') k = window.KITTY_ART.rects[26] ? 26 : 4; else if (k === 'S') k = 0; // straight back (26) and straight front (0) views
       const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 46 : 0; if (lift) g.translate(0, lift);
+      // cross-fade between the old and the new direction drawing, so turning never looks like two pictures swapping
+      if (u._dk == null) u._dk = k; if (k !== u._dk) { u._pk = u._dk; u._dk = k; u._kt = W.time; }
+      const FADE = 0.2, fp = u._pk != null ? Math.min(1, (W.time - u._kt) / FADE) : 1;
+      const pose = (k, al) => { if (al <= 0.01) return; g.save(); g.globalAlpha *= al;
       if ((moving || u.jump) && (k === 5 || k === 2 || k === 1 || k === 6)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2 || k === 1); } // same scale as every other frame, so the size never changes // run frames without the red slash ones
       else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
         const ph = u.walkPhase * 0.75;
@@ -22675,6 +22679,8 @@ class Renderer {
         if (k === 26) kTrot(g, 26, 1.56, ph); else { const B = Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * 6; g.save(); g.translate(0, bob); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
       else { const br = Math.sin(W.time * 3.2 + u.handle), still = W.time - (u._movedAt || 0); g.save(); if (still > 0.4) { g.translate(0, 1.5 * Math.max(0, br)); g.scale(1 + 0.022 * br, 1 - 0.03 * br); } kBlit(g, k, k === 26 ? -1.56 : -1.2, 0.5, 0.92); g.restore();
         if (still > 0.4 && br > 0.92 && Math.random() < 0.25) { const f = u._rf * Math.PI / 180; this.puff(u.x + Math.cos(f) * 40, u.y + 70 + Math.sin(f) * 10, { r0: 3, r1: 10, life: 0.6, col: '255,255,255', a: 0.5, vx: Math.cos(f) * 30, vy: 20 }); } } // standing still: paws planted, tired breathing in a loop
+      g.restore(); };
+      if (fp < 1) { pose(u._pk, 1 - fp); pose(k, fp); } else pose(k, 1);
       return;
     }
     const moving = !!u.order && !u.paused; const ph = u.walkPhase * 2.2; const t = W.time + u.handle * 0.3;
