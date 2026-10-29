@@ -22652,17 +22652,14 @@ class Renderer {
   // trot: draw the body bobbing and the legs (bottom of the picture) in two halves that lift in turns
   // trot like a real four-legged animal: diagonal pairs move together (front-left with back-right, then front-right with back-left).
   // The legs part of the drawing is cut in four: near legs (bottom) and far legs (above them), left and right.
-  const kTrot = (g, k, F, ph) => {
-    const img = kArt(); const r = window.KITTY_ART.rects[k]; F = F * ((window.KITTY_ART.norm && window.KITTY_ART.norm[k]) || 1); const w = r[2], h = r[3], cut = Math.round(h * 0.62), lh = h - cut, mid = Math.round(lh * 0.45);
-    const W2 = w * F, bob = -Math.abs(Math.sin(ph)) * 5, lean = Math.sin(ph) * 0.025;
-    g.save(); g.scale(1, -1); const top = -h * F * 0.92;
-    // far legs first (drawn behind), then the body, then the near legs
-    const quad = (sy0, sh, half, p) => { const lift = Math.max(0, Math.sin(ph + p)), sx = r[0] + half * w / 2, dx = -W2 / 2 + half * W2 / 2;
-      const reach = Math.sin(ph + p), dh = sh * F * (1 - 0.38 * lift + 0.15 * Math.max(0, -reach)), dy = top + (cut + sy0) * F - lift * 20 + bob * 0.4 + (sh * F - dh);
-      g.drawImage(img, sx, r[1] + cut + sy0 - 2, w / 2 + (half ? 0 : 1), sh + 2, dx, dy - 2 * F, W2 / 2 + (half ? 0 : F), dh + 2 * F); }; // small overlaps so no seams show
-    quad(0, mid, 0, Math.PI); quad(0, mid, 1, 0);                     // far legs: left lifts with near-right, right with near-left
-    g.save(); g.translate(0, bob); g.rotate(lean); g.drawImage(img, r[0], r[1], w, cut + 2, -W2 / 2, top, W2, (cut + 2) * F); g.restore();
-    quad(mid, lh - mid, 0, 0); quad(mid, lh - mid, 1, Math.PI);       // near legs
+  const kTrot = (g, k, F, ph) => { // trot with no cuts: the legs part stays glued to the body and only folds up (shorter) when that pair lifts, so nothing ever opens a gap
+    const img = kArt(); const r = window.KITTY_ART.rects[k]; F = F * ((window.KITTY_ART.norm && window.KITTY_ART.norm[k]) || 1); const w = r[2], h = r[3], cut = Math.round(h * 0.6), lh = h - cut;
+    const W2 = w * F, bob = -Math.abs(Math.sin(ph)) * 4, lean = Math.sin(ph) * 0.02, top = -h * F * 0.92;
+    g.save(); g.scale(1, -1);
+    const half = (hf, p) => { const lift = Math.max(0, Math.sin(ph + p)), sx = r[0] + hf * w / 2, dx = -W2 / 2 + hf * W2 / 2, dh = lh * F * (1 - 0.3 * lift);
+      g.drawImage(img, sx, r[1] + cut - 3, w / 2 + (hf ? 0 : 1), lh + 3, dx, top + cut * F + bob - 3 * F, W2 / 2 + (hf ? 0 : F), dh + 3 * F - bob); };
+    half(0, 0); half(1, Math.PI);
+    g.save(); g.translate(0, bob); g.rotate(lean); g.drawImage(img, r[0], r[1], w, cut + 1, -W2 / 2, top, W2, (cut + 1) * F); g.restore();
     g.restore();
   };
   // out of breath after running: fast, deep breathing of the whole body that slowly calms down
@@ -22686,6 +22683,7 @@ class Renderer {
       // cross-fade between the old and the new direction drawing, so turning never looks like two pictures swapping
       if (u._dk == null) u._dk = k; if (k !== u._dk) { u._pk = u._dk; u._dk = k; u._kt = W.time; }
       const FADE = 0.2, fp = u._pk != null ? Math.min(1, (W.time - u._kt) / FADE) : 1;
+      { const q = Math.min(1, (W.time - (u._kt || -9)) / 0.14); g.scale(1 - 0.12 * Math.sin(q * Math.PI), 1); } // short squeeze as it turns to the next drawing
       const pose = (k, al) => { if (al <= 0.01) return; g.save(); g.globalAlpha *= al;
       if ((moving || u.jump) && (k === 5 || k === 2)) { /* side run, the body tilted toward the exact angle so a circle has no jumps */ const f = 16 + Math.floor(u.walkPhase * 0.6) % 3, off = (k === 5 ? ((a + 180) % 360) - 180 : a - 180) * Math.PI / 180; g.save(); g.rotate(off * 0.55); kBlit(g, f, -1.2, 0.5, 0.9, k === 2); g.restore(); } // same scale as every other frame, so the size never changes // run frames without the red slash ones
       else if (moving || u.jump) { // running up, down or diagonally: a real four-leg trot (the legs of the drawing step in turns)
