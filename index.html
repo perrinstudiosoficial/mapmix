@@ -366,7 +366,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
       <label>Controles <select id="optControl"><option value="tap">Tocar / mantener</option><option value="stick">Joystick virtual</option></select></label>
       <label>Sonido <input type="checkbox" id="optSound"></label>
       <label>Música <input type="checkbox" id="optMusic"></label>
-      <label id="kSongRow">Canción <select id="optKSong"><option value="turbo">⚡ Turbo Felino</option><option value="estampida">🐾 Estampida</option><option value="rayo">🌩 Rayo Blanco</option></select></label>
+      <label id="kSongRow">Canción <select id="optKSong"><option value="sinfreno">🔥 Sin Freno</option><option value="turbo">⚡ Turbo Felino</option><option value="estampida">🐾 Estampida</option></select></label>
     </div>
     <button class="big-btn" id="bResume">VOLVER AL JUEGO</button><br>
     <button class="big-btn ghost" id="bQuit">🚪 Abandonar partida</button>
@@ -15046,7 +15046,18 @@ const SONGS = {
     intro: bars(['i1', 'i2'], ['Am', 'E']), introQuiet: 'i1', introFill: 'i2',
     loop: bars(['c1', 'c2', 'c3', 'c4', 'c1', 'c2', 'c3', 'c4', 'd1', 'd2', 'd3', 'd4', 'd1', 'd2', 'd3', 'd4'],
       ['Am', 'G', 'F', 'E', 'Am', 'G', 'F', 'E', 'Am', 'G', 'F', 'E', 'Am', 'G', 'F', 'E']) },
-  rayo: { name: 'Rayo Blanco', bpm: 184, bass: 'oct', harm: true, wave: ['p50', 'p25'],
+  // dark, fast rock-electronic theme (original melody and chords, written for MapMix)
+  sinfreno: { name: 'Sin Freno', bpm: 200, bass: 'drive', harm: true, wave: ['p50', 'p25'],
+    drums: { k: 'x.....x.x.....x.', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
+    lead: { i1: 'D5 - A5 - F5 - A5 - D6 - A5 - F5 - E5 -', i2: 'D5 - Bb5 - F5 - Bb5 - D6 - Bb5 - F5 - D5 -',
+      r1: 'D5 - A5 - F5 - A5 - D6 - A5 - F5 - E5 -', r2: 'D5 - Bb5 - F5 - Bb5 - D6 - Bb5 - F5 - D5 -',
+      r3: 'C5 - A5 - F5 - A5 - C6 - A5 - F5 - C5 -', r4: 'C5 - G5 - E5 - G5 - C6 - D6 - E6 - - -',
+      h1: 'A5 - - - A5 - C6 - D6 - - - C6 - A5 -', h2: 'F5 - - - F5 - G5 - Bb5 - - - A5 - G5 -',
+      h3: 'A5 - - - C6 - - - F6 - E6 - D6 - C6 -', h4: 'E6 - - - D6 - - - C6 - - - G5 - - -' },
+    intro: bars(['i1', 'i2'], ['Dm', 'Bb']), introQuiet: 'i1', introFill: 'i2',
+    loop: bars(['r1', 'r2', 'r3', 'r4', 'r1', 'r2', 'r3', 'r4', 'h1', 'h2', 'h3', 'h4', 'h1', 'h2', 'h3', 'h4'],
+      ['Dm', 'Bb', 'F', 'C', 'Dm', 'Bb', 'F', 'C', 'Dm', 'Bb', 'F', 'C', 'Dm', 'Bb', 'F', 'C']) },
+  rayo: { name: 'Rayo Blanco', /* saved for a future ice map */ bpm: 184, bass: 'oct', harm: true, wave: ['p50', 'p25'],
     drums: { k: 'x...x...x...x...', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' },
     lead: { i1: '. . . . . . . .', i2: 'G5 - - - - - - - D5 - - - B4 - D5 -',
       e1: 'G5 - C6 - E6 - G6 - E6 - C6 - G5 - - -', e2: 'G5 - B5 - D6 - G6 - D6 - B5 - G5 - - -',
@@ -16560,7 +16571,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mapId = online ? (online.game.map || 'shroom25') : (settings.map || 'shroom25');
     const md = mapId === 'kitty5' && window.MAPDATA_KITTY5 ? window.MAPDATA_KITTY5 : MAPDATA; document.body.dataset.map = md === MAPDATA ? 'shroom25' : mapId;
     W = startGame(md, opts);
-    if (W.profile.id === 'kitty5') sfx.setSong(settings.kittySong || 'turbo'); // super-speed theme for the kitties
+    if (W.profile.id === 'kitty5') sfx.setSong(settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'); // super-speed theme for the kitties
     $('#stats .t').textContent = W.profile.id === 'kitty5' ? 'CORRE GATITO 5' : 'ESCAPE SHROOM'; $('#stats .ver').textContent = W.profile.id === 'kitty5' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
     W.on('text', showText);
@@ -16906,7 +16917,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let quitArm = 0; function confirmQuit() { const now = performance.now(); if (now - quitArm < 3000) return true; quitArm = now; $('#bQuit').textContent = '¿Seguro? Toca otra vez para abandonar'; setTimeout(() => { $('#bQuit').textContent = '🚪 Abandonar partida'; }, 3000); return false; }
   btn('#bCenter', () => { if (R) R.freeCam = false; camWatch = null; });
   btn('#bWatch', watchNext);
-  { const ks = $('#optKSong'); ks.value = settings.kittySong || 'turbo'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
+  { const ks = $('#optKSong'); ks.value = settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
