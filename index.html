@@ -19598,7 +19598,7 @@ function buildUnitTypes(md) {
     if ((m.uabi || '').includes('Awan')) b.wander = true;
     b.scale = m.usca || 1;
     if (prof.id === 'bob' && id === 'E000') b.speed = 1000; // MapMix: fast seals on the grass
-    if (prof.id === 'kitty5' && id === 'E000') b.speed = 820; // MapMix: super fast kitties, faster than the glide of Escape Shroom (550)
+    if (prof.id === 'kitty5' && id === 'E000') b.speed = 1100; // MapMix: super fast kitties, faster than the glide of Escape Shroom (550)
     if (run && from === 'ncop') { b.speed = 0; b.r = 26; b.kind = 'circle'; b.inv = true; if (prof.id === 'bob' && id === 'n00C') b.kind = 'hidden'; }
     b.name = md.strings[m.unam] || id;
     b.code = id;
@@ -21397,6 +21397,7 @@ class KittyBots {
     for (const w of wolves) { const vx = (w.x - (w._px ?? w.x)) / dt, vy = (w.y - (w._py ?? w.y)) / dt; w._vx = (w._vx || 0) * 0.7 + vx * 0.3; w._vy = (w._vy || 0) * 0.7 + vy * 0.3; w._px = w.x; w._py = w.y; }
     for (const b of this.bots) {
       const h = W.heroOf(b.p); if (!h || !h.alive || h.paused) continue;
+      if (W.profile.id === 'kitty5' && h.speed > 950) h.speed = 950; // bots run a bit under the player's 1100: at full speed they overshoot the wolves
       b.t -= dt; if (b.t > 0) continue; b.t = 0.1;
       // goal: a dead friend's circle nearby, else the centre
       const goalR = W.script.gget.gg_rct_Next_Round && W.script.gget.gg_rct_Next_Round();
@@ -22659,14 +22660,14 @@ class Renderer {
   // trot: draw the body bobbing and the legs (bottom of the picture) in two halves that lift in turns
   // trot like a real four-legged animal: diagonal pairs move together (front-left with back-right, then front-right with back-left).
   // The legs part of the drawing is cut in four: near legs (bottom) and far legs (above them), left and right.
-  const kTrot = (g, k, F, ph) => { // trot with no cuts: the legs part stays glued to the body and only folds up (shorter) when that pair lifts, so nothing ever opens a gap
+  const kTrot = (g, k, F, ph) => { // trot with no cuts: legs glued to the body fold up in diagonal pairs; the whole body rolls side to side, dips and pushes, like a big cat running at you / away from you
     const img = kArt(); const r = window.KITTY_ART.rects[k]; F = F * ((window.KITTY_ART.norm && window.KITTY_ART.norm[k]) || 1); const w = r[2], h = r[3], cut = Math.round(h * 0.6), lh = h - cut;
-    const W2 = w * F, bob = -Math.abs(Math.sin(ph)) * 4, lean = Math.sin(ph) * 0.02, top = -h * F * 0.92;
-    g.save(); g.scale(1, -1);
-    const half = (hf, p) => { const lift = Math.max(0, Math.sin(ph + p)), sx = r[0] + hf * w / 2, dx = -W2 / 2 + hf * W2 / 2, dh = lh * F * (1 - 0.3 * lift);
-      g.drawImage(img, sx, r[1] + cut - 3, w / 2 + (hf ? 0 : 1), lh + 3, dx, top + cut * F + bob - 3 * F, W2 / 2 + (hf ? 0 : F), dh + 3 * F - bob); };
+    const W2 = w * F, bob = -Math.abs(Math.sin(ph)) * 8, roll = Math.sin(ph) * 0.07, sway = Math.sin(ph) * 4, top = -h * F * 0.92, push = 1 + 0.05 * Math.abs(Math.cos(ph));
+    g.save(); g.scale(1, -1); g.translate(sway, 0);
+    const half = (hf, p) => { const sn = Math.sin(ph + p), lift = Math.max(0, sn), sx = r[0] + hf * w / 2, dx = -W2 / 2 + hf * W2 / 2, dh = lh * F * (1 - 0.45 * lift), reach = (hf ? 1 : -1) * Math.max(0, -sn) * 2.5 * F;
+      g.drawImage(img, sx, r[1] + cut - 3, w / 2 + (hf ? 0 : 1), lh + 3, dx + reach, top + cut * F + bob - 3 * F, W2 / 2 + (hf ? 0 : F), dh + 3 * F - bob); };
     half(0, 0); half(1, Math.PI);
-    g.save(); g.translate(0, bob); g.rotate(lean); g.drawImage(img, r[0], r[1], w, cut + 1, -W2 / 2, top, W2, (cut + 1) * F); g.restore();
+    g.save(); g.translate(0, top + cut * F + bob); g.rotate(roll); g.scale(push, 2 - push); g.drawImage(img, r[0], r[1], w, cut + 1, -W2 / 2, -cut * F, W2, (cut + 1) * F); g.restore(); // body: rolls on the shoulders and stretches with each push
     g.restore();
   };
   // out of breath after running: fast, deep breathing of the whole body that slowly calms down
