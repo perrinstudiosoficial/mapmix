@@ -19977,7 +19977,8 @@ class World {
       }
       if (u.jump) { // kitty jump: a short leap forward, wolves can't touch you in the air
         const J = u.jump, k = (this.time - J.t0) / J.dur;
-        if (k >= 1) { u.jump = null; for (const reg of this.rangeRegs) if (reg.unit === u) reg.seen.clear(); } // land: wolves still on you count again
+        if (k >= 1) { u.jump = null; for (const reg of this.rangeRegs) if (reg.unit === u) reg.seen.clear(); // land: wolves still on you count again
+          if (this.units.some(e => e.alive && !e.removed && (e.t.kind === 'wolf' || e.t.kind === 'crab') && Math.hypot(e.x - u.x, e.y - u.y) < 75)) { u.graceUntil = 0; this.killUnit(u); continue; } } // landing on an enemy kills you
         else { const st = J.spd * dt, nx = u.x + J.dx * st, ny = u.y + J.dy * st; if (this.walkable(nx, ny)) { u.x = nx; u.y = ny; } u.walkPhase += dt * 8; continue; }
       }
       const o = u.order;
@@ -22660,10 +22661,14 @@ class Renderer {
     quad(mid, lh - mid, 0, 0); quad(mid, lh - mid, 1, Math.PI);       // near legs
     g.restore();
   };
+  // out of breath after running: fast, deep breathing of the whole body that slowly calms down
+  const fatigue = (W, u, moving) => { const dt = Math.min(0.1, W._rdt || 0.016);
+    if (moving) { u._run = Math.min(6, (u._run || 0) + dt); u._tired = Math.min(1, u._run / 2.5); } else { u._run = 0; u._tired = Math.max(0.25, (u._tired ?? 0.25) - dt / 14); }
+    const rate = 2.6 + 4.2 * u._tired; u._bph = (u._bph || 0) + dt * rate * Math.PI * 2; return { amp: 0.018 + 0.05 * u._tired, s: Math.sin(u._bph) }; };
   P.drawKitty = function (g, u) {
     const W = this.W; if (!u.alive) return;
     if (kArt()) {
-      if ((!!u.order && !u.paused) || u.jump) u._movedAt = W.time;
+      W._rdt = this._dt; if ((!!u.order && !u.paused) || u.jump) { u._movedAt = W.time; fatigue(W, u, true); }
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3;
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.strokeStyle = hexA(col, 0.9); g.lineWidth = 5; g.beginPath(); g.ellipse(0, -6, 42, 16, 0, 0, TAU); g.stroke(); // team colour ring under your tiger
@@ -22683,7 +22688,7 @@ class Renderer {
         const ph = u.walkPhase * 0.75;
         if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
         if (k === 26) kTrot(g, 26, 1.56, ph); else { const B = Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * 6; g.save(); g.translate(0, bob); kBlit(g, k + (B ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); } }
-      else { const br = Math.sin(W.time * 3.2 + u.handle), still = W.time - (u._movedAt || 0); g.save(); if (still > 0.4) { g.translate(0, 1.5 * Math.max(0, br)); g.scale(1 + 0.022 * br, 1 - 0.03 * br); } kBlit(g, k, k === 26 ? -1.56 : -1.2, 0.5, 0.92); g.restore();
+      else { const F2 = fatigue(W, u, false), br = F2.s, A = F2.amp; g.save(); g.translate(0, 3 * A / 0.068 * Math.max(0, br)); g.rotate(0.02 * br * (A / 0.068)); g.scale(1 + A * 0.8 * br, 1 - A * 1.1 * br); kBlit(g, k, k === 26 ? -1.56 : -1.2, 0.5, 0.92); g.restore(); const still = W.time - (u._movedAt || 0);
         if (still > 0.4 && br > 0.92 && Math.random() < 0.25) { const f = u._rf * Math.PI / 180; this.puff(u.x + Math.cos(f) * 40, u.y + 70 + Math.sin(f) * 10, { r0: 3, r1: 10, life: 0.6, col: '255,255,255', a: 0.5, vx: Math.cos(f) * 30, vy: 20 }); } } // standing still: paws planted, tired breathing in a loop
       g.restore(); };
       if (fp < 1) { pose(u._pk, 1 - fp); pose(k, fp); } else pose(k, 1);
@@ -22762,7 +22767,7 @@ class Renderer {
     { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; const st = 480 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
     const fa = u._rf * Math.PI / 180, fx = Math.cos(fa), fy = Math.sin(fa); // fy > 0: going up (away from camera)
     const jp = u.jump ? Math.min(1, (W.time - u.jump.t0) / u.jump.dur) : 0, lift = u.jump ? Math.sin(jp * Math.PI) * 110 : 0;
-    const ph = t * (moving ? 10 : 3.2), slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? Math.sin(ph) : 0;
+    W._rdt = this._dt; const FT = fatigue(W, u, moving), ph = t * (moving ? 10 : 3.2), slide = moving && onIce, wave = moving && !slide ? Math.sin(ph) : 0, br = !moving ? FT.s * (FT.amp / 0.035) : 0; // panting: deep and fast after running
     const sh = 1 - lift / 260; g.fillStyle = `rgba(0,0,0,${0.3 * sh})`; g.beginPath(); g.ellipse(0, -16, 52 * sh, 15 * sh, 0, 0, TAU); g.fill();
     const view = fy > 0.72 ? 'back' : fy < -0.72 ? 'front' : 'side', dir = fx < 0 ? -1 : 1;
     const js = 1 + (u.jump ? Math.sin(jp * Math.PI) * 0.18 : 0); // a little bigger in the air: reads as high up
