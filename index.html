@@ -70,6 +70,7 @@ body:not([data-map=kitty5]) #kSongRow{display:none}
 body[data-fam=run] #tox, body[data-fam=run] #abil, body[data-fam=run] #bGive, body[data-fam=run] #manaw, body[data-fam=run] #glideTag{display:none!important}
 #abil.deadoff .ab{filter:grayscale(1) brightness(.6);opacity:.5;pointer-events:none}
 #bJump{position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 70px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 12px);width:72px;height:72px;font-size:32px;pointer-events:auto;z-index:5;border-color:#ffd34d}
+#bInvis{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 236px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#9fe6ff}
 #bRoar{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 160px);width:64px;height:64px;font-size:28px;pointer-events:auto;z-index:5;border-color:#ff9a3d}
 body[data-fam=run] #danceWrap{display:none!important}
 #bDance.off{filter:grayscale(1) brightness(.7);opacity:.45}
@@ -261,6 +262,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="ab hidden" id="bBlink">📍<small>Blink tumba</small></div>
   <div class="ab hidden" id="bJump">🐾<small>Saltar</small></div>
   <div class="ab hidden" id="bRoar">😾<small>Gruñido</small></div>
+  <div class="ab hidden" id="bInvis">👻<small>Invisible</small></div>
   <div id="danceWrap"><div id="dancePick" class="hidden"></div><div class="ab" id="bDance"><span id="danceIcon"></span><small>Baile</small></div></div>
   <div id="sprayWrap"><div id="sprayPick" class="hidden"></div><div class="ab locked" id="bSpray"><span>🎨</span><small>Grafiti</small></div></div>
   <div id="emoteWrap"><div id="emotePick" class="hidden"></div><div class="ab" id="bEmote"><span id="emoteIcon"></span><small>Emote</small></div></div>
@@ -20213,6 +20215,10 @@ class World {
     const L = Math.hypot(dx, dy) || 1; h.jump = { t0: this.time, dur: 0.75, dx: dx / L, dy: dy / L, spd: ice ? 1600 : Math.max(700, h.speed * 1.2) * 0.8 }; // longer hang time, same distance
     h.jumpReady = this.time + (this.profile.id === 'bob' ? 10 : 12); /* jump cooldown (shorter in the ice map) */ this.emit('sound', { name: 'coil' }); this.emit('jump', h); return true;
   }
+  cmdInvis(p) { // kitty map only: 6 s nearly invisible (wolves still kill you if they walk over you)
+    const h = this.heroOf(p); if (!h || !h.alive || this.profile.id !== 'kitty5') return false; if (this.time < (h.invisReady || 0)) return false;
+    h.invisReady = this.time + 22; h.invisUntil = this.time + 6; this.emit('sound', { name: 'invis' }); return true;
+  }
   cmdUseItem(p, slot) {
     const h = this.heroOf(p); if (!h || !h.alive) return;
     const it = h.items[slot]; if (!it) return;
@@ -21435,6 +21441,7 @@ class KittyBots {
         const prog = (cur - f) * 32; const keep = b.dx != null && !(x === h.x && y === h.y) ? ((x - h.x) * b.dx + (y - h.y) * b.dy) / R * 12 : 0;
         const sc = prog * (1 + b.wait * 0.6) - danger(x, y) * 0.9 + keep + (x === h.x && y === h.y ? -15 : 0); if (sc > ps) { ps = sc; pick = [x, y]; } }
       if (!pick) continue;
+      if (W.profile.id === 'kitty5' && W.time >= (h.invisReady || 0) && typeof window !== 'undefined' && window.botInvis && near.length >= 3 && Math.random() < 0.15) window.botInvis(h);
       if (W.profile.id === 'kitty5' && W.time >= (h.roarReady || 0) && typeof window !== 'undefined' && window.botRoar && near.filter(w => Math.hypot(w.x - h.x, w.y - h.y) < 300).length >= 2) { window.botRoar(h); }
       // jump over the wolves when cornered (10 s cooldown, like the player's button)
       if (!h.jump && W.time >= (h.jumpReady || 0) && typeof window !== 'undefined' && window.botJump) {
@@ -21607,6 +21614,7 @@ class Sfx {
     else if (n === 'dx_luz') { this.tone(400, 1800, 0.7, 'sine', 0.15); this.tone(600, 2400, 0.7, 'triangle', 0.08, 0.05); this.noise(0.6, 0.12, 6000, 0.5); const A = [900, 1400, 3000]; this.voice(620, 420, 0.6, [A, A], 0.25, 0.05); }
     else if (n === 'dx_fuegos') { for (let r = 0; r < 3; r++) { this.tone(600, 2400, 0.25, 'sine', 0.06, r * 0.18); this.noise(0.35, 0.35, 900, 0.7, 0.3 + r * 0.18); this.tone(120, 50, 0.3, 'sine', 0.3, 0.3 + r * 0.18); } const O = [600, 1000, 2700]; this.voice(700, 400, 0.4, [O, O], 0.25); }
     else if (n === 'dx_flor') { [1047, 1319, 1568, 2093, 1568].forEach((f, i) => this.tone(f, f, 0.3, 'sine', 0.1, i * 0.08)); const O = [600, 1000, 2700], U = [370, 900, 2600]; this.voice(560, 380, 0.6, [O, U], 0.28, 0.1); }
+    else if (n === 'invis') { this.tone(1400, 300, 0.5, 'sine', 0.14); this.tone(2000, 600, 0.5, 'triangle', 0.06, 0.05); this.noise(0.4, 0.1, 6000, 1); }
     else if (n === 'spray') { this.noise(0.35, 0.25, 5000, 0.6); this.noise(0.25, 0.18, 5500, 0.6, 0.4); this.tone(1800, 1700, 0.04, 'square', 0.04, 0.0); }
     else if (n === 'dx_fundador') { // royal fall: a choir chord, bells and a proud "¡Volveré!"
       [523, 659, 784, 1047].forEach((f, i) => { this.tone(f, f, 1.4, 'triangle', 0.09, i * 0.05); this.tone(f * 2, f * 2, 0.5, 'sine', 0.04, 0.3 + i * 0.12); });
@@ -22705,16 +22713,18 @@ class Renderer {
   P.drawKitty = function (g, u) {
     const W = this.W; if (!u.alive) return;
     if (kArt()) {
+      if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); } // invisible: only a faint shimmer
       W._rdt = this._dt; if ((!!u.order && !u.paused) || u.jump) { u._movedAt = W.time; fatigue(W, u, true); }
       const moving = !!u.order && !u.paused, col = this.heroColor(u), t = W.time + u.handle * 0.3; if (u._wasMv && !moving) u._foot = !u._foot; u._wasMv = moving; // each stop ends with the other front paw ahead
       g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -6, 40, 14, 0, 0, TAU); g.fill();
       g.save(); g.translate(0, -6); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); g.restore(); // your aura under your tiger (the same one you leave when you fall)
-      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; if (Math.abs(d) > 150 && !(u._turnD > 1)) { const c0 = u._rf * Math.PI / 180; if (Math.abs(Math.cos(c0)) > 0.5) { const up = Math.sin(c0 + Math.PI / 2) > Math.sin(c0 - Math.PI / 2) ? 1 : -1; d = up * Math.abs(d); } } /* left<->right reversal: always sweep over the top (right, up-right, up, up-left, left) */ const st = 300 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
+      { const dt = Math.min(0.1, this._dt || 0.016); if (u._rf == null) u._rf = u.facing; let d = ((u.facing - u._rf) % 360 + 540) % 360 - 180; if (Math.abs(d) > 150 && !(u._turnD > 1)) { const c0 = u._rf * Math.PI / 180; if (Math.abs(Math.cos(c0)) > 0.5) { const up = Math.sin(c0 + Math.PI / 2) > Math.sin(c0 - Math.PI / 2) ? 1 : -1; d = up * Math.abs(d); } } /* left<->right reversal: always sweep over the top (right, up-right, up, up-left, left) */ const st = 420 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; u._turnD = Math.abs(d) - Math.min(Math.abs(d), st); } // turn smoothly; a reversal sweeps through up/down or left/right (about half a second for a full turn)
       let a = ((u._rf % 360) + 360) % 360; const dirs = u._turnD > 8 ? [[22.5, 5], [67.5, 3], [112.5, 'N'], [157.5, 4], [202.5, 2], [247.5, 1], [292.5, 'S'], [337.5, 6], [360, 5]] : [[40, 5], [64, 3], [116, 'N'], [140, 4], [220, 2], [244, 1], [296, 'S'], [320, 6], [360, 5]]; // while turning every view gets the same share (so all 8 show); settled: wide left/right sectors = full profile
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const straight = k === 'N' || k === 'S', step = Math.floor(u.walkPhase * 0.75 / Math.PI) % 2; // straight up/down: swap the two mirrored views each step, so it reads as running straight
       if (k === 'N') k = window.KITTY_ART.rects[26] ? 26 : 4; else if (k === 'S') k = 0; // straight back (26) and straight front (0) views
       const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 130 : 0; if (lift) { g.translate(0, lift); const js = 1 + lift / 130 * 0.22; g.scale(js, js); } // a high leap: up and a bit bigger, the shadow stays on the ground
+      { const A = { 5: 0, 3: 45, 26: 90, 4: 135, 2: 180, 1: 225, 0: 270, 6: 315 }[k]; if (A != null) { const dl = (((a - A) % 360) + 540) % 360 - 180, r = dl * Math.PI / 180, side = k === 5 || k === 2; const sx = side ? 0.74 + 0.26 * Math.cos(Math.min(1.5, Math.abs(r) * 1.7)) : 1 + 0.16 * Math.abs(Math.sin(r * 1.6)); g.scale(sx, 1); if (!side) g.transform(1, 0, -Math.sin(r * 1.6) * 0.1, 1, 0, 0); } } // between two drawings the body is foreshortened and leaned toward the exact angle, so it seems to rotate continuously like a 3D model
       // cross-fade between the old and the new direction drawing, so turning never looks like two pictures swapping
       if (u._dk == null) u._dk = k; if (k !== u._dk) { u._pk = u._dk; u._dk = k; u._kt = W.time; }
       const FADE = 0.2, fp = u._pk != null ? Math.min(1, (W.time - u._kt) / FADE) : 1;
@@ -23188,6 +23198,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   function doJump() { if (!W || W.profile.family !== 'run') return; const h = W.heroOf(W.local); if (!h) return; let dx = null, dy = null; if (stick.active && Math.hypot(stick.dx, stick.dy) > 0.2) { dx = stick.dx; dy = stick.dy; }
     if (W.cmdJump(W.local, dx, dy) && online) { const j = h.jump; online.net.pushEvent('jump', Math.round(j.dx * 100), Math.round(j.dy * 100)); } }
   function doRoar() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdRoar(W.local) && online) online.net.pushEvent('roar'); }
+  function doInvis() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdInvis(W.local) && online) online.net.pushEvent('invis'); }
+  window.botInvis = u => { if (W.cmdInvis(u.owner) && online && online.host) online.net.pushEvent('binvis', u.owner.id); };
   window.botRoar = u => { if (W.cmdRoar(u.owner) && online && online.host) online.net.pushEvent('broar', u.owner.id); };
   window.botJump = (u, dx, dy) => { if (W.cmdJump(u.owner, dx, dy) && online && online.host) online.net.pushEvent('bjump', u.owner.id, Math.round(dx * 100), Math.round(dy * 100)); };
   // graffiti: sprayed on the floor where you stand (from the emote wheel), lasts 40 s
@@ -23361,6 +23373,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'pause' && slot != null) setPause(!!a, (W.players[slot] && W.players[slot].name) || 'Alguien');
       if (kind === 'ping' && slot != null && typeof a === 'number') doPing(a, e[3], W.players[slot], e[4] === 1);
       if (kind === 'roar' && slot != null) W.cmdRoar(W.players[slot]);
+      if (kind === 'invis' && slot != null) W.cmdInvis(W.players[slot]);
+      if (kind === 'binvis' && typeof a === 'number' && !online.owned.includes(a)) W.cmdInvis(W.players[a]);
       if (kind === 'broar' && typeof a === 'number' && !online.owned.includes(a)) W.cmdRoar(W.players[a]);
       if (kind === 'jump' && slot != null && typeof a === 'number') W.cmdJump(W.players[slot], a / 100, e[3] / 100);
       if (kind === 'bjump' && typeof a === 'number' && !online.owned.includes(a)) W.cmdJump(W.players[a], e[3] / 100, e[4] / 100);
@@ -23498,7 +23512,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       { const left = Math.max(0, tpReadyAt - W.time); const ready = left <= 0 && hero.items.length > 0; $('#bItem0').classList.toggle('has', !!ready); $('#bItem0').classList.toggle('cool', !ready); $('#bItem0').style.setProperty('--cd', (left <= 0 ? 0 : left / TP_CD * 360) + 'deg'); }
       setText('#itemCount', hero.items.length ? '×' + hero.items.length : '');
       $('#abil').classList.toggle('deadoff', !hero.alive); // powers gray while you are dead
-      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / (W.profile.id === 'bob' ? 10 : 12) * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); }
+      if (W.profile.family === 'run') { const bj = $('#bJump'); bj.classList.remove('hidden'); const left = Math.max(0, (hero.jumpReady || 0) - W.time); bj.classList.toggle('cool', left > 0 || !hero.alive); bj.style.setProperty('--cd', (left / (W.profile.id === 'bob' ? 10 : 12) * 360) + 'deg'); const br = $('#bRoar'); br.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const lr = Math.max(0, (hero.roarReady || 0) - W.time); br.classList.toggle('cool', lr > 0 || !hero.alive); br.style.setProperty('--cd', (lr / 14 * 360) + 'deg'); const bi = $('#bInvis'); bi.classList.toggle('hidden', !hero.alive || W.profile.id !== 'kitty5'); const li = Math.max(0, (hero.invisReady || 0) - W.time); bi.classList.toggle('cool', li > 0 || !hero.alive); bi.style.setProperty('--cd', (li / 22 * 360) + 'deg'); } else { $('#bJump').classList.add('hidden'); $('#bRoar').classList.add('hidden'); $('#bInvis').classList.add('hidden'); }
       botChatter();
       if (W.profile.family === 'run') { const r = W.script.gget.udg_Round ? W.script.gget.udg_Round() : 1; setText('#stats .ver', 'Ronda ' + Math.min(5, r || 1) + '/5'); }
       else { if (!W._endTrigs) { W._endTrigs = []; for (let n = 1; n <= 12; n++) { const reg = W.rectRegs.find(r => r.trig.actions[0] && new RegExp('Respawn_End_' + n + '_').test(r.trig.actions[0].name)); W._endTrigs.push(reg ? reg.trig : null); } }
@@ -23678,7 +23692,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   btn('#bWatch', watchNext);
   if (!settings.kSongV2) { settings.kittySong = 'sinfreno'; settings.kSongV2 = 1; saveSettings(); } // the owner picked Sin Freno as the theme
   { const ks = $('#optKSong'); ks.value = settings.kittySong && settings.kittySong !== 'rayo' ? settings.kittySong : 'sinfreno'; ks.addEventListener('change', () => { settings.kittySong = ks.value; saveSettings(); sfx.setSong(ks.value); }); }
-  btn('#bRoar', doRoar);
+  btn('#bRoar', doRoar); btn('#bInvis', doInvis);
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
