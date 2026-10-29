@@ -16147,8 +16147,12 @@ class Renderer {
       let a = ((u.facing % 360) + 360) % 360; const dirs = [[22.5, 5], [90, 4], [157.5, 3], [202.5, 2], [247.5, 1], [292.5, 0], [337.5, 6], [360, 5]];
       let k = 5; for (const [lim, f] of dirs) if (a < lim) { k = f; break; }
       const lift = u.jump ? Math.sin(Math.min(1, (W.time - u.jump.t0) / u.jump.dur) * Math.PI) * 46 : 0; if (lift) g.translate(0, lift);
-      if ((moving || u.jump) && (k === 5 || k === 2)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2); } // run frames without the red slash ones
-      else { const alt = moving ? Math.floor(u.walkPhase * 0.5) % 2 : (Math.sin(t * 1.5) > 0.6 ? 1 : 0); kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); }
+      if ((moving || u.jump) && (k === 5 || k === 2 || k === 1 || k === 6)) { const f = 16 + Math.floor(u.walkPhase * 0.6) % 3; kBlit(g, f, -1.2, 0.5, 0.9, k === 2 || k === 1); } // run frames without the red slash ones
+      else if (moving || u.jump) { // running towards the camera, away from it or diagonally: alternate the two poses with a gallop bounce
+        const ph = u.walkPhase * 0.9, alt = Math.floor(ph / Math.PI) % 2, bob = Math.abs(Math.sin(ph)) * 9, sq = 1 + Math.sin(ph * 2) * 0.05;
+        if (Math.random() < 0.3) { const f = u.facing * Math.PI / 180; this.puff(u.x - Math.cos(f) * 30, u.y - 10 - Math.sin(f) * 30, { r0: 4, r1: 13, life: 0.4, col: '235,225,205', a: 0.35, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
+        g.save(); g.translate(0, bob); g.rotate(Math.sin(ph) * 0.05); g.scale(1 / sq, sq); kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); g.restore(); }
+      else { const alt = Math.sin(t * 1.5) > 0.6 ? 1 : 0; kBlit(g, k + (alt ? 8 : 0), -1.2, 0.5, 0.92); }
       return;
     }
     const moving = !!u.order && !u.paused; const ph = u.walkPhase * 2.2; const t = W.time + u.handle * 0.3;
