@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<script>/* every phone shows the game the same: the page is always 412 px wide and scaled to the screen (a Samsung A52 looks like a Cubot) */
+(function(){try{var W=412,sw=Math.min(screen.width,screen.height);if(!sw||window.self!==window.top)return;var k=(sw/W).toFixed(4),c='width='+W+',initial-scale='+k+',minimum-scale='+k+',maximum-scale='+k+',user-scalable=no,viewport-fit=cover';var ms=document.querySelectorAll('meta[name=viewport]');for(var i=0;i<ms.length;i++)ms[i].setAttribute('content',c);}catch(e){}})();</script>
 <meta name="theme-color" content="#1a0b22">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,7 +44,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #tox{font-size:12px;color:#ffb0c8;margin-top:4px}
 #mmwrap{position:absolute;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));padding:5px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
 #mm{width:118px;height:118px;border-radius:9px;display:block;image-rendering:pixelated}
-#topbtns{display:flex;gap:6px}
+#topbtns{display:grid;grid-template-columns:repeat(3,40px);gap:6px} /* 2 rows of 3 under the minimap: never over the player list */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .sbtn{pointer-events:auto;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;display:grid;place-items:center;cursor:pointer}
 #glideTag{position:absolute;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);padding:6px 12px;font-weight:800;font-size:13px;color:#9fffff;pointer-events:none}
 #msgs{position:absolute;left:max(12px,env(safe-area-inset-left));bottom:150px;max-width:min(560px,70vw);display:flex;flex-direction:column;gap:4px}
