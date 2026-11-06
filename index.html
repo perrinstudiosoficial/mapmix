@@ -61,6 +61,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--
 #sprayWrap{position:absolute;left:max(12px,env(safe-area-inset-left));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 205px);pointer-events:none;z-index:5}
 #bSpray{pointer-events:auto;width:52px;height:52px;font-size:24px;user-select:none;-webkit-user-select:none;touch-action:none}#sprayCd{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:900;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;z-index:2;pointer-events:none}
 #bSpray.cool > span{opacity:.35}
+#tauntWrap{display:none!important}
+#sprayWrap{left:auto;right:calc(max(12px,env(safe-area-inset-right)) + 73px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
+body[data-fam=run] #sprayWrap{right:calc(max(12px,env(safe-area-inset-right)) + 80px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 92px)}
+#hudXp{position:relative;height:12px;border-radius:6px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);overflow:hidden;margin:2px 0 4px;min-width:150px}#hudXp i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#7dff8a,#3fd0ff);display:block}#hudXp span{position:relative;display:block;text-align:center;font-size:9px;font-weight:900;line-height:12px;color:#fff;text-shadow:0 0 2px #000}
 #bSpray.locked{filter:grayscale(1) brightness(.6);opacity:.75}#bSpray.locked::after{content:'🔒';position:absolute;right:-4px;top:-6px;font-size:14px}
 #sprayPick{pointer-events:auto;position:absolute;left:0;bottom:62px;display:flex;gap:6px;padding:6px;border-radius:16px;background:rgba(20,8,30,.85);border:1px solid var(--line)}#sprayPick .eslot canvas{width:46px;height:46px}
 #emoteWrap{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px);pointer-events:none;z-index:5}
@@ -278,7 +282,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 <div id="hud" class="hidden">
   <div id="top">
     <div id="stats" class="pill">
-      <div class="t">MAPMIX</div><div class="ver">v1.0</div><div class="wal" id="hudLvl">⭐ Nv 1</div><div class="wal" id="hudCoins">🪙 0</div>
+      <div class="t">MAPMIX</div><div class="ver">v1.0</div><div class="wal" id="hudLvl" style="display:none">⭐ Nv 1</div><canvas id="hudNick" width="320" height="76" style="width:160px;height:38px;display:block;margin:2px 0"></canvas><div id="hudXp"><i></i><span></span></div><div class="wal" id="hudCoins">🪙 0</div>
       <div id="team"></div>
       <div id="tox" style="display:none">Toxicidad<div class="bar"><i id="toxbar"></i></div></div>
     </div>
@@ -22490,7 +22494,7 @@ class Renderer {
       const me = u.owner === W.local, S = window.SW && SW.settings;
       const lv = me ? (window.playerLvl ? playerLvl() : 1) : (u.owner.lvl || (u.owner.ai ? 3 + (u.owner.id * 7) % 28 : 1));
       const nm = me ? ((S && S.nick) || u.owner.name) : u.owner.name, st = me ? (S && S.nickFx) || 'normal' : u.owner.nickFx || 'normal';
-      const st2 = (window.NICK_STYLES || []).some(x => x[0] === st) ? st : 'normal'; g.save(); g.translate(u.x, -u.y - ny + 6); g.scale(0.66, 0.66); window.drawNick(g, nm, 0, 0, this.heroColor(u), st2, lv, W.time); g.restore(); // smaller, so it doesn't distract while playing
+      if (me) continue; const st2 = (window.NICK_STYLES || []).some(x => x[0] === st) ? st : 'normal'; g.save(); g.translate(u.x, -u.y - ny + 6); g.scale(0.66, 0.66); window.drawNick(g, nm, 0, 0, this.heroColor(u), st2, lv, W.time); g.restore(); // smaller, so it doesn't distract while playing
     }
     for (const u of W.units) {
       if (u.removed || !u.alive || u.t.code !== 'n001') continue;
@@ -23640,7 +23644,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     const onPlate = /^pl\d$/.test(style || '');
     if (/^pl\d$/.test(style || '')) { const i = +style.slice(2), im = window.SPR && SPR.img(PLATE.f);
       g.save(); g.font = '900 26px Nunito, system-ui, sans-serif'; const tw0 = g.measureText(name).width + (lvl ? 60 : 0); g.restore();
-      if (im) { const w = Math.max(210, tw0 * 1.6 + 60), h = w * PLATE.ch / PLATE.cw; g.drawImage(im, i * PLATE.cw, 0, PLATE.cw, PLATE.ch, x - w / 2, y - 9 - h / 2, w, h); }
+      if (im) { const w = Math.max(210, tw0 * 1.6 + 60), h = w * PLATE.ch / PLATE.cw; g.drawImage(im, i * PLATE.cw, 0, PLATE.cw, PLATE.ch, x - w / 2, y - 9 - h * 0.62, w, h); /* the empty middle of a plate sits a bit below its centre */ }
       style = PLATE_TXT[i]; if (style === 'neon') col = '#ff6af0'; }
     g.save(); g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = FONT[style] || '900 26px Nunito, system-ui, sans-serif';
     const badge = lvl ? String(lvl) : '', bw = badge ? g.measureText(badge).width * 0.62 + 16 : 0, tw = g.measureText(name).width; let x0 = x - (tw + bw + (bw ? 6 : 0)) / 2; if (onPlate) x0 = x - tw / 2 - bw - (bw ? 6 : 0); // on a plate the name sits in the middle, the level just left of it
@@ -24415,6 +24419,10 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   btn('#bAgain', () => { if (online) { const o = online; stopGame(); if (o.host) o.net.endGame(); window.Lobby && Lobby.showWait(); } else start(); });
   /* player level: 100 XP per level; playing gives XP, clearing a map gives a whole level */
   window.playerLvl = () => Math.max(1, settings.plv | 0 || 1);
+  // top-left: your nameplate with level and an XP bar (your own name is no longer drawn over your character)
+  function drawHudNick() { const cv = $('#hudNick'); if (!cv || !window.drawNick || $('#hud').classList.contains('hidden')) return; const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); const st = (window.NICK_STYLES || []).some(x => x[0] === settings.nickFx) ? settings.nickFx : 'normal', pl = /^pl/.test(st); g.translate(pl ? 160 : 10, 48); g.scale(pl ? 1.15 : 1.4, pl ? 1.15 : 1.4); if (!pl) { g.textAlign = 'left'; } drawNick(g, settings.nick || 'Jugador', pl ? 0 : 80, 0, '#ff5a5a', st, playerLvl(), performance.now() / 1000);
+    const xp = (settings.pxp | 0) % 100, b = $('#hudXp'); if (b) { b.querySelector('i').style.width = xp + '%'; b.querySelector('span').textContent = 'XP ' + xp + '/100'; } }
+  setInterval(drawHudNick, 120);
   function refreshLvl() { const t = '⭐ Nv ' + playerLvl(); const h = $('#hudLvl'); if (h) h.textContent = t; const n = $('#nickLvl'); if (n) n.textContent = 'Nv ' + playerLvl(); }
   window.refreshLvl = refreshLvl;
   function addLvl(levels, xp) { const l0 = playerLvl(); settings.plv = l0 + (levels | 0); settings.pxp = (settings.pxp | 0) + (xp | 0); while (settings.pxp >= 100) { settings.pxp -= 100; settings.plv++; } saveSettings(); refreshLvl(); const l1 = playerLvl(); if (l1 > l0) { try { showText('⭐ ¡Subiste al nivel ' + l1 + '!' + (Math.floor(l1 / 5) > Math.floor(l0 / 5) ? ' 🔓 Nuevos personajes en la Colección' : '')); } catch (e) {} } }
