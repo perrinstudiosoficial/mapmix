@@ -23660,7 +23660,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
   window.drawNick = function (g, name, x, y, col, style, lvl, t) {
     const basic = !style || style === 'normal';
     const onPlate = /^pl\d$/.test(style || '') || basic;
-    if (basic) { g.save(); g.font = '900 19px Nunito, system-ui, sans-serif'; const w = Math.max(120, g.measureText(name).width + 34), h = 30, x0 = x - w / 2, y0 = y - 12 - h / 2; // the free basic plate: a neat rounded box
+    if (basic) { g.save(); g.font = '900 19px Nunito, system-ui, sans-serif'; const M = g.measureText(name), w = Math.max(120, M.width + 34), h = 30, x0 = x - w / 2, tc = (y - 3) - ((M.actualBoundingBoxAscent || 14) - (M.actualBoundingBoxDescent || 0)) / 2, y0 = tc - h / 2; /* box centred exactly on the letters */ // the free basic plate: a neat rounded box
       const G = g.createLinearGradient(0, y0, 0, y0 + h); G.addColorStop(0, '#5a2d8a'); G.addColorStop(1, '#2a1240'); g.fillStyle = G; g.strokeStyle = '#c9a6ff'; g.lineWidth = 2.5; g.beginPath(); g.roundRect ? g.roundRect(x0, y0, w, h, 9) : g.rect(x0, y0, w, h); g.fill(); g.stroke();
       g.strokeStyle = 'rgba(255,255,255,.25)'; g.lineWidth = 1; g.beginPath(); g.roundRect ? g.roundRect(x0 + 4, y0 + 4, w - 8, h - 8, 6) : g.rect(x0 + 4, y0 + 4, w - 8, h - 8); g.stroke(); g.restore(); col = '#ffffff'; }
     if (/^pl\d$/.test(style || '')) { const i = +style.slice(2), im = window.SPR && SPR.img(PLATE.f);
