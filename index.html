@@ -23629,10 +23629,19 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
 (function () {
   const NICK = window.NICK_STYLES = [
     ['normal', 'Clásico', 0], ['oro', 'Oro Real', 399], ['neon', 'Neón', 299], ['fuego', 'Fuego', 499], ['hielo', 'Hielo', 449], ['arcoiris', 'Arcoíris', 599],
-    ['galaxia', 'Galaxia', 549], ['fantasma', 'Fantasma', 349], ['retro', 'Retro Píxel', 299], ['elegante', 'Elegante', 399], ['chicle', 'Chicle', 249], ['toxico', 'Tóxico', 349]];
+    ['galaxia', 'Galaxia', 549], ['fantasma', 'Fantasma', 349], ['retro', 'Retro Píxel', 299], ['elegante', 'Elegante', 399], ['chicle', 'Chicle', 249], ['toxico', 'Tóxico', 349],
+    // plates drawn behind the name (assets/fx/plates_0.webp, 10 in a row); the letters take the matching text style
+    ['pl0', 'Placa Hielo', 499], ['pl1', 'Placa Fuego', 499], ['pl2', 'Placa Oro Real', 549], ['pl3', 'Placa Dulces', 449], ['pl4', 'Placa Espacio', 549],
+    ['pl5', 'Placa Pirata', 499], ['pl6', 'Placa Neón', 499], ['pl7', 'Placa Sakura', 449], ['pl8', 'Placa Rayos', 549], ['pl9', 'Placa Halloween', 499]];
+  const PLATE_TXT = ['hielo', 'fuego', 'oroP', 'sakura', 'galaxia', 'pirata', 'neon', 'sakura', 'rayo', 'fantasma'];
+  const PLATE = { f: 'fx_plates_0.webp', cw: 400, ch: 110 };
   const FONT = { retro: '900 24px monospace', elegante: 'italic 800 27px Georgia, serif', chicle: '900 26px "Comic Sans MS", cursive, sans-serif' };
   // draws "⭐lvl name" centred at (x,y) in screen-like space (y down). col = the player's colour
   window.drawNick = function (g, name, x, y, col, style, lvl, t) {
+    if (/^pl\d$/.test(style || '')) { const i = +style.slice(2), im = window.SPR && SPR.img(PLATE.f);
+      g.save(); g.font = '900 26px Nunito, system-ui, sans-serif'; const tw0 = g.measureText(name).width + (lvl ? 30 : 0); g.restore();
+      if (im) { const w = Math.max(210, tw0 * 1.6 + 60), h = w * PLATE.ch / PLATE.cw; g.drawImage(im, i * PLATE.cw, 0, PLATE.cw, PLATE.ch, x - w / 2, y - 9 - h / 2, w, h); }
+      style = PLATE_TXT[i]; if (style === 'neon') col = '#ff6af0'; }
     g.save(); g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = FONT[style] || '900 26px Nunito, system-ui, sans-serif';
     const badge = lvl ? String(lvl) : '', bw = badge ? g.measureText(badge).width * 0.62 + 16 : 0, tw = g.measureText(name).width, x0 = x - (tw + bw + (bw ? 6 : 0)) / 2;
     if (badge) { g.save(); g.font = '900 16px Nunito, system-ui, sans-serif'; const bx = x0, by = y - 18; g.fillStyle = '#ffd34d'; g.strokeStyle = 'rgba(0,0,0,.7)'; g.lineWidth = 3; g.beginPath(); g.roundRect ? g.roundRect(bx, by, bw, 22, 8) : g.rect(bx, by, bw, 22); g.fill(); g.stroke(); g.fillStyle = '#2a1240'; g.textAlign = 'center'; g.fillText(badge, bx + bw / 2, by + 17); g.restore(); }
@@ -23649,6 +23658,10 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
       case 'retro': fill = col; g.strokeStyle = '#000'; g.lineWidth = 5; break;
       case 'elegante': fill = grad('#ffffff', col, '#ffffff'); break;
       case 'chicle': fill = '#ff8fd0'; g.strokeStyle = '#fff'; g.lineWidth = 5; g.shadowColor = '#ff4fb0'; g.shadowBlur = 6; break;
+      case 'oroP': fill = grad('#ffffff', '#fff6d0', '#ffffff'); g.strokeStyle = '#5a2e00'; g.lineWidth = 7; break;
+      case 'pirata': fill = grad('#fff1c9', '#ffd27a', '#e0a34a'); g.strokeStyle = '#3a1d08'; break;
+      case 'sakura': fill = '#fff'; g.strokeStyle = '#d0407a'; g.lineWidth = 6; g.shadowColor = '#ff9fc8'; g.shadowBlur = 6; break;
+      case 'rayo': fill = grad('#ffffff', '#8fe9ff', '#ffffff'); g.strokeStyle = '#0b2a6a'; g.shadowColor = '#5fd0ff'; g.shadowBlur = 10 + 6 * Math.abs(Math.sin(t * 11)); break;
       case 'toxico': fill = grad('#d6ff5a', '#4dff6a', '#1aa83a'); g.shadowColor = '#5aff3a'; g.shadowBlur = 10 + 4 * Math.sin(t * 6); break;
     }
     if (style === 'arcoiris') { let xx = cx - tw / 2; g.textAlign = 'left'; for (let i = 0; i < name.length; i++) { const ch = name[i], w = g.measureText(ch).width; g.strokeText(ch, xx, y); g.fillStyle = `hsl(${(t * 120 + i * 30) % 360},95%,62%)`; g.fillText(ch, xx, y); xx += w; } g.restore(); return; }
@@ -24777,7 +24790,7 @@ class Net {
     mvRaf = requestAnimationFrame(step); }
   const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 5) { preFx('spray'); drawSprays(); animSprayFit(); } if (TABS[n][0] === '#tabDfx') preFx('death'); if (TABS[n][0] === '#tabSpawn') preFx('spawn'); if (TABS[n][0] === '#tabAura') preFx('aura'); if (n === 0) renderSkins(); if (n === 1) renderEmotes(); if (TABS[n][0] === '#tabDance') renderMoves('dance'); if (TABS[n][0] === '#tabTaunt') renderMoves('taunt'); if (n === 6) renderPass(); if (TABS[n][0] === '#tabNick') renderNick(); };
   let nkSel = null;
-  function renderNick() { const L = window.NICK_STYLES || [], cur = S.nickFx || 'normal', own = id => id === 'normal' || (S.bought || []).includes('nick:' + id); if (!nkSel) nkSel = (L[0] || [])[0];
+  function renderNick() { const L = window.NICK_STYLES || [], cur = S.nickFx || 'normal', own = id => id === 'normal' || VIP() || (S.bought || []).includes('nick:' + id); if (!nkSel) nkSel = (L[0] || [])[0];
     const it = L.find(x => x[0] === nkSel) || L[0];
     $('#nickGrid').innerHTML = `<div class="fitroom"><canvas id="nkFit" width="520" height="120" style="width:100%;max-width:260px;height:auto"></canvas><div class="fitbar"><b>${esc(it[1])}</b>${own(it[0]) ? (cur === it[0] ? ' ✅ Equipado' : '<button class="cbuy" id="nkEq">Equipar</button>') : `<button class="cbuy" id="nkBuy">Comprar 🪙 ${it[2]}</button>`}</div><small>Así se verá tu nombre arriba de tu personaje</small></div>` +
       L.map(([id, n, pr]) => `<div class="item tap${nkSel === id ? ' sel' : ''}" data-nk="${id}"><canvas class="nkcv" data-s="${id}" width="240" height="60" style="width:100%;max-width:120px;height:auto"></canvas><b>${esc(n)}</b>${own(id) ? `<div class="price owned" style="text-decoration:none;opacity:1;color:${cur === id ? '#7dff8a' : '#fff'}">${cur === id ? '✅ Equipado' : 'Tuyo'}</div>` : `<div class="price">🪙 ${pr}</div>`}</div>`).join('');
@@ -24785,8 +24798,8 @@ class Net {
     { const e = $('#nkEq'); if (e) e.addEventListener('click', () => { S.nickFx = nkSel; SW.saveSettings(); renderNick(); }); }
     { const e = $('#nkBuy'); if (e) e.addEventListener('click', () => { if (buy('nick:' + it[0], it[2], e)) { S.nickFx = it[0]; SW.saveSettings(); renderNick(); } }); }
     cancelAnimationFrame(nkRaf); const step = ts => { const cvs = $('#nickGrid').querySelectorAll('.nkcv'), big = $('#nkFit'); const t = ts / 1000, nm = S.nick || 'Jugador', lv = window.playerLvl ? playerLvl() : 1;
-      if (!$('#nickGrid').classList.contains('hidden')) { cvs.forEach(cv => { const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 240, 60); g.scale(1.4, 1.4); window.drawNick && drawNick(g, nm, 86, 30, '#ff5a5a', cv.dataset.s, lv, t); });
-        if (big) { const g = big.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 520, 120); g.scale(3, 3); window.drawNick && drawNick(g, nm, 87, 30, '#ff5a5a', nkSel, lv, t); } }
+      if (!$('#nickGrid').classList.contains('hidden')) { cvs.forEach(cv => { const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 240, 60); const pl = /^pl/.test(cv.dataset.s); g.scale(pl ? 0.92 : 1.4, pl ? 0.92 : 1.4); window.drawNick && drawNick(g, nm, pl ? 130 : 86, pl ? 42 : 30, '#ff5a5a', cv.dataset.s, lv, t); });
+        if (big) { const g = big.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 520, 120); const pl = /^pl/.test(nkSel); g.scale(pl ? 1.9 : 3, pl ? 1.9 : 3); window.drawNick && drawNick(g, nm, pl ? 137 : 87, pl ? 40 : 30, '#ff5a5a', nkSel, lv, t); } }
       if (cvs.length) nkRaf = requestAnimationFrame(step); }; nkRaf = requestAnimationFrame(step); }
   let nkRaf = 0;
   let curTab = 0; const shopHist = []; const shopTab0 = shopTab;
