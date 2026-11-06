@@ -21791,10 +21791,10 @@ class Sfx {
     { const m = /^(sp_p|dx_d)(\d+)$/.exec(n); if (m) { const th = window.FXART ? FXART.theme(m[1] === 'sp_p' ? 'spawn' : 'death', +m[2]) : 'G'; this.fxSfx(th, +m[2] + (m[1] === 'dx_d' ? 100 : 0), m[1] === 'dx_d'); return; } }
     { const m = /^emo_(\d+)$/.exec(n); if (m) { this.emojiSfx(+m[1]); return; } }
     if (n === 'taunt') { const E = [500, 1800, 2500], A = [800, 1200, 2600]; [0, 0.16, 0.32, 0.5].forEach((d, i) => this.voice(i % 2 ? 520 : 640, i % 2 ? 500 : 620, 0.14, [i % 2 ? A : E, i % 2 ? A : E], 0.3, d)); this.tone(300, 900, 0.1, 'square', 0.05, 0.62); return; }
-    if (n === 'jump') { // the classic platform hop: one quick rising "bwip" (original sound)
-      this.tone(240, 760, 0.2, 'square', 0.32); this.tone(480, 1520, 0.18, 'triangle', 0.4, 0.005); return; }
+    if (n === 'jump') { // the classic platform hop: one quick rising "bwip" (original sound), loud so it cuts through the music
+      this.tone(240, 760, 0.22, 'square', 0.9); this.tone(480, 1520, 0.2, 'triangle', 1.0, 0.005); this.tone(240, 760, 0.22, 'sawtooth', 0.5); return; }
     if (n === 'jump_w') { // the same hop with a little splash (Corre Polar)
-      this.tone(220, 700, 0.2, 'square', 0.3); this.tone(440, 1400, 0.18, 'triangle', 0.4, 0.005); this.noise(0.22, 0.5, 2000, 0.7); return; }
+      this.tone(220, 700, 0.22, 'square', 0.9); this.tone(440, 1400, 0.2, 'triangle', 1.0, 0.005); this.tone(220, 700, 0.22, 'sawtooth', 0.5); this.noise(0.22, 0.9, 2000, 0.7); return; }
     if (n.includes('aghhh') || n === 'death') {
       // a little kid's "waaah!" (each mushroom a slightly different voice), then a soft plop
       const k = 0.9 + Math.random() * 0.25, U = [370, 900, 2600], A = [1000, 1500, 3100], O = [600, 1000, 2700];
