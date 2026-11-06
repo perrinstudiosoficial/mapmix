@@ -23741,6 +23741,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     }
   }
   for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) window.addEventListener(ev, unlockAudio, true);
+  // the menu theme tries to start the moment the game opens (the Android app allows it; a browser waits for the first touch anywhere)
+  setTimeout(() => { try { if (!W && settings.music) { sfx.musicOn = true; sfx.init(); if (sfx.ctx && sfx.ctx.state !== 'running') sfx.ctx.resume().catch(() => {}); } } catch (e) {} }, 300);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && sfx.ctx && sfx.ctx.state !== 'running') sfx.ctx.resume().catch(() => {}); });
   function startMusic() {
     sfx.setSong('fortaleza'); // every new game starts its theme from the beginning
