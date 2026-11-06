@@ -21791,8 +21791,8 @@ class Sfx {
     { const m = /^(sp_p|dx_d)(\d+)$/.exec(n); if (m) { const th = window.FXART ? FXART.theme(m[1] === 'sp_p' ? 'spawn' : 'death', +m[2]) : 'G'; this.fxSfx(th, +m[2] + (m[1] === 'dx_d' ? 100 : 0), m[1] === 'dx_d'); return; } }
     { const m = /^emo_(\d+)$/.exec(n); if (m) { this.emojiSfx(+m[1]); return; } }
     if (n === 'taunt') { const E = [500, 1800, 2500], A = [800, 1200, 2600]; [0, 0.16, 0.32, 0.5].forEach((d, i) => this.voice(i % 2 ? 520 : 640, i % 2 ? 500 : 620, 0.14, [i % 2 ? A : E, i % 2 ? A : E], 0.3, d)); this.tone(300, 900, 0.1, 'square', 0.05, 0.62); return; }
-    if (n === 'jump') { this.tone(260, 880, 0.17, 'sine', 0.24); this.tone(390, 1320, 0.12, 'triangle', 0.07, 0.02); this.noise(0.08, 0.07, 2600, 1); return; } // springy hop (Corre Gatito Corre)
-    if (n === 'jump_w') { this.tone(180, 620, 0.2, 'sine', 0.26); this.noise(0.28, 0.16, 1700, 0.7); this.tone(700, 1100, 0.07, 'sine', 0.08, 0.16); return; } // splashy hop (Corre Polar)
+    if (n === 'jump') { this.tone(220, 900, 0.2, 'sine', 0.7); this.tone(330, 1350, 0.16, 'triangle', 0.3, 0.02); this.tone(140, 90, 0.1, 'sine', 0.5); this.noise(0.1, 0.25, 2600, 1); return; } // springy hop (Corre Gatito Corre)
+    if (n === 'jump_w') { this.tone(160, 640, 0.22, 'sine', 0.7); this.noise(0.3, 0.45, 1700, 0.7); this.tone(700, 1150, 0.08, 'sine', 0.3, 0.16); return; } // splashy hop (Corre Polar)
     if (n.includes('aghhh') || n === 'death') {
       // a little kid's "waaah!" (each mushroom a slightly different voice), then a soft plop
       const k = 0.9 + Math.random() * 0.25, U = [370, 900, 2600], A = [1000, 1500, 3100], O = [600, 1000, 2700];
@@ -24771,7 +24771,7 @@ class Net {
   function renderNick() { const L = window.NICK_STYLES || [], cur = S.nickFx || 'normal', own = id => id === 'normal' || (S.bought || []).includes('nick:' + id); if (!nkSel) nkSel = (L[0] || [])[0];
     const it = L.find(x => x[0] === nkSel) || L[0];
     $('#nickGrid').innerHTML = `<div class="fitroom"><canvas id="nkFit" width="520" height="120" style="width:100%;max-width:260px;height:auto"></canvas><div class="fitbar"><b>${esc(it[1])}</b>${own(it[0]) ? (cur === it[0] ? ' ✅ Equipado' : '<button class="cbuy" id="nkEq">Equipar</button>') : `<button class="cbuy" id="nkBuy">Comprar 🪙 ${it[2]}</button>`}</div><small>Así se verá tu nombre arriba de tu personaje</small></div>` +
-      L.map(([id, n, pr]) => `<div class="item tap${nkSel === id ? ' sel' : ''}" data-nk="${id}"><canvas class="nkcv" data-s="${id}" width="240" height="60" style="width:100%;max-width:120px;height:auto"></canvas><b>${esc(n)}</b>${own(id) ? (cur === id ? '<div class="lockd eq">EQUIPADO</div>' : '<div class="lockd">TUYO</div>') : `<div class="price">🪙 ${pr}</div>`}</div>`).join('');
+      L.map(([id, n, pr]) => `<div class="item tap${nkSel === id ? ' sel' : ''}" data-nk="${id}"><canvas class="nkcv" data-s="${id}" width="240" height="60" style="width:100%;max-width:120px;height:auto"></canvas><b>${esc(n)}</b>${own(id) ? `<div class="price owned" style="text-decoration:none;opacity:1;color:${cur === id ? '#7dff8a' : '#fff'}">${cur === id ? '✅ Equipado' : 'Tuyo'}</div>` : `<div class="price">🪙 ${pr}</div>`}</div>`).join('');
     $('#nickGrid').querySelectorAll('[data-nk]').forEach(el => el.addEventListener('click', () => { nkSel = el.dataset.nk; renderNick(); }));
     { const e = $('#nkEq'); if (e) e.addEventListener('click', () => { S.nickFx = nkSel; SW.saveSettings(); renderNick(); }); }
     { const e = $('#nkBuy'); if (e) e.addEventListener('click', () => { if (buy('nick:' + it[0], it[2], e)) { S.nickFx = it[0]; SW.saveSettings(); renderNick(); } }); }
