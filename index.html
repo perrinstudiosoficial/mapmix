@@ -21791,8 +21791,12 @@ class Sfx {
     { const m = /^(sp_p|dx_d)(\d+)$/.exec(n); if (m) { const th = window.FXART ? FXART.theme(m[1] === 'sp_p' ? 'spawn' : 'death', +m[2]) : 'G'; this.fxSfx(th, +m[2] + (m[1] === 'dx_d' ? 100 : 0), m[1] === 'dx_d'); return; } }
     { const m = /^emo_(\d+)$/.exec(n); if (m) { this.emojiSfx(+m[1]); return; } }
     if (n === 'taunt') { const E = [500, 1800, 2500], A = [800, 1200, 2600]; [0, 0.16, 0.32, 0.5].forEach((d, i) => this.voice(i % 2 ? 520 : 640, i % 2 ? 500 : 620, 0.14, [i % 2 ? A : E, i % 2 ? A : E], 0.3, d)); this.tone(300, 900, 0.1, 'square', 0.05, 0.62); return; }
-    if (n === 'jump') { this.tone(520, 1560, 0.18, 'square', 0.32); this.tone(780, 2100, 0.16, 'triangle', 0.6, 0.01); this.tone(1040, 2600, 0.1, 'sawtooth', 0.18, 0.02); this.noise(0.12, 0.5, 3000, 1); return; } // loud springy hop (Corre Gatito Corre); phone speakers can't play low notes, so it sits high
-    if (n === 'jump_w') { this.tone(420, 1300, 0.2, 'square', 0.3); this.tone(640, 1800, 0.18, 'triangle', 0.6, 0.01); this.noise(0.3, 0.8, 2200, 0.7); this.tone(1200, 1900, 0.08, 'sine', 0.5, 0.16); return; } // loud splashy hop (Corre Polar)
+    if (n === 'jump') { // a cheerful cartoon hop: a rising "boing" glide and a little sparkle on top (original, no copied tune)
+      this.tone(330, 1320, 0.32, 'square', 0.28); this.tone(660, 2640, 0.3, 'triangle', 0.5, 0.01);
+      [1568, 2093, 2637, 3136].forEach((f, i) => this.tone(f, f * 1.01, 0.12, 'triangle', 0.42, 0.2 + i * 0.065)); this.noise(0.06, 0.2, 4000, 1); return; }
+    if (n === 'jump_w') { // a bubbly hop: a watery glide, a splash and three bubble pops
+      this.tone(300, 1200, 0.3, 'square', 0.24); this.tone(600, 1800, 0.28, 'sine', 0.6, 0.01); this.noise(0.32, 0.7, 2200, 0.7);
+      [0.2, 0.28, 0.37].forEach((d, i) => this.tone(900 + i * 250, 1700 + i * 300, 0.07, 'sine', 0.55, d)); return; }
     if (n.includes('aghhh') || n === 'death') {
       // a little kid's "waaah!" (each mushroom a slightly different voice), then a soft plop
       const k = 0.9 + Math.random() * 0.25, U = [370, 900, 2600], A = [1000, 1500, 3100], O = [600, 1000, 2700];
