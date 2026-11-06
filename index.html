@@ -22490,7 +22490,7 @@ class Renderer {
       const me = u.owner === W.local, S = window.SW && SW.settings;
       const lv = me ? (window.playerLvl ? playerLvl() : 1) : (u.owner.lvl || (u.owner.ai ? 3 + (u.owner.id * 7) % 28 : 1));
       const nm = me ? ((S && S.nick) || u.owner.name) : u.owner.name, st = me ? (S && S.nickFx) || 'normal' : u.owner.nickFx || 'normal';
-      window.drawNick(g, nm, u.x, -u.y - ny, this.heroColor(u), st, lv, W.time);
+      const st2 = (window.NICK_STYLES || []).some(x => x[0] === st) ? st : 'normal'; g.save(); g.translate(u.x, -u.y - ny + 6); g.scale(0.66, 0.66); window.drawNick(g, nm, 0, 0, this.heroColor(u), st2, lv, W.time); g.restore(); // smaller, so it doesn't distract while playing
     }
     for (const u of W.units) {
       if (u.removed || !u.alive || u.t.code !== 'n001') continue;
@@ -23596,7 +23596,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
   const AURA_N = ['Tecno Azul', 'Estrella Dorada', 'Cristal', 'Enredadera', 'Runas Violeta', 'Marea', 'Piedra Antigua', 'Noche Lunar', 'Corazones', 'Llamas de Otoño', 'Espinas', 'Nubes Estrella', 'Engranajes', 'Viento', 'Amatista', 'Hojas de Otoño', 'Píxel', 'Rubí Real', 'Copo de Nieve', 'Festivo',
     'Rayo Dorado', 'Zafiro', 'Fuego Rúnico', 'Musgo', 'Violeta Real', 'Celeste', 'Flor de Cerezo', 'Arena', 'Sol', 'Burbujas', 'Tierra', 'Luna Mística', 'Neón Azul', 'Bosque', 'Hielo Puro', 'Rubí Oscuro', 'Oro Viejo', 'Runas del Mar', 'Raíces', 'Lavanda',
     'Corona Dorada', 'Glaciar', 'Lava', 'Jardín', 'Tormenta', 'Abismo', 'Media Luna', 'Oleaje', 'Roca', 'Ciudad Neón', 'Alas de Ángel', 'Calaveras', 'Amor', 'Reloj Antiguo', 'Cielo', 'Arrecife', 'Otoño Dorado', 'Galaxia', 'Sombras', 'Arcoíris'];
-  const SPRAY_N = ['LOL', 'Calavera Rey', 'Corazón Roto', 'Carita XD', 'Diamante', 'Cohete', 'Estrella', 'Gatito', 'Pizza', 'Corona', 'NOOB', 'Fuego', 'Enojado', 'Fantasma', 'Rayo', 'Corazón', 'Control Gamer', 'GG', 'Alien', 'Tiburón'];
+  const SPRAY_N = ['LOL', 'GG', 'Calavera DJ', 'Gato Pro', 'Pizza', 'Encapuchado', 'Control Gamer', 'Spray Rey', 'Carita XD', 'Corazón Roto', 'Calavera de Fuego', 'BOOM', 'Pingüino Pro', 'Máscara', 'Dona', 'Lobo', 'Cohete', 'Diamante', 'Corona', 'Audífonos'];
   const count = k => (FXM[k] || []).reduce((s, x) => s + x.n, 0);
   const nameOf = (k, i) => { if (k === 'aura') return 'Aura ' + (AURA_N[i] || i + 1); if (k === 'spray') return SPRAY_N[i] || 'Grafiti ' + (i + 1); const t = (TH[k] || '')[i] || 'G'; const same = [...(TH[k] || '')].slice(0, i).filter(x => x === t).length; return TNAME[t] + (same ? ' ' + (same + 1) : ''); };
   const priceOf = (k, i) => ({ aura: [299, 349, 399, 449, 499], spawn: [249, 299, 349, 399], death: [299, 349, 399, 449], spray: [149, 199, 249] }[k] || [299])[(i * 7 + 3) % ({ aura: 5, spawn: 4, death: 4, spray: 3 }[k] || 1)];
@@ -23628,8 +23628,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
 // nickname styles: the name stays your account name, the style changes its letters and effects
 (function () {
   const NICK = window.NICK_STYLES = [
-    ['normal', 'Clásico', 0], ['oro', 'Oro Real', 399], ['neon', 'Neón', 299], ['fuego', 'Fuego', 499], ['hielo', 'Hielo', 449], ['arcoiris', 'Arcoíris', 599],
-    ['galaxia', 'Galaxia', 549], ['fantasma', 'Fantasma', 349], ['retro', 'Retro Píxel', 299], ['elegante', 'Elegante', 399], ['chicle', 'Chicle', 249], ['toxico', 'Tóxico', 349],
+    ['normal', 'Clásico', 0],
     // plates drawn behind the name (assets/fx/plates_0.webp, 10 in a row); the letters take the matching text style
     ['pl0', 'Placa Hielo', 499], ['pl1', 'Placa Fuego', 499], ['pl2', 'Placa Oro Real', 549], ['pl3', 'Placa Dulces', 449], ['pl4', 'Placa Espacio', 549],
     ['pl5', 'Placa Pirata', 499], ['pl6', 'Placa Neón', 499], ['pl7', 'Placa Sakura', 449], ['pl8', 'Placa Rayos', 549], ['pl9', 'Placa Halloween', 499]];
@@ -23638,12 +23637,13 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
   const FONT = { retro: '900 24px monospace', elegante: 'italic 800 27px Georgia, serif', chicle: '900 26px "Comic Sans MS", cursive, sans-serif' };
   // draws "⭐lvl name" centred at (x,y) in screen-like space (y down). col = the player's colour
   window.drawNick = function (g, name, x, y, col, style, lvl, t) {
+    const onPlate = /^pl\d$/.test(style || '');
     if (/^pl\d$/.test(style || '')) { const i = +style.slice(2), im = window.SPR && SPR.img(PLATE.f);
-      g.save(); g.font = '900 26px Nunito, system-ui, sans-serif'; const tw0 = g.measureText(name).width + (lvl ? 30 : 0); g.restore();
+      g.save(); g.font = '900 26px Nunito, system-ui, sans-serif'; const tw0 = g.measureText(name).width + (lvl ? 60 : 0); g.restore();
       if (im) { const w = Math.max(210, tw0 * 1.6 + 60), h = w * PLATE.ch / PLATE.cw; g.drawImage(im, i * PLATE.cw, 0, PLATE.cw, PLATE.ch, x - w / 2, y - 9 - h / 2, w, h); }
       style = PLATE_TXT[i]; if (style === 'neon') col = '#ff6af0'; }
     g.save(); g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = FONT[style] || '900 26px Nunito, system-ui, sans-serif';
-    const badge = lvl ? String(lvl) : '', bw = badge ? g.measureText(badge).width * 0.62 + 16 : 0, tw = g.measureText(name).width, x0 = x - (tw + bw + (bw ? 6 : 0)) / 2;
+    const badge = lvl ? String(lvl) : '', bw = badge ? g.measureText(badge).width * 0.62 + 16 : 0, tw = g.measureText(name).width; let x0 = x - (tw + bw + (bw ? 6 : 0)) / 2; if (onPlate) x0 = x - tw / 2 - bw - (bw ? 6 : 0); // on a plate the name sits in the middle, the level just left of it
     if (badge) { g.save(); g.font = '900 16px Nunito, system-ui, sans-serif'; const bx = x0, by = y - 18; g.fillStyle = '#ffd34d'; g.strokeStyle = 'rgba(0,0,0,.7)'; g.lineWidth = 3; g.beginPath(); g.roundRect ? g.roundRect(bx, by, bw, 22, 8) : g.rect(bx, by, bw, 22); g.fill(); g.stroke(); g.fillStyle = '#2a1240'; g.textAlign = 'center'; g.fillText(badge, bx + bw / 2, by + 17); g.restore(); }
     const cx = x0 + bw + (bw ? 6 : 0) + tw / 2; g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,0.75)'; g.lineJoin = 'round';
     const grad = (a, b, c) => { const G = g.createLinearGradient(cx - tw / 2, y - 22, cx + tw / 2, y); G.addColorStop(0, a); G.addColorStop(0.5, b); G.addColorStop(1, c || a); return G; };
@@ -24790,7 +24790,7 @@ class Net {
     mvRaf = requestAnimationFrame(step); }
   const shopTab = n => { TABS.forEach(([tb, gr], i) => { $(tb).classList.toggle('on', i === n); $(gr).classList.toggle('hidden', i !== n); }); $('#shopHint').textContent = TABS[n][2]; if (n === 5) { preFx('spray'); drawSprays(); animSprayFit(); } if (TABS[n][0] === '#tabDfx') preFx('death'); if (TABS[n][0] === '#tabSpawn') preFx('spawn'); if (TABS[n][0] === '#tabAura') preFx('aura'); if (n === 0) renderSkins(); if (n === 1) renderEmotes(); if (TABS[n][0] === '#tabDance') renderMoves('dance'); if (TABS[n][0] === '#tabTaunt') renderMoves('taunt'); if (n === 6) renderPass(); if (TABS[n][0] === '#tabNick') renderNick(); };
   let nkSel = null;
-  function renderNick() { const L = window.NICK_STYLES || [], cur = S.nickFx || 'normal', own = id => id === 'normal' || VIP() || (S.bought || []).includes('nick:' + id); if (!nkSel) nkSel = (L[0] || [])[0];
+  function renderNick() { if (!(window.NICK_STYLES || []).some(x => x[0] === S.nickFx)) S.nickFx = 'normal'; const L = window.NICK_STYLES || [], cur = S.nickFx || 'normal', own = id => id === 'normal' || VIP() || (S.bought || []).includes('nick:' + id); if (!nkSel) nkSel = (L[0] || [])[0];
     const it = L.find(x => x[0] === nkSel) || L[0];
     $('#nickGrid').innerHTML = `<div class="fitroom"><canvas id="nkFit" width="520" height="120" style="width:100%;max-width:260px;height:auto"></canvas><div class="fitbar"><b>${esc(it[1])}</b>${own(it[0]) ? (cur === it[0] ? ' ✅ Equipado' : '<button class="cbuy" id="nkEq">Equipar</button>') : `<button class="cbuy" id="nkBuy">Comprar 🪙 ${it[2]}</button>`}</div><small>Así se verá tu nombre arriba de tu personaje</small></div>` +
       L.map(([id, n, pr]) => `<div class="item tap${nkSel === id ? ' sel' : ''}" data-nk="${id}"><canvas class="nkcv" data-s="${id}" width="240" height="60" style="width:100%;max-width:120px;height:auto"></canvas><b>${esc(n)}</b>${own(id) ? `<div class="price owned" style="text-decoration:none;opacity:1;color:${cur === id ? '#7dff8a' : '#fff'}">${cur === id ? '✅ Equipado' : 'Tuyo'}</div>` : `<div class="price">🪙 ${pr}</div>`}</div>`).join('');
@@ -24812,8 +24812,8 @@ class Net {
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
   // Season 1 pass: real shop items. The premium track is worth much more than its price
-  const PASS_FREE = { 3: ['aura', 'a12', 'Aura Engranajes'], 6: ['dfx', 'd1', 'Muerte Fantasmas'], 10: ['nick', 'chicle', 'Nickname Chicle'], 15: ['spawn', 'p10', 'Aparición Corazones'], 20: ['spray', 's15', 'Grafiti Corazón'], 25: ['coin', 100, '100 monedas'], 30: ['aura', 'a57', 'Aura Galaxia'] };
-  const PASS_PREM = { 1: ['aura', 'a42', 'Aura Lava'], 2: ['coin', 50, '50 monedas'], 4: ['dfx', 'd10', 'Muerte Calaveras'], 5: ['nick', 'fuego', 'Nickname Fuego'], 7: ['spray', 's9', 'Grafiti Corona'], 8: ['spawn', 'p11', 'Aparición Galaxia'], 10: ['aura', 'a50', 'Aura Alas de Ángel'], 12: ['dfx', 'd5', 'Muerte Confeti'], 14: ['nick', 'galaxia', 'Nickname Galaxia'], 16: ['coin', 150, '150 monedas'], 18: ['spawn', 'p36', 'Aparición Destello Dorado'], 20: ['spray', 's17', 'Grafiti GG'], 22: ['aura', 'a59', 'Aura Arcoíris'], 24: ['dfx', 'd3', 'Muerte Corazón Roto'], 26: ['coin', 200, '200 monedas'], 28: ['nick', 'arcoiris', 'Nickname Arcoíris'], 30: ['spawn', 'p45', 'Aparición Arcoíris (legendaria)'] };
+  const PASS_FREE = { 3: ['aura', 'a12', 'Aura Engranajes'], 6: ['dfx', 'd1', 'Muerte Fantasmas'], 10: ['nick', 'pl3', 'Placa Dulces'], 15: ['spawn', 'p10', 'Aparición Corazones'], 20: ['spray', 's15', 'Grafiti Lobo'], 25: ['coin', 100, '100 monedas'], 30: ['aura', 'a57', 'Aura Galaxia'] };
+  const PASS_PREM = { 1: ['aura', 'a42', 'Aura Lava'], 2: ['coin', 50, '50 monedas'], 4: ['dfx', 'd10', 'Muerte Calaveras'], 5: ['nick', 'pl1', 'Placa Fuego'], 7: ['spray', 's18', 'Grafiti Corona'], 8: ['spawn', 'p11', 'Aparición Galaxia'], 10: ['aura', 'a50', 'Aura Alas de Ángel'], 12: ['dfx', 'd5', 'Muerte Confeti'], 14: ['nick', 'pl4', 'Placa Espacio'], 16: ['coin', 150, '150 monedas'], 18: ['spawn', 'p36', 'Aparición Destello Dorado'], 20: ['spray', 's1', 'Grafiti GG'], 22: ['aura', 'a59', 'Aura Arcoíris'], 24: ['dfx', 'd3', 'Muerte Corazón Roto'], 26: ['coin', 200, '200 monedas'], 28: ['nick', 'pl6', 'Placa Neón'], 30: ['spawn', 'p45', 'Aparición Arcoíris (legendaria)'] };
   const PASS_PRICE = 2999, PASS_CLP = 5000, CLP_PER_COIN = 1.23; /* best coin pack: about $10.9 per coin */
   const itemValue = r => { if (r[0] === 'coin') return r[1]; if (r[0] === 'nick') return ((window.NICK_STYLES || []).find(x => x[0] === r[1]) || [, , 0])[2]; const q = window.FXART && FXART.parse(r[1]); return q ? FXART.priceOf(q.k, q.i) : 0; };
   const passOwns = (kind, id) => Object.entries(PASS_FREE).concat(S.passPrem || VIP() ? Object.entries(PASS_PREM) : []).some(([l, r]) => r[0] === kind && r[1] === id && passLv() >= +l);
