@@ -24795,7 +24795,7 @@ class Net {
   // the back arrow inside the shop goes back to where you were (previous tab / game), and only leaves the shop at the start
   shopBackStep = () => { const h = shopHist.pop(); shopHist.length = 0; if (!h) return false; if (h[0] === 'tab') goTab(h[1], false); else if (h[0] === 'cat') { skCat = h[1]; fitSkin = 'base'; renderSkins(); } return true; };
   document.querySelector('#shop .back').addEventListener('click', e => { shopHist.length = 0; e.stopImmediatePropagation(); show('menu'); }, true); /* the shop's back arrow goes straight to the main menu */
-  click('#goShop', () => { shopHist.length = 0; for (const k in fxSel) delete fxSel[k]; sprSel = null; nkSel = null; fitSkin = null; renderSkins(); try { renderDA(); drawSprays(); renderNick(); } catch (e) {} }); /* every visit starts on the first item of each section */
+  click('#goShop', () => { shopHist.length = 0; for (const k in fxSel) delete fxSel[k]; sprSel = null; nkSel = null; fitSkin = null; fitAng = 270; fitDrag = null; renderSkins(); try { renderDA(); drawSprays(); renderNick(); } catch (e) {} }); /* every visit starts on the first item of each section */
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
   // Season 1 pass: real shop items. The premium track is worth much more than its price
