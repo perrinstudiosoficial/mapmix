@@ -23997,7 +23997,12 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const txt = !u.alive ? ['revivanme porfa', 'ayudaaa', 'alguien me revive?', 'estoy muerto jaja'][Math.floor(Math.random() * 4)] : dead.length && Math.random() < 0.4 ? ['voy a revivir a alguien', 'aguanten, voy', 'hay gente muerta, cuidado'][Math.floor(Math.random() * 3)] : list[Math.floor(Math.random() * list.length)];
     window.botChat(u, txt);
   }
-  window.botChat = (u, text) => { chatFrom(u.owner, text); if (online && online.host) online.net.pushEvent('bchat', u.owner.id, text); };
+  // bots type like people: no line twice in a row, sometimes without accents, a stretched letter, an 'xd' or 'jaja'
+  const botSaid = [];
+  const humanize = x => { if (/^-?\d+$/.test(x)) return x; if (Math.random() < 0.35) x = x.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); if (Math.random() < 0.2) x = x.toLowerCase(); if (Math.random() < 0.12) x = x.replace(/([aeiou])([^aeiou]*)$/, (m, v, r) => v.repeat(2 + Math.floor(Math.random() * 3)) + r); const r = /jaj|xd/i.test(x) ? 1 : Math.random(); if (r < 0.08) x += ' xd'; else if (r < 0.14) x += ' jaja'; else if (r < 0.18) x += '!!'; return x; };
+  const GAME_OPEN = ['vamos!', 'buena suerte a todos', 'a ganar esta', 'esta la ganamos', 'que empiece', 'listos?', 'vamo con todo', 'cuidado con los payasos', 'nadie se muera eh', 'hoy si llegamos', 'suerte cabros', 'alguien sabe este mapa?', 'primera vez en este mapa', 'tranqui que yo cubro', 'vamos team', 'a darle', 'ojo con las trampas', 'el último invita', 'no me esperen jaja', 'quien llega primero?'];
+  window.botOpen = () => { if (!W || !W.ai || !W.ai.bots || (online && !online.host)) return; const bs = W.ai.bots.slice().sort(() => Math.random() - 0.5).slice(0, Math.random() < 0.5 ? 1 : 2); const L = GAME_OPEN.slice().sort(() => Math.random() - 0.5); bs.forEach((b, i) => setTimeout(() => { const h = W && W.heroOf(b.p); if (h && window.botChat) window.botChat(h, L[i]); }, 1500 + i * (1500 + Math.random() * 2500) + Math.random() * 2000)); };
+  window.botChat = (u, text) => { if (botSaid.includes(text) && !/^-?\d+$/.test(text)) return; botSaid.push(text); if (botSaid.length > 12) botSaid.shift(); text = humanize(text); chatFrom(u.owner, text); if (online && online.host) online.net.pushEvent('bchat', u.owner.id, text); };
   function setPause(on, who, local) {
     if (on) { gPause = { until: performance.now() + PAUSE_DUR * 1000, who: who || (settings.nick || 'Tú') }; sfx.play('click'); }
     else gPause = null;
@@ -24019,7 +24024,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     online = onl || null;
     $('#menu').classList.add('hidden'); $('#end').classList.add('hidden'); $('#hud').classList.remove('hidden');
     for (const s of document.querySelectorAll('.screen')) if (s.id !== 'pause' && s.id !== 'end' && s.id !== 'powers') s.classList.add('hidden');
-    sfx.init(); sfx.muted = !settings.sound; startMusic(); refreshSprayBtn(); $('#hudCoins').textContent = '🪙 ' + (settings.coins | 0); refreshLvl(); setTimeout(() => { try { $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast); } catch (e) {} }, 300);
+    sfx.init(); sfx.muted = !settings.sound; startMusic(); chatterAt = 0; setTimeout(() => { try { window.botOpen && window.botOpen(); } catch (e) {} }, 600); refreshSprayBtn(); $('#hudCoins').textContent = '🪙 ' + (settings.coins | 0); refreshLvl(); setTimeout(() => { try { $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast); } catch (e) {} }, 300);
     const mode = online ? online.game.mode : settings.mode, speed = online ? online.game.speed : settings.speed;
     let opts = { bots: settings.bots, maxFade: 3, playerName: settings.nick || 'Tú' };
     if (online) {
@@ -25030,7 +25035,7 @@ class Net {
   const pickP = a => { const ok = a.filter(x => !usedPieces.includes(x)); const v = pick(ok.length ? ok : a); usedPieces.push(v); if (usedPieces.length > 24) usedPieces.shift(); return v; }; // a phrase part isn't reused for a while
   const fresh = (make) => { for (let i = 0; i < 12; i++) { const s = make(); if (!recent.includes(s)) { recent.push(s); if (recent.length > 150) recent.shift(); return s; } } return null; };
   const who = (not) => { let n; do { n = pick(GEN_NAMES); } while (n === lastName || (not && not.includes(n))); lastName = n; return n; };
-  const push = (n, x, dt = 0) => { GEN.push({ id: 'b' + Date.now() + Math.random(), n, x, t: Date.now() + dt }); while (GEN.length > 40) GEN.shift(); };
+  const push = (n, x, dt = 0) => { if (typeof vary === 'function') try { x = vary(x); } catch (e) {} GEN.push({ id: 'b' + Date.now() + Math.random(), n, x, t: Date.now() + dt }); while (GEN.length > 40) GEN.shift(); };
   function genTick() {
     const r = Math.random();
     if (r < 0.14) { // a short conversation between two or three people
@@ -25043,7 +25048,11 @@ class Net {
     else { const s = fresh(() => pick(FIXED)); if (s) push(who(), s); }
     setTimeout(genTick, 700 + Math.random() * 1800);
   }
-  push('Kyle', 'wena!', -4000); push('Coni', 'alguien para jugar?', -2000); setTimeout(genTick, 2000);
+  // how people really type: sometimes no accents, a stretched letter, a 'jaja' or 'xd' at the end, never the same twice
+  const vary = x => { if (Math.random() < 0.35) x = x.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); if (Math.random() < 0.15) x = x.replace(/([aeiou])([^aeiou]*)$/, (m, v, r) => v.repeat(2 + Math.floor(Math.random() * 3)) + r); const r = /jaj|xd/i.test(x) ? 1 : Math.random(); if (r < 0.1) x += ' xd'; else if (r < 0.17) x += ' jaja'; else if (r < 0.22) x += '!!'; else if (r < 0.26) x = x.replace(/\?$/, '??'); return x; };
+  const OPEN = ['wena!', 'holaa', 'buenas a todos', 'alguien para jugar?', 'quien se tira una?', 'llegué', 'volví jaja', 'hola gente', 'que tal la tarde', 'alguien despierto?', 'recién salí de clases', 'por fin en casa', 'alguien juega escape?', 'quien pa una partida', 'hoy si paso la 8', 'que hacen', 'ya llegué cabros', 'buenas buenas', 'de nuevo por aquí', 'alguien online?', 'aburrido, quien juega', 'ando con tiempo, armemos', 'quién quiere team', 'hola, soy nuevo', 'me tienen enganchado este juego', 'vuelvo en 5', 'alguien de santiago?', 'alguien de arica?', 'que mapa juegan?', 'hola hola', 'yo de nuevo xd', 'me aburrí de estudiar', 'entré un rato', 'hoy toca jugar', 'alguien con ganas?', 'wenas wenas', 'saludos', 'estoy listo', 'quien me acompaña', 'jugamos?'];
+  { const o = OPEN.slice().sort(() => Math.random() - 0.5); const n1 = who(), n2 = who([n1]); push(n1, vary(o[0]), -(3000 + Math.random() * 3000)); if (Math.random() < 0.8) push(n2, vary(o[1]), -(800 + Math.random() * 1500)); } // every visit starts with different people saying different things
+  setTimeout(genTick, 1500 + Math.random() * 2500);
   const genFeed = () => net.chats('lobby').concat(GEN).sort((a, b) => a.t - b.t).slice(-40);
   function sendChat(where, inSel) { const v = $(inSel).value.trim(); if (!v) return; $(inSel).value = ''; if (!net.say(where, nick(), v)) { if (where === 'lobby') GEN.push({ id: 'me' + Date.now(), n: nick(), x: v, t: Date.now(), me: true }); else toast('Sin conexión online'); } refreshChats(); }
   function refreshChats() { const g = genFeed(); renderChat('#gLog', g); renderChat('#mLog', g); renderChat('#rLog', net.chats('room')); }
@@ -25161,7 +25170,7 @@ class Net {
       const fake = cfg.fake || [], free = 12 - hs.length - fake.length, now = Date.now();
       if (!cfg.nextJoin) cfg.nextJoin = now + 3000 + Math.random() * 4000;
       if (free > 0 && now >= cfg.nextJoin) { const pool = ['Coni', 'Agus', 'Joaco', 'Isa', 'Martu', 'Benji', 'Vicho', 'Fran', 'Cata', 'Nacho', 'Sofi', 'Tomi', 'Javi', 'Pía', 'Lucas', 'Mati', 'Dani', 'Rocío', 'Seba', 'Amanda', 'xXGamerXx', 'ElPro99', 'kitty_lover', 'hongo_loco'].filter(n => !fake.includes(n) && !hs.some(p => p.presence.nick === n));
-        const n = pool[Math.floor(Math.random() * pool.length)]; const nf = fake.concat([n]); net.setCfg({ fake: nf, bots: nf.length, nextJoin: now + 4000 + Math.random() * 9000 * (1 + nf.length / 4) }); try { net.say('room', n, ['hola!', 'wena', 'holaa', 'buenas', 'vamos!', 'hola gente', 'listo', 'que onda'][Math.floor(Math.random() * 8)]); } catch (e) {} }
+        const n = pool[Math.floor(Math.random() * pool.length)]; const nf = fake.concat([n]); net.setCfg({ fake: nf, bots: nf.length, nextJoin: now + 4000 + Math.random() * 9000 * (1 + nf.length / 4) }); try { net.say('room', n, ['hola!', 'wena', 'holaa', 'buenas', 'vamos!', 'hola gente', 'llegué', 'listo', 'a ganar', 'quien lidera?', 'hola a todos', 'vamo vamo', 'que onda', 'ya estoy', 'buenaas', 'yo me uno', 'esta sala se ve buena', 'saludos', 'vamos team', 'holi'][Math.floor(Math.random() * 20)]); } catch (e) {} }
       else if (free > 0 && !cfg.nextJoin) net.setCfg({ nextJoin: now + 5000 }); }
     const fakeN = (cfg.fake || []).length;
     const isHost = net.role === 'host'; const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
