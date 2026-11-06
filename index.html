@@ -21791,12 +21791,10 @@ class Sfx {
     { const m = /^(sp_p|dx_d)(\d+)$/.exec(n); if (m) { const th = window.FXART ? FXART.theme(m[1] === 'sp_p' ? 'spawn' : 'death', +m[2]) : 'G'; this.fxSfx(th, +m[2] + (m[1] === 'dx_d' ? 100 : 0), m[1] === 'dx_d'); return; } }
     { const m = /^emo_(\d+)$/.exec(n); if (m) { this.emojiSfx(+m[1]); return; } }
     if (n === 'taunt') { const E = [500, 1800, 2500], A = [800, 1200, 2600]; [0, 0.16, 0.32, 0.5].forEach((d, i) => this.voice(i % 2 ? 520 : 640, i % 2 ? 500 : 620, 0.14, [i % 2 ? A : E, i % 2 ? A : E], 0.3, d)); this.tone(300, 900, 0.1, 'square', 0.05, 0.62); return; }
-    if (n === 'jump') { // a cheerful cartoon hop: a rising "boing" glide and a little sparkle on top (original, no copied tune)
-      this.tone(330, 1320, 0.32, 'square', 0.28); this.tone(660, 2640, 0.3, 'triangle', 0.5, 0.01);
-      [1568, 2093, 2637, 3136].forEach((f, i) => this.tone(f, f * 1.01, 0.12, 'triangle', 0.42, 0.2 + i * 0.065)); this.noise(0.06, 0.2, 4000, 1); return; }
-    if (n === 'jump_w') { // a bubbly hop: a watery glide, a splash and three bubble pops
-      this.tone(300, 1200, 0.3, 'square', 0.24); this.tone(600, 1800, 0.28, 'sine', 0.6, 0.01); this.noise(0.32, 0.7, 2200, 0.7);
-      [0.2, 0.28, 0.37].forEach((d, i) => this.tone(900 + i * 250, 1700 + i * 300, 0.07, 'sine', 0.55, d)); return; }
+    if (n === 'jump') { // the classic platform hop: one quick rising "bwip" (original sound)
+      this.tone(240, 760, 0.2, 'square', 0.32); this.tone(480, 1520, 0.18, 'triangle', 0.4, 0.005); return; }
+    if (n === 'jump_w') { // the same hop with a little splash (Corre Polar)
+      this.tone(220, 700, 0.2, 'square', 0.3); this.tone(440, 1400, 0.18, 'triangle', 0.4, 0.005); this.noise(0.22, 0.5, 2000, 0.7); return; }
     if (n.includes('aghhh') || n === 'death') {
       // a little kid's "waaah!" (each mushroom a slightly different voice), then a soft plop
       const k = 0.9 + Math.random() * 0.25, U = [370, 900, 2600], A = [1000, 1500, 3100], O = [600, 1000, 2700];
