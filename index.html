@@ -23605,7 +23605,8 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     const W = this.W; if (!u.alive) return; const map = W.profile.id, cid = this.sprCharOf(u), C = MAN.chars[cid]; if (!C) return;
     const t = W.time, dt = Math.min(0.1, this._dt || 0.016), col = this.heroColor(u);
     if (u._rf == null) u._rf = u.facing; { const d = ((u.facing - u._rf) % 360 + 540) % 360 - 180, st = 640 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
-    const moving = (!!u.order && !u.paused) || !!u.glide; const [row, mir] = SPR.dir(u._rf);
+    { const mv = u._lx != null && Math.hypot(u.x - u._lx, u.y - u._ly) > 0.4; if (mv) u._lastMv = t; }
+    const moving = (!!u.order && !u.paused) || !!u.glide || (u._lastMv != null && t - u._lastMv < 0.3); /* keeps running through tiny gaps between moves */ const [row, mir] = SPR.dir(u._rf);
     if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); }
     // moving cancels any animation (and the idle rotation)
     if (moving || u.jump) { u._still = t; if (u.dance) u.dance = null; }
