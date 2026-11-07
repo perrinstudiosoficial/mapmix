@@ -306,6 +306,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .lvbox{width:min(80vw,330px);border-radius:20px;padding:18px 16px;background:linear-gradient(160deg,#3b1f78,#1d0f40);border:2px solid #ff6fb0;box-shadow:0 0 24px rgba(255,111,176,.35);text-align:center;color:#fff}.lvq{font-size:18px;font-weight:900;margin-bottom:14px}.lvbtns{display:flex;gap:10px}.lvbtns button{flex:1;border:0;border-radius:14px;padding:11px 6px;font-size:16px;font-weight:900;color:#fff}.lvyes{background:linear-gradient(#ff7a9a,#e0335e);box-shadow:0 3px 0 #9b1c3d}.lvno{background:linear-gradient(#5be36b,#20a83a);box-shadow:0 3px 0 #11702a}
 #lore .card,#powers .card{max-height:90vh;overflow-y:auto}
 #rankBtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:rgba(20,6,32,.85);border:1px solid rgba(255,255,255,.2);cursor:pointer;flex:none;margin-left:auto}body > #rankBtn{display:none!important}.pchead #bell{margin-left:6px}#rank{position:fixed;inset:0;z-index:61;background:rgba(5,0,12,.8);display:grid;place-items:center;padding:16px}.rkrow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.05);margin:3px 0}.rkrow.me{background:rgba(138,77,255,.35);outline:1px solid #b3ff5a}.rkrow i{font-style:normal;width:34px;text-align:center;font-weight:900}.rkrow img{width:28px;height:28px;border-radius:7px}.rkrow b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rkrow em{font-style:normal;color:#ffd34d;font-weight:900}
+.icimg{width:40px;height:40px;object-fit:contain;vertical-align:middle}.ks .icimg,.krow .ic .icimg{width:100%;height:100%;max-width:44px;max-height:44px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -518,10 +519,10 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   <div class="card" style="text-align:left">
     <h1 style="font-size:30px;text-align:center">PODERES</h1>
     <div id="pwShroom">
-    <div class="pw"><span>🛼</span><div><b>Correr</b>Toca 🛼 y sales deslizándote recto y rápido, sin parar. Mientras corres, el joystick solo te hace girar. Toca 🛼 otra vez para volver a caminar.</div></div>
-    <div class="pw"><span>🌀</span><div><b>Disparar</b>Toca 🌀 y luego toca un payaso: le lanzas un disparo que lo hace desaparecer. Solo sirve con los payasos que deambulan; los demás son invulnerables. Gasta energía (barra azul).</div></div>
-    <div class="pw"><span>🍄</span><div><b>Teletransporte</b>Encuentra un hongo escondido en el nivel, toca 🍄 y luego toca a un compañero: te quedas quieto un momento mientras se forma la luz y apareces a su lado. Cada viaje gasta un hongo y hay que esperar 20 segundos entre uno y otro. Si tienes un hongo y un amigo está cerca, puedes regalárselo con 🎁.</div></div>
-    <div class="pw"><span>✚</span><div><b>Revivir y pedir ayuda</b>Si caes, puedes mover la cámara o mirar a un compañero. Toca 📍 para avisar a todos dónde está tu tumba. Para revivir a otro, camina encima de su tumba.</div></div>
+    <div class="pw"><span><img class="icimg" src="assets/fx/it_p_run.webp" alt=""></span><div><b>Correr</b>Toca 🛼 y sales deslizándote recto y rápido, sin parar. Mientras corres, el joystick solo te hace girar. Toca 🛼 otra vez para volver a caminar.</div></div>
+    <div class="pw"><span><img class="icimg" src="assets/fx/it_p_shoot.webp" alt=""></span><div><b>Disparar</b>Toca 🌀 y luego toca un payaso: le lanzas un disparo que lo hace desaparecer. Solo sirve con los payasos que deambulan; los demás son invulnerables. Gasta energía (barra azul).</div></div>
+    <div class="pw"><span><img class="icimg" src="assets/fx/it_p_tele.webp" alt=""></span><div><b>Teletransporte</b>Encuentra un hongo escondido en el nivel, toca 🍄 y luego toca a un compañero: te quedas quieto un momento mientras se forma la luz y apareces a su lado. Cada viaje gasta un hongo y hay que esperar 20 segundos entre uno y otro. Si tienes un hongo y un amigo está cerca, puedes regalárselo con 🎁.</div></div>
+    <div class="pw"><span><img class="icimg" src="assets/fx/it_p_help.webp" alt=""></span><div><b>Revivir y pedir ayuda</b>Si caes, puedes mover la cámara o mirar a un compañero. Toca 📍 para avisar a todos dónde está tu tumba. Para revivir a otro, camina encima de su tumba.</div></div>
     </div><div id="pwRun"></div><div id="pwSec"></div>
     <button class="big-btn" id="bPowersClose" style="display:block;margin:12px auto 0">ENTENDIDO</button>
   </div>
@@ -22309,7 +22310,7 @@ class Renderer {
       if (it.taken) continue; const b = Math.sin(W.time * 4 + it.handle) * 6;
       g.save(); g.translate(it.x, it.y);
       g.fillStyle = `rgba(255,255,140,${0.25 + 0.15 * Math.sin(W.time * 5)})`; g.beginPath(); g.arc(0, 0, 60, 0, 7); g.fill();
-      g.translate(0, 8 + b); this.mushroom(g, 26, '#ff3b6b'); g.restore();
+      g.translate(0, 8 + b); { const im = Renderer._hongo || (Renderer._hongo = Object.assign(new Image(), { src: 'assets/fx/it_hongo.webp' })); if (im.complete && im.naturalWidth) { g.scale(1, -1); g.drawImage(im, -36, -60, 72, 72); } else this.mushroom(g, 26, '#ff3b6b'); } g.restore(); // the hidden mushroom (same picture as in the info)
     }
   }
   mushroom(g, sz, color) {
@@ -23597,7 +23598,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     charOf(p, map, W) { const S = window.SW && window.SW.settings; let id = null; if (p && W && p === W.local) { id = S && S.skins && S.skins[map]; if (id && window.ownsChar && !window.ownsChar(map, id)) id = null; } else if (p) id = (p.skins && p.skins[map]) || null;
       if (!SPR.valid(map, id) && p && p.ai && W) { const L = SPR.chars(map); id = L[(p.id * 7 + 3) % L.length]; } // bots wear a mix of the characters
       return SPR.valid(map, id) ? id : BASE_CHAR[map]; },
-    has(cid, a) { const c = MAN.chars[cid]; return !!(c && c.anims[a]); },
+    has(cid, a) { const c = MAN.chars[cid]; return !!(c && (c.anims[a] || (a === 'wave' && c.anims.swave))); }, // Saludar uses the shop wave when there is no other
     // which drawing to show: row of the sheet + mirror for the left side. angle in degrees, 0 = east, counter-clockwise (y up)
     dir(a) { const d = ((Math.round(a / 45) % 8) + 8) % 8; return [[2, 1], [1, 1], [0, 1], [1, -1], [2, -1], [3, -1], [4, 1], [3, 1]][d]; },
     frame(cid, a, row, fi) { const c = MAN.chars[cid]; const A = c && c.anims[a]; if (!A) return null; const im = img(A.f); if (!im) return null; const n = A.n[row] || 8; fi = ((fi % n) + n) % n; return { im, sx: fi * A.cw, sy: row * A.ch, sw: A.cw, sh: A.ch, k: A.k ? A.k[row] : 1 }; }, // k: size fix so a run pose is never bigger than standing
@@ -23645,6 +23646,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     if (u._lx != null) u._dist = (u._dist || 0) + Math.min(40, Math.hypot(u.x - u._lx, u.y - u._ly)); u._lx = u.x; u._ly = u.y;
     if (u.jump) { const p = Math.min(1, (W.time - u.jump.t0) / u.jump.dur); lift = Math.sin(p * Math.PI) * 90; if (C.anims.flip && (!C.anims.flip.side || row === 2)) { a = 'flip'; const nf = (C.anims.flip.n && C.anims.flip.n[2]) || 8; fi = Math.min(nf - 1, Math.floor(p * nf)); } /* 8 or 16 poses; a side-only somersault is used only when jumping sideways */ else { a = C.anims.run ? 'run' : 'walk'; const nF = (C.anims[a].n && C.anims[a].n[row]) || 8; fi = Math.floor(p * nF * 1.5); } }
     else if (moving) { a = C.anims.run && (u.glide || map !== 'shroom25' || (u.speedMul || 1) > 1.2) ? 'run' : 'walk'; if (!C.anims[a]) a = C.anims.walk ? 'walk' : 'run'; { const nF = (C.anims[a].n && C.anims[a].n[row]) || 8, fast = a === 'run' && (u.glide || map !== 'shroom25' || (u.speedMul || 1) > 1.2); u._rt = (u._rt || 0) + dt; fi = Math.floor(u._rt * (fast ? 3.6 : 3.0) * nF); } } /* by the clock while moving: one smooth endless loop */
+    else if (u.dance && u.dance.id === 'wave' && !C.anims.wave && C.anims.swave) { const e = (performance.now() - u.dance.t0) / 1000, S = [0, 1, 2, 3, 2, 3, 2, 3, 1, 0]; a = 'swave'; fi = S[Math.min(S.length - 1, Math.floor(e / 0.28))]; if (e > 2.8) u.dance = null; }
     else if (u.dance && C.anims[u.dance.id]) { a = u.dance.id; const e = (performance.now() - u.dance.t0) / 1000;
       if (a === 'flip') { const D = 1.2, p = Math.min(1, e / D); lift = Math.sin(p * Math.PI) * 120; const nf = (C.anims.flip.n && C.anims.flip.n[2]) || 8, q = nf > 8 ? p : Math.max(0, Math.min(1, (p - 0.2) / 0.6)); fi = Math.min(nf - 1, Math.floor(q * nf)); if (p >= 1) u.dance = null; } // jump up first, the somersault happens high in the air
       else { fi = e * 7; smooth = true; } }
@@ -23958,14 +23960,15 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     potV: ['🥤', 'Poción de Velocidad', 'Úsala: +60% de velocidad por 15 segundos.'], potM: ['🔵', 'Poción de Maná', 'Úsala: recarga al instante todos tus poderes.'], sobi: ['🎭', 'Máscara del Sabio', 'Llévala: tus poderes se recargan más rápido (50% en el tigre, 25% en la foca).'], botas: ['👢', 'Botas de Velocidad', 'Llévalas: +15% de velocidad.'],
     colE: ['📿', 'Amuleto Vital', 'Llévalo: Invisible y Dash duran más (2 s en el tigre, 1 s en la foca).'], minas: ['💣', 'Minas Trampa', 'Úsalas: dejas una mina escondida donde estás; el lobo que la pise sale volando y queda aturdido 6 s. 3 cargas.'], tomo: ['📕', 'Libro del Veloz', 'Úsalo: +10% de velocidad para el resto de la partida.'] };
   // what each map hides: shown before playing (map info) and in game (Poderes)
-  const SECRETS = { shroom25: [['🍄', 'Hongo escondido', 'En cada nivel hay un hongo oculto: recógelo para usar el Teletransporte hacia un compañero.']],
+  const icImg = k => `<img class="icimg" src="assets/fx/it_${k}.webp" alt="">`; window.icImg = icImg; // item / power pictures (same in the map info and in game)
+  const SECRETS = { shroom25: [[icImg('hongo'), 'Hongo escondido', 'En cada nivel hay un hongo oculto: recógelo para usar el Teletransporte hacia un compañero.']],
     kitty5: ['potV', 'potM', 'sobi', 'botas', 'colE', 'minas', 'tomo'], bob: ['potE', 'potEM', 'sobi', 'sobiU', 'colE', 'colM', 'tomo'] };
-  const secretList = id => (SECRETS[id] || []).map(x => typeof x === 'string' ? KITEMS[x] : x).filter(Boolean);
+  const secretList = id => (SECRETS[id] || []).map(x => typeof x === 'string' ? (KITEMS[x] ? [icImg(x)].concat(KITEMS[x].slice(1)) : null) : x).filter(Boolean);
   window.secretsHTML = id => secretList(id).map(([e, n, d]) => `<div class="pw"><span>${e}</span><div><b>${n}</b>${d}</div></div>`).join('');
-  const RUN_POW = { kitty5: [['🐾', 'Saltar', 'Saltas por encima de los lobos; en el aire no te tocan, pero cuidado al caer encima de uno.'], ['😾', 'Gruñido', 'Espanta a los lobos que están cerca.'], ['👻', 'Invisible', 'Casi invisible por unos segundos (si un lobo te pisa, igual caes).'], ['💫', 'Aturdir', 'Los lobos cercanos quedan quietos 5 segundos.'], ['⚡', 'Embestida', 'Corres mucho más rápido por 3 segundos.']],
-    bob: [['🐾', 'Saltar', 'Saltas por encima de los enemigos; sobre el hielo saltas hacia donde te estás deslizando.'], ['😾', 'Gruñido', 'Espanta a los enemigos que están cerca.'], ['🧊', 'Hielo', 'En el hielo no puedes frenar: te deslizas y el joystick solo te hace girar.']] };
+  const RUN_POW = { kitty5: [[icImg('p_jump'), 'Saltar', 'Saltas por encima de los lobos; en el aire no te tocan, pero cuidado al caer encima de uno.'], [icImg('p_roar'), 'Gruñido', 'Espanta a los lobos que están cerca.'], [icImg('p_invis'), 'Invisible', 'Casi invisible por unos segundos (si un lobo te pisa, igual caes).'], [icImg('p_stun'), 'Aturdir', 'Los lobos cercanos quedan quietos 5 segundos.'], [icImg('p_dash'), 'Embestida', 'Corres mucho más rápido por 3 segundos.']],
+    bob: [[icImg('p_jump'), 'Saltar', 'Saltas por encima de los enemigos; sobre el hielo saltas hacia donde te estás deslizando.'], [icImg('p_roar'), 'Gruñido', 'Espanta a los enemigos que están cerca.'], [icImg('p_ice'), 'Hielo', 'En el hielo no puedes frenar: te deslizas y el joystick solo te hace girar.']] };
   function fillPowers() { const id = W && W.profile.id, run = W && W.profile.family === 'run'; $('#pwShroom').style.display = run ? 'none' : '';
-    $('#pwRun').innerHTML = run ? (RUN_POW[id] || []).concat([['✚', 'Revivir', 'Si un amigo cae, toca su círculo para revivirlo.']]).map(([e, n, d]) => `<div class="pw"><span>${e}</span><div><b>${n}</b>${d}</div></div>`).join('') : '';
+    $('#pwRun').innerHTML = run ? (RUN_POW[id] || []).concat([[icImg('p_revive'), 'Revivir', 'Si un amigo cae, toca su círculo para revivirlo.']]).map(([e, n, d]) => `<div class="pw"><span>${e}</span><div><b>${n}</b>${d}</div></div>`).join('') : '';
     const sec = secretsHTML(id); $('#pwSec').innerHTML = sec ? `<h3 style="text-align:center;margin:10px 0 4px">🔮 SECRETOS Y OBJETOS</h3>` + sec : ''; }
   const KSKILLS = { aRes: ['🌀', 'Aura de Galope', 'Tú y los amigos cerca corren más rápido: +10% / +20% / +30%.'], aBri: ['✨', 'Aura de Chispa', 'Tú y los amigos cerca recargan los poderes más rápido: +20% / +40% / +60%.'], viento: ['🌬️', 'Paso Fantasma', 'Mejora tu Invisible: dura 8 / 10 / 12 s y corres +10% / +40% / +70% mientras estás invisible.'] };
   function doStun() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdStun(W.local) && online) online.net.pushEvent('stun'); }
@@ -23978,14 +23981,14 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const items = W.lootItems(), skills = W.lootSkills(), hasSk = Object.keys(skills).length; const full = (h.kinv || []).length >= 6;
     let html = hasSk ? `<div class="ktabs"><button data-kt="items" class="${kTab === 'items' ? 'on' : ''}">🎒 Objetos</button><button data-kt="skills" class="${kTab === 'skills' ? 'on' : ''}">⭐ Habilidades</button></div>` : '';
     if (kTab === 'skills' && hasSk) html += Object.entries(skills).map(([id, L]) => { const lv = (h.skills || {})[id] || 0, [ic, n, d] = KSKILLS[id]; return `<div class="krow"><div class="ic">${ic}</div><div><b>${n} <span style="color:#ffe27a">Nv ${lv}/3</span></b><small>${d}</small></div><button data-learn="${id}" ${lv >= 3 || (h.gold || 0) < L[lv] ? 'disabled' : ''}>${lv >= 3 ? 'MÁX' : '🔮 ' + L[lv]}</button></div>`; }).join('');
-    else html += Object.entries(items).map(([id, pr]) => { const [ic, n, d] = KITEMS[id]; return `<div class="krow"><div class="ic">${ic}</div><div><b>${n}</b><small>${d}</small></div><button data-buy="${id}" ${(h.gold || 0) < pr || full ? 'disabled' : ''}>🔮 ${pr}</button></div>`; }).join('');
+    else html += Object.entries(items).map(([id, pr]) => { const [ic, n, d] = KITEMS[id]; return `<div class="krow"><div class="ic">${icImg(id)}</div><div><b>${n}</b><small>${d}</small></div><button data-buy="${id}" ${(h.gold || 0) < pr || full ? 'disabled' : ''}>🔮 ${pr}</button></div>`; }).join('');
     html += `<div class="krow"><div class="ic">💰</div><div><b>¿Te faltan fichas?</b><small>Cambia monedas 🪙 de la tienda del menú por fichas 🔮.</small></div><button data-more="1" disabled>Próximamente</button></div>`;
     $('#kShopList').innerHTML = html;
     $('#kShopList').querySelectorAll('[data-kt]').forEach(b => b.addEventListener('click', () => { kTab = b.dataset.kt; renderKShop(); }));
     $('#kShopList').querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { if (W.kittyBuy(h, b.dataset.buy)) { if (online) online.net.pushEvent('kbuy', b.dataset.buy); showText('🛒 Compraste: ' + KITEMS[b.dataset.buy][1]); } renderKShop(); }));
     $('#kShopList').querySelectorAll('[data-learn]').forEach(b => b.addEventListener('click', () => { if (W.kittyLearn(h, b.dataset.learn)) { if (online) online.net.pushEvent('klearn', b.dataset.learn); showText('⭐ Aprendiste: ' + KSKILLS[b.dataset.learn][1] + ' nivel ' + h.skills[b.dataset.learn]); } renderKShop(); })); }
   function kittyHud(h) { const on = W.profile.family === 'run'; $('#kitBar').classList.toggle('hidden', !on); if (!on) return;
-    $('#kGold').textContent = '🔮 ' + (h.gold || 0); const inv = h.kinv || []; const key = inv.join(',') + '|' + (h.mineCharges ?? 3); if ($('#kInv').dataset.k !== key) { $('#kInv').dataset.k = key; $('#kInv').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `<div class="ks" data-i="${i}">${inv[i] ? KITEMS[inv[i]][0] + (inv[i] === 'minas' ? `<sup>${h.mineCharges ?? 3}</sup>` : '') : ''}</div>`).join('');
+    $('#kGold').textContent = '🔮 ' + (h.gold || 0); const inv = h.kinv || []; const key = inv.join(',') + '|' + (h.mineCharges ?? 3); if ($('#kInv').dataset.k !== key) { $('#kInv').dataset.k = key; $('#kInv').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `<div class="ks" data-i="${i}">${inv[i] ? icImg(inv[i]) + (inv[i] === 'minas' ? `<sup>${h.mineCharges ?? 3}</sup>` : '') : ''}</div>`).join('');
       $('#kInv').querySelectorAll('.ks').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.i, it = inv[i]; if (!it) return; if (W.kittyUse(h, i)) { if (online) online.net.pushEvent('kuse', i); showText('✨ Usaste: ' + KITEMS[it][1]); } else showText(KITEMS[it][0] + ' ' + KITEMS[it][1] + ': ' + KITEMS[it][2]); })); }
     $('#bKShop').classList.toggle('hidden', !(h.alive && nearShop(h))); }
   function doInvis() { if (!W || W.profile.id !== 'kitty5') return; if (W.cmdInvis(W.local) && online) online.net.pushEvent('invis'); }
@@ -24957,9 +24960,11 @@ class Net {
   // level ranking (menu 🏆): real players seen online + the community bots, highest level first
   const rkHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
   function botRank() { const days = Math.max(0, Math.floor(Date.now() / 864e5) - 20758); return GEN_NAMES.slice(0, 70).map(n => { const r = rkHash(n), base = Math.floor(1 + Math.pow(r, 2.6) * 95); return { nick: n, lvl: Math.min(500, base + Math.floor(days * r * 0.35)), av: 'av' + Math.floor(rkHash(n + 'a') * 16), bot: 1 }; }); }
-  async function openRank() { $('#rank').classList.remove('hidden'); const L = $('#rkList'); L.innerHTML = '<div class="hint">Cargando…</div>';
+  let rkReal = []; const rkLoad = () => allSeen().then(a => { rkReal = a || []; }).catch(() => {}); setTimeout(rkLoad, 4000);
+  function openRank() { $('#rank').classList.remove('hidden'); paintRank(); rkLoad().then(() => { if (!$('#rank').classList.contains('hidden')) paintRank(); }); }
+  function paintRank() { const L = $('#rkList');
     const me = { nick: S.nick || 'Jugador', lvl: window.playerLvl ? playerLvl() : 1, av: S.avatar || 'av0', me: 1, uid: S.account && S.account.uid };
-    let real = []; try { real = (await allSeen()).filter(v => v.lvl && (!me.uid || v.uid !== me.uid)); } catch (e) {}
+    const real = rkReal.filter(v => v.lvl && (!me.uid || v.uid !== me.uid));
     const all = botRank().concat(real.map(v => ({ nick: v.nick, lvl: v.lvl | 0, av: v.av }))).concat([me]).sort((a, b) => b.lvl - a.lvl || (a.me ? -1 : 1));
     const pos = all.indexOf(me) + 1, top = all.slice(0, 100), src = a => window.avatarSrcOf ? avatarSrcOf(a) : 'assets/fx/av_' + (parseInt(String(a || '').replace(/\D/g, '')) || 0) % 16 + '.webp';
     const row = (p, i) => `<div class="rkrow${p.me ? ' me' : ''}"><i>${['🥇', '🥈', '🥉'][i] || (i + 1)}</i><img src="${src(p.av)}" alt=""><b>${esc(p.nick)}${p.me ? ' (tú)' : ''}</b><em>Nv ${p.lvl}</em></div>`;
@@ -26098,6 +26103,7 @@ class Net {
       let list = [], v = { cur: {}, prev: {}, mine: [] }, ok = false;
       try { ok = await Cloud.init(); if (ok) { list = await Cloud.maps(); v = await Cloud.votes(); } } catch (e) { ok = false; }
       COMM.cloud = ok; COMM.list = officials.concat(list); COMM.cur = withCrowd(v.cur, weekNo()); COMM.prev = withCrowd(v.prev, weekNo() - 1); COMM.mine = v.mine; COMM.loaded = true;
+      for (const [k, p] of Object.entries(PEND)) { if (Date.now() - p.t > 180e3) { delete PEND[k]; continue; } const has = COMM.mine.includes(k); if (has !== p.on) { COMM.mine = p.on ? COMM.mine.concat([k]) : COMM.mine.filter(x => x !== k); COMM.cur[k] = Math.max(0, (COMM.cur[k] || 0) + (p.on ? 1 : -1)); } } // a vote just made wins over a cloud copy that is not updated yet
       renderWeekly(); if (!$('#forge').classList.contains('hidden')) renderTab();
     })();
     return COMM.loading;
@@ -26171,10 +26177,15 @@ class Net {
     const vb = r.querySelector('[data-a=vote]'); if (vb) click(vb, () => doVote(m));
     return r;
   }
+  // votes count at once on screen; the cloud is updated in the background
+  const PEND = {};
   async function doVote(m) {
-    try { COMM.mine = await Cloud.vote(m.key); const v = await Cloud.votes(); COMM.cur = withCrowd(v.cur, weekNo()); COMM.prev = withCrowd(v.prev, weekNo() - 1); toast(COMM.mine.includes(m.key) ? '👍 ¡Votaste por “' + m.name + '”!' : 'Voto quitado'); }
-    catch (e) { toast(e.message === 'max' ? 'Ya usaste tus 3 votos de esta semana (toca uno votado para quitarlo)' : 'No se pudo votar ahora'); }
-    renderTab(); renderWeekly();
+    if (!COMM.cloud) { toast('Para votar, abre el juego con tu cuenta de Claude'); return; }
+    const k = m.key, on = !COMM.mine.includes(k);
+    if (on && COMM.mine.length >= 3) { toast('Ya usaste tus 3 votos de esta semana (toca uno votado para quitarlo)'); return; }
+    COMM.mine = on ? COMM.mine.concat([k]) : COMM.mine.filter(x => x !== k); COMM.cur[k] = Math.max(0, (COMM.cur[k] || 0) + (on ? 1 : -1)); PEND[k] = { on, t: Date.now() };
+    toast(on ? '👍 ¡Votaste por “' + m.name + '”!' : 'Voto quitado'); renderTab(); renderWeekly();
+    try { await Cloud.vote(k); } catch (e) { delete PEND[k]; COMM.mine = on ? COMM.mine.filter(x => x !== k) : COMM.mine.concat([k]); COMM.cur[k] = Math.max(0, (COMM.cur[k] || 0) + (on ? -1 : 1)); toast(e.message === 'max' ? 'Ya usaste tus 3 votos de esta semana' : 'No se pudo votar ahora'); renderTab(); renderWeekly(); }
   }
   async function publishFlow(s, ok, pub, changed) {
     if (pub && !(changed && ok)) { try { await Cloud.unpublish(s.id); s.pub = null; saveMine(); toast('Mapa quitado de la comunidad'); } catch (e) { toast('No se pudo quitar ahora'); } renderTab(); loadComm(true); return; }
