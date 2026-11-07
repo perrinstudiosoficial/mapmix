@@ -19979,7 +19979,6 @@ class World {
   setPos(u, x, y) {
     if (!u || u.removed) return;
     if (this.isRemoteUnit(u) && !u._netMove) return; // its own player moves it
-    if (u.hero && this.profile.id === 'bob' && u._iceIn != null && !u.jump) { const e = this.time - u._iceIn, d = Math.hypot(x - u.x, y - u.y); if (e < 0.7 && d < 120) { const f = 0.4 + 0.6 * Math.sin(Math.min(1, e / 0.7) * Math.PI / 2); x = u.x + (x - u.x) * f; y = u.y + (y - u.y) * f; } }
     if (!u.fly && !this.walkable(x, y)) { const p = this.nearestWalkable(x, y, 192); if (p) { x = p.x; y = p.y; } else return; }
     const moved = Math.hypot(x - u.x, y - u.y);
     if (u.hero && moved > 300) { u.order = null; u.path = null; } // don't walk back toward an old click after a teleport
@@ -20081,7 +20080,16 @@ class World {
     if (this.ended) steps = Math.min(steps, 3);
     for (let s = 0; s < steps; s++) this.tick();
   }
-  tick() {
+  // Corre Polar: grass <-> ice changes speed smoothly (runs after everything moved this tick: no burst, no sudden stop)
+  iceSmooth(dt) { if (this.profile.id !== 'bob') return; for (const u of this.units) { if (!u.hero || u.removed || !u.alive || this.remote.has(u.owner.id)) { if (u.hero) u._px = null; continue; }
+        const px = u._px, py = u._py; if (px != null && !u.jump && dt > 0) { const dx = u.x - px, dy = u.y - py, d = Math.hypot(dx, dy), v = d / dt, A = 900, base = u.speed * this.heroSpeedMul(u);
+          if (d > 220) u._v = 0; else { const pv = u._v || 0;
+            if (v > Math.max(base, pv) + 5) { const lim = Math.max(base, pv + A * dt); if (v > lim) { const k = lim / v, nx = px + dx * k, ny = py + dy * k; if (this.walkable(nx, ny)) { u.x = nx; u.y = ny; } } } // speeding up onto the ice
+            else if ((pv > base * 1.05 || this.tileTypeAt(u.x, u.y) === 'Nice') && v < pv - A * dt && u._vdx != null) { const sp = pv - A * dt, nx = u.x + u._vdx * (sp - v) * dt, ny = u.y + u._vdy * (sp - v) * dt; if (this.walkable(nx, ny)) { u.x = nx; u.y = ny; } } // leaving the ice: glide out and slow down
+            const ex = u.x - px, ey = u.y - py, e = Math.hypot(ex, ey); u._v = e / dt; if (e > 0.5) { u._vdx = ex / e; u._vdy = ey / e; } } }
+                u._px = u.x; u._py = u.y; } }
+  tick() { this._tick0(); this.iceSmooth(TICK); }
+  _tick0() {
     const dt = TICK; this.time += dt; this.loopCount = 0;
     // timers & periodic events
     for (const tm of this.timers) {
@@ -20110,7 +20118,6 @@ class World {
       if (u.hero && this.profile.id === 'bob') { // keep your momentum when you slide off the ice onto the grass
         const onIce = this.tileTypeAt(u.x, u.y) === 'Nice';
         if (u._wasIce && !onIce && !u.order && !u.jump) { const f = u.facing * Math.PI / 180; const tx = u.x + Math.cos(f) * 500, ty = u.y + Math.sin(f) * 500; const q = this.walkable(tx, ty) ? { x: tx, y: ty } : this.nearestWalkable(tx, ty, 200); if (q) this.issueOrder(u, 851986, q.x, q.y); }
-        if (onIce && !u._wasIce) u._iceIn = this.time; // entering the ice: the slide speeds up smoothly (see setPos)
         u._wasIce = onIce;
         if (onIce && !u.jump && !this.remote.has(u.owner.id)) { // on ice you can't stop or turn on the spot: the slide carries you, the stick only steers a curve
           const o = u.order; if (o && o.type === 'move') { if (Math.hypot(o.x - u.x, o.y - u.y) < 40) { u.order = null; u.path = null; }
@@ -24915,8 +24922,8 @@ class Net {
   if (S.account && !S.account.uid) { S.account.uid = newUid(); SW.saveSettings(); }
   setTimeout(accountAsk, 400);
   // your characters' emoji sheets load while you are in the menu, so the first emote in a map is instant
-  const preEmo = () => { try { if (!window.SPR) return; for (const m of ['shroom25', 'kitty5', 'bob']) { const c = SPR.MAN.chars[SPR.charOf({ skins: S.skins || {} }, m, null)]; if (c && c.emoji) SPR.img(c.emoji.f); } } catch (e) {} };
-  setTimeout(preEmo, 1500); setInterval(preEmo, 8000);
+  const preEmo = () => { try { if (!window.SPR) return; for (const m of ['shroom25', 'kitty5', 'bob']) { const c = SPR.MAN.chars[SPR.charOf({ skins: S.skins || {} }, m, null)]; if (c && c.emoji) SPR.img(c.emoji.f); if (c) for (const a of ['views', 'blink', 'run', 'walk', 'flip']) if (c.anims[a]) SPR.img(c.anims[a].f); } /* your characters are ready before the map opens */ } catch (e) {} };
+  setTimeout(preEmo, 300); setInterval(preEmo, 8000);
   // ---------- friends: add by ID; online friends show what they play and for how long (live through the lobby) ----------
   const MAPN = { shroom25: 'Escape Fantasía', kitty5: 'Corre Gatito Corre', bob: 'Corre Polar' };
   function myPresence() { const W = window.SW && SW.W, ingame = W && !$('#hud').classList.contains('hidden'); if (ingame && !myPresence.since) myPresence.since = Date.now(); if (!ingame) myPresence.since = 0; return { uid: S.account && S.account.uid, nick: S.nick || 'Jugador', av: S.avatar || 'av0', adds: (S.friends || []).filter(f => !f.bot && Date.now() - (f.at || 0) < 7 * 864e5).map(f => f.uid).slice(-20), map: ingame ? (MAPN[W.profile.id] || W.profile.name || 'un mapa') : null, since: myPresence.since || null }; }
