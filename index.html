@@ -66,7 +66,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 #bSpray.cool > span{opacity:.35}
 #pcard{position:fixed;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:40;width:236px;pointer-events:none;background:rgba(20,6,32,.72);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:3px 6px 5px}#pcard canvas{width:180px;height:39px;display:block}#pcard.hidden{display:none}
 .pcxp,#hudXp{position:relative;height:13px;border-radius:7px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);overflow:hidden}.pcxp i,#hudXp i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#7dff8a,#3fd0ff);display:block}.pcxp span,#hudXp span{position:relative;display:block;text-align:center;font-size:9px;font-weight:900;line-height:13px;color:#fff;text-shadow:0 0 2px #000,0 0 2px #000}
-body.pcon .screen{padding-top:16px}.sw{position:relative;display:inline-block;width:54px;height:30px;flex:none}.sw input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}.sw i{position:absolute;inset:0;border-radius:15px;background:#4a2a62;border:1px solid rgba(255,255,255,.2);transition:.2s}.sw i::after{content:'OFF';position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#bbb;transition:.2s;font:900 7px Nunito,sans-serif;display:grid;place-items:center;color:#333}.sw input:checked+i{background:#5fd12f}.sw input:checked+i::after{left:27px;background:#fff;content:'ON';color:#2a6a10}
+body.pcon .screen{padding-top:16px}#hud .pcav,#hud #hudNick,#hud .pcid{display:none!important}body > #bell:not(.ig){display:none!important}
+.sw{position:relative;display:inline-block;width:54px;height:30px;flex:none}.sw input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}.sw i{position:absolute;inset:0;border-radius:15px;background:#4a2a62;border:1px solid rgba(255,255,255,.2);transition:.2s}.sw i::after{content:'OFF';position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#bbb;transition:.2s;font:900 7px Nunito,sans-serif;display:grid;place-items:center;color:#333}.sw input:checked+i{background:#5fd12f}.sw input:checked+i::after{left:27px;background:#fff;content:'ON';color:#2a6a10}
 #prCard #pcard{position:static;width:100%;margin:0 auto}#prCard canvas{width:220px!important;height:48px!important}#prCard .pcav{width:58px;height:58px}#prCard .pcid{font-size:12px}#prCard .pcav{pointer-events:none}.pchead{display:flex;align-items:center;gap:10px;margin:0 0 6px}.pchead .avbtn{width:52px;height:52px;border-radius:12px;border:2px solid #c9a6ff;cursor:pointer;flex:none;object-fit:cover;background:#2a1240}.pchead .pct{flex:1;min-width:0;text-align:center}.pchead .pct h1{margin:0}.pchead #bell{position:relative;right:auto;top:auto;flex:none}
 .pchead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:-2px -4px 8px}.pchead #pcard{position:static;width:236px}.pchead #bell{position:relative;right:auto;top:auto;flex:none}
 /* main menu fits in one screen under the player card: title on top, chat visible */
@@ -369,9 +370,10 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
       <button class="big-btn cyan" id="goOnline">JUGAR ONLINE</button>
       <button class="big-btn gold" id="goForge">🛠 TALLER DE MAPAS</button>
       <button class="big-btn pink" id="goShop">TIENDA</button>
+      <button class="big-btn" id="goSettings2" style="background:linear-gradient(#b9a6ff,#7b5cff);color:#1a0d36">⚙ CONFIGURACIÓN</button>
     </div>
     <div class="weekly" data-back="menu"></div>
-    <div class="row2"><button class="big-btn ghost" id="goSettings">⚙ Ajustes</button><button class="big-btn ghost" id="goFriends">👥 Amigos</button></div>
+    <div class="row2"><button class="big-btn ghost" id="goFriends">👥 Amigos</button></div>
     <div class="lbl">💬 Chat general</div>
     <div class="mchat"><div class="mlog" id="mLog" style="height:110px"></div><div class="mrow"><input id="mIn" maxlength="90" placeholder="Escribe a todos…" autocomplete="off"><button id="mSend">ENVIAR</button></div></div>
   </div>
@@ -21971,7 +21973,7 @@ class Sfx {
       if (!this.ctx) return;
       const now = c.currentTime;
       if (this._songChanged) { load(); next = now + 0.15; }
-      if (!this.musicOn || this.muted) { next = now + 0.1; }
+      if (!this.musicOn) { next = now + 0.1; } /* music and FX are separate switches */
       else {
         if (next < now) next = now + 0.05;
         while (next < now + 1.0) {
@@ -24472,7 +24474,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     g.querySelectorAll('img:not(.lock)').forEach(im => im.addEventListener('click', () => { settings.avatar = im.dataset.av; saveSettings(); g.querySelectorAll('img').forEach(x => x.classList.toggle('sel', x === im)); }));
     $('#avPick').classList.remove('hidden'); }
   $('#avClose') && $('#avClose').addEventListener('click', () => $('#avPick').classList.add('hidden'));
-  function drawHudNick() { const inGame = !$('#hud').classList.contains('hidden'); const pc = $('#pcard'); if (pc) { pc.classList.toggle('hidden', inGame); const scr = !inGame && [...document.querySelectorAll('.screen')].find(e => !e.classList.contains('hidden') && e.querySelector('.card')); const card = scr && scr.querySelector('.card'); const bl = $('#bell');
+  function drawHudNick() { const inGame = !$('#hud').classList.contains('hidden'); const pc = $('#pcard'); if (pc) { pc.classList.toggle('hidden', inGame); const scr = !inGame && !$('#menu').classList.contains('hidden') ? $('#menu') : null; document.querySelectorAll('.pchead').forEach(h => { if (!scr || !scr.contains(h)) h.style.display = 'none'; else h.style.display = ''; }); /* avatar + mail only on the main menu */ const card = scr && scr.querySelector('.card'); const bl = $('#bell');
       // menus show only your avatar (top-left) and the mail; tapping the avatar opens your profile with the rest
       if (pc.parentNode !== $('#prCard') && $('#prCard')) $('#prCard').appendChild(pc);
       if (card) { let h = card.querySelector(':scope > .pchead'); if (!h) { h = document.createElement('div'); h.className = 'pchead'; h.innerHTML = '<img class="avbtn pcav2" alt=""><div class="pct"></div>'; card.insertBefore(h, card.firstChild); const t = card.querySelector(':scope > h1'); if (t) h.querySelector('.pct').appendChild(t); } const ab = h.querySelector('.avbtn'), src = avatarSrc(); if (ab.getAttribute('src') !== src) ab.setAttribute('src', src); if (bl && bl.parentNode !== h) h.appendChild(bl); }
@@ -24506,8 +24508,8 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   for (const b of document.querySelectorAll('.helpBtn')) btn('#' + b.id, () => $('#powers').classList.remove('hidden'));
   btn('#bPowersClose', () => $('#powers').classList.add('hidden'));
   $('#optControl').addEventListener('change', e => { settings.control = e.target.value; saveSettings(); });
-  $('#optSound').addEventListener('change', e => { settings.sound = e.target.checked; sfx.muted = !settings.sound; saveSettings(); });
-  $('#optMusic').addEventListener('change', e => { settings.music = e.target.checked; saveSettings(); if (hasCustom) { if (settings.music) audio.play().catch(() => {}); else audio.pause(); } else sfx.musicOn = settings.music; });
+  $('#optSound').addEventListener('change', e => { settings.sound = e.target.checked; sfx.muted = !settings.sound; saveSettings(); try { if (sfx.fxGain) sfx.fxGain.gain.value = settings.sound ? 1 : 0; } catch (x) {} });
+  $('#optMusic').addEventListener('change', e => { settings.music = e.target.checked; saveSettings(); if (hasCustom) { if (settings.music) audio.play().catch(() => {}); else audio.pause(); } else sfx.musicOn = settings.music; try { const g = sfx.musicGain && sfx.musicGain.gain, c = sfx.ctx; if (g && c) { g.cancelScheduledValues(c.currentTime); g.setValueAtTime(settings.music ? (sfx.songId === 'menu' ? 0.7 : 1.3) : 0, c.currentTime); } } catch (x) {} }); /* silent / back the same instant */
   for (const [m, g, k] of [['#optSoundM', '#optSound', 'sound'], ['#optMusicM', '#optMusic', 'music']]) { const a = $(m), b = $(g); if (a && b) { b.checked = a.checked = settings[k] !== false; a.addEventListener('change', () => { b.checked = a.checked; b.dispatchEvent(new Event('change')); }); setInterval(() => { const v = settings[k] !== false; if (a.checked !== v) a.checked = v; if (b.checked !== v) b.checked = v; }, 800); } }
   function syncSettingsUI() { $('#optControl').value = settings.control; $('#optSound').checked = settings.sound; $('#optMusic').checked = settings.music; }
   $('#bots').value = String(settings.bots); $('#mode').value = settings.mode;
@@ -24813,7 +24815,7 @@ class Net {
   click('#goSolo', () => { S.nick = nick(); SW.saveSettings(); show('solo'); });
   click('#goOnline', () => { S.nick = nick(); SW.saveSettings(); show('online'); openOnline(); });
   const showCoins = () => { const n = S.coins | 0; $('#menuCoins').textContent = '🪙 ' + n + ' monedas'; document.querySelectorAll('.wcoins').forEach(e => { e.textContent = '🪙 ' + n; }); }; showCoins(); setInterval(showCoins, 2000);
-  click('#goShop', () => { show('shop'); });
+  click('#goShop', () => { show('shop'); }); click('#goSettings2', () => { const b = $('#goSettings'); if (b) b.click(); else show('settings'); });
   click('#goSettings', () => show('settings'));
 
   // ---------- shop (coming soon) ----------
@@ -24931,7 +24933,7 @@ class Net {
     for (const o of L) { if (!o || !o.uid || o.uid === me || seenA.includes(o.uid)) continue; seenA.push(o.uid); if (!(S.friends || []).some(f => f.uid === o.uid)) newNotif({ id: 'n' + Date.now() + o.uid, type: 'add', uid: o.uid, nick: o.nick, av: o.av, at: Date.now() }); else SW.saveSettings(); } } catch (e) {} }
   setInterval(checkAddsDb, 20000); setTimeout(checkAddsDb, 12000);
   // the ✉️ icon: menus, shop, map choice and "prepare match"; in a game only when something new arrived. It shakes and chimes on arrival
-  function bell(fresh) { const b = $('#bell'); if (!b) return; const n = (S.notifs || []).length, ingame = !$('#hud').classList.contains('hidden'); const scr = ['menu', 'shop', 'solo', 'pre'].some(id => { const e = $('#' + id); return e && !e.classList.contains('hidden'); });
+  function bell(fresh) { const b = $('#bell'); if (!b) return; const n = (S.notifs || []).length, ingame = !$('#hud').classList.contains('hidden'); const scr = ['menu'].some(id => { const e = $('#' + id); return e && !e.classList.contains('hidden'); });
     b.classList.toggle('hidden', !(scr || (ingame && n))); b.classList.toggle('ig', ingame && !scr); $('#bellN').textContent = n ? String(n) : '';
     if (fresh) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); try { SW.sfx.init(); SW.sfx.play('notif'); } catch (e) {} } }
   setInterval(() => { try { checkAdds(); bell(); } catch (e) {} }, 1000);
@@ -26370,7 +26372,7 @@ class Net {
 
 </script>
 <div id="leaveAsk" class="hidden" style="position:fixed;inset:0;z-index:999;background:rgba(10,0,25,.7);display:flex;align-items:center;justify-content:center"><div class="lvbox"><div class="lvq">¿Seguro que quieres salir de la partida?</div><div class="lvbtns"><button id="leaveYes" class="lvyes">Salir</button><button id="leaveNo" class="lvno">Seguir jugando</button></div></div></div>
-<div id="ageAsk" class="hidden" style="position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center"><div style="background:#1d1240;border:2px solid #ff6fb0;border-radius:16px;padding:18px;max-width:300px;text-align:center;font-weight:800"><div style="font-size:30px">🔞</div><p>¿Eres mayor de edad (+18)?</p><p style="font-size:12px;opacity:.8">Las groserías se mostrarán sin censura en el chat.</p><button id="ageYes" class="btn">Sí</button> <button id="ageNo" class="btn">No</button></div></div>
+<div id="ageAsk" class="hidden" style="position:fixed;inset:0;z-index:999;background:rgba(10,0,25,.7);display:flex;align-items:center;justify-content:center"><div class="lvbox"><div style="font-size:30px">🔞</div><div class="lvq">¿Eres mayor de edad (+18)?</div><div style="font-size:12px;opacity:.8;margin:-4px 0 10px">Las groserías se mostrarán sin censura en el chat.</div><div class="lvbtns"><button id="ageYes" class="lvyes">Sí, soy +18</button><button id="ageNo" class="lvno">No</button></div></div></div>
 <script>if("serviceWorker" in navigator&&location.protocol==="https:")window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
 </body>
 </html>
