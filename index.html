@@ -21834,6 +21834,17 @@ class Sfx {
     }
     } finally { this.tone = tone0; this.noise = noise0; } // louder emojis
   }
+  // each character's own "hello" when you pick it (original synthesized sounds)
+  charSfx(id) { const T = (a, b, d, ty, v, dl) => this.tone(a, b, d, ty, v, dl), N = (d, v, f, q, dl) => this.noise(d, v, f, q, dl), V = (a, b, d, F, v, dl) => this.voice(a, b, d, F, v, dl);
+    const I = [300, 2300, 3000], E = [500, 1800, 2500], A = [800, 1200, 2600], O = [500, 900, 2400], U = [350, 800, 2300];
+    if (id === 'elfo') { [0, 0.11, 0.22].forEach((d, i) => V(820 + i * 90, 900 + i * 90, 0.09, [I, E], 0.32, d)); [1568, 2093, 2637].forEach((f, i) => T(f, f, 0.18, 'triangle', 0.22, 0.34 + i * 0.07)); return; } // giggle + sparkle
+    if (id === 'leon') { T(150, 85, 0.75, 'sawtooth', 0.55); T(220, 110, 0.7, 'square', 0.25, 0.02); N(0.7, 0.5, 500, 0.8); V(170, 120, 0.7, [A, O], 0.35); return; } // roar
+    if (id === 'foca') { [0, 0.22].forEach(d => { V(520, 380, 0.13, [A, O], 0.5, d); N(0.08, 0.2, 1200, 1, d); }); T(600, 1400, 0.25, 'sine', 0.25, 0.48); return; } // "arf arf" + bubble
+    let h = 0; for (const c of id) h = (h * 31 + c.charCodeAt(0)) % 997; const k = 0.8 + (h % 9) / 20;
+    if (/tigre|jaguar|leopardo|puma|pantera|guepardo/.test(id)) { T(130 * k, 80 * k, 0.6, 'sawtooth', 0.5); N(0.6, 0.45, 450 * k, 0.8); V(160 * k, 110 * k, 0.6, [A, O], 0.3); return; } // big cats: growl
+    if (/gato|lince|serval|margay|ocelote|caracal|jaguarundi/.test(id)) { V(700 * k, 520 * k, 0.12, [I, E], 0.4); V(760 * k, 480 * k, 0.4, [E, U], 0.42, 0.1); return; } // small cats: meow
+    if (id === 'tiburon') { T(90, 60, 0.5, 'sine', 0.6); N(0.5, 0.4, 700, 0.6); T(500, 1500, 0.2, 'sine', 0.2, 0.3); return; } // splash
+    [0, 0.09, 0.18].forEach((d, i) => T(523 * k * [1, 1.26, 1.5][i], 523 * k * [1, 1.26, 1.5][i], 0.18, 'triangle', 0.35, d)); } // others: a little jingle
   play(name) {
     if (!this.ctx || this.muted) return;
     const n = String(name || '').toLowerCase();
@@ -21841,6 +21852,7 @@ class Sfx {
     { const m = /^(sp_p|dx_d)(\d+)$/.exec(n); if (m) { const th = window.FXART ? FXART.theme(m[1] === 'sp_p' ? 'spawn' : 'death', +m[2]) : 'G'; this.fxSfx(th, +m[2] + (m[1] === 'dx_d' ? 100 : 0), m[1] === 'dx_d'); return; } }
     { const m = /^emo_(\d+)$/.exec(n); if (m) { this.emojiSfx(+m[1]); return; } }
     if (n === 'taunt') { const E = [500, 1800, 2500], A = [800, 1200, 2600]; [0, 0.16, 0.32, 0.5].forEach((d, i) => this.voice(i % 2 ? 520 : 640, i % 2 ? 500 : 620, 0.14, [i % 2 ? A : E, i % 2 ? A : E], 0.3, d)); this.tone(300, 900, 0.1, 'square', 0.05, 0.62); return; }
+    { const m = /^char_(.+)$/.exec(n); if (m) { this.charSfx(m[1]); return; } }
     if (n === 'notif') { [[880, 0], [1318, 0.12], [1760, 0.24]].forEach(([f, d]) => this.tone(f, f, 0.22, 'sine', 0.55, d)); this.tone(2637, 2637, 0.3, 'triangle', 0.2, 0.3); return; } // friendly notification chime
     if (n === 'jump') { // the classic platform hop: one quick rising "bwip" (original sound), loud so it cuts through the music
       this.tone(240, 760, 0.22, 'square', 0.9); this.tone(480, 1520, 0.2, 'triangle', 1.0, 0.005); this.tone(240, 760, 0.22, 'sawtooth', 0.5); return; }
@@ -23979,7 +23991,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   // ---------- dances (original moves; hold the button to pick one) ----------
   const DANCES = { wave: ['👋', 'Saludar'], tired: ['😮‍💨', 'Cansado'], sit: ['🪑', 'Sentarse'], yawn: ['🥱', 'Bostezar'], blink: ['😑', 'Parpadear'], dance: ['✨', 'Animación', 1], goofy: ['🤪', 'Cara de bobo', 1], flip: ['🤸', 'Salto mortal', 1], taunt: ['😜', 'Burlarse', 1] };
   const myCid = () => W && window.SPR ? SPR.charOf(W.local, W.profile.id, W) : null;
-  const animList = () => { const cid = myCid(), map = W && W.profile.id; return Object.keys(DANCES).filter(id => id !== 'taunt' && (!cid || SPR.has(cid, id)) && (!DANCES[id][2] || (window.ownsAnim && ownsAnim(cid, id)))); };
+  const animList = () => { const cid = myCid(), map = W && W.profile.id; return Object.keys(DANCES).filter(id => id !== 'taunt' && id !== 'flip' && (!cid || SPR.has(cid, id)) && (!DANCES[id][2] || (window.ownsAnim && ownsAnim(cid, id)))); };
   if (!settings.danceLast || !DANCES[settings.danceLast]) settings.danceLast = 'wave';
   const DANCE_CD = 1, DANCE_LEN = Infinity; // dances loop until you move
   function sendDance(id, who) {
@@ -24854,7 +24866,7 @@ class Net {
     ['#tabSpray', '#sprayGrid', 'Pinta el piso con el botón 🎨 (tócalo para pintar, mantenlo para elegir entre tus 5). Dura 40 segundos, todos lo ven, y sirve en todos los juegos.'], ['#tabPass', '#passBox', 'Juega cualquier mapa para subir de nivel: ganas XP por cada ronda o etapa que pasa tu equipo y por cada minuto jugado.'], ['#tabCoins', '#coinGrid', 'Las monedas servirán para comprar skins, emotes, efectos y auras.']];
   TABS.push(['#tabNick', '#nickGrid', 'Estilos para tu nombre: letras y efectos. Tu nombre siempre es el de tu cuenta.']); TABS.push(['#tabDance', '#danceGrid', 'Animaciones de cada juego (se usan con el botón Animación). Toca una para verla.'], ['#tabTaunt', '#tauntGrid', 'La burla de cada juego (botón 😜 en la partida). Toca para verla.']);
   const MOVE_MAPS = [['shroom25', '🍄 Escape Fantasía'], ['kitty5', '🐯 Corre Gatito Corre'], ['bob', '🦭 Corre Polar']];
-  const MOVES = { dance: { shroom25: [['dance', 'Bailar', 299], ['goofy', 'Cara de bobo', 199], ['flip', 'Salto mortal estático', 249]], kitty5: [['dance', 'Bailar', 299], ['goofy', 'Cara de bobo', 199], ['flip', 'Salto mortal', 249]], bob: [['dance', 'Bailar', 299], ['goofy', 'Cara de bobo', 199], ['flip', 'Salto mortal', 249]] },
+  const MOVES = { dance: { shroom25: [['dance', 'Bailar', 299], ['goofy', 'Cara de bobo', 199]], kitty5: [['dance', 'Bailar', 299], ['goofy', 'Cara de bobo', 199]], bob: [['dance', 'Bailar', 299], ['goofy', 'Cara de bobo', 199]] },
     taunt: { shroom25: [['taunt', 'Burlarse', 199]], kitty5: [['taunt', 'Burlarse', 199]], bob: [['taunt', 'Burlarse', 199]] } };
   window.MOVES_SHOP = MOVES;
   const ownsMove = (cat, id) => !!S.vipOwner || (S.bought || []).includes('mv:' + cat + ':' + id); window.ownsMove = ownsMove;
@@ -24989,7 +25001,7 @@ class Net {
   // the back arrow inside the shop goes back to where you were (previous tab / game), and only leaves the shop at the start
   shopBackStep = () => { const h = shopHist.pop(); shopHist.length = 0; if (!h) return false; if (h[0] === 'tab') goTab(h[1], false); else if (h[0] === 'cat') { skCat = h[1]; fitSkin = 'base'; renderSkins(); } return true; };
   document.querySelector('#shop .back').addEventListener('click', e => { shopHist.length = 0; e.stopImmediatePropagation(); show('menu'); }, true); /* the shop's back arrow goes straight to the main menu */
-  click('#goShop', () => { shopHist.length = 0; for (const k in fxSel) delete fxSel[k]; sprSel = null; nkSel = null; fitSkin = null; fitAng = 270; fitDrag = null; renderSkins(); try { renderDA(); drawSprays(); renderNick(); } catch (e) {} }); /* every visit starts on the first item of each section */
+  click('#goShop', () => { shopHist.length = 0; for (const k in fxSel) delete fxSel[k]; sprSel = null; nkSel = null; fitSkin = null; fitAng = 270; fitDrag = null; chTab = 'info'; renderSkins(); try { renderDA(); drawSprays(); renderNick(); } catch (e) {} }); /* every visit starts on the first item of each section */
   // death effects and death auras: two free ones to equip now, the rest coming soon (tap to preview)
   const passLv = () => Math.min(30, Math.floor((S.passXP || 0) / 100) + 1);
   // Season 1 pass: real shop items. The premium track is worth much more than its price
@@ -25137,8 +25149,8 @@ class Net {
       (SKIN_CATS.find(c => c[0] === skCat)[2] ? `<div class="sknext">🔒 Este mapa llega pronto. Sus personajes estarán disponibles cuando se abra el mapa.</div>` :
       `<div class="fitroom"><canvas id="fitCv" width="240" height="170"></canvas><div class="fitbar"><b id="fitName"></b></div><small>Tu nivel: ⭐ ${lv} · Desliza sobre el personaje para girarlo</small>${charDetail(skCat, fitSkin)}</div>` +
       list.map(id => { const C = M[id], need = charLvl(skCat, id), own = ownsChar(skCat, id); return `<div class="item tap sk${fitSkin === id ? ' sel' : ''}${own ? '' : ' lockd'}" data-skin="${id}"><img class="apv" loading="lazy" src="assets/spr/${C.thumb}" style="width:96px;height:96px;object-fit:contain${own ? '' : ';filter:grayscale(.85) brightness(.7)'}"><b>${esc(C.name)}</b>${need === 0 ? '<div class="price owned" style="text-decoration:none">GRATIS</div>' : own ? '<div class="price owned" style="text-decoration:none">✅ Nivel ' + need + '</div>' : (need >= 999 ? '<div class="price" style="font-size:11px">⏳ Pronto disponible</div>' : `<div class="price" style="font-size:11px">🔒 Se desbloquea al nivel ${need}</div>`)}${equipped === id ? '<div class="lockd eq">EQUIPADO</div>' : own ? '<div class="lockd">TOCA PARA ELEGIR</div>' : ''}</div>`; }).join(''));
-    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat && !SKIN_CATS.find(c => c[0] === skCat)[2]) { shopHist.length = 0; shopHist.push(['cat', skCat]); } skCat = b.dataset.cat; fitSkin = null; renderSkins(); }));
-    $('#shopGrid').querySelectorAll('[data-skin]').forEach(el => { el.addEventListener('click', () => { fitSkin = el.dataset.skin; fitExtra = null; if (ownsChar(skCat, fitSkin)) { S.skins = S.skins || {}; S.skins[skCat] = fitSkin; SW.saveSettings(); } renderSkins(); }); });
+    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat && !SKIN_CATS.find(c => c[0] === skCat)[2]) { shopHist.length = 0; shopHist.push(['cat', skCat]); } skCat = b.dataset.cat; fitSkin = null; chTab = 'info'; renderSkins(); }));
+    $('#shopGrid').querySelectorAll('[data-skin]').forEach(el => { el.addEventListener('click', () => { fitSkin = el.dataset.skin; fitExtra = null; chTab = 'info'; try { SW.sfx.init(); SW.sfx.play('char_' + fitSkin); } catch (e) {} if (ownsChar(skCat, fitSkin)) { S.skins = S.skins || {}; S.skins[skCat] = fitSkin; SW.saveSettings(); } renderSkins(); }); });
     $('#shopGrid').querySelectorAll('[data-ct]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); chTab = b.dataset.ct; fitExtra = null; renderSkins(); }));
     $('#shopGrid').querySelectorAll('[data-ce]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); const i = +b.dataset.ce, id = 'c' + i; try { SW.sfx.init(); SW.sfx.play('emo_' + i); } catch (e2) {} if (!ownsEmo(fitSkin, i)) return; let sl = emoOwnedSlots(fitSkin); if (sl.includes(id)) sl = sl.filter(x => x !== id); else { if (sl.length >= 5) sl.shift(); sl.push(id); } if (!sl.length) sl = ['c0']; S.emoteSlots = sl; S.emoteLast = id; SW.saveSettings(); renderSkins(); }));
     $('#shopGrid').querySelectorAll('[data-ca]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); if (e.target.closest('.chbuy')) { const a = b.dataset.ca; if (ownsChar(skCat, fitSkin) && buy('ca:' + fitSkin + ':' + a, ANIM_N[a][1], e.target)) renderSkins(); else if (!ownsChar(skCat, fitSkin)) e.target.textContent = '🔒 Nivel ' + charLvl(skCat, fitSkin); return; } fitExtra = fitExtra === b.dataset.ca ? null : b.dataset.ca; fitT0 = performance.now(); if (fitExtra === 'taunt') { try { SW.sfx.init(); SW.sfx.play('taunt'); } catch (e2) {} } renderSkins(); }));
@@ -25148,11 +25160,11 @@ class Net {
     fc.addEventListener('pointerdown', e => { fitDrag = [e.clientX, fitAng]; fc.setPointerCapture(e.pointerId); }); fc.addEventListener('pointermove', e => { if (fitDrag) fitAng = fitDrag[1] - (e.clientX - fitDrag[0]) * 1.2; }); fc.addEventListener('pointerup', () => { fitDrag = null; }); fc.addEventListener('pointercancel', () => { fitDrag = null; });
     animSkins(); }
   // the character's own section: skins, emojis, animations and taunts (prices come later)
-  let chTab = 'skins', fitExtra = null, fitT0 = 0;
+  let chTab = 'info', fitExtra = null, fitT0 = 0;
   // prices of each character's own items. The natural moves are free (they happen by themselves when you stand still)
   const ANIM_N = { taunt: ['😜 Burlarse', 199], dance: ['💃 Bailar', 299], goofy: ['🤪 Cara de bobo', 199], flip: ['🤸 Salto mortal', 249], wave: ['👋 Saludar', 0], blink: ['😑 Parpadear', 0], tired: ['😮‍💨 Cansado', 0], sit: ['🪑 Sentarse', 0], yawn: ['🥱 Bostezar', 0] };
   const EMO_N = ['Feliz', 'Carcajada', 'Llorón', 'Enojado', 'Dormido', 'Enamorado', 'Sorprendido', 'Mareado', 'Guiño', 'Facha', 'Tímido', 'Pensando', 'Aburrido', '¡¿Qué?!', 'Lengüita', 'Asco'], EMO_FREE = [0, 1, 2, 3], EMO_PRICE = 99;
-  const CHAR_INFO = { elfo: { bio: 'Un duende travieso del bosque encantado. Ágil y rápido, conoce cada atajo para escapar.', tip: 'Usa el salto para esquivar y escapar por los bordes.' }, leon: { bio: 'El rey de la sabana. Fuerte, valiente y siempre listo para una carrera.', tip: 'Usa la Embestida para abrirte paso.' }, foca: { bio: 'Una foca juguetona de los mares helados. Resbala sobre el hielo a toda velocidad.', tip: 'Aprovecha el hielo para ganar velocidad.' } };
+  const CHAR_INFO = { elfo: { bio: 'Un duende travieso del bosque encantado. Ágil y rápido, conoce cada atajo para escapar.' }, leon: { bio: 'El rey de la sabana. Fuerte, valiente y siempre listo para una carrera.' }, foca: { bio: 'Una foca juguetona de los mares helados. Resbala sobre el hielo a toda velocidad.' } };
   const emoOwnedSlots = cid => { const sl = (S.emoteSlots || []).filter(id => /^c\d+$/.test(id) && ownsEmo(cid, +id.slice(1))); return sl.length ? sl : ['c0']; };
   const emoLvl = i => +i === 0 ? 0 : 3 * +i; /* the first face is free, the others unlock with the player level */
   const ownsEmo = (cid, i) => VIP() || emoLvl(i) <= (window.playerLvl ? playerLvl() : 1);
@@ -25162,7 +25174,7 @@ class Net {
   function charDetail(cat, cid) { const C = (window.SPR && SPR.MAN.chars[cid]) || {}, nm = esc(C.name || ''); const tabs = [['info', 'ℹ️ Info'], ['skins', '🎨 Skins'], ['emo', '😄 Emojis']]; if (chTab === 'anim') chTab = 'skins';
     const lv = window.playerLvl ? playerLvl() : 1, slots = emoOwnedSlots(cid); let body = '';
     if (chTab === 'info') { const I = CHAR_INFO[cid] || {}, ready = READY.includes(cid), MODE = { shroom25: '🍄 Escape Fantasía', kitty5: '🐯 Corre Gatito Corre', bob: '🦭 Corre Polar' };
-      body = `<div class="chinfo"><b>${nm}</b><p>🎮 Modo: ${MODE[cat] || ''}</p><p>${esc(I.bio || 'Un nuevo personaje que muy pronto podrás usar.')}</p>${I.tip ? `<p>💡 ${esc(I.tip)}</p>` : ''}<p>${ready ? '✅ Disponible' : '⏳ Pronto disponible'}</p></div>`; }
+      body = `<div class="chinfo"><b>${nm}</b><p>🎮 Modo: ${MODE[cat] || ''}</p><p>${esc(I.bio || 'Un nuevo personaje que muy pronto podrás usar.')}</p><p>${ready ? '✅ Disponible' : '⏳ Pronto disponible'}</p></div>`; }
     else if (chTab === 'skins') body = [1, 2, 3, 4].map(i => `<div class="chit grey"><div style="font-size:34px">👕</div><b>Skin ${i}</b><em>🔜 Pronto</em></div>`).join('');
     else body = `<div class="sknext" style="width:100%">Elige hasta 5 caras para tu botón (${slots.length}/5)</div>` + EMO_N.map((n, i) => { const own = ownsEmo(cid, i), on = slots.includes('c' + i); return `<div class="chit${own ? '' : ' grey'}${on ? ' on' : ''}" data-ce="${i}">${window.cemoHTML ? cemoHTML(cid, i, 40) : ''}<small>${n}</small><em>${own ? (on ? '✅ En tu botón' : (i === 0 ? 'GRATIS' : 'Toca para elegir')) : '🔒 Nivel ' + emoLvl(i)}</em></div>`; }).join('');
     return `<div class="chtabs">${tabs.map(([k, n]) => `<button data-ct="${k}" class="${chTab === k ? 'on' : ''}">${n}</button>`).join('')}</div><div class="chbody">${body}</div>`; }
