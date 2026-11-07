@@ -20329,7 +20329,7 @@ class World {
     const h = this.heroOf(p); if (!h || !h.alive || h.hidden || h.paused || h.jump) return false;
     if (this.time < (h.jumpReady || 0)) return false;
     const ice = this.profile.id === 'bob' && this.tileTypeAt(h.x, h.y) === 'Nice'; let dx = dirX, dy = dirY; if (dx == null || ice) { /* on ice you jump the way you are sliding: no turning back in the air */ const f = h.facing * Math.PI / 180; dx = Math.cos(f); dy = Math.sin(f); }
-    const L = Math.hypot(dx, dy) || 1; h.jump = { t0: this.time, dur: 0.75, dx: dx / L, dy: dy / L, spd: ice ? 1600 : Math.max(700, h.speed * 1.2) * 0.8 }; // longer hang time, same distance
+    const L = Math.hypot(dx, dy) || 1; h.jump = { t0: this.time, dur: 0.75, dx: dx / L, dy: dy / L, spd: ice ? 850 : Math.max(700, h.speed * 1.2) * 0.8 }; // longer hang time, same distance
     h.jumpReady = this.time + 2; /* jump cooldown (shorter in the ice map) */ this.emit('sound', { name: 'coil' }); this.emit('jump', h); return true;
   }
   cmdStun(p) { // kitty map: every wolf near you is stunned for 5 s (they still hurt if you walk into them)
