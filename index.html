@@ -26435,29 +26435,29 @@ class Net {
     stoneRing(g, TC.x, TC.y, TR + 22, 46, 48, '#7b7590', '#6a6480'); g.strokeStyle = '#4a4560'; g.lineWidth = 4; g.beginPath(); g.arc(TC.x, TC.y, TR - 1, 0, TAU); g.stroke(); g.beginPath(); g.arc(TC.x, TC.y, TR + 45, 0, TAU); g.stroke();
     g.strokeStyle = 'rgba(255,255,255,0.18)'; g.lineWidth = 6; g.beginPath(); g.arc(TC.x, TC.y, TR + 10, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
 
-    // waterfall: a big natural rocky hill rising behind the wall; the water springs from a crack between the rocks and falls in steps into the pond
-    const wx = TC.x, wy = TC.y - TR + 165;
-    const rock = (x, y, rx, ry, c, hl) => { g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(x + 6, y + ry * 0.55, rx, ry * 0.45, 0, 0, TAU); g.fill(); g.fillStyle = c; g.beginPath(); g.moveTo(x - rx, y + ry * 0.3); g.quadraticCurveTo(x - rx * 1.05, y - ry * 0.6, x - rx * 0.35, y - ry); g.quadraticCurveTo(x + rx * 0.3, y - ry * 1.15, x + rx * 0.9, y - ry * 0.45); g.quadraticCurveTo(x + rx * 1.1, y + ry * 0.2, x + rx * 0.6, y + ry * 0.55); g.quadraticCurveTo(x, y + ry * 0.75, x - rx, y + ry * 0.3); g.fill(); g.fillStyle = hl; g.beginPath(); g.ellipse(x - rx * 0.25, y - ry * 0.55, rx * 0.5, ry * 0.25, -0.2, 0, TAU); g.fill(); };
-    const R1 = [[-330, -330, 150, 120], [330, -330, 160, 125], [-150, -400, 150, 120], [160, -405, 155, 120], [0, -470, 170, 120], [-420, -200, 110, 90], [420, -200, 115, 90], [-250, -240, 120, 100], [255, -240, 125, 100]];
-    for (const [x, y, rx, ry] of R1) rock(wx + x, wy + y, rx, ry, '#5d5869', 'rgba(255,255,255,0.10)');
-    g.fillStyle = '#2e7a35'; for (const [x, y, r] of [[-330, -440, 60], [330, -440, 60], [-470, -280, 50], [470, -280, 52], [-160, -510, 48], [170, -515, 50]]) { g.beginPath(); g.arc(wx + x, wy + y, r, 0, TAU); g.arc(wx + x + r * 0.6, wy + y + 10, r * 0.7, 0, TAU); g.arc(wx + x - r * 0.6, wy + y + 12, r * 0.7, 0, TAU); g.fill(); }
-    // the stream from the top, in three falls between rocks
-    const fall = (x0, y0, w0, h0) => { const fg = g.createLinearGradient(x0 - w0, 0, x0 + w0, 0); fg.addColorStop(0, '#5fb6ea'); fg.addColorStop(0.5, '#d4f3ff'); fg.addColorStop(1, '#5fb6ea'); g.fillStyle = fg; g.beginPath(); g.moveTo(x0 - w0 * 0.8, y0); g.quadraticCurveTo(x0, y0 - 10, x0 + w0 * 0.8, y0); g.lineTo(x0 + w0, y0 + h0); g.lineTo(x0 - w0, y0 + h0); g.closePath(); g.fill();
-      g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = 3; for (let k = 0; k < 5; k++) { const x = x0 - w0 * 0.7 + k * w0 * 0.35, o = (t * 240 + k * 41) % 50; for (let y = y0 + o; y < y0 + h0 - 8; y += 50) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 18); g.stroke(); } }
-      g.fillStyle = 'rgba(255,255,255,0.85)'; for (let k = 0; k < 5; k++) { const ph = (t * 1.8 + k / 5) % 1; g.globalAlpha = 1 - ph; g.beginPath(); g.arc(x0 - w0 * 0.6 + k * w0 * 0.3, y0 + h0 - ph * 14, 5 + ph * 6, 0, TAU); g.fill(); } g.globalAlpha = 1; };
-    g.fillStyle = '#3d8fd6'; g.beginPath(); g.ellipse(wx, wy - 470, 55, 18, 0, 0, TAU); g.fill();
-    fall(wx, wy - 470, 34, 95); rock(wx - 95, wy - 330, 85, 60, '#6b6677', 'rgba(255,255,255,0.12)'); rock(wx + 95, wy - 330, 85, 60, '#67627a', 'rgba(255,255,255,0.12)');
-    g.fillStyle = '#3d8fd6'; g.beginPath(); g.ellipse(wx, wy - 370, 60, 18, 0, 0, TAU); g.fill();
-    fall(wx, wy - 370, 46, 120); rock(wx - 120, wy - 180, 95, 70, '#736e82', 'rgba(255,255,255,0.13)'); rock(wx + 120, wy - 180, 95, 70, '#6e697d', 'rgba(255,255,255,0.13)');
-    g.fillStyle = '#3d8fd6'; g.beginPath(); g.ellipse(wx, wy - 245, 66, 20, 0, 0, TAU); g.fill();
-    fall(wx, wy - 245, 58, 235);
-    // pond with a natural rocky border
-    g.fillStyle = '#5a5567'; g.beginPath(); g.ellipse(wx, wy + 10, 200, 82, 0, 0, TAU); g.fill();
-    const pg = g.createRadialGradient(wx, wy + 5, 10, wx, wy + 5, 175); pg.addColorStop(0, '#6fd0ff'); pg.addColorStop(1, '#2a86d8'); g.fillStyle = pg; g.beginPath(); g.ellipse(wx, wy + 5, 172, 64, 0, 0, TAU); g.fill();
-    for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; if (Math.sin(a) < -0.6) continue; rock(wx + Math.cos(a) * 185, wy + 14 + Math.sin(a) * 74, 26 + (k % 3) * 6, 18 + (k % 2) * 5, k % 2 ? '#7a7588' : '#6a6577', 'rgba(255,255,255,0.12)'); }
-    g.fillStyle = 'rgba(255,255,255,0.9)'; for (let k = 0; k < 10; k++) { const ph = (t * 1.5 + k / 10) % 1; g.globalAlpha = 1 - ph; g.beginPath(); g.arc(wx - 55 + k * 12, wy - 12 - ph * 26, 6 + ph * 7, 0, TAU); g.fill(); } g.globalAlpha = 1;
-    g.strokeStyle = 'rgba(255,255,255,0.6)'; g.lineWidth = 3; for (let k = 0; k < 3; k++) { const r = ((t * 35 + k * 35) % 105) + 20; g.globalAlpha = 1 - r / 125; g.beginPath(); g.ellipse(wx, wy + 8, r, r * 0.38, 0, 0, TAU); g.stroke(); } g.globalAlpha = 1;
-    for (const [x, y] of [[-95, 22], [90, 30]]) { g.fillStyle = '#4caf50'; g.beginPath(); g.ellipse(wx + x, wy + y, 20, 10, 0, 0, TAU); g.fill(); g.fillStyle = '#ff8fc8'; g.beginPath(); g.arc(wx + x + 4, wy + y - 3, 5, 0, TAU); g.fill(); }
+    // waterfall: a tall fall coming from far above (out of view), between two rocky cliffs, into the pond
+    const wx = TC.x, wy = TC.y - TR + 165, top = wy - 1600, bot = wy - 30;
+    const rock = (x, y, rx, ry, c, hl) => { g.fillStyle = c; g.beginPath(); g.moveTo(x - rx, y + ry * 0.3); g.quadraticCurveTo(x - rx * 1.05, y - ry * 0.6, x - rx * 0.35, y - ry); g.quadraticCurveTo(x + rx * 0.3, y - ry * 1.15, x + rx * 0.9, y - ry * 0.45); g.quadraticCurveTo(x + rx * 1.1, y + ry * 0.2, x + rx * 0.6, y + ry * 0.55); g.quadraticCurveTo(x, y + ry * 0.75, x - rx, y + ry * 0.3); g.fill(); g.fillStyle = hl; g.beginPath(); g.ellipse(x - rx * 0.25, y - ry * 0.55, rx * 0.5, ry * 0.25, -0.2, 0, TAU); g.fill(); };
+    // cliffs on both sides, stacked rocks going up out of the screen
+    for (let y = bot - 40, k = 0; y > top - 200; y -= 110, k++) { for (const sd of [-1, 1]) { const x = wx + sd * (150 + (k % 3) * 25), rx = 120 + (k % 2) * 30; rock(x, y, rx, 85, k % 2 ? '#5d5869' : '#676275', 'rgba(255,255,255,0.10)'); rock(x + sd * 160, y - 40, 130, 90, '#56516a', 'rgba(255,255,255,0.08)'); } }
+    g.fillStyle = '#2e7a35'; for (let y = bot - 160, k = 0; y > top; y -= 230, k++) for (const sd of [-1, 1]) { const x = wx + sd * (300 + (k % 2) * 60); g.beginPath(); g.arc(x, y, 50, 0, TAU); g.arc(x + 30, y + 12, 36, 0, TAU); g.arc(x - 30, y + 14, 36, 0, TAU); g.fill(); }
+    // the falling water: wide sheet with streaks running down
+    const W0 = 70, W1 = 95; const fg = g.createLinearGradient(wx - W1, 0, wx + W1, 0); fg.addColorStop(0, '#3e9ee0'); fg.addColorStop(0.25, '#8fd6ff'); fg.addColorStop(0.5, '#e4f8ff'); fg.addColorStop(0.75, '#8fd6ff'); fg.addColorStop(1, '#3e9ee0');
+    g.fillStyle = fg; g.beginPath(); g.moveTo(wx - W0, top); g.lineTo(wx + W0, top); g.lineTo(wx + W1, bot); g.lineTo(wx - W1, bot); g.closePath(); g.fill();
+    g.save(); g.beginPath(); g.moveTo(wx - W0, top); g.lineTo(wx + W0, top); g.lineTo(wx + W1, bot); g.lineTo(wx - W1, bot); g.closePath(); g.clip();
+    for (let k = 0; k < 16; k++) { const fx = wx - W1 + 8 + k * (2 * W1 - 16) / 15, sp = 520 + (k % 4) * 90, L = 60 + (k % 3) * 40, o = (t * sp + k * 97) % 260; g.strokeStyle = k % 3 ? 'rgba(255,255,255,0.7)' : 'rgba(30,120,200,0.35)'; g.lineWidth = k % 3 ? 4 : 6; for (let y = top + o - 260; y < bot; y += 260) { g.beginPath(); g.moveTo(fx, y); g.lineTo(fx, y + L); g.stroke(); } }
+    g.restore();
+    // pond in front of the fall
+    g.fillStyle = '#5a5567'; g.beginPath(); g.ellipse(wx, wy + 10, 205, 84, 0, 0, TAU); g.fill();
+    const pg = g.createRadialGradient(wx, wy + 5, 10, wx, wy + 5, 175); pg.addColorStop(0, '#6fd0ff'); pg.addColorStop(1, '#2a86d8'); g.fillStyle = pg; g.beginPath(); g.ellipse(wx, wy + 5, 175, 66, 0, 0, TAU); g.fill();
+    // where it hits the water: foam, splashes and rings spreading over the pond
+    const hy = wy - 32; g.save(); g.beginPath(); g.ellipse(wx, wy + 5, 175, 66, 0, 0, TAU); g.clip();
+    g.strokeStyle = 'rgba(255,255,255,0.75)'; g.lineWidth = 3; for (let k = 0; k < 4; k++) { const r = ((t * 45 + k * 40) % 160) + 30; g.globalAlpha = Math.max(0, 1 - r / 190); g.beginPath(); g.ellipse(wx, hy + r * 0.12, r, r * 0.36, 0, 0, TAU); g.stroke(); } g.globalAlpha = 1;
+    g.fillStyle = 'rgba(255,255,255,0.92)'; g.beginPath(); g.ellipse(wx, hy, W1 + 20, 26, 0, 0, TAU); g.fill(); g.restore();
+    for (let k = 0; k < 14; k++) { const ph = (t * 1.7 + k / 14) % 1, x = wx - W1 + k * (2 * W1) / 13; g.globalAlpha = 1 - ph; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x + Math.sin(k * 2.3) * 10, hy - ph * 45, 7 + ph * 8, 0, TAU); g.fill(); } g.globalAlpha = 1;
+    g.fillStyle = 'rgba(220,245,255,0.35)'; g.beginPath(); g.ellipse(wx, hy - 30, W1 + 50, 40, 0, 0, TAU); g.fill(); // mist
+    for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; if (Math.sin(a) < -0.5) continue; rock(wx + Math.cos(a) * 190, wy + 14 + Math.sin(a) * 76, 26 + (k % 3) * 6, 18 + (k % 2) * 5, k % 2 ? '#7a7588' : '#6a6577', 'rgba(255,255,255,0.12)'); }
+    for (const [x, y] of [[-110, 28], [105, 34]]) { g.fillStyle = '#4caf50'; g.beginPath(); g.ellipse(wx + x, wy + y, 20, 10, 0, 0, TAU); g.fill(); g.fillStyle = '#ff8fc8'; g.beginPath(); g.arc(wx + x + 4, wy + y - 3, 5, 0, TAU); g.fill(); }
     // rocks, bushes with berries, lamps
     for (const [x, y, r] of [[TC.x - TR * 0.66, TC.y + TR * 0.12, 40], [TC.x + TR * 0.68, TC.y + TR * 0.05, 34]]) { g.fillStyle = '#5c5868'; g.beginPath(); g.ellipse(x, y, r * 1.3, r, 0, 0, TAU); g.fill(); g.fillStyle = '#7d7889'; g.beginPath(); g.ellipse(x - r * 0.3, y - r * 0.35, r * 0.7, r * 0.45, 0, 0, TAU); g.fill(); g.fillStyle = '#4e9c45'; g.beginPath(); g.ellipse(x + r * 0.4, y - r * 0.6, r * 0.45, r * 0.25, 0, 0, TAU); g.fill(); }
     for (const [x, y] of BUSH) { g.fillStyle = '#2f7d39'; g.beginPath(); g.arc(x - 22, y, 28, 0, TAU); g.arc(x + 22, y, 28, 0, TAU); g.arc(x, y - 18, 30, 0, TAU); g.fill(); g.fillStyle = '#45a04c'; g.beginPath(); g.arc(x - 8, y - 22, 16, 0, TAU); g.fill(); g.fillStyle = '#ff5a6e'; for (const [a, b] of [[-20, -6], [14, -14], [2, 4], [26, 2]]) { g.beginPath(); g.arc(x + a, y + b, 5, 0, TAU); g.fill(); } }
@@ -26465,11 +26465,11 @@ class Net {
     // butterflies
     for (let k = 0; k < 5; k++) { const a = t * 0.4 + k * 1.3, x = TC.x + Math.cos(a * (1 + k * 0.1)) * TR * 0.6, y = TC.y + Math.sin(a * 1.3) * TR * 0.45, f = Math.abs(Math.sin(t * 12 + k)); g.fillStyle = ['#ffd54a', '#ff8fc8', '#9fd8ff', '#ffffff', '#c59bff'][k]; g.beginPath(); g.ellipse(x - 6 * f, y, 6 * f + 1, 8, 0, 0, TAU); g.ellipse(x + 6 * f, y, 6 * f + 1, 8, 0, 0, TAU); g.fill(); }
   }
-  function drawTrainTrees(g) { for (const [x, y, r, k] of TREES) { if (Math.abs(x - TC.x) < 560 && y < TC.y - TR + 40 && y > TC.y - TR - 520) continue; /* the rocky hill is there */ g.fillStyle = '#5a3b22'; g.fillRect(x - r * 0.12, y - r * 0.2, r * 0.24, r * 0.6); const c = k < 0.5 ? ['#1e6b34', '#2f8f45', '#46b35a'] : ['#2a5e2a', '#3c7d36', '#5aa64a']; c.forEach((col, i) => { g.fillStyle = col; g.beginPath(); g.arc(x + (i - 1) * r * 0.18, y - r * 0.55 - i * r * 0.18, r * (0.62 - i * 0.12), 0, TAU); g.fill(); }); } }
+  function drawTrainTrees(g) { for (const [x, y, r, k] of TREES) { if (Math.abs(x - TC.x) < 560 && y < TC.y - TR + 40) continue; /* the rocky hill is there */ g.fillStyle = '#5a3b22'; g.fillRect(x - r * 0.12, y - r * 0.2, r * 0.24, r * 0.6); const c = k < 0.5 ? ['#1e6b34', '#2f8f45', '#46b35a'] : ['#2a5e2a', '#3c7d36', '#5aa64a']; c.forEach((col, i) => { g.fillStyle = col; g.beginPath(); g.arc(x + (i - 1) * r * 0.18, y - r * 0.55 - i * r * 0.18, r * (0.62 - i * 0.12), 0, TAU); g.fill(); }); } }
   function trainClamp() { const h = PL.G && PL.G.local; if (!h) return; const dx = h.x - TC.x, dy = h.y - TC.y, d = Math.hypot(dx, dy), m = TR - 30; if (d > m) { h.x = TC.x + dx / d * m; h.y = TC.y + dy / d * m; } }
   let trainCat = 'shroom25', trainFx = null;
   function playTrain() { playMap(F.serialize(TRAIN), { name: '🎯 Entrenamiento', back: 'solo', train: true }); PL.G.goal = null; PL.G.cps = []; S.fBotsSaved = null;
-    for (const h of PL.G.heroes.slice(1)) { h.alive = false; h.gone = true; } PL.G.heroes = [PL.G.local]; $('#fpTry').classList.remove('hidden'); const sk = S.skins || {}; trainCat = sk.shroom25 ? 'shroom25' : 'shroom25'; trainSync(); }
+    for (const h of PL.G.heroes.slice(1)) { h.alive = false; h.gone = true; } PL.G.heroes = [PL.G.local]; $('#fpTry').classList.remove('hidden'); PL.G.local.facing = Math.PI / 2; /* look at the player */ const sk = S.skins || {}; trainCat = sk.shroom25 ? 'shroom25' : 'shroom25'; trainSync(); }
   function trainSync() { const o = PL.G && PL.G.local && PL.G.local.owner; if (!o) return; o.skins = Object.assign({}, S.skins || {}); o.aura = S.aura || 'anillo'; SP.W.profile = { id: trainCat, family: trainCat === 'shroom25' ? 'shroom' : 'run' }; }
   function trainPanel(tab) { const L = window.trainLists ? trainLists() : { aura: [], spawn: [], death: [], chars: [] }; tab = tab || trainPanel.tab || 'char'; trainPanel.tab = tab;
     const T = [['char', '🧝 Personaje'], ['aura', '⭕ Aura'], ['spawn', '✨ Aparición'], ['death', '💥 Muerte']];
