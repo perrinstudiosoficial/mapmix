@@ -21516,6 +21516,10 @@ class BotManager {
 }
 
 const BOT_NAMES12 = ['Bobby', 'Adem', 'Zack', 'Kyle', 'Michael', 'AJ', 'Chad', 'Kevin', 'Steven', 'Jason', 'Max', 'Ricky'];
+// names that look typed by real players: symbols, numbers, nicknames, fan names; a fresh mix every game
+const NAME_POOL = ['xX_Seba_Xx', 'Coni.exe', '★Valee★', 'tomi2010', 'Benja_gg', 'ElPato', 'la_martu', 'NachoPro07', 'Fer♡', 'Joaquin_CL', 'Kiara.uwu', 'Vicho:v', 'DarkKnight99', 'Gabo_ツ', 'SoyCrack', 'Pipe_x', 'Cata ✿', 'Santi.YT', 'Mati_Gamer', 'nico_mx', 'Rocío♪', 'Emi_kawaii', '~Luna~', 'ProKiller777', 'elbrayan', 'Agus.exe', 'T0MAS', 'Isa_<3', 'xLucasx', 'Diego_ZZ', 'FAN_DEL_KPOP', 'reina_del_anime', 'PokeFan_12', 'fan_del_futbol', 'GokuBlack_X', 'Naruto♦Uzu', 'Mbappe_Jr', 'Shrek_Lover', 'MinecraftKing', 'Sonic_Fan99', 'L0LxD', 'NoobMaster', 'shadow_ツ', 'Pancito', 'Kevin_CL', 'flor:3', 'el_profe', 'Bastian.69x', 'Ale_ჯ', 'Thiago!', 'MaxiOP', 'GG_EZ', '¡Juanito!', 'Ricky_Ricon', 'Cami_♥', 'Tefa.zzz', 'ElTigre', 'Kathe', 'ZackAttack', 'n0name'];
+function shuffleBotNames() { const P = NAME_POOL.slice().sort(() => Math.random() - 0.5); for (let i = 0; i < BOT_NAMES12.length; i++) BOT_NAMES12[i] = P[i]; if (typeof KITTY_NAMES !== 'undefined') for (let i = 0; i < KITTY_NAMES.length; i++) KITTY_NAMES[i] = P[i]; if (typeof BOT_NAMES !== 'undefined') for (let i = 0; i < BOT_NAMES.length; i++) BOT_NAMES[i] = P[i]; }
+if (typeof window !== 'undefined') window.shuffleBotNames = shuffleBotNames;
 const EXTRA_IDS = [11, 13, 14];
 function setupAI(W, nBots, opts = {}) {
   W.vision = new Vision(W);
@@ -22519,6 +22523,7 @@ class Renderer {
       g.beginPath(); g.moveTo(x - 8, y + 26 * pop); g.lineTo(x, y + 40 * pop); g.lineTo(x + 8, y + 26 * pop); g.fill();
       const CE = e.ci != null && window.SPR ? SPR.emoji(SPR.charOf(u.owner, this.W.profile.id, this.W), e.ci) : null;
       if (CE) { const s = 56 * pop; g.drawImage(CE.im, CE.sx, CE.sy, CE.sw, CE.sh, x - s / 2, y - s / 2, s, s); }
+      else if (e.ci != null && window.SPR && SPR.MAN.chars[SPR.charOf(u.owner, this.W.profile.id, this.W)] && SPR.MAN.chars[SPR.charOf(u.owner, this.W.profile.id, this.W)].emoji) { /* the face is still loading: show nothing rather than a wrong one */ }
       else if (e.img) { const s = 50 * pop; g.drawImage(e.img, x - s / 2, y - s / 2 + 1, s, s); } else { g.font = `${Math.round(38 * pop)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; g.fillStyle = '#000'; g.fillText(e.e, x, y + 2); }
     }
     g.globalAlpha = 1; g.restore();
@@ -24085,7 +24090,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     online = onl || null;
     $('#menu').classList.add('hidden'); $('#end').classList.add('hidden'); $('#hud').classList.remove('hidden');
     for (const s of document.querySelectorAll('.screen')) if (s.id !== 'pause' && s.id !== 'end' && s.id !== 'powers') s.classList.add('hidden');
-    sfx.init(); sfx.muted = !settings.sound; startMusic(); chatterAt = 0; setTimeout(() => { try { window.botOpen && window.botOpen(); } catch (e) {} }, 600); refreshSprayBtn(); $('#hudCoins').textContent = '🪙 ' + (settings.coins | 0); refreshLvl(); setTimeout(() => { try { $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast); } catch (e) {} }, 300);
+    sfx.init(); sfx.muted = !settings.sound; startMusic(); try { if (window.SPR && W) for (const p of W.players) { const c = SPR.MAN.chars[SPR.charOf(p, W.profile.id, W)]; if (c && c.emoji) SPR.img(c.emoji.f); } } catch (e) {} /* faces ready before the first emote */ chatterAt = 0; setTimeout(() => { try { window.botOpen && window.botOpen(); } catch (e) {} }, 600); refreshSprayBtn(); $('#hudCoins').textContent = '🪙 ' + (settings.coins | 0); refreshLvl(); setTimeout(() => { try { $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast); } catch (e) {} }, 300);
     const mode = online ? online.game.mode : settings.mode, speed = online ? online.game.speed : settings.speed;
     let opts = { bots: settings.bots, maxFade: 3, playerName: settings.nick || 'Tú' };
     if (online) {
@@ -25171,7 +25176,7 @@ class Net {
   }
   const roomBotMsgs = []; // the host's bots talk in the waiting room (only on the host, shown to everyone)
   // general chat: real players (online) + the game's bot players chatting now and then
-  const GEN = []; const GEN_NAMES = ['Kevin_CL', 'Coni.exe', 'SebaPro', 'xXdanteXx', 'la_vale', 'tomi2010', 'Maxi_gg', 'Fer', 'Gabo', 'Joaco', 'Flo', 'Martu', 'Benji', 'Pipe', 'Nacho', 'Agus', 'Lucho', 'Rocío', 'Emi', 'Santi', 'Mati_cl', 'Diego', 'Ale', 'Juanito', 'Vicho', 'Panchito', 'Cata', 'Jose', 'Bastian', 'Kathe', 'Leo', 'Nico_mx', 'Pato', 'Isa', 'Simón', 'Gonza', 'Tefa', 'ElBrayan', 'Kiara', 'Thiago', 'Bobby', 'Adem', 'Zack', 'Kyle', 'Michael', 'AJ', 'Chad', 'Kevin', 'Steven', 'Jason', 'Max', 'Ricky', 'Nico', 'Benja', 'Feña', 'Coni', 'Javi', 'Seba', 'Vale', 'Tomi', 'Pancho', 'Dani', 'Rodri', 'Cami', 'Isi', 'Matu', 'Lucho', 'Gabo', 'Flo', 'Joaco'];
+  const GEN = []; const GEN_NAMES = (typeof NAME_POOL !== 'undefined' ? NAME_POOL : []).concat(['Kevin_CL', 'Coni.exe', 'SebaPro', 'xXdanteXx', 'la_vale', 'tomi2010', 'Maxi_gg', 'Fer', 'Gabo', 'Joaco', 'Flo', 'Martu', 'Benji', 'Pipe', 'Nacho', 'Agus', 'Lucho', 'Rocío', 'Emi', 'Santi', 'Mati_cl', 'Diego', 'Ale', 'Juanito', 'Vicho', 'Panchito', 'Cata', 'Jose', 'Bastian', 'Kathe', 'Leo', 'Nico_mx', 'Pato', 'Isa', 'Simón', 'Gonza', 'Tefa', 'ElBrayan', 'Kiara', 'Thiago', 'Bobby', 'Adem', 'Zack', 'Kyle', 'Michael', 'AJ', 'Chad', 'Kevin', 'Steven', 'Jason', 'Max', 'Ricky', 'Nico', 'Benja', 'Feña', 'Coni', 'Javi', 'Seba', 'Vale', 'Tomi', 'Pancho', 'Dani', 'Rodri', 'Cami', 'Isi', 'Matu', 'Lucho', 'Gabo', 'Flo', 'Joaco']);
   // lots of pieces combined, plus little back-and-forth conversations, and nothing repeats for a long while
   const PIECES = {
     a: ['alguien para', 'busco team pa', 'quien se tira', 'vamos a', 'me falta gente pa', 'entren a', 'armemos', 'necesito 2 pa'],
@@ -25413,7 +25418,7 @@ class Net {
     $('#preSlots').querySelectorAll('.lrow.tap').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot; preBots = i <= preBots ? i - 1 : i; renderPre(); }));
     const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[soloMap]) || {}; const m = MAPS.find(x => x.id === soloMap) || MAPS[0];
     $('#prePrev').innerHTML = `<div class="pvic">${m.icon || '🗺'}</div><b>${esc(mapName(soloMap))}</b><div class="pvd"><span>Jugadores: ${preBots + 1}/12</span><span>Modo: ${$('#mode').value === 'practice' ? 'Práctica' : 'Original'}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
-  click('#bPlay', () => { preBots = Math.min(11, Math.max(0, S.bots ?? 11)); renderPre(); show('pre'); });
+  click('#bPlay', () => { try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} preBots = Math.min(11, Math.max(0, S.bots ?? 11)); renderPre(); show('pre'); });
   click('#preMinus', () => { preBots = Math.max(0, preBots - 1); renderPre(); }); click('#prePlus', () => { preBots = Math.min(11, preBots + 1); renderPre(); });
   click('#preFill', () => { preBots = 11; renderPre(); }); click('#preNone', () => { preBots = 0; renderPre(); });
   click('#preStart', () => { S.bots = preBots; S.mode = $('#mode').value; S.map = soloMap; SW.saveSettings(); SW.start(); });
