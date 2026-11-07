@@ -311,6 +311,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .mic{width:34px;height:34px;object-fit:contain}.lic{width:28px;height:28px;object-fit:contain;vertical-align:middle}.pvic .mic{width:64px;height:64px}
 .glbl{font-weight:800;font-size:13px;margin:8px 0 3px;color:#e9d8ff}.gd{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}.gi{display:flex;gap:6px;align-items:flex-start;text-align:left}.gi .icimg{width:30px;height:30px;flex:none}.gi b{display:block;font-size:12px;line-height:1.15}.gi small{display:block;font-size:10.5px;line-height:1.2;opacity:.85}
 #powers .card{padding:14px 16px!important}#bItem0,#bBlink{font-size:0!important;background-repeat:no-repeat;background-position:50% 42%;background-size:62%}#bItem0{background-image:url(assets/fx/it_p_tele.webp)}#bBlink{background-image:url(assets/fx/it_p_help.webp)}#bItem0 small,#bBlink small,#bItem0 kbd,#bItem0 em{font-size:10px}
+.bic{width:30px;height:30px;vertical-align:middle;border-radius:7px;margin:-6px 4px -4px 0}.wkic{width:20px;height:20px;vertical-align:middle;border-radius:5px;margin-right:3px}.mapc .mic{width:38px;height:38px;border-radius:9px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -383,7 +384,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
     <div class="homebtns">
       <button class="big-btn" id="goSolo">JUGAR SOLO</button>
       <button class="big-btn cyan" id="goOnline">JUGAR ONLINE</button>
-      <button class="big-btn gold" id="goForge">🛠 TALLER DE MAPAS</button>
+      <button class="big-btn gold" id="goForge"><img class="bic" src="assets/fx/mi_forge.webp" alt=""> TALLER DE MAPAS</button>
       <button class="big-btn pink" id="goShop">TIENDA</button>
       <button class="big-btn" id="goSettings2" style="background:linear-gradient(#b9a6ff,#7b5cff);color:#1a0d36">⚙ CONFIGURACIÓN</button>
     </div>
@@ -21088,12 +21089,15 @@ class BotManager {
       let j = b.pi; const scan = b.gT <= 0; if (scan) b.gT = gliding ? 0.08 : (rev ? 0.1 : 0.3);
       for (let k = b.pi + 1; scan && k < Math.min(gpath.length, b.pi + 40); k++) { if (this.safeLineStrict(h.x, h.y, gpath[k].x, gpath[k].y) && this.glideClear(h, gpath[k], ens, rev)) j = k; else break; }
       const tp = gpath[j], dj = Math.hypot(tp.x - h.x, tp.y - h.y);
-      if (gliding) {
-        b.pi = j; h.facing = Math.atan2(tp.y - h.y, tp.x - h.x) * 180 / Math.PI;
-        if (dj < 130 || (scan && (!this.safeLineStrict(h.x, h.y, tp.x, tp.y) || !this.glideClear(h, tp, ens, rev)))) { W.cmdCast(b.p, 'A005'); b.glideCd = rev ? 0.2 : 0.8; }
-        return;
+      if (gliding) { // keep running a long time: follow the path, turning at each corner, stop only when the way is not safe
+        const steer = q => { h.facing = Math.atan2(q.y - h.y, q.x - h.x) * 180 / Math.PI; };
+        if (j > b.pi) { b.pi = j; steer(tp); return; }
+        const cur = gpath[b.pi], dc = Math.hypot(cur.x - h.x, cur.y - h.y);
+        if (dc > 90 && (!scan || (this.safeLineStrict(h.x, h.y, cur.x, cur.y) && this.glideClear(h, cur, ens, rev)))) { steer(cur); return; }
+        const nx = gpath[b.pi + 1]; if (nx && this.safeLineStrict(h.x, h.y, nx.x, nx.y) && this.glideClear(h, nx, ens, rev)) { b.pi++; steer(nx); return; }
+        W.cmdCast(b.p, 'A005'); b.glideCd = rev ? 0.2 : 0.4; return;
       }
-      const minD = rev ? 220 : 300; // bots use Correr often, like real players
+      const minD = rev ? 200 : 220; // bots use Correr often, like real players
       if (scan && dj > minD && this.safeLineStrict(h.x, h.y, tp.x, tp.y) && this.glideClear(h, tp, ens, rev) && this.segmentOk(h.x, h.y, tp.x, tp.y, 520)) {
         if (W.cmdCast(b.p, 'A005')) { b.pi = j; h.facing = Math.atan2(tp.y - h.y, tp.x - h.x) * 180 / Math.PI; return; }
       }
@@ -24868,7 +24872,7 @@ class Net {
       el.appendChild(c);
     }
   }
-  const MAP_IC = {}; /* own map pictures go here when the icon sheet arrives */ window.mapIcon = (m, cls = 'mic') => m && MAP_IC[m.id] ? `<img class="${cls}" src="assets/fx/mi_${m.id}.webp" alt="">` : (m && m.icon) || '';
+  const MAP_IC = Object.fromEntries(['shroom25', 'shroom27', 'polar', 'polar3', 'polarrf', 'gayheaven', 'gaymars', 'correk', 'rungay', 'bob', 'kitty5', 'kitty', 'jurassic', 'orc', 'spell', 'uther4', 'utherz', 'zombie', 'estupido1', 'estupido2', 'estupido3', 'estupido4'].map(k => [k, 1])); /* the map icon sheet */ window.mapIcon = (m, cls = 'mic') => m && MAP_IC[m.id] ? `<img class="${cls}" src="assets/fx/mi_${m.id}.webp" alt="">` : (m && m.icon) || '';
   function showLore(m) {
     const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[m.id]) || { t: m.name, lore: 'Un nuevo minijuego que llega pronto a MapMix Online.', how: 'Próximamente.' };
     $('#loreT').innerHTML = mapIcon(m, 'lic') + ' ' + esc(L.t); $('#loreL').textContent = L.lore; $('#loreH').textContent = L.how; { const sec = window.guideHTML ? guideHTML(m.id) : ''; $('#loreS').innerHTML = sec; $('#loreSecW').style.display = sec ? '' : 'none'; } $('#lore').classList.remove('hidden');
@@ -26127,7 +26131,7 @@ class Net {
   }
   function renderWeekly() {
     const f = featured(); const m = f.m; if (!m) return;
-    const html = `<div class="wk-l"><div class="wk-t">⭐ MAPA DE LA SEMANA</div><div class="wk-n"></div><div class="wk-s"></div></div><button class="big-btn wk-b">▶ JUGAR</button>`;
+    const html = `<div class="wk-l"><div class="wk-t"><img class="wkic" src="assets/fx/mi_weekly.webp" alt="">MAPA DE LA SEMANA</div><div class="wk-n"></div><div class="wk-s"></div></div><button class="big-btn wk-b">▶ JUGAR</button>`;
     for (const el of document.querySelectorAll('.weekly')) {
       el.innerHTML = html; el.querySelector('.wk-n').textContent = m.name; el.querySelector('.wk-s').textContent = 'por ' + m.by + ' · ' + f.why + (f.votes ? ' · 👍 ' + f.votes : '');
       click(el.querySelector('.wk-b'), () => playMap(m.data, { key: m.key, name: m.name, back: el.dataset.back || 'menu', entry: m }));
