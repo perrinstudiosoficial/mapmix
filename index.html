@@ -25216,7 +25216,7 @@ class Net {
   const fresh = (make) => { for (let i = 0; i < 12; i++) { const s = make(); if (!recent.includes(s)) { recent.push(s); if (recent.length > 150) recent.shift(); return s; } } return null; };
   const who = (not) => { let n; do { n = pick(GEN_NAMES); } while (n === lastName || (not && not.includes(n))); lastName = n; return n; };
   const push = (n, x, dt = 0) => { if (typeof vary === 'function') try { x = vary(x); } catch (e) {} GEN.push({ id: 'b' + Date.now() + Math.random(), n, x, t: Date.now() + dt }); while (GEN.length > 40) GEN.shift(); };
-  function genTick() {
+  function genOne() {
     const r = Math.random();
     if (r < 0.14) { // a short conversation between two or three people
       const cv = pick(CONVOS); const key = cv[0][0]; if (!recent.includes(key)) { recent.push(key); const ppl = []; cv.forEach((opts, i) => { const n = i === 2 && ppl[0] ? ppl[0] : who(ppl); ppl.push(n); setTimeout(() => push(n, pick(opts)), i * (1800 + Math.random() * 2500)); }); }
@@ -25226,8 +25226,10 @@ class Net {
     else if (r < 0.78 && typeof aiRooms === 'function') { const rs = aiRooms().filter(x => x.st === 'wait' && !x.lock); if (rs.length) { const s = fresh(() => pickP(PIECES.g) + ' ' + pick(rs).name); if (s) push(who(), s); } }
     else if (r < 0.84) { const s = fresh(() => pickP(PIECES.h) + ' ' + pickP(PIECES.i)); if (s) push(who(), s); }
     else { const s = fresh(() => pick(FIXED)); if (s) push(who(), s); }
-    setTimeout(genTick, 700 + Math.random() * 1800);
   }
+  // busier chat: a line every 0.4–1.5 s, and often 2–4 people writing at almost the same time
+  function genTick() { genOne(); const r = Math.random(); const extra = r < 0.25 ? 3 : r < 0.5 ? 2 : r < 0.7 ? 1 : 0; for (let k = 1; k <= extra; k++) setTimeout(genOne, k * (120 + Math.random() * 450));
+    setTimeout(genTick, 400 + Math.random() * 1100 + extra * 300); }
   // how people really type: sometimes no accents, a stretched letter, a 'jaja' or 'xd' at the end, never the same twice
   const vary = x => { if (Math.random() < 0.35) x = x.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); if (Math.random() < 0.15) x = x.replace(/([aeiou])([^aeiou]*)$/, (m, v, r) => v.repeat(2 + Math.floor(Math.random() * 3)) + r); const r = /jaj|xd/i.test(x) ? 1 : Math.random(); if (r < 0.1) x += ' xd'; else if (r < 0.17) x += ' jaja'; else if (r < 0.22) x += '!!'; else if (r < 0.26) x = x.replace(/\?$/, '??'); return x; };
   const OPEN = ['wena!', 'holaa', 'buenas a todos', 'alguien para jugar?', 'quien se tira una?', 'llegué', 'volví jaja', 'hola gente', 'que tal la tarde', 'alguien despierto?', 'recién salí de clases', 'por fin en casa', 'alguien juega escape?', 'quien pa una partida', 'hoy si paso la 8', 'que hacen', 'ya llegué cabros', 'buenas buenas', 'de nuevo por aquí', 'alguien online?', 'aburrido, quien juega', 'ando con tiempo, armemos', 'quién quiere team', 'hola, soy nuevo', 'me tienen enganchado este juego', 'vuelvo en 5', 'alguien de santiago?', 'alguien de arica?', 'que mapa juegan?', 'hola hola', 'yo de nuevo xd', 'me aburrí de estudiar', 'entré un rato', 'hoy toca jugar', 'alguien con ganas?', 'wenas wenas', 'saludos', 'estoy listo', 'quien me acompaña', 'jugamos?'];
