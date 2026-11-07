@@ -24889,6 +24889,9 @@ class Net {
   function newUid() { return String(100000000 + Math.floor(Math.random() * 900000000)); } // 9-digit player ID
   if (S.account && !S.account.uid) { S.account.uid = newUid(); SW.saveSettings(); }
   setTimeout(accountAsk, 400);
+  // your characters' emoji sheets load while you are in the menu, so the first emote in a map is instant
+  const preEmo = () => { try { if (!window.SPR) return; for (const m of ['shroom25', 'kitty5', 'bob']) { const c = SPR.MAN.chars[SPR.charOf({ skins: S.skins || {} }, m, null)]; if (c && c.emoji) SPR.img(c.emoji.f); } } catch (e) {} };
+  setTimeout(preEmo, 1500); setInterval(preEmo, 8000);
   // ---------- friends: add by ID; online friends show what they play and for how long (live through the lobby) ----------
   const MAPN = { shroom25: 'Escape Fantasía', kitty5: 'Corre Gatito Corre', bob: 'Corre Polar' };
   function myPresence() { const W = window.SW && SW.W, ingame = W && !$('#hud').classList.contains('hidden'); if (ingame && !myPresence.since) myPresence.since = Date.now(); if (!ingame) myPresence.since = 0; return { uid: S.account && S.account.uid, nick: S.nick || 'Jugador', av: S.avatar || 'av0', adds: (S.friends || []).filter(f => !f.bot && Date.now() - (f.at || 0) < 7 * 864e5).map(f => f.uid).slice(-20), map: ingame ? (MAPN[W.profile.id] || W.profile.name || 'un mapa') : null, since: myPresence.since || null }; }
@@ -25172,7 +25175,7 @@ class Net {
     const el = $(logSel); if (!el) return; const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
     el.innerHTML = msgs.length ? '' : '<div class="mnone">' + (logSel === '#gLog' ? 'Nadie ha escrito todavía. ¡Saluda!' : 'Chat de la sala') + '</div>';
     for (const m of msgs) { const d = document.createElement('div'); d.className = 'ml' + (m.me ? ' me' : ''); const b = document.createElement('b'); b.textContent = m.n + ': '; d.appendChild(b); d.appendChild(document.createTextNode(window.cleanText ? window.cleanText(m.x) : m.x)); el.appendChild(d); }
-    if (atBottom) el.scrollTop = el.scrollHeight;
+    el.scrollTop = el.scrollHeight; requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; }); /* always the newest message */
   }
   const roomBotMsgs = []; // the host's bots talk in the waiting room (only on the host, shown to everyone)
   // general chat: real players (online) + the game's bot players chatting now and then
