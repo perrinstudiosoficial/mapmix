@@ -312,6 +312,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .glbl{font-weight:800;font-size:13px;margin:8px 0 3px;color:#e9d8ff}.gd{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}.gi{display:flex;gap:6px;align-items:flex-start;text-align:left}.gi .icimg{width:30px;height:30px;flex:none}.gi b{display:block;font-size:12px;line-height:1.15}.gi small{display:block;font-size:10.5px;line-height:1.2;opacity:.85}
 #powers .card{padding:14px 16px!important}#bItem0,#bBlink{font-size:0!important;background-repeat:no-repeat;background-position:50% 42%;background-size:62%}#bItem0{background-image:url(assets/fx/it_p_tele.webp)}#bBlink{background-image:url(assets/fx/it_p_help.webp)}#bItem0 small,#bBlink small,#bItem0 kbd,#bItem0 em{font-size:10px}
 .bic{width:30px;height:30px;vertical-align:middle;border-radius:7px;margin:-6px 4px -4px 0}.wkic{width:20px;height:20px;vertical-align:middle;border-radius:5px;margin-right:3px}.mapc .mic{width:38px;height:38px;border-radius:9px}
+#fpTry{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 190px);z-index:6;pointer-events:auto;font-size:16px;padding:10px 14px}#trainPanel{position:absolute;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);max-height:44vh;z-index:7;background:rgba(20,8,34,.94);border:2px solid #8a4dff;border-radius:16px;padding:8px;pointer-events:auto;display:flex;flex-direction:column}#trainPanel.hidden{display:none}.trt{display:flex;gap:4px;flex-wrap:wrap}.trt button{border:0;border-radius:10px;padding:6px 8px;background:#3a2560;color:#fff;font-weight:800;font-size:12px}.trt button.on{background:#8a4dff}.trt button[data-x]{margin-left:auto}.trg{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;overflow-y:auto;margin-top:6px}.tri{background:#2a1a48;border-radius:10px;padding:4px;text-align:center;cursor:pointer}.tri.on{outline:2px solid #b3ff5a}.tri img{width:54px;height:54px;object-fit:contain}.tri small{display:block;font-size:10px;line-height:1.1}.tri canvas.fxc{margin:2px auto 0!important}.trq{font-size:30px;height:54px;display:grid;place-items:center}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -565,7 +566,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
   </div>
   <div id="fplay" class="hidden">
     <div id="fpTop" class="pill"><div class="t" id="fpName"></div><div class="fpst">⏱ <span id="fpTime">0:00</span> · 💀 <span id="fpDeaths">0</span></div><div id="fpTeam"></div></div>
-    <button class="eb" id="fpExit">✕ Salir</button>
+    <button class="eb" id="fpExit">✕ Salir</button><button class="eb hidden" id="fpTry">🎨 Probar</button><div id="trainPanel" class="hidden"></div>
     <div id="fpDead" class="pill hidden"><div class="big">¡CAÍSTE!</div><div id="fpDeadMsg"></div></div>
     <div id="fpStick"><div id="fpKnob"></div></div>
   </div>
@@ -24680,6 +24681,7 @@ function makeMockRoom() {
 }
 
 const MAPS = [
+  { id: 'train', name: 'Entrenamiento', icon: '🎯', ready: true },
   { id: 'shroom25', name: 'Escape Fantasía', icon: '🍄', ready: true },
   { id: 'shroom27', name: 'Escape Fantasía: Noche Eterna', icon: '🌙' },
   { id: 'polar', name: 'Escape Ártico', icon: '❄️' }, { id: 'polar3', name: 'Escape Ártico: Tormenta', icon: '🧊' }, { id: 'polarrf', name: 'Pingüinos en Fuga', icon: '🐧' },
@@ -24692,6 +24694,7 @@ const MAPS = [
   { id: 'estupido1', name: 'Mapa Absurdo 1', icon: '🤪' }, { id: 'estupido2', name: 'Mapa Absurdo 2', icon: '🤪' }, { id: 'estupido3', name: 'Mapa Absurdo 3', icon: '🤪' }, { id: 'estupido4', name: 'Mapa Absurdo 4', icon: '🤪' },
 ];
 const MAP_LORE = {
+  train: { t: 'Entrenamiento', lore: 'Una plaza tranquila y cerrada, sin enemigos, para probar tus cosas con calma.', how: 'Muévete libre por la zona · toca 🎨 Probar para cambiar al instante tu personaje, aura, aparición y muerte (solo lo que ya tienes) y ver cómo se ven.' },
   shroom25: { t: 'Escape Fantasía', lore: 'En lo más profundo del Bosque Psicodélico, un grupo de hongos mareados despertó dentro de un laberinto encantado. Payasos de feria, carritos sin frenos, fuegos que saltan de zona en zona y espinas escondidas bajo las palancas vigilan cada pasillo. Nadie escapa solo: el que cae deja su círculo de poder y solo un compañero puede traerlo de vuelta.', how: '12 etapas · llega a cada punto de control · toca la tumba de un amigo para revivirlo · si caen todos, pierden.' },
   kitty5: { t: 'Corre Gatito Corre', lore: 'En la Selva de Cristal, una manada de tigres blancos con armadura quedó atrapada en un laberinto de murallas que gira en espiral. Los lobos del Rey Aullido patrullan cada pasillo sin descanso, y la única salida está en el centro. Corren tan rápido que el pasto echa humo: el que cae deja su círculo y solo un compañero puede rescatarlo tocándolo.', how: '5 rondas · corre por la espiral hasta el centro · si un lobo te toca, caes · toca el círculo de un amigo para revivirlo.' },
   bob: { t: 'Corre Polar', lore: 'Un grupo de focas gordas y glotonas se escapó del Gran Acuario Polar rumbo al mar. El camino es un espiral de hielo resbaloso donde no hay frenos: una vez que agarras vuelo, solo puedes doblar en curva. Los cangrejos gruñones del puerto cuidan cada orilla y pellizcan fuerte. Ninguna foca llega sola: las que caen esperan a que otra las rescate.', how: '5 rondas · en el hielo te deslizas sin frenar · en el pasto caminas · un cangrejo te quita 500 de vida · toca a una amiga caída para revivirla.' },
@@ -24878,7 +24881,7 @@ class Net {
   // ---------- maps ----------
   function mapGrid(el, selected, onPick) {
     el.innerHTML = '';
-    const sorted = MAPS.slice().sort((a, b) => (!!b.ready - !!a.ready) || a.name.replace(/^[¡¿]/, '').localeCompare(b.name.replace(/^[¡¿]/, ''), 'es')); // playable first, then A-Z
+    const sorted = MAPS.slice().sort((a, b) => ((b.id === 'train') - (a.id === 'train')) || (!!b.ready - !!a.ready) || a.name.replace(/^[¡¿]/, '').localeCompare(b.name.replace(/^[¡¿]/, ''), 'es')); // playable first, then A-Z
     for (const m of sorted) {
       const c = document.createElement('div'); c.className = 'mapc' + (m.ready ? '' : ' soon') + (m.id === selected ? ' sel' : '');
       c.innerHTML = `<span class="badge${m.ready ? '' : ' soon'}">${m.ready ? 'DISPONIBLE' : 'PRONTO'}</span><button class="minfo" title="Info">i</button><div class="ic">${mapIcon(m)}</div><div class="nm"></div>`;
@@ -25103,6 +25106,9 @@ class Net {
   // something equipped that you don't own goes back to the basic one
   { const fix = (key, kind, list, base) => { const v = S[key]; if (!v || v === base) return; const it = list.find(x => x[0] === v); if (!it || !owns(kind, it)) S[key] = base; };
     setTimeout(() => { fix('deathFx', 'dfx', DFX_ITEMS, 'clasico'); fix('spawnFx', 'spawn', SPAWN_ITEMS, 'estandar'); fix('aura', 'aura', AURA_ITEMS, 'anillo'); SW.saveSettings(); }, 1500); }
+  window.trainLists = () => ({ aura: AURA_ITEMS.filter(it => owns('aura', it)), spawn: [['estandar', 'Estándar']].concat(SPAWN_ITEMS.filter(it => owns('spawn', it))), death: [['clasico', 'Clásica']].concat(DFX_ITEMS.filter(it => owns('dfx', it))),
+    chars: ['shroom25', 'kitty5', 'bob'].flatMap(cat => (window.SPR ? Object.keys(SPR.MAN.chars).filter(id => SPR.MAN.chars[id].game === cat && READY.includes(id) && ownsChar(cat, id)) : []).map(id => [cat, id])) });
+  window.fxThumbT = (id, n) => fxThumb(id, n); window.paintFxT = r => paintFx(r);
   const priceTag = (own, p, vip) => p === 'GRATIS' ? '<div class="price owned" style="text-decoration:none;opacity:1">GRATIS</div>' : vip && own ? '<div class="price owned" style="text-decoration:none;opacity:1;color:#ffd23a">TUYO 👑</div>' : `<div class="price${own ? ' owned' : ''}">${p}</div>`;
   const tagTxt = (eq, own) => eq || own ? `<div class="lockd${eq ? ' eq' : ''}">${eq ? 'EQUIPADO' : 'TOCA PARA EQUIPAR'}</div>` : '';
   const prevs = []; // animated previews: [canvas, draw(g, t)]
@@ -25534,7 +25540,7 @@ class Net {
     $('#preSlots').querySelectorAll('.lrow.tap').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot; preBots = i <= preBots ? i - 1 : i; renderPre(); }));
     const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[soloMap]) || {}; const m = MAPS.find(x => x.id === soloMap) || MAPS[0];
     $('#prePrev').innerHTML = `<div class="pvic">${mapIcon(m) || '🗺'}</div><b>${esc(mapName(soloMap))}</b><div class="pvd"><span>Jugadores: ${preBots + 1}/12</span><span>Modo: ${$('#mode').value === 'practice' ? 'Práctica' : 'Original'}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
-  click('#bPlay', () => { try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} preBots = Math.min(11, Math.max(0, S.bots ?? 11)); renderPre(); show('pre'); });
+  click('#bPlay', () => { if (soloMap === 'train') { if (window.ForgeUI) ForgeUI.playTrain(); return; } try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} preBots = Math.min(11, Math.max(0, S.bots ?? 11)); renderPre(); show('pre'); });
   click('#preMinus', () => { preBots = Math.max(0, preBots - 1); renderPre(); }); click('#prePlus', () => { preBots = Math.min(11, preBots + 1); renderPre(); });
   click('#preFill', () => { preBots = 11; renderPre(); }); click('#preNone', () => { preBots = 0; renderPre(); });
   click('#preStart', () => { S.bots = preBots; S.mode = $('#mode').value; S.map = soloMap; SW.saveSettings(); SW.start(); });
@@ -26040,7 +26046,7 @@ class Net {
       } else if (kind === 1) {
         const h = o, u = h.sp || (h.sp = { handle: h.handle, owner: h.owner, t: h.t, alive: true, glide: false, paused: false });
         u.x = h.x; u.y = -h.y; u.facing = -h.facing * 180 / Math.PI; u.walkPhase = h.walkPhase; u.order = h.moving ? 1 : null; u.alive = true; u.inv = h.grace > t;
-        g.save(); g.translate(h.x, h.y); g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(3, 12, 24, 9, 0, 0, TAU); g.fill(); g.scale(1, -1); if (window.SPR && SP.drawSprHero && SPR.MAN.chars[SP.sprCharOf(u)]) { const L = SP.W.local; SP.W.local = null; SP.drawSprHero(g, u); SP.W.local = L; } else SP.drawHero(g, u); g.restore(); /* the elf (or your Escape Fantasía character) */
+        g.save(); g.translate(h.x, h.y); g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(3, 12, 24, 9, 0, 0, TAU); g.fill(); g.scale(1, -1); if (window.SPR && SP.drawSprHero && SPR.MAN.chars[SP.sprCharOf(u)]) { const L = SP.W.local; SP.W.local = null; SP.drawSprHero(g, u); SP.W.local = L; } if (PL.opt && PL.opt.train && trainFx && h === PL.G.local) { const p = (PL.G.time - trainFx.t0) / 1.6; if (p >= 1) trainFx = null; else { const col = SP.heroColor(u); g.save(); try { if (trainFx.k === 'spawn') SP.drawSpawnFx(g, { kind: S.spawnFx || 'estandar', col }, p); else SP.drawDeathFx(g, { kind: S.deathFx || 'clasico', col, x: 0, y: 0 }, p); } catch (e) {} g.restore(); } } else SP.drawHero(g, u); g.restore(); /* the elf (or your Escape Fantasía character) */
       } else { const h = o, u = h.spm || (h.spm = { owner: h.owner, handle: h.handle }); g.save(); g.translate(h.tx, h.ty); g.scale(1, -1); SP.drawMarker(g, u); g.restore(); }
     }
     // shells, explosions, deaths
@@ -26401,7 +26407,26 @@ class Net {
     PL.on = true; resize(); try { sfx.init(); sfx.musicOn = S.music; sfx.setSong('fortaleza'); } catch (e) {}
     loop.kick();
   }
-  function leavePlay() {
+  // ---------- Entrenamiento: a small closed plaza, no enemies, to try your things ----------
+  const TRAIN = (() => { const w = 14, h = 11, m = F.newMap(w, h, 'Entrenamiento'); for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) m.t[j * w + i] = (i === 0 || j === 0 || i === w - 1 || j === h - 1) ? 5 : ((i + j) % 7 === 0 ? 3 : (i > 4 && i < 9 && j > 3 && j < 7) ? 2 : 1);
+    for (const [i, j] of [[3, 3], [10, 3], [3, 7], [10, 7]]) m.t[j * w + i] = 3;
+    m.e = [{ k: 'start', x: 7, y: 5.5 }, { k: 'goal', x: -50, y: -50 }]; return m; })();
+  let trainCat = 'shroom25', trainFx = null;
+  function playTrain() { playMap(F.serialize(TRAIN), { name: '🎯 Entrenamiento', back: 'solo', train: true }); PL.G.goal = null; PL.G.cps = []; S.fBotsSaved = null;
+    for (const h of PL.G.heroes.slice(1)) { h.alive = false; h.gone = true; } PL.G.heroes = [PL.G.local]; $('#fpTry').classList.remove('hidden'); const sk = S.skins || {}; trainCat = sk.shroom25 ? 'shroom25' : 'shroom25'; trainSync(); }
+  function trainSync() { const o = PL.G && PL.G.local && PL.G.local.owner; if (!o) return; o.skins = Object.assign({}, S.skins || {}); o.aura = S.aura || 'anillo'; SP.W.profile = { id: trainCat, family: trainCat === 'shroom25' ? 'shroom' : 'run' }; }
+  function trainPanel(tab) { const L = window.trainLists ? trainLists() : { aura: [], spawn: [], death: [], chars: [] }; tab = tab || trainPanel.tab || 'char'; trainPanel.tab = tab;
+    const T = [['char', '🧝 Personaje'], ['aura', '⭕ Aura'], ['spawn', '✨ Aparición'], ['death', '💥 Muerte']];
+    const cur = { aura: S.aura || 'anillo', spawn: S.spawnFx || 'estandar', death: S.deathFx || 'clasico' };
+    let body = '';
+    if (tab === 'char') body = L.chars.map(([cat, id]) => { const C = SPR.MAN.chars[id]; const on = trainCat === cat && (S.skins || {})[cat] === id; return `<div class="tri${on ? ' on' : ''}" data-c="${cat}|${id}"><img src="assets/spr/${C.thumb}" alt=""><small>${esc(C.name)}</small></div>`; }).join('');
+    else body = L[tab].map(([id, n]) => `<div class="tri${cur[tab] === id ? ' on' : ''}" data-f="${id}">${id.match(/^[apd]\d+$/) && window.fxThumbT ? fxThumbT(id === 'anillo' ? 'a60' : id, 54) : `<div class="trq">${tab === 'aura' ? '⭕' : tab === 'spawn' ? '✨' : '💥'}</div>`}<small>${esc(String(n).replace(/^Aura /, ''))}</small></div>`).join('');
+    $('#trainPanel').innerHTML = `<div class="trt">${T.map(([k, n]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}">${n}</button>`).join('')}<button data-x="1">✕</button></div><div class="trg">${body || '<div class="hint">Aún no tienes nada de esto. Consíguelo en la tienda.</div>'}</div>`;
+    $('#trainPanel').classList.remove('hidden'); if (window.paintFxT) paintFxT($('#trainPanel'));
+    $('#trainPanel').querySelectorAll('[data-t]').forEach(b => b.onclick = () => trainPanel(b.dataset.t)); $('#trainPanel').querySelector('[data-x]').onclick = () => $('#trainPanel').classList.add('hidden');
+    $('#trainPanel').querySelectorAll('[data-c]').forEach(b => b.onclick = () => { const [cat, id] = b.dataset.c.split('|'); S.skins = S.skins || {}; S.skins[cat] = id; trainCat = cat; SW.saveSettings(); trainSync(); trainFx = { k: 'spawn', t0: PL.G.time }; trainPanel(); });
+    $('#trainPanel').querySelectorAll('[data-f]').forEach(b => b.onclick = () => { const id = b.dataset.f; if (tab === 'aura') S.aura = id; else if (tab === 'spawn') { S.spawnFx = id; trainFx = { k: 'spawn', t0: PL.G.time }; } else { S.deathFx = id; trainFx = { k: 'death', t0: PL.G.time }; } SW.saveSettings(); trainSync(); trainPanel(); }); }
+  function leavePlay() { $('#fpTry').classList.add('hidden'); $('#trainPanel').classList.add('hidden'); if (PL.opt && PL.opt.train) SP.W.profile = { id: 'shroom25', family: 'shroom' };
     PL.on = false; $('#fplay').classList.add('hidden'); $('#fEnd').classList.add('hidden'); endStick();
     try { sfx.setSong('menu'); } catch (e) {}
     const back = PL.opt.back;
@@ -26409,7 +26434,8 @@ class Net {
     $('#fed').classList.add('hidden');
     if (back === 'forge') { show('forge'); renderTab(); } else show(back || 'menu');
   }
-  click('#fpExit', () => {
+  click('#fpTry', () => { if ($('#trainPanel').classList.contains('hidden')) trainPanel(); else $('#trainPanel').classList.add('hidden'); });
+  click('#fpExit', () => { if (PL.opt && PL.opt.train) { leavePlay(); return; }
     if (PL.opt.test) { leavePlay(); return; }
     if (Date.now() - PL.quitArm > 2500) { PL.quitArm = Date.now(); $('#fpExit').textContent = '¿Salir? toca otra vez'; setTimeout(() => { if (PL.on) $('#fpExit').textContent = '✕ Salir'; }, 2500); return; }
     leavePlay();
@@ -26518,7 +26544,7 @@ class Net {
       requestAnimationFrame(t => this.frame(t));
     },
   };
-  window.ForgeUI = { openEditor, playMap, get ED() { return ED; }, get PL() { return PL; }, loadComm, featured, Cloud, COMM, mine: () => mine };
+  window.ForgeUI = { openEditor, playMap, playTrain, get ED() { return ED; }, get PL() { return PL; }, loadComm, featured, Cloud, COMM, mine: () => mine };
 })();
 
 </script>
