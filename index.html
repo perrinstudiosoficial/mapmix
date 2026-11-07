@@ -24926,6 +24926,10 @@ class Net {
   // two bot friends so the list is never empty: one playing, one disconnected (their times keep moving like a real person's)
   // AI players: now and then one sends you a friend request; if you accept, it plays rarely and keeps a believable record of when it was last on
   const BOT_NAMES = ['Vicho', 'Martu.x', 'Gabo_cl', 'la_tefa', 'Benji2011', 'NachoPro', 'Flo', 'Agus.exe', 'Joaco', 'Cata_gg', 'Pipe', 'Rocío', 'Thiago', 'Emi_kawaii', 'Santi99', 'Isa', 'Lucho', 'ElPato'];
+  // every account gets different AI people: names are built from pieces, so two players almost never see the same ones
+  function randHumanName() { const R = a => a[Math.floor(Math.random() * a.length)]; const base = R(['vale', 'seba', 'coni', 'tomi', 'benja', 'nacho', 'fer', 'joaco', 'kiara', 'vicho', 'gabo', 'pipe', 'cata', 'santi', 'mati', 'nico', 'rocio', 'emi', 'luna', 'agus', 'isa', 'lucas', 'diego', 'ale', 'thiago', 'maxi', 'cami', 'tefa', 'kathe', 'flor', 'dani', 'javi', 'franco', 'sofi', 'martin', 'eli', 'bruno', 'ignacia', 'amanda', 'leo', 'ricky', 'dante', 'zoe', 'hugo', 'mia', 'gonza', 'trini', 'pancho', 'antonia']);
+    const st = Math.floor(Math.random() * 9), cap = w => w[0].toUpperCase() + w.slice(1), n = () => String(Math.floor(Math.random() * (Math.random() < 0.5 ? 99 : 9999)));
+    return [() => cap(base) + '_' + n(), () => 'xX' + cap(base) + 'Xx', () => cap(base) + R(['.exe', 'Pro', 'GG', '_cl', 'YT', 'OP', '_mx', 'uwu']), () => R(['★', '~', '✿', '♡', 'ツ']) + cap(base) + R(['★', '~', '✿', '♡', 'ツ']), () => base + n(), () => R(['Dark', 'Shadow', 'Neo', 'Mr', 'Lil', 'Super', 'El']) + cap(base) + (Math.random() < 0.5 ? n() : ''), () => cap(base) + R([' <3', ':3', ' :v', '!!', 'zz']), () => R(['la_', 'el_', 'soy']) + base + R(['', '_', '.']) + R(['', 'x', n()]), () => cap(base).toUpperCase()][st]().slice(0, 14); }
   const MAPL = ['Escape Fantasía', 'Corre Gatito Corre', 'Corre Polar'];
   const hsh = (a, b) => { let h = (a * 2654435761 ^ b * 40503) >>> 0; h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; return (h ^ (h >>> 13)) >>> 0; };
   function botState(f) { const now = Date.now(), W = 12 * 36e5, k0 = Math.floor(now / W), sd = +f.bot || 7;
@@ -24933,7 +24937,7 @@ class Net {
     return { on: false, seen: now - 16 * 864e5 }; }
   if (S.botFriends === 1) { S.friends = (S.friends || []).filter(f => !(f.bot === 1 || f.bot === 2)); S.notifs = (S.notifs || []).filter(n => n.uid !== '402776153'); S.botFriends = 2; SW.saveSettings(); } // the old sample friends go away
   setInterval(() => { if (!S.account) return; const now = Date.now(); if (!S.nextBotReq) { S.nextBotReq = now + (4 + Math.random() * 6) * 6e4; SW.saveSettings(); return; } if (now < S.nextBotReq || (S.botReqs | 0) >= 8) return;
-    S.nextBotReq = now + (20 + Math.random() * 40) * 6e4; S.botReqs = (S.botReqs | 0) + 1; const used = (S.friends || []).map(f => f.nick); const nm = BOT_NAMES.filter(x => !used.includes(x))[Math.floor(Math.random() * 10)] || 'Jugador' + Math.floor(Math.random() * 900 + 100);
+    S.nextBotReq = now + (20 + Math.random() * 40) * 6e4; S.botReqs = (S.botReqs | 0) + 1; const used = (S.friends || []).map(f => f.nick).concat((S.notifs || []).map(n => n.nick)); let nm = ''; for (let t = 0; t < 20 && (!nm || used.includes(nm)); t++) nm = randHumanName();
     newNotif({ id: 'n' + now, type: 'add', uid: String(100000000 + Math.floor(Math.random() * 9e8)), nick: nm, av: 'av' + Math.floor(Math.random() * 16), bot: 3 + Math.floor(Math.random() * 9999), at: now }); }, 30000);
   function renderFriends() { const F = S.friends || (S.friends = []), on = onlineMap(); $('#frMine').innerHTML = `Tu ID: <b style="font-size:15px;letter-spacing:1px">${esc(S.account && S.account.uid || '—')}</b> · compártelo con tus amigos`;
     let ch = false; F.forEach(f => { const o = on[f.uid]; if (o) { f.seen = Date.now(); ch = true; if (o.nick && f.nick !== o.nick) f.nick = o.nick; } }); if (ch) SW.saveSettings();
