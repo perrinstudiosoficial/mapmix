@@ -22370,7 +22370,7 @@ class Renderer {
       else if (kind === 'kitty' && W.profile.id === 'kitty5' && this.drawTiger3D && !(window.SW && window.SW.settings && window.SW.settings.tiger3d !== true)) { if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); } this.drawTiger3D(g, u); }
       else if (kind === 'kitty' && W.profile.id === 'kitty5' && this.drawCatSheet && this.catReady(u)) this.drawCatSheet(g, u); // the sheet big cats (white tiger by default)
       else if (kind === 'kitty') this.drawKitty(g, u); else if (kind === 'wolf') this.drawWolf(g, u); else if (kind === 'circle') this.drawKittyCircle(g, u); else if (kind === 'shop') this.drawKittyShop(g, u); else if (kind === 'swimmer') this.drawPuffer(g, u); else if (kind === 'crab') this.drawCrab(g, u); else if (kind === 'hidden') {}
-      else if (code === 'H003') { if (this.drawBoy && window.BOY_ART) this.drawBoy(g, u); else this.drawHero(g, u); } // the boy (or his skins) replaces the mushroom kid
+      else if (code === 'H003') { if (this.drawBoy && window.BOY_ART) this.drawBoy(g, u); } /* the old mushroom kid no longer exists */ // the boy (or his skins) replaces the mushroom kid
       else if (code === 'h000' || code === 'h007' || code === 'h008' || code === 'h009') this.drawClown(g, u, code);
       else if (u.t.mortar) this.drawMortar(g, u);
       else if (code === 'h004') this.drawKart(g, u);
@@ -22768,7 +22768,7 @@ class Renderer {
     else if (h === 'fiesta') { g.fillStyle = '#ff4fd8'; g.beginPath(); g.moveTo(-16, -20); g.lineTo(0, -62); g.lineTo(16, -20); g.closePath(); g.fill(); g.strokeStyle = O; g.lineWidth = 2; g.stroke(); g.fillStyle = '#ffe14d'; for (const y of [-30, -42, -52]) { g.beginPath(); g.arc(0, y, 2.5, 0, TAU); g.fill(); } g.fillStyle = '#4dfcff'; g.beginPath(); g.arc(0, -63, 5, 0, TAU); g.fill(); }
     else if (h === 'casco') { const gg = g.createRadialGradient(-10, -10, 4, 0, -4, 44); gg.addColorStop(0, 'rgba(255,255,255,0.55)'); gg.addColorStop(1, 'rgba(160,210,255,0.12)'); g.fillStyle = gg; g.beginPath(); g.arc(0, 4, 44, Math.PI, 0); g.closePath(); g.fill(); g.strokeStyle = 'rgba(200,220,240,0.9)'; g.lineWidth = 3; g.stroke(); }
     g.restore(); }
-  P.drawHero = function (g, u) {
+  P.drawHero = function (g, u) { return; /* the old mushroom kid is gone: the elf (sprites) is the hero */
     const W = this.W; if (!u.alive) return;
     const moving = !!u.order && !u.paused && !u.glide; const ph = u.walkPhase * 2.6; const sw = moving ? Math.sin(ph) : 0;
     const t = W.time + u.handle * 0.37;
@@ -26046,7 +26046,7 @@ class Net {
       } else if (kind === 1) {
         const h = o, u = h.sp || (h.sp = { handle: h.handle, owner: h.owner, t: h.t, alive: true, glide: false, paused: false });
         u.x = h.x; u.y = -h.y; u.facing = -h.facing * 180 / Math.PI; u.walkPhase = h.walkPhase; u.order = h.moving ? 1 : null; u.alive = true; u.inv = h.grace > t;
-        g.save(); g.translate(h.x, h.y); g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(3, 12, 24, 9, 0, 0, TAU); g.fill(); g.scale(1, -1); if (window.SPR && SP.drawSprHero && SPR.MAN.chars[SP.sprCharOf(u)]) { const L = SP.W.local; SP.W.local = null; SP.drawSprHero(g, u); SP.W.local = L; } if (PL.opt && PL.opt.train && trainFx && h === PL.G.local) { const p = (PL.G.time - trainFx.t0) / 1.6; if (p >= 1) trainFx = null; else { const col = SP.heroColor(u); g.save(); try { if (trainFx.k === 'spawn') SP.drawSpawnFx(g, { kind: S.spawnFx || 'estandar', col }, p); else SP.drawDeathFx(g, { kind: S.deathFx || 'clasico', col, x: 0, y: 0 }, p); } catch (e) {} g.restore(); } } else SP.drawHero(g, u); g.restore(); /* the elf (or your Escape Fantasía character) */
+        g.save(); g.translate(h.x, h.y); g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(3, 12, 24, 9, 0, 0, TAU); g.fill(); g.scale(1, -1); if (window.SPR && SP.drawSprHero && SPR.MAN.chars[SP.sprCharOf(u)]) { const L = SP.W.local; SP.W.local = null; SP.drawSprHero(g, u); SP.W.local = L; } if (PL.opt && PL.opt.train && trainFx && h === PL.G.local) { const p = (PL.G.time - trainFx.t0) / 1.6; if (p >= 1) trainFx = null; else { const col = SP.heroColor(u); g.save(); try { if (trainFx.k === 'spawn') SP.drawSpawnFx(g, { kind: S.spawnFx || 'estandar', col }, p); else SP.drawDeathFx(g, { kind: S.deathFx || 'clasico', col, x: 0, y: 0 }, p); } catch (e) {} g.restore(); } } g.restore(); /* the elf (or your Escape Fantasía character) */
       } else { const h = o, u = h.spm || (h.spm = { owner: h.owner, handle: h.handle }); g.save(); g.translate(h.tx, h.ty); g.scale(1, -1); SP.drawMarker(g, u); g.restore(); }
     }
     // shells, explosions, deaths
