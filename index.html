@@ -23139,7 +23139,6 @@ class Renderer {
       const pu = 0.5 + 0.5 * Math.sin(t * 2.5 + seed); g.save(); g.scale(1, 0.42);
       const gl = g.createRadialGradient(0, 0, R * 0.7, 0, 0, R * 1.25); gl.addColorStop(0, hexA(col, 0)); gl.addColorStop(0.75, hexA(col, 0.35 + 0.15 * pu)); gl.addColorStop(1, hexA(col, 0)); g.fillStyle = gl; g.beginPath(); g.arc(0, 0, R * 1.25, 0, TAU); g.fill();
       g.strokeStyle = hexA(col, 0.95); g.lineWidth = 4; g.beginPath(); g.arc(0, 0, R, 0, TAU); g.stroke(); g.strokeStyle = 'rgba(255,255,255,0.75)'; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, R, 0, TAU); g.stroke(); g.restore();
-      for (let k = 0; k < 4; k++) { const q = (t * 0.35 + k * 0.25 + seed * 0.13) % 1, a = k * 1.7 + seed; g.fillStyle = hexA(col, (1 - q) * 0.9); g.beginPath(); g.arc(Math.cos(a) * R * 1.05, Math.sin(a) * R * 0.44 + q * 26, 2.2, 0, TAU); g.fill(); }
       return; }
     if (style === 'cristal') { // crystal star aura (art) drawn with additive light, pulsing, with rising sparks and light beams
       if (!auraImg && window.AURA_ART) { auraImg = new Image(); auraImg.src = window.AURA_ART.cristal; }
@@ -23606,7 +23605,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     const t = W.time, dt = Math.min(0.1, this._dt || 0.016), col = this.heroColor(u);
     if (u._rf == null) u._rf = u.facing; { const d = ((u.facing - u._rf) % 360 + 540) % 360 - 180, st = 640 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
     { const mv = u._lx != null && Math.hypot(u.x - u._lx, u.y - u._ly) > 0.4; if (mv) u._lastMv = t; }
-    const moving = (!!u.order && !u.paused) || !!u.glide || (u._lastMv != null && t - u._lastMv < 0.3); /* keeps running through tiny gaps between moves */ const [row, mir] = SPR.dir(u._rf);
+    const mine = u.owner === W.local && window.stickOn && window.SW && SW.settings && SW.settings.control === 'stick'; const moving = !!u.glide || (mine ? window.stickOn() : ((!!u.order && !u.paused) || (u._lastMv != null && t - u._lastMv < 0.12))); /* your hero runs exactly while your thumb is on the joystick: no pauses, stops the moment you let go */ const [row, mir] = SPR.dir(u._rf);
     if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); }
     // moving cancels any animation (and the idle rotation)
     if (moving || u.jump) { u._still = t; if (u.dance) u.dance = null; }
@@ -23630,7 +23629,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     g.save(); g.translate(0, -4); this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, (u.handle || 0) % 7, 44); g.restore();
     if (u.inv && !(u.t && u.t.inv)) { g.strokeStyle = `rgba(255,240,120,${0.6 + 0.3 * Math.sin(W.time * 12)})`; g.lineWidth = 5; g.beginPath(); g.arc(0, 30, 50, 0, TAU); g.stroke(); }
     if (!F) { g.fillStyle = col; g.globalAlpha *= 0.5; g.beginPath(); g.arc(0, 26, 16 + Math.sin(t * 6) * 2, 0, TAU); g.fill(); return; } // still downloading: a soft dot, never a wrong picture
-    if (!(smooth && SPR.blitSmooth(g, cid, a, row, fi, s, mir, lift - 2, sx, sy))) blit(g, F, s, mir, lift - 2, sx, sy);
+if (!(smooth && SPR.blitSmooth(g, cid, a, row, fi, s, mir, lift - 2, sx, sy))) blit(g, F, s, mir, lift - 2, sx, sy);
     if (moving && !u.jump && map === 'kitty5' && Math.random() < 0.2) { const f = u._rf * Math.PI / 180; this.puff(u.x - Math.cos(f) * 26, u.y - 4 - Math.sin(f) * 26, { r0: 4, r1: 11, life: 0.35, col: '235,225,205', a: 0.28, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
   };
 })();
@@ -24326,6 +24325,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let holding = false, holdPos = { x: 0, y: 0 }, holdT = 0, targeting = null, lastTap = null;
   const pointers = new Map(); let pinch = null;
   const stick = { active: false, dx: 0, dy: 0, id: null };
+  window.stickOn = () => settings.control === 'stick' && stick.active && Math.hypot(stick.dx, stick.dy) > 0.12; // the run animation follows your thumb exactly
   cv.addEventListener('contextmenu', e => e.preventDefault());
   cv.addEventListener('pointerdown', e => {
     if (!W) return; sfx.init(); reviveLock = 0;
