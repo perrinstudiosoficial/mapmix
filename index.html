@@ -26027,8 +26027,10 @@ class Net {
     const list = [];
     for (const e of ents) if (ENT[e.k].enemy) list.push([e.k === 'mortar' || e.k === 'mine' ? e.y * TS : (st.pos(e).y), 0, e]);
     for (const h of st.heroes || []) { if (h.alive) list.push([h.y, 1, h]); else if (h.tx != null) list.push([h.ty, 2, h]); }
+    if (st.train) for (const [y, fn] of trainProps(t)) list.push([y, 9, fn]);
     list.sort((p, q) => p[0] - q[0]);
     for (const [, kind, o] of list) {
+      if (kind === 9) { o(); continue; }
       if (kind === 0) {
         const e = o, p = st.pos(e), u = e._u || (e._u = { handle: (e.x * 13 + e.y * 7) | 0, t: { code: 'h001', r: 30 }, walkPhase: 0, owner: { id: 0 } });
         u.x = p.x; u.y = -p.y; u.order = p.mv ? 1 : null;
@@ -26417,7 +26419,7 @@ class Net {
   const BUSH = [[-0.78, 0.45], [0.8, 0.3], [-0.55, 0.78], [0.55, 0.8], [-0.86, -0.1], [0.88, -0.25]].map(([a, b]) => [TC.x + a * TR, TC.y + b * TR]);
   const LAMP = [[-0.42, 0.42], [0.42, 0.42], [-0.42, -0.25], [0.42, -0.25]].map(([a, b]) => [TC.x + a * TR, TC.y + b * TR]);
   function stoneRing(g, cx, cy, r, w, n, c1, c2) { for (let k = 0; k < n; k++) { const a0 = k / n * TAU, a1 = (k + 0.92) / n * TAU; g.fillStyle = k % 2 ? c1 : c2; g.beginPath(); g.arc(cx, cy, r + w / 2, a0, a1); g.arc(cx, cy, r - w / 2, a1, a0, true); g.closePath(); g.fill(); } }
-  function drawTrainMountains(g, t) { const wx = TC.x, wy = TC.y - TR + 165, top = wy - 1600, bot = wy - 30;
+  function drawTrainMountains(g, t) { const wx = TC.x, wy = TC.y - TR + 95, top = wy - 1600, bot = wy - 30;
     // mountains: a big rocky range fills the whole back, the fall comes down a gorge in the middle
     const mtn = (pts, c1, c2) => { const gr = g.createLinearGradient(0, bot - 1700, 0, bot); gr.addColorStop(0, c1); gr.addColorStop(1, c2); g.fillStyle = gr; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (const p of pts.slice(1)) g.lineTo(p[0], p[1]); g.closePath(); g.fill(); };
     const B = TC.y - TR + 60;
@@ -26450,7 +26452,7 @@ class Net {
     g.strokeStyle = 'rgba(255,255,255,0.18)'; g.lineWidth = 6; g.beginPath(); g.arc(TC.x, TC.y, TR + 10, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
 
     // waterfall: a tall fall coming from far above (out of view), between two rocky cliffs, into the pond
-    const wx = TC.x, wy = TC.y - TR + 165, top = wy - 1600, bot = wy - 30;
+    const wx = TC.x, wy = TC.y - TR + 95, top = wy - 1600, bot = wy - 30;
     const rock = (x, y, rx, ry, c, hl) => { g.fillStyle = c; g.beginPath(); g.moveTo(x - rx, y + ry * 0.3); g.quadraticCurveTo(x - rx * 1.05, y - ry * 0.6, x - rx * 0.35, y - ry); g.quadraticCurveTo(x + rx * 0.3, y - ry * 1.15, x + rx * 0.9, y - ry * 0.45); g.quadraticCurveTo(x + rx * 1.1, y + ry * 0.2, x + rx * 0.6, y + ry * 0.55); g.quadraticCurveTo(x, y + ry * 0.75, x - rx, y + ry * 0.3); g.fill(); g.fillStyle = hl; g.beginPath(); g.ellipse(x - rx * 0.25, y - ry * 0.55, rx * 0.5, ry * 0.25, -0.2, 0, TAU); g.fill(); };
     // the falling water: wide sheet with streaks running down
     const W0 = 70, W1 = 95; const fg = g.createLinearGradient(wx - W1, 0, wx + W1, 0); fg.addColorStop(0, '#3e9ee0'); fg.addColorStop(0.25, '#8fd6ff'); fg.addColorStop(0.5, '#e4f8ff'); fg.addColorStop(0.75, '#8fd6ff'); fg.addColorStop(1, '#3e9ee0');
@@ -26469,20 +26471,39 @@ class Net {
     g.fillStyle = 'rgba(220,245,255,0.35)'; g.beginPath(); g.ellipse(wx, hy - 30, W1 + 50, 40, 0, 0, TAU); g.fill(); // mist
     for (let k = 0; k < 14; k++) { const a = k / 14 * TAU; if (Math.sin(a) < -0.5) continue; rock(wx + Math.cos(a) * 190, wy + 14 + Math.sin(a) * 76, 26 + (k % 3) * 6, 18 + (k % 2) * 5, k % 2 ? '#7a7588' : '#6a6577', 'rgba(255,255,255,0.12)'); }
     for (const [x, y] of [[-110, 28], [105, 34]]) { g.fillStyle = '#4caf50'; g.beginPath(); g.ellipse(wx + x, wy + y, 20, 10, 0, 0, TAU); g.fill(); g.fillStyle = '#ff8fc8'; g.beginPath(); g.arc(wx + x + 4, wy + y - 3, 5, 0, TAU); g.fill(); }
-    // rocks, bushes with berries, lamps
-    for (const [x, y, r] of [[TC.x - TR * 0.66, TC.y + TR * 0.12, 40], [TC.x + TR * 0.68, TC.y + TR * 0.05, 34]]) { g.fillStyle = '#5c5868'; g.beginPath(); g.ellipse(x, y, r * 1.3, r, 0, 0, TAU); g.fill(); g.fillStyle = '#7d7889'; g.beginPath(); g.ellipse(x - r * 0.3, y - r * 0.35, r * 0.7, r * 0.45, 0, 0, TAU); g.fill(); g.fillStyle = '#4e9c45'; g.beginPath(); g.ellipse(x + r * 0.4, y - r * 0.6, r * 0.45, r * 0.25, 0, 0, TAU); g.fill(); }
-    for (const [x, y] of BUSH) { g.fillStyle = '#2f7d39'; g.beginPath(); g.arc(x - 22, y, 28, 0, TAU); g.arc(x + 22, y, 28, 0, TAU); g.arc(x, y - 18, 30, 0, TAU); g.fill(); g.fillStyle = '#45a04c'; g.beginPath(); g.arc(x - 8, y - 22, 16, 0, TAU); g.fill(); g.fillStyle = '#ff5a6e'; for (const [a, b] of [[-20, -6], [14, -14], [2, 4], [26, 2]]) { g.beginPath(); g.arc(x + a, y + b, 5, 0, TAU); g.fill(); } }
-    for (const [x, y] of LAMP) { g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.ellipse(x + 6, y + 4, 16, 6, 0, 0, TAU); g.fill(); g.fillStyle = '#3c3548'; g.fillRect(x - 4, y - 70, 8, 72); const gl = 0.55 + 0.15 * Math.sin(t * 3 + x); const lg = g.createRadialGradient(x, y - 78, 2, x, y - 78, 40); lg.addColorStop(0, `rgba(255,230,140,${gl})`); lg.addColorStop(1, 'rgba(255,230,140,0)'); g.fillStyle = lg; g.beginPath(); g.arc(x, y - 78, 40, 0, TAU); g.fill(); g.fillStyle = '#ffe28a'; g.beginPath(); g.arc(x, y - 78, 9, 0, TAU); g.fill(); g.strokeStyle = '#3c3548'; g.lineWidth = 3; g.strokeRect(x - 10, y - 88, 20, 20); }
-    // butterflies
-    for (let k = 0; k < 5; k++) { const a = t * 0.4 + k * 1.3, x = TC.x + Math.cos(a * (1 + k * 0.1)) * TR * 0.6, y = TC.y + Math.sin(a * 1.3) * TR * 0.45, f = Math.abs(Math.sin(t * 12 + k)); g.fillStyle = ['#ffd54a', '#ff8fc8', '#9fd8ff', '#ffffff', '#c59bff'][k]; g.beginPath(); g.ellipse(x - 6 * f, y, 6 * f + 1, 8, 0, 0, TAU); g.ellipse(x + 6 * f, y, 6 * f + 1, 8, 0, 0, TAU); g.fill(); }
   }
+  const BIGROCK = [[TC.x - TR * 0.72, TC.y + TR * 0.08], [TC.x + TR * 0.7, TC.y + TR * 0.02]];
+  function drawBigRock(g, x, y) { g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(x + 8, y + 6, 92, 26, 0, 0, TAU); g.fill();
+    const blob = (cx, cy, w, h, c1, c2) => { const gr = g.createLinearGradient(cx - w, cy - h, cx + w * 0.6, cy + h * 0.4); gr.addColorStop(0, c1); gr.addColorStop(1, c2); g.fillStyle = gr; g.beginPath(); g.moveTo(cx - w, cy); g.quadraticCurveTo(cx - w * 1.02, cy - h * 0.9, cx - w * 0.3, cy - h); g.quadraticCurveTo(cx + w * 0.5, cy - h * 1.08, cx + w * 0.95, cy - h * 0.35); g.quadraticCurveTo(cx + w * 1.08, cy + h * 0.1, cx + w * 0.7, cy + h * 0.18); g.lineTo(cx - w * 0.8, cy + h * 0.18); g.closePath(); g.fill(); g.strokeStyle = 'rgba(30,25,45,0.5)'; g.lineWidth = 3; g.stroke(); };
+    blob(x + 38, y + 4, 52, 62, '#9a96ab', '#5e5a70'); blob(x - 22, y, 70, 96, '#a7a3b8', '#625e75'); blob(x - 58, y + 8, 34, 38, '#8f8aa1', '#58546a');
+    g.fillStyle = 'rgba(255,255,255,0.22)'; g.beginPath(); g.ellipse(x - 42, y - 72, 26, 10, -0.4, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(30,25,45,0.4)'; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 10, y - 70); g.lineTo(x - 2, y - 45); g.lineTo(x - 12, y - 28); g.stroke();
+    g.fillStyle = '#4e9c45'; g.beginPath(); g.ellipse(x - 30, y - 88, 26, 9, 0, 0, TAU); g.ellipse(x + 34, y - 52, 18, 7, 0, 0, TAU); g.fill(); g.fillStyle = '#6cc55f'; g.beginPath(); g.ellipse(x - 34, y - 91, 14, 5, 0, 0, TAU); g.fill(); }
   const TTREE = { x: TC.x + TR * 0.68, y: TC.y - TR * 0.46 };
-  const OBST = () => [[TTREE.x, TTREE.y, 46], ...LAMP.map(([x, y]) => [x, y, 22]), ...BUSH.map(([x, y]) => [x, y - 6, 50]), [TC.x - TR * 0.66, TC.y + TR * 0.12, 52], [TC.x + TR * 0.68, TC.y + TR * 0.05, 46]];
+  const OBST = () => [[TTREE.x, TTREE.y, 46], ...LAMP.map(([x, y]) => [x, y, 22]), ...BUSH.map(([x, y]) => [x, y - 6, 50]), ...BIGROCK.map(([x, y]) => [x, y - 10, 70])];
   function drawTrainTree(g) { const { x, y } = TTREE, r = 95; g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(x + 10, y + 8, 70, 22, 0, 0, TAU); g.fill(); g.fillStyle = '#6b4426'; g.fillRect(x - 13, y - 70, 26, 76); g.fillStyle = '#7d5230'; g.fillRect(x - 13, y - 70, 9, 76); [['#1f7a3a', 0], ['#2f9a4a', 1], ['#4cc062', 2]].forEach(([c, i]) => { g.fillStyle = c; g.beginPath(); g.arc(x + (i - 1) * 28, y - 100 - i * 26, r * (0.75 - i * 0.14), 0, TAU); g.arc(x - 40 + i * 10, y - 80 - i * 22, r * (0.5 - i * 0.08), 0, TAU); g.arc(x + 44 - i * 8, y - 84 - i * 20, r * (0.5 - i * 0.08), 0, TAU); g.fill(); }); g.fillStyle = '#ff5a6e'; for (const [a, b] of [[-30, -120], [25, -140], [40, -95], [-10, -165]]) { g.beginPath(); g.arc(x + a, y + b, 7, 0, TAU); g.fill(); } }
-  function drawTrainTrees(g) { drawTrainTree(g); for (const [x, y, r, k] of TREES) { if (Math.abs(x - TC.x) < 560 && y < TC.y - TR + 40) continue; /* the rocky hill is there */ g.fillStyle = '#5a3b22'; g.fillRect(x - r * 0.12, y - r * 0.2, r * 0.24, r * 0.6); const c = k < 0.5 ? ['#1e6b34', '#2f8f45', '#46b35a'] : ['#2a5e2a', '#3c7d36', '#5aa64a']; c.forEach((col, i) => { g.fillStyle = col; g.beginPath(); g.arc(x + (i - 1) * r * 0.18, y - r * 0.55 - i * r * 0.18, r * (0.62 - i * 0.12), 0, TAU); g.fill(); }); } }
+  function drawLamp(g, x, y, t) { g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.ellipse(x + 6, y + 4, 16, 6, 0, 0, TAU); g.fill(); g.fillStyle = '#3c3548'; g.fillRect(x - 4, y - 70, 8, 72); const gl = 0.55 + 0.15 * Math.sin(t * 3 + x); const lg = g.createRadialGradient(x, y - 78, 2, x, y - 78, 40); lg.addColorStop(0, `rgba(255,230,140,${gl})`); lg.addColorStop(1, 'rgba(255,230,140,0)'); g.fillStyle = lg; g.beginPath(); g.arc(x, y - 78, 40, 0, TAU); g.fill(); g.fillStyle = '#ffe28a'; g.beginPath(); g.arc(x, y - 78, 9, 0, TAU); g.fill(); g.strokeStyle = '#3c3548'; g.lineWidth = 3; g.strokeRect(x - 10, y - 88, 20, 20); }
+  function drawBush(g, x, y) { g.fillStyle = '#2f7d39'; g.beginPath(); g.arc(x - 22, y, 28, 0, TAU); g.arc(x + 22, y, 28, 0, TAU); g.arc(x, y - 18, 30, 0, TAU); g.fill(); g.fillStyle = '#45a04c'; g.beginPath(); g.arc(x - 8, y - 22, 16, 0, TAU); g.fill(); g.fillStyle = '#ff5a6e'; for (const [a, b] of [[-20, -6], [14, -14], [2, 4], [26, 2]]) { g.beginPath(); g.arc(x + a, y + b, 5, 0, TAU); g.fill(); } }
+  // birds and butterflies roam the whole map; now and then they rest on the tree a while
+  const FAUNA = []; let faunaT = null;
+  function faunaInit() { let sd = 5; const R = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    for (let k = 0; k < 7; k++) FAUNA.push({ bird: true, x: TC.x + (R() - 0.5) * 2600, y: TC.y + (R() - 0.5) * 2200, tx: 0, ty: 0, sp: 260 + R() * 160, alt: 110 + R() * 70, col: ['#ff8a3d', '#3d9bff', '#ffd23f', '#e8505b', '#7a5cff', '#2fbf71', '#ffffff'][k], rest: 0, ph: R() * 9 });
+    for (let k = 0; k < 12; k++) FAUNA.push({ bird: false, x: TC.x + (R() - 0.5) * 900, y: TC.y + (R() - 0.5) * 800, tx: 0, ty: 0, sp: 70 + R() * 50, alt: 35 + R() * 30, col: ['#ffd54a', '#ff8fc8', '#9fd8ff', '#ffffff', '#c59bff', '#ff9f5a'][k % 6], rest: 0, ph: R() * 9 });
+    FAUNA.forEach(pick); }
+  function pick(f) { const r = Math.random(); if (r < 0.22) { f.tx = TTREE.x + (Math.random() - 0.5) * 120; f.ty = TTREE.y + 2; f.perch = true; } else { f.perch = false; const span = f.bird ? 1500 : TR * 0.95; const a = Math.random() * TAU, d = Math.sqrt(Math.random()) * span; f.tx = TC.x + Math.cos(a) * d; f.ty = TC.y + Math.sin(a) * d * 0.8; } }
+  function faunaStep(t) { if (!FAUNA.length) faunaInit(); const dt = faunaT == null ? 0 : Math.min(0.1, t - faunaT); faunaT = t;
+    for (const f of FAUNA) { if (f.rest > 0) { f.rest -= dt; if (f.rest <= 0) pick(f); continue; } const dx = f.tx - f.x, dy = f.ty - f.y, d = Math.hypot(dx, dy); if (d < 12) { if (f.perch) f.rest = 2.5 + Math.random() * 4; else pick(f); continue; } const st = Math.min(d, f.sp * dt); f.x += dx / d * st + Math.sin(t * 3 + f.ph) * (f.bird ? 0.6 : 1.8); f.y += dy / d * st + Math.cos(t * 2.3 + f.ph) * (f.bird ? 0.4 : 1.4); f.dir = dx < 0 ? -1 : 1; } }
+  function drawFauna(g, f, t) { const resting = f.rest > 0, h = resting ? (f.bird ? 105 : 80) : f.alt + Math.sin(t * 2 + f.ph) * 10, x = f.x, y = f.y - h;
+    if (!resting) { g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(f.x, f.y, f.bird ? 16 : 6, f.bird ? 5 : 2, 0, 0, TAU); g.fill(); }
+    if (f.bird) { const fl = resting ? 0.15 : Math.sin(t * 14 + f.ph); g.save(); g.translate(x, y); g.scale(f.dir || 1, 1); g.fillStyle = f.col; g.beginPath(); g.ellipse(0, 0, 18, 11, 0, 0, TAU); g.fill(); g.beginPath(); g.arc(14, -7, 8, 0, TAU); g.fill(); g.fillStyle = '#ffb02e'; g.beginPath(); g.moveTo(21, -8); g.lineTo(29, -5); g.lineTo(21, -3); g.fill(); g.fillStyle = '#1a1020'; g.beginPath(); g.arc(16, -9, 2.2, 0, TAU); g.fill(); g.fillStyle = 'rgba(0,0,0,0.18)'; g.beginPath(); g.moveTo(-6, -2); g.lineTo(-2, -2 - 22 * fl); g.lineTo(8, -2); g.fill(); g.fillStyle = f.col; g.beginPath(); g.moveTo(-6, -3); g.lineTo(-4, -3 - 24 * fl); g.lineTo(8, -3); g.fill(); g.beginPath(); g.moveTo(-16, -2); g.lineTo(-28, -6); g.lineTo(-26, 4); g.fill(); g.restore(); }
+    else { const fl = resting ? 0.5 : Math.abs(Math.sin(t * 16 + f.ph)); g.fillStyle = f.col; g.beginPath(); g.ellipse(x - 6 * fl, y, 6 * fl + 1, 8, -0.3, 0, TAU); g.ellipse(x + 6 * fl, y, 6 * fl + 1, 8, 0.3, 0, TAU); g.fill(); g.fillStyle = '#2a1a30'; g.fillRect(x - 1, y - 6, 2, 12); } }
+  function trainProps(t) { faunaStep(t); const L = [];
+    for (const [x, y] of LAMP) L.push([y, () => drawLamp(g, x, y, t)]); for (const [x, y] of BUSH) L.push([y, () => drawBush(g, x, y)]); for (const [x, y] of BIGROCK) L.push([y, () => drawBigRock(g, x, y)]); L.push([TTREE.y, () => drawTrainTree(g)]);
+    for (const f of FAUNA) L.push([f.rest > 0 ? f.y + 1 : f.y, () => drawFauna(g, f, t)]); return L; }
+  function drawTrainTrees(g) { for (const [x, y, r, k] of TREES) { if (Math.abs(x - TC.x) < 560 && y < TC.y - TR + 40) continue; /* the rocky hill is there */ g.fillStyle = '#5a3b22'; g.fillRect(x - r * 0.12, y - r * 0.2, r * 0.24, r * 0.6); const c = k < 0.5 ? ['#1e6b34', '#2f8f45', '#46b35a'] : ['#2a5e2a', '#3c7d36', '#5aa64a']; c.forEach((col, i) => { g.fillStyle = col; g.beginPath(); g.arc(x + (i - 1) * r * 0.18, y - r * 0.55 - i * r * 0.18, r * (0.62 - i * 0.12), 0, TAU); g.fill(); }); } }
   function trainClamp() { const h = PL.G && PL.G.local; if (!h) return; const hr = 26;
     { const dx = h.x - TC.x, dy = h.y - TC.y, d = Math.hypot(dx, dy), m = TR - 30; if (d > m) { h.x = TC.x + dx / d * m; h.y = TC.y + dy / d * m; } }
-    { const px = TC.x, py = TC.y - TR + 165 + 5, ax = 205 + hr, ay = 84 + hr, ex = (h.x - px) / ax, ey = (h.y - py) / ay, e = Math.hypot(ex, ey); if (e < 1) { h.x = px + ex / e * ax; h.y = py + ey / e * ay; } } // the pond (and the fall behind it)
+    { const px = TC.x, py = TC.y - TR + 95 + 5, ax = 210 + hr, ay = 84 + hr; if (h.y < py && Math.abs(h.x - px) < ax) { const ex = (h.x - px) / ax; h.y = Math.max(h.y, py + ay * Math.sqrt(Math.max(0, 1 - ex * ex))); } else { const ex = (h.x - px) / ax, ey = (h.y - py) / ay, e = Math.hypot(ex, ey); if (e < 1) { h.x = px + ex / e * ax; h.y = py + ey / e * ay; } } } // the pond (and the fall behind it)
     for (const [x, y, r] of OBST()) { const dx = h.x - x, dy = h.y - y, d = Math.hypot(dx, dy) || 1, m = r + hr; if (d < m) { h.x = x + dx / d * m; h.y = y + dy / d * m; } } }
   let trainCat = 'shroom25', trainFx = null;
   function playTrain() { playMap(F.serialize(TRAIN), { name: '🎯 Entrenamiento', back: 'solo', train: true }); PL.G.goal = null; PL.G.cps = []; S.fBotsSaved = null;
