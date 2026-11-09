@@ -22596,7 +22596,7 @@ class Renderer {
         const o = ((T.h - 1 - j) * T.w + i) * 4; img.data[o] = col[0]; img.data[o + 1] = col[1]; img.data[o + 2] = col[2]; img.data[o + 3] = 255;
       }
       c.putImageData(img, 0, 0); this.mmVersion = W.terrainVersion;
-      let i0 = T.w, i1 = 0, j0 = T.h, j1 = 0; if (W.profile.family === 'run') for (let j = 0; j < T.h; j++) for (let i = 0; i < T.w; i++) { if (this.tileKind(W.tileIds[W.tex[j * T.w + i]]) === 'toxic') continue; if (i < i0) i0 = i; if (i > i1) i1 = i; if (j < j0) j0 = j; if (j > j1) j1 = j; }
+      let i0 = T.w, i1 = 0, j0 = T.h, j1 = 0; if (W.profile.family === 'run') for (let j = 0; j < T.h; j++) for (let i = 0; i < T.w; i++) { if (this.tileKind(W.tileIds[W.tex[j * T.w + i]]) === 'toxic' || !W.walkable(T.cx + (i - 0.5) * 128 + 64, T.cy + (j - 0.5) * 128 + 64)) continue; if (i < i0) i0 = i; if (i > i1) i1 = i; if (j < j0) j0 = j; if (j > j1) j1 = j; }
       this.mmB = i1 > i0 ? (() => { const sz = Math.max(i1 - i0, j1 - j0) + 3, ci = (i0 + i1) / 2, cj = (j0 + j1) / 2; return { i0: ci - sz / 2, j0: cj - sz / 2, sz }; })() : { i0: 0, j0: 0, sz: Math.max(T.w, T.h) }; // run maps: zoom on the playable area
     }
     const g = mm.getContext('2d'); const S = mm.width;
