@@ -343,6 +343,14 @@ body:not(.hudfull) #team,body:not(.hudfull) #stats .pcrow,body:not(.hudfull) #to
 #failHelp .fh-btn{display:block;width:100%;margin-top:18px;border:0;border-radius:12px;padding:14px;font-weight:900;font-size:17px;font-family:inherit;color:#fff;background:linear-gradient(#59b4ff,#2a6fe0);cursor:pointer}
 #failHelp .fh-foot{background:#111;color:#bbb;font-size:13px;padding:18px 22px}
 .tabic{width:22px;height:22px;border-radius:6px;object-fit:cover;vertical-align:middle;margin:-4px 5px -2px 0}.chinfo .tabic{width:20px;height:20px}
+#shop{align-content:start}
+#qpick{position:fixed;inset:0;z-index:60;background:rgba(8,2,14,.78);display:flex;align-items:center;justify-content:center;padding:14px}
+#qpick .qpbox{width:min(460px,100%);max-height:92vh;overflow:auto;background:#22123a;border:2px solid #6c3fd6;border-radius:18px;padding:14px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+#qpick .qpt{display:block;color:#b6ff5c;font-size:19px;font-weight:900;margin:2px 0 10px}
+#qpick .qpgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+#qpick .qpc{background:#2d1a4a;border:2px solid #3b2560;border-radius:12px;padding:6px 4px;color:#fff;font:inherit;font-weight:800;font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+#qpick .qpc img{width:64px;height:64px;object-fit:contain}#qpick .qpc.on{border-color:#b6ff5c;background:#34205a;box-shadow:0 0 0 2px rgba(182,255,92,.25)}
+#qpick .qpgo{margin:4px auto 6px;display:block}#qpick .qpx{background:none;border:0;color:#cbb8f0;font:inherit;font-weight:700;padding:6px 12px;cursor:pointer}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -25293,7 +25301,7 @@ class Net {
   const ownsChar = (cat, id) => READY.includes(id) && (PREMIUM[id] ? (S.bought || []).includes('ch:' + id) /* premium: only bought one by one, never by code or pass */ : (VIP() || charLvl(cat, id) <= (window.playerLvl ? playerLvl() : 1)));
   window.ownsChar = ownsChar;
   // re-draws without jumping: keeps every scroll position of the shop
-  const keepScroll = fn => { const L = []; for (let e = $('#shopGrid'); e; e = e.parentElement) L.push([e, e.scrollTop]); fn(); for (const [e, t] of L) e.scrollTop = t; };
+  const keepScroll = fn => { const L = []; for (let e = $('#shopGrid'); e; e = e.parentElement) L.push([e, e.scrollTop]); const sx = [...document.querySelectorAll('#shopGrid .skcats')].map(e => e.scrollLeft); fn(); for (const [e, t] of L) e.scrollTop = t; document.querySelectorAll('#shopGrid .skcats').forEach((e, i) => { if (sx[i] != null) e.scrollLeft = sx[i]; }); }; /* the map tabs stay where they were scrolled, the page does not jump */
   function renderSkins() { if (!renderSkins._in) { renderSkins._in = 1; try { keepScroll(renderSkins); } finally { renderSkins._in = 0; } return; } prevsSk.length = 0; const list = charList(skCat), cur = window.SPR ? SPR.charOf({}, skCat, { local: {} }) : '';
     const mine = (S.skins || {})[skCat]; const equipped = window.SPR && SPR.valid(skCat, mine) && ownsChar(skCat, mine) ? mine : (window.SPR ? SPR.BASE_CHAR[skCat] : '');
     if (!fitSkin || fitSkin === 'base' || !(window.SPR && SPR.valid(skCat, fitSkin))) fitSkin = list[0] || equipped;
@@ -25624,7 +25632,19 @@ class Net {
   click('#bPlay', () => { if (soloMap === 'train') { if (window.ForgeUI) ForgeUI.playTrain(); return; } try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} preBots = Math.min(11, Math.max(0, S.bots ?? 11)); renderPre(); show('pre'); });
   click('#preMinus', () => { preBots = Math.max(0, preBots - 1); renderPre(); }); click('#prePlus', () => { preBots = Math.min(11, preBots + 1); renderPre(); });
   click('#preFill', () => { preBots = 11; renderPre(); }); click('#preNone', () => { preBots = 0; renderPre(); });
-  click('#preStart', () => { S.bots = preBots; S.mode = $('#mode').value; S.map = soloMap; SW.saveSettings(); SW.start(); });
+  const goStart = () => { S.bots = preBots; S.mode = $('#mode').value; S.map = soloMap; SW.saveSettings(); SW.start(); };
+  /* quick pick before every match: only the characters (and skins) the player owns for this map */
+  function quickPick() { const cat = soloMap, list = window.SPR ? charList(cat).filter(id => ownsChar(cat, id)) : []; if (!list.length) return goStart();
+    const M = SPR.MAN.chars; let sel = SPR.charOf({}, cat, { local: {} }); if (!list.includes(sel)) sel = list[0];
+    const ov = document.createElement('div'); ov.id = 'qpick';
+    const draw = () => { const sks = Object.keys(M).filter(k => M[k].skinOf === sel && (S.bought || []).includes('sk:' + k));
+      ov.innerHTML = `<div class="qpbox"><b class="qpt">Elige tu personaje</b><div class="qpgrid">${list.map(id => `<button class="qpc${id === sel ? ' on' : ''}" data-q="${id}"><img src="assets/spr/${M[id].thumb}" alt=""><span>${esc(M[id].name)}</span></button>`).join('')}</div>${sks.length ? `<b class="qpt" style="font-size:15px">Skin</b><div class="qpgrid">${[sel].concat(sks).map(k => `<button class="qpc${(S.skinVar || {})[sel] === k || (k === sel && !(S.skinVar || {})[sel]) ? ' on' : ''}" data-qs="${k}"><img src="assets/spr/${M[k].thumb}" alt=""><span>${k === sel ? 'Normal' : esc(M[k].name)}</span></button>`).join('')}</div>` : ''}<button class="big-btn qpgo">¡JUGAR!</button><button class="qpx">Cancelar</button></div>`;
+      ov.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { sel = b.dataset.q; S.skins = S.skins || {}; S.skins[cat] = sel; SW.saveSettings(); draw(); });
+      ov.querySelectorAll('[data-qs]').forEach(b => b.onclick = () => { S.skinVar = S.skinVar || {}; S.skinVar[sel] = b.dataset.qs === sel ? null : b.dataset.qs; SW.saveSettings(); draw(); });
+      ov.querySelector('.qpgo').onclick = () => { ov.remove(); S.skins = S.skins || {}; S.skins[cat] = sel; goStart(); };
+      ov.querySelector('.qpx').onclick = () => ov.remove(); };
+    draw(); document.body.appendChild(ov); }
+  click('#preStart', quickPick);
   if (location.hash.includes('online')) { show('online'); openOnline(); }
   setTimeout(() => { net.connect().catch(() => {}); }, 800); // so the general chat on the menu is live
   window.MM_BOOTED = true; // the lobby is up: the 'could not start' screen is no longer needed
