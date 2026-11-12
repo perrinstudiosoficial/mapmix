@@ -23755,7 +23755,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
       if (a === 'flip') { const D = 1.2, p = Math.min(1, e / D); lift = Math.sin(p * Math.PI) * 120; const nf = (C.anims.flip.n && C.anims.flip.n[2]) || 8, q = nf > 8 ? p : Math.max(0, Math.min(1, (p - 0.2) / 0.6)); fi = Math.min(nf - 1, Math.floor(q * nf)); if (p >= 1) u.dance = null; } // jump up first, the somersault happens high in the air
       else { fi = e * (a === 'anim' ? 9 : 7); smooth = a !== 'anim'; if (a === 'anim' && e > 8 / 9 * 2) u.dance = null; } }
     else if (t - u._still > 2 && !C.anims.idle) { const L = ['blink']; const n = SPR.seq(cid, t - u._still - 2, L, 1, 2); if (n) { a = n.a; fi = n.fi; smooth = true; } } // AFK: one natural move at a time, each holds its pose
-    else { const b = SPR.blinkStill(cid, t + (u.handle || 0) * 0.7); a = b.a; fi = b.fi; if (b.mix) smooth = true; }
+    else { const b = SPR.blinkStill(cid, performance.now() / 1000 + (u.handle || 0) * 0.7); /* real clock, same as the shop: the game clock moves in steps */ a = b.a; fi = b.fi; if (b.mix) smooth = true; }
     if (a === 'blink' && !C.anims.blink) { a = SPR.stand(cid); fi = 0; smooth = false; }
     let F = SPR.frame(cid, a, row, Math.floor(fi)) || SPR.frame(cid, SPR.stand(cid), row, 0);
     if (!SPR.frame(cid, a, row, 0)) smooth = false;
