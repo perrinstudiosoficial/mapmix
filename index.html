@@ -21123,7 +21123,7 @@ class BotManager {
     if (h.paused) return;
     // look human: an emote now and then (more after reviving or when a friend falls)
     b.emoT = (b.emoT == null ? 15 + Math.random() * 40 : b.emoT) - dt;
-    if (b.emoT <= 0 && typeof window !== 'undefined' && window.botEmote) { b.emoT = 25 + Math.random() * 60; if (Math.random() < 0.6) window.botEmote(h, 'c' + Math.floor(Math.random() * 16)); else if (window.botDance && !h.order) window.botDance(h); }
+    if (b.emoT <= 0 && typeof window !== 'undefined' && window.botEmote) { b.emoT = 25 + Math.random() * 60; const rr = Math.random(); if (rr < 0.45) window.botEmote(h, 'c' + Math.floor(Math.random() * 16)); else if (rr < 0.8 && window.botSpray && h.alive) window.botSpray(h); /* bots paint graffiti too */ else if (window.botDance && !h.order) window.botDance(h); }
     b.chatT = (b.chatT == null ? 60 + Math.random() * 120 : b.chatT) - dt;
     if (b.chatT <= 0 && typeof window !== 'undefined' && window.botChat) { b.chatT = 120 + Math.random() * 180; if (Math.random() < 0.4) { const L = ['vamos', 'dale dale', 'cuidado', 'jaja', 'uff casi', 'esperen', 'voy', 'ese payaso xd', 'ez', 'vamos que se puede']; window.botChat(h, L[Math.floor(Math.random() * L.length)]); } }
     // never stand still forever: if a bot makes no progress for a while it plays bolder, then even bolder
@@ -23055,6 +23055,11 @@ class Renderer {
     ball(g, 0, 0, 6.5, Math.sin(W.time * 10 + u.handle) > 0 ? '#ff2a2a' : '#5a0000', false);
   };
 
+  // 'this is you': an arrow in your colour that drops in 3 little bounces now and then (always for a few seconds after you appear or revive)
+  P.drawYouArrow = function (g, y0, col, t, always) { let k; if (always) k = 1; else { const c = t % 9; if (c > 1.6) return; k = 1; }
+    const b = Math.abs(Math.sin(t * Math.PI * 1.9)) * 18, y = y0 + 8 + b; g.save(); g.globalAlpha *= 0.95 * k; g.translate(0, y); g.scale(1.45, 1.45); g.translate(0, -y);
+    g.beginPath(); g.moveTo(0, y); g.lineTo(-15, y + 20); g.lineTo(-6, y + 20); g.lineTo(-6, y + 34); g.lineTo(6, y + 34); g.lineTo(6, y + 20); g.lineTo(15, y + 20); g.closePath();
+    g.lineJoin = 'round'; g.strokeStyle = 'rgba(0,0,0,0.75)'; g.lineWidth = 5; g.stroke(); g.fillStyle = col; g.fill(); g.strokeStyle = 'rgba(255,255,255,0.9)'; g.lineWidth = 1.6; g.stroke(); g.restore(); };
   // dead-player marker: a floating little ghost over a glowing ring
   P.drawMarker = function (g, u) {
     const W = this.W; const p = (W.time * 0.8) % 1; const col = this.heroColor(u);
@@ -23063,6 +23068,7 @@ class Renderer {
     g.globalAlpha = 0.35 + 0.15 * Math.sin(W.time * 4); g.fillStyle = bg; g.fillRect(-14, 0, 28, 260); g.globalAlpha = 1;
     const pr = (W.time * 0.8) % 1; g.save(); g.scale(1, 0.5); g.strokeStyle = hexA(col, 0.7 * (1 - pr)); g.lineWidth = 3; g.beginPath(); g.arc(0, 0, 44 + pr * 45, 0, TAU); g.stroke(); g.restore();
     this.drawDeathAura(g, col, this.auraOf(u.owner), W.time, u.handle % 7, 42); // circle of power instead of a tombstone
+    if (u.owner === W.local) { u._yaA = false; this.drawYouArrow(g, 70, col, W.time, true); } /* your tomb */
   };
 
   // distance ruler for the human cannon (it always fires towards the east)
@@ -23245,10 +23251,10 @@ class Renderer {
   // drawn in world space (y up), centred on the ground point; R = ring radius
   let auraImg = null;
   P.drawDeathAura = function (g, col, style, t, seed = 0, R = 46, pc = false) {
-    if (pc && col) { /* in a match: a clear ring in the player's team colour under any aura, so you always know which one is you */
+    if (false && pc && col) { /* (off) in a match: a clear ring in the player's team colour under any aura, so you always know which one is you */
       const pu = 0.5 + 0.5 * Math.sin(t * 3 + seed); g.save(); g.scale(1, 0.42); const gl = g.createRadialGradient(0, 0, R * 0.55, 0, 0, R * 1.35); gl.addColorStop(0, hexA(col, 0)); gl.addColorStop(0.7, hexA(col, 0.45 + 0.15 * pu)); gl.addColorStop(1, hexA(col, 0)); g.fillStyle = gl; g.beginPath(); g.arc(0, 0, R * 1.35, 0, TAU); g.fill();
       g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 8; g.beginPath(); g.arc(0, 0, R * 1.08, 0, TAU); g.stroke(); g.strokeStyle = hexA(col, 1); g.lineWidth = 5; g.beginPath(); g.arc(0, 0, R * 1.08, 0, TAU); g.stroke(); g.restore(); }
-    if (!style || style === 'anillo') { if (this.drawImgAura && this.drawImgAura(g, 60, t, R, pc ? col : null)) return; } /* the main aura everyone starts with (silver ring) */ { const q = window.FXART && FXART.parse(style); if (q && q.k === 'aura') { if (!this.drawImgAura(g, q.i, t, R)) style = 'anillo'; else return; } }
+    if (!style || style === 'anillo') { if (this.drawImgAura && this.drawImgAura(g, 60, t, R)) return; } /* the main aura everyone starts with (silver ring) */ { const q = window.FXART && FXART.parse(style); if (q && q.k === 'aura') { if (!this.drawImgAura(g, q.i, t, R)) style = 'anillo'; else return; } }
     if (style === 'anillo' || !style) { // the basic aura everybody has: a glowing ring in your colour with a few sparks
       const pu = 0.5 + 0.5 * Math.sin(t * 2.5 + seed); g.save(); g.scale(1, 0.42);
       const gl = g.createRadialGradient(0, 0, R * 0.7, 0, 0, R * 1.25); gl.addColorStop(0, hexA(col, 0)); gl.addColorStop(0.75, hexA(col, 0.35 + 0.15 * pu)); gl.addColorStop(1, hexA(col, 0)); g.fillStyle = gl; g.beginPath(); g.arc(0, 0, R * 1.25, 0, TAU); g.fill();
@@ -23362,7 +23368,7 @@ class Renderer {
     g.restore();
   };
   P.drawGraffiti = function (g) { const W = this.W, L = W.graffiti; if (!L || !L.length) return; const now = W.time;
-    for (let i = L.length - 1; i >= 0; i--) { const s = L[i], age = now - s.t0; const al = (age < 0.35 ? age / 0.35 : 1) * 0.92; /* stays on the floor for the whole game */ g.save(); g.translate(s.x, s.y); this.drawGraffitiArt(g, s.id, s.col, al); g.restore(); } };
+    for (let i = L.length - 1; i >= 0; i--) { const s = L[i], age = now - s.t0; const al = (age < 0.35 ? age / 0.35 : 1) * 0.92; /* stays on the floor for the whole game */ g.save(); g.translate(s.x, s.y); g.scale(1.6, 1.6); /* bigger graffiti */ this.drawGraffitiArt(g, s.id, s.col, al); g.restore(); } };
   // ===================== spawn effects (start of every round) =====================
   P.spawnFxOf = function (p) { if (!p) return 'estandar'; const S = typeof window !== 'undefined' && window.SW && window.SW.settings; if (p === this.W.local) { const v = (S && S.spawnFx) || 'estandar'; return v === 'fundador' && !(window.SW.isVip && window.SW.isVip()) && !((S.spawnBought || []).includes('fundador')) ? 'estandar' : v; } return p.spawnFx || 'estandar'; };
   P.drawSpawnFx = function (g, e, p) { { const q = window.FXART && FXART.parse(e.kind); if (q && q.k === 'spawn') { if (this.drawImgSpawn(g, q.i, p, e.col)) return; e = Object.assign({}, e, { kind: 'estandar' }); } }
@@ -23751,6 +23757,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
     if (u.inv && !(u.t && u.t.inv)) { g.strokeStyle = `rgba(255,240,120,${0.6 + 0.3 * Math.sin(W.time * 12)})`; g.lineWidth = 5; g.beginPath(); g.arc(0, 30, 50, 0, TAU); g.stroke(); }
     if (!F) { g.fillStyle = col; g.globalAlpha *= 0.5; g.beginPath(); g.arc(0, 26, 16 + Math.sin(t * 6) * 2, 0, TAU); g.fill(); return; } // still downloading: a soft dot, never a wrong picture
 if (!(smooth && SPR.blitSmooth(g, cid, a, row, fi, s, mir, lift - 2, sx, sy))) blit(g, F, s, mir, lift - 2, sx, sy);
+    if (u.owner === W.local) { if (!u._yaA) u._yaT = W.time; u._yaA = true; const top = (F.ch || 120) * s * (F.k || 1) + lift; this.drawYouArrow(g, top, col, W.time, W.time - (u._yaT || 0) < 4); }
     if (moving && !u.jump && map === 'kitty5' && Math.random() < 0.2) { const f = u._rf * Math.PI / 180; this.puff(u.x - Math.cos(f) * 26, u.y - 4 - Math.sin(f) * 26, { r0: 4, r1: 11, life: 0.35, col: '235,225,205', a: 0.28, vx: -Math.cos(f) * 40, vy: -Math.sin(f) * 40 }); }
   };
 })();
@@ -24282,7 +24289,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     W.on('revive', u => { if (u.hero) { sfx.play('revive'); if (u.owner === W.local) $('#dead').classList.add('hidden'); } });
     W.on('revive', u => { if (u.hero && u.owner !== W.local && W.ai && W.ai.bots && W.ai.bots.some(b => b.p === u.owner) && Math.random() < 0.4 && W.time > 5) setTimeout(() => { if (W && u.alive) window.botChat(u, ['gracias!', 'graciaas', 'ty', 'vamos de nuevo', 'me salvaron']['01234'[Math.floor(Math.random() * 5)]]); }, 900 + Math.random() * 1500); });
     W.on('end', e => { if (e && e.win) addLvl(1, 0); showEnd(e); });
-    { const W0 = W; const iv = setInterval(() => { if (W !== W0) { clearInterval(iv); return; } if (Math.random() < 0.8) { const H = W.units.filter(u => u.hero && u.alive && u.owner && u.owner !== W.local && (u.owner.ai || !online)); const u = H[Math.floor(Math.random() * H.length)]; if (u && window.botEmote) botEmote(u, 'c' + Math.floor(Math.random() * 16)); } }, 3500); } /* the bots chat with emojis */
+    { const W0 = W; const iv = setInterval(() => { if (W !== W0) { clearInterval(iv); return; } if (Math.random() < 0.8) { const H = W.units.filter(u => u.hero && u.alive && u.owner && u.owner !== W.local && (u.owner.ai || !online)); const u = H[Math.floor(Math.random() * H.length)]; if (u && Math.random() < 0.18 && window.botSpray) botSpray(u); /* bots paint graffiti too */ else if (u && window.botEmote) botEmote(u, 'c' + Math.floor(Math.random() * 16)); } }, 3500); } /* the bots chat with emojis */
     W.on('death', u => { if (R && u.hero) { const fx = R.deathFxOf(u.owner); if (fx === 'clasico' && W.profile.id === 'shroom25') { const ef = W.addEffect(u.x, u.y, 'shroomdeath'); ef.dur = 1.0; ef.col = R.heroColor(u); ef.hu = u; } else { const ef = W.addEffect(u.x, u.y, 'dfx'); ef.dur = { confeti: 1.6, calavera: 1.8, fuegos: 1.9, flor: 1.5, ko: 1.4, epico: 1.5 }[fx] || 1.2; ef.kind = fx; ef.col = R.heroColor(u); } } });
     W.on('death', u => { if (!R || u.hero) return; for (let k = 0; k < (u.hero ? 14 : 6); k++) R.puff(u.x, u.y, { r0: 6, r1: 26, life: 0.8, col: u.hero ? '255,150,230' : '230,230,255', a: 0.6, vx: (Math.random() - 0.5) * 260, vy: (Math.random() - 0.5) * 260 }); });
     if (online) W.on('death', u => { if (!u.hero && u.killer && u.killer.hero && online.owned.includes(u.killer.owner.id)) online.net.pushEvent('kill', u.handle); });
