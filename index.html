@@ -26541,7 +26541,7 @@ class Net {
   }, { passive: false });
 
   // ---------- playing a custom map ----------
-  const PZ0 = 0.45; let plZT = null; function plZoomBack(ms) { clearTimeout(plZT); plZT = setTimeout(() => { if (PL.pinch) plZoomBack(); else { const z0 = PL.V.z, t0 = performance.now(); const st = () => { const k = Math.min(1, (performance.now() - t0) / 350); if (!PL.pinch) PL.V.z = z0 + (PZ0 - z0) * (1 - (1 - k) * (1 - k)); if (k < 1 && !PL.pinch) requestAnimationFrame(st); }; st(); } }, ms ?? 1500); } // zoom out only, then back to the normal camera
+  const PZ0 = 0.32; /* same camera distance as a real match, so characters look the same size */ let plZT = null; function plZoomBack(ms) { clearTimeout(plZT); plZT = setTimeout(() => { if (PL.pinch) plZoomBack(); else { const z0 = PL.V.z, t0 = performance.now(); const st = () => { const k = Math.min(1, (performance.now() - t0) / 350); if (!PL.pinch) PL.V.z = z0 + (PZ0 - z0) * (1 - (1 - k) * (1 - k)); if (k < 1 && !PL.pinch) requestAnimationFrame(st); }; st(); } }, ms ?? 1500); } // zoom out only, then back to the normal camera
   const PL = { on: false, G: null, terr: null, V: { x: 0, y: 0, z: 0.45 }, opt: null, stick: { id: null, dx: 0, dy: 0 }, mouse: null, keys: new Set(), watch: null, quitArm: 0, ptr: new Map(), pinch: null, free: false, hudT: 0 };
   function playMap(data, opt) {
     const m = F.parse(typeof data === 'string' ? JSON.parse(data) : data); if (!m) { toast('Mapa dañado'); return; }
