@@ -23693,7 +23693,7 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
   const HSZ = { shroom25: 112, kitty5: 110, bob: 104 };
   const NAT = ['wave', 'tired', 'sit', 'yawn', 'blink']; // the natural idle moves (free, played when you stand still)
   const imgs = {};
-  function img(f) { let im = imgs[f]; if (!im) { im = imgs[f] = new Image(); im.src = (f.indexOf('fx_') === 0 ? 'assets/fx/' + f.slice(3) : BASE + f); } return im.complete && im.naturalWidth ? im : null; }
+  function img(f) { let im = imgs[f]; const u = (f.indexOf('fx_') === 0 ? 'assets/fx/' + f.slice(3) : BASE + f); if (!im) { im = imgs[f] = new Image(); im._t = performance.now(); im._n = 0; im.onerror = () => { im._bad = 1; }; im.src = u; } if (im._bad && performance.now() - im._t > 1200 && im._n < 20) { im._bad = 0; im._n++; im._t = performance.now(); im.src = u + '?r=' + im._n; } return im.complete && im.naturalWidth ? im : null; } /* a picture that failed (weak signal) is asked for again, so a character never stays invisible */
   const SPR = window.SPR = {
     MAN, BASE_CHAR, NAT, img,
     chars(map) { return Object.keys(MAN.chars).filter(k => MAN.chars[k].game === map && !MAN.chars[k].skinOf).sort((a, b) => MAN.chars[a].name.localeCompare(MAN.chars[b].name, 'es')); },
@@ -23928,6 +23928,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
 
   // ---------- custom music (the player's own file, kept only on this device) ----------
   const audio = new Audio(); audio.loop = true; audio.volume = 0.6; let hasCustom = false;
+  document.addEventListener('error', e => { const t = e.target; if (!t || t.tagName !== 'IMG') return; const n = (+t.dataset.rt || 0) + 1; if (n > 15) return; t.dataset.rt = n; const u = t.getAttribute('src').split('?')[0]; setTimeout(() => { t.src = u + '?r=' + n; }, 800 * n); }, true); /* <img> that failed: try again */
   function idb(fn) { try { const r = indexedDB.open('shroom', 1); r.onupgradeneeded = () => r.result.createObjectStore('f'); r.onsuccess = () => { try { fn(r.result); } catch (e) {} }; r.onerror = () => {}; } catch (e) {} }
   function setMusicBlob(blob, name) {
     try { audio.src = URL.createObjectURL(blob); hasCustom = settings.song === 'custom'; if (hasCustom) sfx.musicOn = false; $('#musicName').textContent = name || 'Tu canción'; } catch (e) {}
