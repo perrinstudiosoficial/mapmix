@@ -24051,6 +24051,8 @@ if (!(smooth && SPR.blitSmooth(g, cid, a, row, fi, s, mir, lift - 2, sx, sy))) b
 // heroes, walking, pathing and drawing come from the engine; skills, projectiles, score and bots live here.
 // Online: the host runs every rule and sends a snapshot; the others send their casts and draw what the host says.
 'use strict';
+window.FXDATA={}; /* filled by the build: small icons inside the page */
+window.FX = n => (window.FXDATA && FXDATA[n]) || 'assets/fx/' + n + '.webp';
 // p: where the button sits on the skill pad [column 1-2 from the left, row 1-3 from the top]; img: picture in assets/fx
 const ARENA = {
   correk: { name: '¡Corre o Te Pillan!', kind: 'tag', rounds: 5, roundT: 60, speed: 360, music: 'pesadilla',
@@ -24516,7 +24518,7 @@ function arenaHud(A, ui) {
   bar.classList.remove('hidden'); top.classList.remove('hidden');
   const S = me ? A.skillsOf(me) : C.skills;
   const key = S.map(s => s.id).join(',');
-  if (bar._key !== key) { bar._key = key; bar.innerHTML = S.map((s, i) => `<div class="ab arenaB" data-k="${s.id}" style="grid-column:${s.p[0]};grid-row:${s.p[1]}">${s.img ? `<img class="sk" src="assets/fx/${s.img}.webp" alt="">` : `<span>${s.ic}</span>`}<b class="chg"></b><kbd>${'QWERT'[i]}</kbd><small>${s.n}</small></div>`).join('');
+  if (bar._key !== key) { bar._key = key; bar.innerHTML = S.map((s, i) => `<div class="ab arenaB" data-k="${s.id}" style="grid-column:${s.p[0]};grid-row:${s.p[1]}">${s.img ? `<img class="sk" src="${FX(s.img)}" alt="">` : `<span>${s.ic}</span>`}<b class="chg"></b><kbd>${'QWERT'[i]}</kbd><small>${s.n}</small></div>`).join('');
     for (const el of bar.children) arenaBtn(A, el, ui); }
   for (const el of bar.children) { const s = S.find(x => x.id === el.dataset.k); const left = me ? A.ready(me, s.id) : 0; const noCh = s.id === 'requiem' && !(A.charges[W.local.id] > 0); el.classList.toggle('cool', (left > 0 && s.cd > 1.5) || !me || !me.alive || noCh); /* 1-second powers never darken: they are always ready */ el.style.setProperty('--cd', (s && left > 0 ? Math.round(left / s.cd * 360) : 0) + 'deg');
     if (s.id === 'requiem') { const c = el.querySelector('.chg'), n = A.charges[W.local.id] || 0; if (c && c.textContent !== String(n)) c.textContent = n; c.className = 'chg' + (n >= 10 ? ' full' : ''); } }
@@ -24790,7 +24792,7 @@ function arenaTakeRune(A, u, k) {
 }
 
 // ---------------- drawing ----------------
-const _runeImg = {}; function runeImg(k) { if (!_runeImg[k]) { const im = new Image(); im.src = 'assets/fx/' + RUNES[k].img + '.webp'; _runeImg[k] = im; } return _runeImg[k]; }
+const _runeImg = {}; function runeImg(k) { if (!_runeImg[k]) { const im = new Image(); im.src = FX(RUNES[k].img); _runeImg[k] = im; } return _runeImg[k]; }
 function arenaItemsGround(A, g) {
   const W = A.W, t = W.time;
   // shop stalls
@@ -24889,7 +24891,7 @@ function arenaItemsBot(A, b, u, D) {
 
 // ---------------- map info: the powers (same pictures as the buttons), the runes and the shop ----------------
 window.arenaGuide = id => {
-  const C = ARENA[id]; if (!C) return ''; const ic = (img, e) => img ? `<img class="icimg" src="assets/fx/${img}.webp" alt="">` : `<span class="icemo">${e}</span>`;
+  const C = ARENA[id]; if (!C) return ''; const ic = (img, e) => img ? `<img class="icimg" src="${FX(img)}" alt="">` : `<span class="icemo">${e}</span>`;
   const SK = { stun: 'Deja quieto 2 s al Pillador cerca de ti.', blink: 'Te teletransportas hacia donde apuntas.', shield: 'Nada te atrapa por 3 s.', invis: 'El Pillador no te ve 4 s.', grab: 'Lanzas la mano y traes al que toques.', dash: 'Corres mucho más rápido 1,6 s.', roar: 'Los que corren cerca quedan lentos 2,5 s.', cloud: 'Una nube verde te sigue 5 s: frena y daña poco a poco.', hook: 'Atrapa al primero que toque y lo arrastra en curva hacia ti.', leap: 'Un gran salto sobre árboles y muros.', arrow: 'Mientras más lejos llega, más daño y más aturde.', raze1: 'Sombra cerca de ti.', raze2: 'Sombra a media distancia.', raze3: 'Sombra lejos.', requiem: 'Explosión alrededor: más fuerte con más cargas (hasta 20).' };
   const sk = (C.skills || []).concat(C.chaser || []).filter((s, i, a) => a.findIndex(x => x.id === s.id) === i);
   let h = `<div class="glbl">⚡ Poderes</div><div class="gd gd2">` + sk.map(s => `<div class="gi">${ic(s.img, s.ic)}<div><b>${s.n}</b><small>${SK[s.id] || ''}</small></div></div>`).join('') + '</div>';
@@ -25115,7 +25117,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   const secretList = id => (SECRETS[id] || []).map(x => typeof x === 'string' ? (KITEMS[x] ? [icImg(x), KITEMS[x][1], SHORT[x] || KITEMS[x][2]] : null) : x).filter(Boolean);
   window.secretsHTML = id => secretList(id).map(([e, n, d]) => `<div class="pw"><span>${e}</span><div><b>${n}</b>${d}</div></div>`).join('');
   // one guide for each map: the SAME icons and names as the in-game buttons (map info before playing + Poderes in game)
-  const ic = k => `<img class="icimg" src="assets/fx/${k}.webp" alt="">`;
+  const ic = k => `<img class="icimg" src="${window.FX ? FX(k) : "assets/fx/" + k + ".webp"}" alt="">`;
   const POW = { shroom25: [[ic('ic_run'), 'Correr', 'Sales deslizándote recto y rápido; el joystick te hace girar.'], [ic('ic_shoot'), 'Disparar', 'Toca un payaso que deambula para hacerlo desaparecer.'], [ic('it_p_tele'), 'Teletransporte', 'Con un hongo, apareces al lado de un compañero.'], [ic('it_p_help'), 'Pedir ayuda', 'Si caes, avisa a todos dónde está tu tumba.']],
     kitty5: [[ic('ic_jump'), 'Saltar', 'Pasas por encima de los lobos.'], [ic('ic_roar'), 'Gruñido', 'Espanta a los lobos cercanos.'], [ic('ic_invis'), 'Invisible', 'Casi invisible unos segundos.'], [ic('ic_stun'), 'Aturdir', 'Los lobos cerca quedan quietos 5 s.'], [ic('ic_dash'), 'Embestida', 'Corres mucho más rápido 3 s.'], ],
     bob: [[ic('ic_jump'), 'Saltar', 'Saltas alto sobre los cangrejos, hacia donde te deslizas.']] };
