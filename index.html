@@ -426,6 +426,34 @@ body[data-fam=arena] #sprayWrap{bottom:calc(max(12px,env(safe-area-inset-bottom)
 #arenaBar .ab small,#arenaBar .ab kbd,#arenaBar .ab .chg{z-index:2}
 #arenaBar .ab.cool img.sk{filter:saturate(.55) brightness(.75)}
 body[data-fam=arena] #bBlink, body[data-fam=arena] #sosWrap{display:none!important}
+
+/* lobby v294: colour swap, quick difficulty for every bot, lists that float (the page never grows) */
+.ldl{position:fixed!important;right:auto!important;bottom:auto!important;z-index:999}
+.lrow .lc.pick{cursor:pointer;width:16px!important;height:16px!important;box-shadow:0 0 0 2px #0006}.lrow .lc.mine{width:16px!important;height:16px!important;box-shadow:0 0 0 2px #ffd34d}
+.lslots .lteam{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.qdiff{display:inline-flex;gap:3px}.qdiff button{font:800 10px system-ui;border-radius:7px;border:1px solid #6a74c0;background:#262a5a;color:#fff;padding:3px 6px;cursor:pointer}
+.qdiff .d-facil,.ldiff.d-facil{color:#8affa0}.qdiff .d-normal{color:#a8c4ff}.qdiff .d-dificil,.ldiff.d-dificil{color:#ffc46b}.qdiff .d-extremo{color:#ff6b9a;border-color:#ff6b9a}
+.wic{width:20px;height:20px;vertical-align:middle;margin-right:4px;border-radius:50%}#preFill .wic,#preNone .wic{width:22px;height:22px;margin:-4px 5px -4px -4px}
+#preWin .wz{display:none}#preWin.zt .wz{display:flex}#preWin.zt .wt,#preWin.zt .wk{display:none}
+#pre .wprev{padding:6px 10px}#pre .lrow{min-height:34px}
+#watchBar .wplay{min-width:30px}#watchBar .wplay.on{background:#ffd34d!important;color:#222!important}
+#watchList{display:flex;flex-wrap:wrap;gap:4px;max-width:250px;margin-top:4px;max-height:120px;overflow:auto}#watchList.hidden{display:none}#watchList button{font:800 11px system-ui;border-radius:8px;border:1px solid #5a6ad0;background:#262a5a;color:#fff;padding:4px 7px;display:flex;align-items:center;gap:4px}#watchList button i{width:10px;height:10px;border-radius:3px;display:inline-block}#watchList button.on{background:#ffd34d;color:#222}#watchList button.out{opacity:.45}
+
+/* arenas v294: gold + bag (left, above the stick) and the shop */
+#arenaInv{position:fixed;right:max(10px,env(safe-area-inset-right));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 345px);display:flex;flex-wrap:wrap-reverse;flex-direction:row-reverse;gap:5px;width:98px;z-index:6}#arenaInv.hidden{display:none}
+#arenaInv button{position:relative;width:44px;height:44px;border-radius:12px;border:2px solid #6a74c0;background:rgba(20,16,50,.85);color:#fff;font-size:22px;display:grid;place-items:center;padding:0;overflow:hidden}
+#arenaInv button i{position:absolute;right:2px;bottom:0;font:900 10px system-ui;color:#ffd34d;font-style:normal}
+#arenaInv .ashop{width:64px;border-color:#ffd34d;background:linear-gradient(#5a3d00,#2e1f00);font-size:16px;display:flex;flex-direction:column;line-height:1}#arenaInv .ashop b{font:900 12px system-ui;color:#ffe27a}#arenaInv .ashop.near{box-shadow:0 0 10px #ffd34d;animation:apulse 1s infinite alternate}
+@keyframes apulse{to{box-shadow:0 0 18px #ffd34d}}
+#arenaInv .aitem.act{border-color:#7dff8a}#arenaInv .aitem.cool::after{content:'';position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.65) var(--cd),transparent 0)}
+#arenaShop{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,94vw);max-height:76vh;display:flex;flex-direction:column;background:linear-gradient(#24205a,#151238);border:2px solid #6a74c0;border-radius:16px;z-index:40;color:#fff;box-shadow:0 10px 40px #000a;padding:8px}#arenaShop.hidden{display:none}
+#arenaShop .ashead{display:flex;align-items:center;gap:8px;font-size:16px}#arenaShop .ashead span{margin-left:auto;color:#ffe27a;font-weight:900}#arenaShop .ashead button{border:0;background:#3a3f8a;color:#fff;border-radius:8px;width:30px;height:30px;font-size:16px}
+#arenaShop .asfar{font-size:11px;color:#ffb0b0;margin:4px 0}#arenaShop .astabs{display:flex;gap:4px;margin:6px 0;flex-wrap:wrap}#arenaShop .astabs button{flex:1;font:800 11px system-ui;border-radius:8px;border:1px solid #5a6ad0;background:#262a5a;color:#fff;padding:6px 4px}#arenaShop .astabs button.on{background:#ffd34d;color:#222}
+#arenaShop .aslist{overflow-y:auto;display:flex;flex-direction:column;gap:5px}#arenaShop .asrow{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;text-align:left;background:#1d1a48;border-radius:10px;padding:5px}
+#arenaShop .asic{font-size:24px;text-align:center}#arenaShop .asrow b{font-size:13px}#arenaShop .asrow b i{color:#ffe27a;font-style:normal;font-size:11px}#arenaShop .asrow small{display:block;font-size:10.5px;opacity:.8;line-height:1.25}
+#arenaShop .asrow button{font:900 12px system-ui;border:0;border-radius:9px;background:linear-gradient(#ffe27a,#ffbf1f);color:#3a2600;padding:7px 8px;white-space:nowrap}#arenaShop .asrow button:disabled{filter:grayscale(1);opacity:.5}
+.gd2 .gi small{font-size:10.5px;line-height:1.2}.gd2 .icimg{width:28px!important;height:28px!important;border-radius:50%}.icemo{font-size:24px;width:30px;text-align:center;flex:none}.gnote{display:block;font-size:10.5px;opacity:.8;text-align:left;line-height:1.25}
+#lore .card{max-height:96vh!important}#lore .gd{gap:2px 6px}#lore .glbl{margin:5px 0 2px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -478,7 +506,7 @@ window.addEventListener('unhandledrejection',function(e){if(!window.MM_BOOTED){c
   <div id="chatBar" class="hidden"><input id="chatIn" maxlength="80" placeholder="Escribe un mensaje…" autocomplete="off"><button id="chatSend">ENVIAR</button></div>
   <div id="mmwrap">
     <div class="pill" style="padding:5px"><canvas id="mm" width="192" height="192"></canvas></div>
-    <div id="watchBar" class="hidden"><div class="wtitle">👻 Cámara libre · arrastra para mirar</div><div class="wrow"><button class="wbtn" id="bWatchMe">🪦 Mi tumba</button><button class="wbtn" id="bWatch">👁 Ver compañero ▶</button></div><div class="wname">Mirando: <b id="watchName">tu tumba</b></div></div>
+    <div id="watchBar" class="hidden"><div class="wtitle">👻 Cámara libre · arrastra para mirar</div><div class="wrow"><button class="wbtn" id="bWatchMe">🪦 Mi tumba</button><button class="wbtn" id="bWatch">👁 Ver compañero</button><button class="wbtn wplay" id="bWatchList">▶</button></div><div id="watchList" class="hidden"></div><div class="wname">Mirando: <b id="watchName">tu tumba</b></div></div>
     <div id="topbtns"><div class="sbtn helpBtn" id="bHelp1" title="Poderes">?</div><div class="sbtn" id="bFull" title="Pantalla completa">⛶</div><div class="sbtn" id="bCenter" title="Centrar">◎</div><div class="sbtn" id="bCam" title="Cámara libre">📷<i class="nox"></i></div><div class="sbtn" id="bChat" title="Chat">💬</div><div class="sbtn" id="bPauseG" title="Pausa">⏸</div><div class="sbtn" id="bMenu" title="Menú">☰</div></div>
   </div>
   <div id="msgs"></div>
@@ -583,8 +611,8 @@ window.addEventListener('unhandledrejection',function(e){if(!window.MM_BOOTED){c
     <div class="tbar"><button class="back" data-back="solo">‹</button><h2>PREPARAR PARTIDA</h2><span class="wallet wcoins" style="margin-left:auto">🪙 0</span></div>
     <div id="prePrev" class="wprev"></div>
     <div id="preSlots" class="lslots"></div>
-    <div id="preWin" class="opts hidden"><label class="wlab">⏱️ La partida termina en</label><div class="wopts"><div class="wgrp"><span>⏱ Tiempo</span><button data-w="t1">1′</button><button data-w="t2">2′</button><button data-w="t3">3′</button><button data-w="t4">4′</button><button data-w="t5">5′</button></div><div class="wgrp"><span>💀 Bajas</span><button data-w="k5">5</button><button data-w="k10">10</button><button data-w="k15">15</button><button data-w="k20">20</button></div></div></div>
-    <div class="opts"><label>Bots para completar <span class="stepper"><button id="preMinus">−</button><b id="preBots">11</b><button id="prePlus">+</button></span></label><div style="display:flex;gap:6px"><button class="buy" id="preFill">🤖 Llenar con bots</button><button class="buy" id="preNone">🚫 Sin bots</button></div></div>
+    <div id="preWin" class="opts hidden"><label class="wlab"><img class="wic" src="assets/fx/ic_termina.webp" alt=""> La partida termina en</label><div class="wopts"><div class="wgrp wt"><span><img class="wic" src="assets/fx/ic_tiempo.webp" alt="">Tiempo</span><button data-w="t1">1′</button><button data-w="t2">2′</button><button data-w="t3">3′</button><button data-w="t4">4′</button><button data-w="t5">5′</button></div><div class="wgrp wk"><span><img class="wic" src="assets/fx/ic_bajas.webp" alt="">Bajas</span><button data-w="k5">5</button><button data-w="k10">10</button><button data-w="k15">15</button><button data-w="k20">20</button></div><div class="wgrp wz"><span><img class="wic" src="assets/fx/ic_tiempo.webp" alt="">Amanecer</span><button data-w="z15">15′</button><button data-w="z20">20′</button><button data-w="z25">25′</button><button data-w="z30">30′</button></div></div></div>
+    <div class="opts"><label>Bots para completar <span class="stepper"><button id="preMinus">−</button><b id="preBots">11</b><button id="prePlus">+</button></span></label><div style="display:flex;gap:6px"><button class="buy" id="preFill"><img class="wic" src="assets/fx/ic_llenar.webp" alt="">Llenar con bots</button><button class="buy" id="preNone"><img class="wic" src="assets/fx/ic_sinia.webp" alt="">Sin bots</button></div></div>
     <button class="big-btn" id="preStart">EMPEZAR PARTIDA</button>
   </div>
 </div>
@@ -22563,6 +22591,7 @@ class Renderer {
   isFriend(u) { const L = this.W.local; return u.owner === L || (L.allies.has(u.owner.id) && u.owner.allies.has(L.id)); }
   canSee(u, hero) {
     const W = this.W;
+    if (W.arena && typeof arenaVisible === 'function' && u.hero) { const v = arenaVisible(W.arena, u); if (v !== undefined) return v; } /* arenas: invisible heroes, darkness (zombies) */
     if (this.isFriend(u)) return true;
     if (W.vision && !W.vision.cellVisible(u.x, u.y)) return false;
     if (!u.t.invis) return true;
@@ -22585,6 +22614,7 @@ class Renderer {
       const vis = this.canSee(u, hero); if (!vis) continue;
       g.save(); g.translate(u.x, u.y);
       if (u.t.invis) g.globalAlpha = 0.55 + 0.2 * Math.sin(W.time * 10);
+      if (W.arena && u.hero && typeof arenaAlpha === 'function') g.globalAlpha *= arenaAlpha(W.arena, u); /* inside your own cloud / invisible: faded, but you still see yourself */
       const dead = !u.alive;
       if (dead && !u.hero) { g.globalAlpha *= Math.max(0, 1 - (W.time - u.deathTime) / 1.5); g.scale(1, 0.4); }
       const code = u.t.code;
@@ -24024,8 +24054,8 @@ if (!(smooth && SPR.blitSmooth(g, cid, a, row, fi, s, mir, lift - 2, sx, sy))) b
 // p: where the button sits on the skill pad [column 1-2 from the left, row 1-3 from the top]; img: picture in assets/fx
 const ARENA = {
   correk: { name: '¡Corre o Te Pillan!', kind: 'tag', rounds: 5, roundT: 60, speed: 360, music: 'pesadilla',
-    skills: [{ id: 'stun', ic: '💫', n: 'Aturdir', cd: 7, p: [1, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 3.5, p: [2, 3] }, { id: 'shield', ic: '🛡️', n: 'Escudo', cd: 9, p: [2, 2] }],
-    chaser: [{ id: 'grab', ic: '🖐️', n: 'Agarrar', cd: 4, p: [1, 3] }, { id: 'dash', ic: '⚡', n: 'Embestida', cd: 3.5, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 4, p: [2, 2] }] },
+    skills: [{ id: 'stun', ic: '💫', img: 'sk_stun', n: 'Aturdir', cd: 7, p: [1, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 3.5, p: [2, 3] }, { id: 'shield', ic: '🛡️', img: 'sk_shield', n: 'Escudo', cd: 9, p: [2, 2] }, { id: 'invis', ic: '👻', img: 'sk_invis', n: 'Invisible', cd: 12, p: [1, 2] }],
+    chaser: [{ id: 'grab', ic: '🖐️', img: 'sk_hook', n: 'Agarrar', cd: 4, p: [1, 3] }, { id: 'dash', ic: '⚡', img: 'sk_dash', n: 'Embestida', cd: 3.5, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 4, p: [2, 2] }, { id: 'roar', ic: '🦁', img: 'sk_roar', n: 'Gruñido', cd: 10, p: [1, 2] }] },
   zombie: { name: 'Infección Zombi', kind: 'infect', rounds: 3, roundT: 120, speed: 360, music: 'sombras',
     skills: [{ id: 'stun', ic: '💫', n: 'Aturdir', cd: 9, p: [1, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 6, p: [2, 3] }, { id: 'shield', ic: '🛡️', n: 'Escudo', cd: 12, p: [2, 2] }],
     chaser: [{ id: 'grab', ic: '🖐️', n: 'Agarrar', cd: 6, p: [1, 3] }, { id: 'dash', ic: '⚡', n: 'Embestida', cd: 5, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 7, p: [2, 2] }] },
@@ -24045,7 +24075,7 @@ const ARENA_DIFF = {
   dificil: { err: 80, react: 0.2, dodge: 0.72, cast: 0.8, lead: 0.92, keep: 0.9 },
   extremo: { err: 8, react: 0.07, dodge: 0.98, cast: 1, lead: 1, keep: 1, blinkDodge: true },
 };
-const SELF_SKILLS = { blink: 1, leap: 1, dash: 1, shield: 1 }; /* online: these move / protect only you, so your own phone does them at once */
+const SELF_SKILLS = { blink: 1, leap: 1, dash: 1, shield: 1, invis: 1 }; /* online: these move / protect only you, so your own phone does them at once */
 window.ARENA = ARENA;
 window.charGame = m => (m === 'mirana' ? 'kitty5' : ARENA[m] ? 'shroom25' : m); /* arenas use the Escape Fantasía characters; Guerra de Flechas the cats of Corre Amigo Corre */
 const isChase = C => C.kind === 'tag' || C.kind === 'infect';
@@ -24093,12 +24123,30 @@ function setupArena(W, opts) {
   A.say = (txt, col) => { W.emit('text', (col ? '|c' + col : '') + txt + (col ? '|r' : '')); if (!A.client) A.fxLog.push({ id: ++A.fxId, k: 'say', txt, col, t: W.time }); };
   A.enemy = (a, b2) => a !== b2 && (isChase(C) ? A.isHunter(a) !== A.isHunter(b2) : a.owner.team !== b2.owner.team);
   A.alive = () => A.heroes.filter(u => u.alive && !u.removed);
-  A.nearestFoe = u => { let best = null, bd = Infinity; for (const e of A.alive()) { if (!A.enemy(u, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; best = e; } } return best; };
+  A.nearestFoe = u => { let best = null, bd = Infinity; for (const e of A.alive()) { if (!A.enemy(u, e)) continue; if (e.invisUntil > W.time && !(u.visionUntil > W.time)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; best = e; } } return best; };
   A.addFx = f => { A.fx.push(f); if (!A.client) A.fxLog.push(Object.assign({ id: ++A.fxId }, f, { u: f.u ? f.u.owner.id : undefined })); };
   if (!A.client) { if (C.kind === 'tag') arenaTagStart(A); else if (C.kind === 'infect') arenaInfStart(A); else A.say(A.goal < Infinity ? '¡Primer equipo en llegar a ' + A.goal + ' bajas gana!' : '¡Gana el equipo con más bajas en ' + Math.round(A.timeLeft / 60) + ' min!', 'ffffd34d'); }
+  if (typeof arenaItemsSetup === 'function') arenaItemsSetup(A, opts); /* runes and shops (team arenas) */
   W.onTick = dt => arenaTick(A, dt);
   W.arenaCast = (p, k, aim) => { const u = W.heroOf(p); if (!u) return false; return arenaCast(A, u, k, aim); };
   return A;
+}
+// the hook's chain: a curve from you (where you are now) through the spot you threw it from to its farthest point
+function arenaCurve(p, s) { const o = p.o, a = 1 - s; return [a * a * o.x + 2 * a * s * p.sx + s * s * p.fx, a * a * o.y + 2 * a * s * p.sy + s * s * p.fy]; }
+function arenaCurveLen(p) { let L = 0, q = arenaCurve(p, 0); for (let i = 1; i <= 8; i++) { const r = arenaCurve(p, i / 8 * p.s); L += Math.hypot(r[0] - q[0], r[1] - q[1]); q = r; } return L / Math.max(0.05, p.s); }
+function arenaStat(A, u, k, d) { return A.stat ? A.stat(u, k, d) : d; } /* items and runes change these (arena_items.js) */
+function arenaHookCatch(A, p) {
+  const W = A.W, o = p.o;
+  if (A.walls) for (const w of A.walls) if (Math.hypot(w.x - p.x, w.y - p.y) < 110 && !p.back) { p.back = true; w.hp -= 34; A.addFx({ k: 'puff', x: p.x, y: p.y, t: W.time, dur: 0.4, col: '200,200,190' }); return true; } /* barricades turn hooks away */
+  for (const e of A.alive()) { if (e === o || e.jump || e.hooked) continue; if (p.k === 'grab' && !A.enemy(o, e)) continue; if (Math.hypot(e.x - p.x, e.y - p.y) < 60) { p.back = true; p.v = e; e.hooked = p; e.order = null; e.path = null; if (A.enemy(o, e) && p.k === 'hook') arenaHit(A, o, e, 34 * arenaStat(A, o, 'hookDmg', 1)); if (e.owner === W.local) A.camSnap = W.time + 99; W.emit('sound', { name: 'coil' }); return true; } }
+  if (A.illus) for (const il of A.illus) if (!il.dead && A.enemy(o, il.src) && Math.hypot(il.x - p.x, il.y - p.y) < 60) { il.dead = true; A.addFx({ k: 'puff', x: il.x, y: il.y, t: W.time, dur: 0.5, col: '200,160,255' }); p.back = true; return true; }
+  return false;
+}
+function arenaArrowStep(A, p) {
+  const W = A.W, o = p.o;
+  if (A.illus) for (const il of A.illus) if (!il.dead && A.enemy(o, il.src) && Math.hypot(il.x - p.x, il.y - p.y) < 58) { il.dead = true; A.addFx({ k: 'puff', x: il.x, y: il.y, t: W.time, dur: 0.5, col: '200,160,255' }); p.done = true; return true; }
+  for (const e of A.alive()) { if (!A.enemy(o, e) || e.jump) continue; if (Math.hypot(e.x - p.x, e.y - p.y) < 58) { const f = Math.min(1, p.d / 1600); arenaHit(A, o, e, (30 + 70 * f) * arenaStat(A, o, 'arrowDmg', 1), 0.6 + 2.4 * f); A.addFx({ k: 'puff', x: p.x, y: p.y, t: W.time, dur: 0.4, col: '170,220,255' }); if (A.onArrowHit) A.onArrowHit(p, e); p.done = true; return true; } }
+  return false;
 }
 // teleport a hero and remember it, so online the owner of that hero moves too
 function arenaMove(A, u, x, y) { u.x = x; u.y = y; u.order = null; u.path = null; if (!A.client) A.mv[u.owner.id] = [Math.round(x), Math.round(y), ++A.mvSeq]; }
@@ -24152,30 +24200,37 @@ function arenaAim(A, u, k, aim) {
 function arenaCast(A, u, k, aim, remote) {
   const W = A.W, C = A.C; if (!u || !u.alive || A.ended || (A.pause && W.time < A.pause)) return false;
   if (u.stunUntil > W.time || u.hooked) return false;
+  if (u.silencedUntil > W.time) { if (u.owner === W.local) A.say('¡Estás silenciado! 🤐', 'ffcfa0ff'); return false; }
+  if (typeof k === 'string' && k.startsWith('it:')) { if (A.client) { if (window.arenaSend) arenaSend(k, arenaAim(A, u, k, aim)); return true; } return A.useItem ? A.useItem(u, k.slice(3), aim) : false; } /* an item from the bag */
   const S = A.skillsOf(u).find(s => s.id === k); if (!S || (!remote && A.ready(u, k) > 0)) return false;
   if (k === 'requiem' && !(A.charges[u.owner.id] > 0)) { if (u.owner === W.local) A.say('Necesitas cargas: pégale a un rival con las sombras', 'ffcfa0ff'); return false; }
   const a = arenaAim(A, u, k, aim); u.facing = Math.atan2(a.dy, a.dx) * 180 / Math.PI;
   if (A.client) { // online, not the host: send it; do the moves of your own hero right here
-    A.cd.set(u.handle + ':' + k, W.time + S.cd); if (window.arenaSend) arenaSend(k, a);
-    if (SELF_SKILLS[k]) ({ blink: () => arenaBlink(A, u, a), leap: () => arenaLeap(A, u, a), dash: () => { u.dashUntil = W.time + 1.6; }, shield: () => { u.shieldUntil = W.time + 3; } })[k]();
+    A.cd.set(u.handle + ':' + k, W.time + S.cd * arenaStat(A, u, 'cdMul', 1)); if (window.arenaSend) arenaSend(k, a);
+    if (SELF_SKILLS[k]) ({ blink: () => arenaBlink(A, u, a), leap: () => arenaLeap(A, u, a), dash: () => { u.dashUntil = W.time + 1.6; }, shield: () => { u.shieldUntil = W.time + 3; }, invis: () => { u.invisUntil = W.time + 4; } })[k]();
     return true;
   }
+  if (k !== 'invis') u.invisUntil = 0; /* using a power shows you again */
   const ok = ({
-    hook() { A.proj.push({ id: ++A.pid, k: 'hook', o: u, x: u.x, y: u.y, sx: u.x, sy: u.y, dx: a.dx, dy: a.dy, sp: 1800, max: 1250, d: 0, back: false, trail: [] }); W.emit('sound', { name: 'coil' }); return true; },
+    hook() { A.proj.push({ id: ++A.pid, k: 'hook', o: u, x: u.x, y: u.y, sx: u.x, sy: u.y, fx: u.x, fy: u.y, s: 1, dx: a.dx, dy: a.dy, sp: 1800 * arenaStat(A, u, 'hookSpd', 1), max: 1250 * arenaStat(A, u, 'hookRange', 1), d: 0, back: false, bn: 0 }); W.emit('sound', { name: 'coil' }); return true; },
     cloud() { A.clouds.push({ o: u, t: W.time, dur: 5, r: 170 }); A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.6, col: '90,255,60' }); return true; },
-    arrow() { A.proj.push({ id: ++A.pid, k: 'arrow', o: u, x: u.x, y: u.y, dx: a.dx, dy: a.dy, sp: 1500, max: 2800, d: 0 }); W.emit('sound', { name: 'coil' }); return true; },
+    arrow() { let sp2 = 0; const id = u.owner.id, sa = A.spec && A.has && (A.inv[id] || []).find(q => ARENA_ITEMS[q.k] && ARENA_ITEMS[q.k].arrow); if (sa && !(A.spec[id] > W.time)) { sp2 = ARENA_ITEMS[sa.k].arrow; A.spec[id] = W.time + 10; } /* a special arrow every 10 s */
+      const mk = (dx, dy) => A.proj.push({ id: ++A.pid, k: 'arrow', o: u, x: u.x, y: u.y, dx, dy, sp: 1500 * arenaStat(A, u, 'arrowSpd', 1), max: 2800 * arenaStat(A, u, 'arrowRange', 1), d: 0, sp2: sp2 === 'triple' ? 0 : sp2 });
+      if (sp2 === 'triple') { for (const da of [-0.2, 0, 0.2]) { const c = Math.cos(da), s2 = Math.sin(da); mk(a.dx * c - a.dy * s2, a.dx * s2 + a.dy * c); } } else mk(a.dx, a.dy); W.emit('sound', { name: 'coil' }); return true; },
     leap() { if (remote) { u.jump = { t0: W.time, dur: 0.5, dx: a.dx, dy: a.dy, spd: 0 }; return true; } return arenaLeap(A, u, a); },
     raze1() { return arenaRaze(A, u, a, 200); }, raze2() { return arenaRaze(A, u, a, 450); }, raze3() { return arenaRaze(A, u, a, 700); },
-    requiem() { const n = A.charges[u.owner.id] || 0; A.charges[u.owner.id] = 0; A.addFx({ k: 'requiem', x: u.x, y: u.y, t: W.time, dur: 0.9, n });
-      for (const e of A.alive()) { if (!A.enemy(u, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d > 650) continue; const near = d < 260 ? 1 : 1 - 0.6 * (d - 260) / 390; arenaHit(A, u, e, n * 10 * near, 0, true); }
+    requiem() { const n = A.charges[u.owner.id] || 0; A.charges[u.owner.id] = 0; const RR = 650 + arenaStat(A, u, 'reqAoe', 0), mul = 1 + arenaStat(A, u, 'reqDmg', 0); A.addFx({ k: 'requiem', x: u.x, y: u.y, t: W.time, dur: 0.9, n, r: RR });
+      for (const e of A.alive()) { if (!A.enemy(u, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d > RR) continue; const near = d < 260 ? 1 : 1 - 0.6 * (d - 260) / (RR - 260); arenaHit(A, u, e, n * 10 * near * mul, 0, true); }
       W.emit('sound', { name: 'death' }); return true; },
     blink() { return remote ? true : arenaBlink(A, u, a); },
     stun() { const ch = A.nearestFoe(u); if (!ch || Math.hypot(ch.x - u.x, ch.y - u.y) > 420) { if (u.owner === W.local) A.say('Está muy lejos', 'ffff8080'); return false; } ch.stunUntil = W.time + 2; ch.order = null; ch.path = null; A.addFx({ k: 'bolt', x: u.x, y: u.y, tx: ch.x, ty: ch.y, t: W.time, dur: 0.35 }); W.emit('sound', { name: 'coil' }); return true; },
     shield() { u.shieldUntil = W.time + 3; W.emit('sound', { name: 'revive' }); return true; },
     dash() { u.dashUntil = W.time + 1.6; W.emit('sound', { name: 'coil' }); return true; },
-    grab() { A.proj.push({ id: ++A.pid, k: 'grab', o: u, x: u.x, y: u.y, sx: u.x, sy: u.y, dx: a.dx, dy: a.dy, sp: 1500, max: 650, d: 0, back: false, trail: [] }); return true; },
+    invis() { u.invisUntil = W.time + 4; A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.5, col: '160,220,255' }); W.emit('sound', { name: 'teleport' }); return true; }, /* 4 s that the catcher can't see you */
+    roar() { let n = 0; for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - u.x, e.y - u.y) < 520) { e.slowUntil = W.time + 2.5; n++; } A.addFx({ k: 'roar', x: u.x, y: u.y, t: W.time, dur: 0.7 }); W.emit('sound', { name: 'roar' }); return true; }, /* the runners near you slow down */
+    grab() { A.proj.push({ id: ++A.pid, k: 'grab', o: u, x: u.x, y: u.y, sx: u.x, sy: u.y, fx: u.x, fy: u.y, s: 1, dx: a.dx, dy: a.dy, sp: 1500, max: 650, d: 0, back: false }); return true; },
   })[k]();
-  if (ok) A.cd.set(u.handle + ':' + k, W.time + S.cd);
+  if (ok) A.cd.set(u.handle + ':' + k, W.time + S.cd * arenaStat(A, u, 'cdMul', 1));
   return ok;
 }
 // a landing spot: open ground of the same play area (through walls and trees, never into a closed pocket or across the river)
@@ -24198,16 +24253,21 @@ function arenaLeap(A, u, a) {
   u.order = null; u.path = null; u.leap = { t0: W.time, dur: 0.5, x0: u.x, y0: u.y, x1: f.x, y1: f.y }; u.jump = { t0: W.time, dur: 0.5, dx: a.dx, dy: a.dy, spd: 0 }; W.emit('sound', { name: 'coil' }); return true;
 }
 function arenaRaze(A, u, a, D) {
-  const W = A.W, x = u.x + a.dx * D, y = u.y + a.dy * D; A.addFx({ k: 'raze', x, y, t: W.time, dur: 0.6 }); W.emit('sound', { name: 'coil' });
-  let hit = false; for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - x, e.y - y) < 190) { arenaHit(A, u, e, 50); hit = true; } /* two shadows and you are out */
-  if (hit) A.charges[u.owner.id] = Math.min(20, (A.charges[u.owner.id] || 0) + 1); /* every shadow that lands charges the Réquiem */
+  const W = A.W, x = u.x + a.dx * D, y = u.y + a.dy * D, md = A.inv ? ((A.inv[u.owner.id] || []).map(q => ARENA_ITEMS[q.k] && ARENA_ITEMS[q.k].raze).find(Boolean) || '') : '';
+  let R = 190 + arenaStat(A, u, 'razeAoe', 0), dmg = 50; if (md === 'prec') { R = 125; dmg = 80; } if (md === 'meteor') R += 150; if (md === 'xl') { R += 50; dmg += 10; }
+  const go = () => { A.addFx({ k: 'raze', x, y, t: W.time, dur: 0.6, r: R }); W.emit('sound', { name: 'coil' });
+    let hit = false; for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - x, e.y - y) < R) { arenaHit(A, u, e, dmg); hit = true; } /* two shadows and you are out */
+    if (hit) A.charges[u.owner.id] = Math.min(20, (A.charges[u.owner.id] || 0) + 1); /* every shadow that lands charges the Réquiem */ };
+  if (md === 'meteor') { A.addFx({ k: 'mark', x, y, t: W.time, dur: 0.75, r: R }); (A.later = A.later || []).push({ t: W.time + 0.75, fn: go }); } else go();
   return true;
 }
 function arenaHit(A, by, u, dmg, stun, unstoppable, quiet) {
   const W = A.W; if (!u.alive || A.ended || dmg <= 0) return;
   if (u.jump && !unstoppable) return;
   if (u.shieldUntil > W.time) return;
+  if (A.onHitMod) { dmg = A.onHitMod(by, u, dmg); if (dmg <= 0) return; }
   if (stun) { u.stunUntil = Math.max(u.stunUntil || 0, W.time + stun); u.order = null; u.path = null; }
+  if (by && by !== u) by.invisUntil = 0; /* hitting someone shows you */
   u.ahp -= dmg; u.hitT = W.time; if (!quiet) A.addFx({ k: 'num', x: u.x, y: u.y + 60, t: W.time, dur: 0.9, txt: '-' + Math.round(dmg) });
   if (u.owner === W.local && by && by !== u) A.camSnap = W.time + 1.2; /* hit by an enemy: the camera comes back to you right away */
   if (u.ahp <= 0) { u.ahp = 0; arenaKill(A, by, u); }
@@ -24215,7 +24275,7 @@ function arenaHit(A, by, u, dmg, stun, unstoppable, quiet) {
 function arenaKill(A, by, u) {
   const W = A.W; u.graceUntil = 0; if (u.hooked) { u.hooked.v = null; u.hooked = null; } u.jump = null; u.leap = null; W.killUnit(u, by); if (u.alive) return;
   A.deaths[u.owner.id]++; A.charges[u.owner.id] = 0; /* dying loses your Réquiem charges */
-  if (by && by !== u) { A.kills[by.owner.id]++; if (A.C.kind === 'team') A.score[by.owner.team]++; }
+  if (by && by !== u) { A.kills[by.owner.id]++; if (A.C.kind === 'team') A.score[by.owner.team]++; if (A.onKill) A.onKill(by, u); }
   A.say((by && by !== u ? by.owner.name + ' eliminó a ' : '') + u.owner.name, by && by.owner.team === W.local.team ? 'ff7dff8a' : 'ffff7a7a');
   u.reviveAt = W.time + 0.35; /* back right away */
   if (A.C.kind === 'team' && A.score.some(s => s >= A.goal)) arenaFinish(A);
@@ -24235,7 +24295,7 @@ function arenaTick(A, dt) {
   const W = A.W, C = A.C;
   for (const u of A.heroes) { const v = u._vx != null ? 0.7 : 0; u._vx = (u._vx || 0) * v + (1 - v) * ((u.x - (u._lx ?? u.x)) / Math.max(dt, 1e-3)); u._vy = (u._vy || 0) * v + (1 - v) * ((u.y - (u._ly ?? u.y)) / Math.max(dt, 1e-3)); u._lx = u.x; u._ly = u.y;
     if (u.leap) { const L = u.leap, k = Math.min(1, (W.time - L.t0) / L.dur); if (!A.client || u.owner === W.local) { u.x = L.x0 + (L.x1 - L.x0) * k; u.y = L.y0 + (L.y1 - L.y0) * k; } u.order = null; u.path = null; if (k >= 1) u.leap = null; }
-    u.speed = (u.baseSpd || 360) * (u.slowUntil > W.time ? 0.55 : 1); }
+    u.speed = (u.baseSpd || 360) * (u.slowUntil > W.time ? 0.55 : 1) * Math.max(0.3, arenaStat(A, u, 'spd', 1)); }
   for (const f of A.fx) if (W.time - f.t > f.dur) f.dead = true; A.fx = A.fx.filter(f => !f.dead);
   if (A.client) { arenaClientTick(A, dt); return; }
   A.fxLog = A.fxLog.filter(f => W.time - f.t < 2);
@@ -24246,32 +24306,31 @@ function arenaTick(A, dt) {
   for (const p of A.proj) {
     if (p.done) continue; const o = p.o;
     if (!o.alive && !p.back) { p.done = true; if (p.v) p.v.hooked = null; continue; }
-    if (!p.back) {
-      const st = p.sp * dt; p.x += p.dx * st; p.y += p.dy * st; p.d += st;
-      if (p.trail && (!p.trail.length || Math.hypot(p.x - p.trail[p.trail.length - 1][0], p.y - p.trail[p.trail.length - 1][1]) > 60)) p.trail.push([p.x, p.y]);
-      if (p.k === 'arrow') { for (const e of A.alive()) { if (!A.enemy(o, e) || e.jump) continue; if (Math.hypot(e.x - p.x, e.y - p.y) < 58) { const f = Math.min(1, p.d / 1600); arenaHit(A, o, e, 30 + 70 * f, 0.6 + 2.4 * f); A.addFx({ k: 'puff', x: p.x, y: p.y, t: W.time, dur: 0.4, col: '170,220,255' }); p.done = true; break; } } }
-      else if (p.k === 'hook' || p.k === 'grab') for (const e of A.alive()) { if (e === o || e.jump || e.hooked) continue; if (p.k === 'grab' && !A.enemy(o, e)) continue; if (Math.hypot(e.x - p.x, e.y - p.y) < 60) { p.back = true; p.v = e; e.hooked = p; e.order = null; e.path = null; if (A.enemy(o, e) && p.k === 'hook') arenaHit(A, o, e, 34); if (e.owner === W.local) A.camSnap = W.time + 99; W.emit('sound', { name: 'coil' }); break; } }
+    if (!p.back) { // flying out: always straight, the way it was thrown
+      const st = p.sp * dt; p.x += p.dx * st; p.y += p.dy * st; p.d += st; p.fx = p.x; p.fy = p.y;
+      if (p.k === 'arrow') { if (p.sp2 === 'poison' && (!p.lastC || p.d - p.lastC > 220)) { p.lastC = p.d; A.clouds.push({ o, t: W.time, dur: 3, r: 120, fixed: true, x: p.x, y: p.y, dps: 8 }); } if (p.sp2 === 'ice') for (const e of A.alive()) if (A.enemy(o, e) && Math.hypot(e.x - p.x, e.y - p.y) < 260) e.slowUntil = W.time + 1.5; if (arenaArrowStep(A, p, dt)) continue; }
+      else if (p.k === 'hook' || p.k === 'grab') { arenaHookCatch(A, p); const bnc = p.k === 'hook' ? arenaStat(A, o, 'bounce', 0) : 0; if (!p.back && bnc && p.bn < bnc + 1) { const B = A.bounds; let hitE = false; if (p.x < B[0] + 60 || p.x > B[2] - 60) { p.dx = -p.dx; hitE = true; } if (p.y < B[1] + 60 || p.y > B[3] - 60) { p.dy = -p.dy; hitE = true; } if (hitE) { p.bn++; p.sx = p.x; p.sy = p.y; } } }
       if (!p.done && p.d >= p.max) { if (p.k === 'arrow') p.done = true; else p.back = true; }
-    } else { // coming back along the same path it flew (the chain bends as you walk), then to you
-      let st = p.sp * 1.1 * dt;
-      while (st > 0 && !p.done) { const tg = p.trail && p.trail.length ? p.trail[p.trail.length - 1] : [o.x, o.y]; const dx = tg[0] - p.x, dy = tg[1] - p.y, d = Math.hypot(dx, dy);
-        if (d <= st) { p.x = tg[0]; p.y = tg[1]; st -= d; if (p.trail && p.trail.length) p.trail.pop(); else if (Math.hypot(o.x - p.x, o.y - p.y) < 50) p.done = true; else { st = 0; } }
-        else { p.x += dx / d * st; p.y += dy / d * st; st = 0; } }
-      if (!p.done && (!p.trail || !p.trail.length) && Math.hypot(o.x - p.x, o.y - p.y) < 60) p.done = true;
+    } else { // coming back: along a curve from the farthest point to where you are NOW (the chain bends as you walk)
+      const L = arenaCurveLen(p); p.s -= p.sp * 1.1 * dt / Math.max(80, L);
+      if (p.s <= 0) { p.s = 0; p.done = true; } const q = arenaCurve(p, p.s); p.x = q[0]; p.y = q[1];
+      if (!p.v && !p.done) arenaHookCatch(A, p); /* on the way back it still grabs whoever it touches */
+      if (Math.hypot(o.x - p.x, o.y - p.y) < 50) p.done = true;
       const v = p.v; if (v && v.alive && !p.done) { v.x = p.x; v.y = p.y; }
-      if (p.done && v) { v.hooked = null; if (v.owner === W.local) A.camSnap = W.time + 0.5; let nx = v.x, ny = v.y; if (!W.walkable(nx, ny) || A.compAt(nx, ny) !== A.compAt(o.x, o.y)) { const q = W.nearestWalkable(o.x + (v.x - o.x) * 0.3, o.y + (v.y - o.y) * 0.3, 400); if (q) { nx = q.x; ny = q.y; } } arenaMove(A, v, nx, ny);
-        if (p.k === 'grab' && v.alive) arenaCatch(A, o, v); if (p.k === 'hook' && v.alive && A.enemy(o, v)) arenaHit(A, o, v, 33); /* pulled all the way: the bite */ }
+      if (p.done && v) { v.hooked = null; if (v.owner === W.local) A.camSnap = W.time + 0.5; let nx = v.x, ny = v.y; if (!W.walkable(nx, ny) || A.compAt(nx, ny) !== A.compAt(o.x, o.y)) { const q2 = W.nearestWalkable(o.x + (v.x - o.x) * 0.3, o.y + (v.y - o.y) * 0.3, 400); if (q2) { nx = q2.x; ny = q2.y; } } arenaMove(A, v, nx, ny);
+        if (p.k === 'grab' && v.alive) arenaCatch(A, o, v); if (p.k === 'hook' && v.alive && A.enemy(o, v)) { const dmg = 33 * arenaStat(A, o, 'hookDmg', 1) * (1 + 0.1 * (p.bn || 0) * arenaStat(A, o, 'bounce', 0)) + arenaStat(A, o, 'drag', 0) * Math.hypot(p.fx - o.x, p.fy - o.y) / 30; arenaHit(A, o, v, dmg); const hl = arenaStat(A, o, 'hookLife', 0); if (hl) o.ahp = Math.min(o.amax, o.ahp + dmg * hl); } /* pulled all the way: the bite */ }
     }
   }
   A.proj = A.proj.filter(p => !p.done);
   // poison cloud (hook map): goes with whoever threw it, slows and slowly hurts the enemies inside, never your team
-  for (const c of A.clouds) { if (W.time - c.t > c.dur || !c.o.alive) { c.done = true; continue; } c.x = c.o.x; c.y = c.o.y; for (const e of A.alive()) if (A.enemy(c.o, e) && Math.hypot(e.x - c.x, e.y - c.y) < c.r) { e.slowUntil = W.time + 0.4; arenaHit(A, c.o, e, 8 * dt, 0, false, true); } }
+  for (const c of A.clouds) { if (W.time - c.t > c.dur || (!c.fixed && !c.o.alive)) { c.done = true; continue; } if (!c.fixed) { c.x = c.o.x; c.y = c.o.y; } for (const e of A.alive()) if (A.enemy(c.o, e) && Math.hypot(e.x - c.x, e.y - c.y) < c.r) { e.slowUntil = W.time + 0.4; arenaHit(A, c.o, e, (c.dps || 8) * dt, 0, false, true); } }
   A.clouds = A.clouds.filter(c => !c.done);
+  if (A.itemsTick) A.itemsTick(dt);
   for (const u of A.heroes) {
     if (u.hooked) { u.order = null; u.path = null; }
     u.healing = u.alive && C.kind === 'team' && u.ahp < u.amax && W.time - (u.hitT || 0) > 2;
     if (u.healing) u.ahp = Math.min(u.amax, u.ahp + 22 * dt); /* heals fast out of combat */
-    if (!u.alive && u.reviveAt && W.time >= u.reviveAt && C.kind === 'team') { u.reviveAt = 0; const s = A.spawnOf(u.owner); arenaRevive(A, u, s.x, s.y); u.graceUntil = W.time + 1.2; u.shieldUntil = W.time + 1.2; if (u.owner === W.local) A.camSnap = W.time + 0.4; }
+    if (!u.alive && u.reviveAt && W.time >= u.reviveAt && C.kind === 'team') { u.reviveAt = 0; const s = A.spawnOf(u.owner); arenaRevive(A, u, s.x, s.y); if (A.onRevive) A.onRevive(u); u.graceUntil = W.time + 1.2; u.shieldUntil = W.time + 1.2; if (u.owner === W.local) A.camSnap = W.time + 0.4; }
   }
   if (isChase(C)) {
     if (C.kind === 'infect' && A.infAt && W.time >= A.infAt) { A.infAt = 0; const L = A.alive(), n = L.length >= 8 ? 2 : 1; for (let i = 0; i < n; i++) { const c = L.filter(u => !A.zomb.has(u.owner.id)); const u = c[Math.floor(W.rand() * c.length)]; if (u) arenaInfect(A, u); } A.say('¡El virus despertó! Huye de los zombis', 'ff8cff6a'); }
@@ -24282,24 +24341,27 @@ function arenaTick(A, dt) {
   if (W.ai.active) arenaBots(A, dt);
 }
 // where the camera should look: your own hook / arrow in flight, with you still on the screen; a hit on you brings it back to you
+function arenaThreats(A, me) { const out = []; for (const p of A.proj) { if (p.back || p.done || p.o === me || !A.enemy(p.o, me) || p.k === 'grab') continue; const rx = me.x - p.x, ry = me.y - p.y, along = rx * p.dx + ry * p.dy; if (along < -50 || along > 2200) continue; if (Math.abs(rx * p.dy - ry * p.dx) > 260) continue; out.push(p); } return out; }
 function arenaCam(A, cw, ch, z0) {
   const W = A.W, me = W.heroOf(W.local); if (!me) return null;
   if (A.look && me.alive) { const z = A.look; return { x: me.x + z.x, y: me.y + z.y, z: z0 * 0.72 }; }
   if (A.camSnap > W.time) return null;
   const p = A.proj.find(q => q.o === me && (q.k === 'hook' || q.k === 'arrow' || q.k === 'grab') && !q.done); if (!p) return null;
-  const dx = Math.abs(p.x - me.x), dy = Math.abs(p.y - me.y);
-  const z = Math.max(z0 * 0.42, Math.min(z0, (cw * 0.8) / (dx + 260), (ch * 0.7) / (dy + 360)));
-  return { x: (p.x + me.x) / 2, y: (p.y + me.y) / 2, z };
+  /* your shot and you on the screen, and also anything flying at you (so an arrow from behind is never hidden) */
+  let x0 = Math.min(p.x, me.x), x1 = Math.max(p.x, me.x), y0 = Math.min(p.y, me.y), y1 = Math.max(p.y, me.y);
+  for (const q of arenaThreats(A, me)) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); }
+  const z = Math.max(z0 * 0.36, Math.min(z0, (cw * 0.8) / (x1 - x0 + 260), (ch * 0.7) / (y1 - y0 + 360)));
+  return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, z };
 }
 
 // ---------------- online ----------------
 // the host packs everything the others need to draw and to know who is alive
 function arenaSnap(A) {
   const W = A.W, r = n => Math.round(n), H = {};
-  for (const u of A.heroes) { const id = u.owner.id; H[id] = [u.alive ? 1 : 0, r(u.ahp), A.kills[id], A.deaths[id], A.charges[id] || 0, r(Math.max(0, (u.stunUntil || 0) - W.time) * 10), (u.slowUntil > W.time ? 1 : 0) | (u.shieldUntil > W.time ? 2 : 0) | (u.healing ? 4 : 0) | (A.zomb.has(id) ? 8 : 0) | (u.dashUntil > W.time ? 16 : 0)]; }
+  for (const u of A.heroes) { const id = u.owner.id; H[id] = [u.alive ? 1 : 0, r(u.ahp), A.kills[id], A.deaths[id], A.charges[id] || 0, r(Math.max(0, (u.stunUntil || 0) - W.time) * 10), (u.slowUntil > W.time ? 1 : 0) | (u.shieldUntil > W.time ? 2 : 0) | (u.healing ? 4 : 0) | (A.zomb.has(id) ? 8 : 0) | (u.dashUntil > W.time ? 16 : 0) | (u.invisUntil > W.time ? 32 : 0) | (u.visionUntil > W.time ? 64 : 0)]; }
   return { H, sc: A.score, rd: A.round, re: r(((A.roundEnd || 0) - W.time) * 10), pz: r(Math.max(0, (A.pause || 0) - W.time) * 10), tl: r(A.timeLeft), en: A.ended ? 1 : 0, cz: A.chaser ? A.chaser.owner.id : -1, ia: A.infAt ? r((A.infAt - W.time) * 10) : 0,
-    pr: A.proj.map(p => [p.id, p.k, r(p.x), r(p.y), r(p.dx * 100), r(p.dy * 100), p.o.owner.id, p.back ? 1 : 0, p.v ? p.v.owner.id : -1, p.sx != null ? [r(p.sx), r(p.sy)].concat(...(p.trail || []).map(t => [r(t[0]), r(t[1])])) : 0]),
-    cl: A.clouds.map(c => [c.o.owner.id, r((W.time - c.t) * 10)]), fx: A.fxLog.slice(-24).map(f => [f.id, f.k, r(f.x || 0), r(f.y || 0), r((W.time - f.t) * 10), f.k === 'say' ? f.txt : f.k === 'num' ? f.txt : f.k === 'bolt' ? [r(f.tx), r(f.ty)] : f.k === 'requiem' ? f.n : f.col || 0, f.col || 0, f.u ?? -1]), mv: A.mv };
+    pr: A.proj.map(p => [p.id, p.k, r(p.x), r(p.y), r(p.dx * 100), r(p.dy * 100), p.o.owner.id, p.back ? 1 : 0, p.v ? p.v.owner.id : -1, p.sx != null ? [r(p.sx), r(p.sy), r(p.fx), r(p.fy), r(p.s * 1000)] : 0, p.sp2 || 0]),
+    cl: A.clouds.map(c => [c.o.owner.id, r((W.time - c.t) * 10), c.fixed ? 1 : 0, r(c.x || 0), r(c.y || 0), c.dur, c.r]), it: typeof arenaItemsSnap === 'function' ? arenaItemsSnap(A) : null, fx: A.fxLog.slice(-24).map(f => [f.id, f.k, r(f.x || 0), r(f.y || 0), r((W.time - f.t) * 10), f.k === 'say' ? f.txt : f.k === 'num' ? f.txt : (f.k === 'bolt' || f.k === 'shot') ? [r(f.tx), r(f.ty)] : f.k === 'requiem' ? [f.n, r(f.r || 650)] : (f.k === 'raze' || f.k === 'mark' || f.k === 'boom') ? r(f.r || 190) : f.col || 0, f.col || 0, f.u ?? -1]), mv: A.mv };
 }
 // the others: copy what the host says
 function arenaApply(A, s) {
@@ -24313,17 +24375,18 @@ function arenaClientTick(A, dt) {
   for (const id in s.H) { const u = byId[id]; if (!u) continue; const [al, hp, k, d, ch, st, fl] = s.H[id];
     A.kills[id] = k; A.deaths[id] = d; A.charges[id] = ch; u.ahp = hp; const zb = !!(fl & 8); if (zb && !A.zomb.has(+id)) { A.zomb.add(+id); u.owner.forceChar = (window.SPR && SPR.MAN && SPR.MAN.chars.orco) ? 'orco' : null; } if (!zb && A.zomb.has(+id)) { A.zomb.delete(+id); u.owner.forceChar = null; }
     if (st) u.stunUntil = W.time + st / 10; else if (u.stunUntil > W.time + 0.2) u.stunUntil = 0;
-    u.slowUntil = (fl & 1) ? W.time + 0.3 : 0; u.shieldUntil = (fl & 2) ? Math.max(u.shieldUntil || 0, W.time + 0.2) : (u.owner === W.local ? u.shieldUntil : 0); u.healing = !!(fl & 4); if (fl & 16) u.dashUntil = Math.max(u.dashUntil || 0, W.time + 0.2);
+    u.slowUntil = (fl & 1) ? W.time + 0.3 : 0; u.shieldUntil = (fl & 2) ? Math.max(u.shieldUntil || 0, W.time + 0.2) : (u.owner === W.local ? u.shieldUntil : 0); u.healing = !!(fl & 4); if (fl & 16) u.dashUntil = Math.max(u.dashUntil || 0, W.time + 0.2); u.invisUntil = (fl & 32) ? Math.max(u.invisUntil || 0, W.time + 0.2) : (u.owner === W.local ? u.invisUntil : 0); u.visionUntil = (fl & 64) ? W.time + 0.3 : 0;
     if (!al && u.alive) { u._netKill = true; W.killUnit(u); u._netKill = false; }
     if (al && !u.alive) { const m = s.mv[id]; arenaRevive(A, u, m ? m[0] : u.x, m ? m[1] : u.y); } }
   for (const id in s.mv) { const m = s.mv[id]; if ((A.mvSeen[id] || 0) >= m[2]) continue; A.mvSeen[id] = m[2]; const u = byId[id]; if (u && u.owner === W.local) { u.x = m[0]; u.y = m[1]; u.order = null; u.path = null; } }
-  A.proj = s.pr.map(q => { const o = byId[q[6]]; const p = { id: q[0], k: q[1], x: q[2], y: q[3], dx: q[4] / 100, dy: q[5] / 100, o, back: !!q[7], v: byId[q[8]] || null }; if (q[9]) { p.sx = q[9][0]; p.sy = q[9][1]; p.trail = []; for (let i = 2; i < q[9].length; i += 2) p.trail.push([q[9][i], q[9][i + 1]]); } return p; }).filter(p => p.o);
+  A.proj = s.pr.map(q => { const o = byId[q[6]]; const p = { id: q[0], k: q[1], x: q[2], y: q[3], dx: q[4] / 100, dy: q[5] / 100, o, back: !!q[7], v: byId[q[8]] || null }; if (q[9]) { p.sx = q[9][0]; p.sy = q[9][1]; p.fx = q[9][2]; p.fy = q[9][3]; p.s = q[9][4] / 1000; } if (q[10]) p.sp2 = q[10]; return p; }).filter(p => p.o);
   for (const u of A.heroes) u.hooked = null; for (const p of A.proj) if (p.v) { p.v.hooked = p; if (p.v.owner === W.local) { p.v.x = p.x; p.v.y = p.y; p.v.order = null; p.v.path = null; A.camSnap = W.time + 0.6; } }
-  A.clouds = s.cl.map(c => ({ o: byId[c[0]], t: W.time - c[1] / 10, dur: 5, r: 170 })).filter(c => c.o);
+  A.clouds = s.cl.map(c => ({ o: byId[c[0]], t: W.time - c[1] / 10, dur: c[5] || 5, r: c[6] || 170, fixed: !!c[2], x: c[3], y: c[4] })).filter(c => c.o);
+  if (s.it && typeof arenaItemsApply === 'function') arenaItemsApply(A, s.it);
   for (const f of s.fx) { if (f[0] <= (A.fxSeen || 0)) continue; A.fxSeen = f[0]; const t = W.time - f[4] / 10;
     if (f[1] === 'say') { W.emit('text', (f[6] ? '|c' + f[6] : '') + f[5] + (f[6] ? '|r' : '')); continue; }
-    const o = { k: f[1], x: f[2], y: f[3], t, dur: { raze: 0.6, requiem: 0.9, puff: 0.5, bolt: 0.35, num: 0.9 }[f[1]] || 0.6 };
-    if (f[1] === 'num') o.txt = f[5]; if (f[1] === 'bolt') { o.tx = f[5][0]; o.ty = f[5][1]; } if (f[1] === 'requiem') o.n = f[5]; if (f[1] === 'puff' && f[5]) o.col = f[5];
+    const o = { k: f[1], x: f[2], y: f[3], t, dur: { raze: 0.6, requiem: 0.9, puff: 0.5, bolt: 0.35, num: 0.9, shot: 0.3, mark: 0.75, boom: 0.6, roar: 0.7 }[f[1]] || 0.6 };
+    if (f[1] === 'num') o.txt = f[5]; if (f[1] === 'bolt' || f[1] === 'shot') { o.tx = f[5][0]; o.ty = f[5][1]; } if (f[1] === 'requiem') { o.n = f[5][0]; o.r = f[5][1]; } if (f[1] === 'raze' || f[1] === 'mark' || f[1] === 'boom') o.r = f[5]; if (f[1] === 'puff' && f[5]) o.col = f[5];
     if (f[1] === 'num' && me && Math.hypot(f[2] - me.x, f[3] - 60 - me.y) < 80) A.camSnap = W.time + 1.2;
     A.fx.push(o); }
   if (s.en && !A.ended) arenaFinish(A);
@@ -24351,6 +24414,7 @@ function arenaBots(A, dt) {
     if (A.id === 'pudge') { if (td < 1300 && Math.random() < D.cast) arenaCast(A, u, 'hook', aimAt(1800)); if (td < 260 && Math.random() < D.cast) arenaCast(A, u, 'cloud'); }
     if (A.id === 'mirana') { if (td < 1900 && Math.random() < D.cast) arenaCast(A, u, 'arrow', aimAt(1500)); if (td < 420 && Math.random() < 0.3 * D.cast) { const d = td || 1; arenaCast(A, u, 'leap', { dx: (u.x - tgt.x) / d, dy: (u.y - tgt.y) / d, exact: true }); } }
     if (A.id === 'nevermore') { const a = aimAt(1e9); const k = a.dist < 330 ? 'raze1' : a.dist < 580 ? 'raze2' : a.dist < 830 ? 'raze3' : null; if (k && Math.random() < D.cast) arenaCast(A, u, k, a); const n = A.charges[u.owner.id] || 0; if (n >= (D.lead > 0.9 ? 8 : 4) && td < 280 && Math.random() < D.cast) arenaCast(A, u, 'requiem'); if (n >= 8 && td > 350 && td < 650 && D.blinkDodge && A.ready(u, 'blink') <= 0) { const d = td || 1; arenaCast(A, u, 'blink', { dx: (tgt.x - u.x) / d, dy: (tgt.y - u.y) / d, dist: td - 60, exact: true }); } }
+    if (typeof arenaItemsBot === 'function' && arenaItemsBot(A, b, u, D)) continue; /* shopping at the base, using items, taking a rune nearby */
     // keep a good distance: step in or out, with some sideways wiggle
     const d = td || 1, nx = (u.x - tgt.x) / d, ny = (u.y - tgt.y) / d, side = Math.random() < 0.5 ? 1 : -1;
     const k2 = d > want + 150 ? -1 : d < want - 150 ? 1 : 0, r = 240 * (0.5 + D.keep);
@@ -24363,12 +24427,14 @@ function botTag(A, b, u, D) {
   if (A.isHunter(u)) {
     const tgt = A.nearestFoe(u); if (!tgt) { if (!u.order) { const s = A.spots[Math.floor(Math.random() * A.spots.length)]; if (s) botGo(W, u, s.x, s.y); } return; } const td = Math.hypot(tgt.x - u.x, tgt.y - u.y);
     if (td < 520 && Math.random() < D.cast * 0.6) arenaCast(A, u, 'dash');
+    if (td < 430 && Math.random() < D.cast * 0.5) arenaCast(A, u, 'roar');
     if (td < 640 && td > 140 && Math.random() < D.cast * 0.5) { const t = td / 1500, x = tgt.x + (tgt._vx || 0) * t * D.lead, y = tgt.y + (tgt._vy || 0) * t * D.lead, d = Math.hypot(x - u.x, y - u.y) || 1; arenaCast(A, u, 'grab', { dx: (x - u.x) / d, dy: (y - u.y) / d, exact: true }); }
     if (D.blinkDodge && td > 500 && td < 760 && A.ready(u, 'blink') <= 0) { const d = td || 1; arenaCast(A, u, 'blink', { dx: (tgt.x - u.x) / d, dy: (tgt.y - u.y) / d, dist: td - 40, exact: true }); }
     const t = Math.min(0.8, td / 800) * D.lead; botGo(W, u, tgt.x + (tgt._vx || 0) * t, tgt.y + (tgt._vy || 0) * t); return;
   }
   const ch = A.nearestFoe(u); if (!ch) { if (!u.order) { const s = A.spots[Math.floor(Math.random() * A.spots.length)]; if (s) botGo(W, u, s.x, s.y); } return; } const d = Math.hypot(u.x - ch.x, u.y - ch.y);
   if (d < 380 && Math.random() < D.cast) arenaCast(A, u, 'stun'); if (d < 200 && Math.random() < D.cast) arenaCast(A, u, 'shield');
+  if (d < 520 && d > 220 && Math.random() < D.cast * 0.5) arenaCast(A, u, 'invis');
   if (d < 330 && Math.random() < D.cast) { const n = d || 1; arenaCast(A, u, 'blink', { dx: (u.x - ch.x) / n, dy: (u.y - ch.y) / n, exact: true }); }
   if (d > 1300 && Math.random() < 0.7) { if (!u.order) { const s = A.spots[Math.floor(Math.random() * A.spots.length)]; if (s && Math.hypot(s.x - ch.x, s.y - ch.y) > 900) botGo(W, u, s.x, s.y); } return; }
   // run: the reachable spot farthest from the hunter among a few nearby ones (good bots look at more spots)
@@ -24378,34 +24444,42 @@ function botTag(A, b, u, D) {
 function botGo(W, u, x, y) { if (!W.walkable(x, y)) { const q = W.nearestWalkable(x, y, 300); if (!q) return; x = q.x; y = q.y; } W.issueOrder(u, 851986, x, y); }
 
 // ---------------- drawing (world space, y up) ----------------
+function arenaClouds(A, g, top) { const t = A.W.time;
+  for (const c of A.clouds) { const k = (t - c.t) / c.dur, al = (k < 0.1 ? k / 0.1 : k > 0.85 ? (1 - k) / 0.15 : 1) * (top ? 0.3 : 1), x = c.fixed ? c.x : c.o.x, y = c.fixed ? c.y : c.o.y;
+    for (let i = 0; i < 11; i++) { const a = i * 0.57 + t * 0.9, rr = c.r * (0.3 + 0.32 * ((i * 37) % 10) / 10); g.fillStyle = `rgba(${30 + (i % 3) * 25},${245 - (i % 2) * 20},30,${0.5 * al})`; g.beginPath(); g.arc(x + Math.cos(a) * c.r * 0.45, y + Math.sin(a * 1.3) * c.r * 0.38 + 30, rr, 0, 7); g.fill(); }
+    if (!top) continue;
+    for (let i = 0; i < 6; i++) { const q = (t * 0.7 + i / 6) % 1; g.fillStyle = `rgba(160,255,90,${2.4 * (1 - q) * al})`; g.beginPath(); g.arc(x + Math.cos(i * 2.1) * c.r * 0.6, y + 30 + q * 120, 8, 0, 7); g.fill(); }
+    g.strokeStyle = `rgba(90,255,40,${2 * al})`; g.lineWidth = 6; g.setLineDash([16, 12]); g.beginPath(); g.arc(x, y, c.r, t, t + 6.28); g.stroke(); g.setLineDash([]); } }
+/* who you can see: enemies that went invisible are hidden (a vision rune shows them) */
+function arenaVisible(A, u) { const W = A.W, me = W.heroOf(W.local); if (!me || u === me || !A.enemy(me, u)) return undefined; if (u.invisUntil > W.time && !(me.visionUntil > W.time)) return false; if (A.dark) return A.dark(u, me); return undefined; }
+function arenaAlpha(A, u) { const t = A.W.time; let a = 1; if (u.invisUntil > t) a *= 0.4 + 0.08 * Math.sin(t * 9); if (A.clouds.some(c => c.o === u)) a *= 0.62; return a; } /* faded inside your poison cloud, but always there */
 function arenaGround(A, g, R) {
-  const W = A.W; if (A.id !== 'pudge') return; const [x0, y0, x1, y1] = A.bounds, t = W.time;
+  const W = A.W; A.R = R; arenaClouds(A, g, false); if (A.extraGround) A.extraGround(g); if (A.id !== 'pudge') return; const [x0, y0, x1, y1] = A.bounds, t = W.time;
   const i0 = Math.max(0, Math.floor((x0 + 6144) / 32)), i1 = Math.min(W.PW - 1, Math.ceil((x1 + 6144) / 32)), j0 = Math.max(0, Math.floor((y0 + 6144) / 32)), j1 = Math.min(W.PW - 1, Math.ceil((y1 + 6144) / 32));
   g.fillStyle = '#1f5fa8'; g.beginPath(); for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const x = -6144 + i * 32; if (W.pbase[j * W.PW + i] || (Math.abs(x + 16) < 270 && !W.walkableCell(i, j))) g.rect(x - 0.5, -6144 + j * 32 - 0.5, 33, 33); } g.fill(); /* the river, and its edges you can't walk on */
   g.strokeStyle = 'rgba(190,230,255,0.35)'; g.lineWidth = 5; g.beginPath(); for (let j = j0; j <= j1; j += 3) for (let i = i0; i <= i1; i += 5) if (W.pbase[j * W.PW + i]) { const x = -6144 + i * 32 + 20 * Math.sin(t * 1.5 + j), y = -6144 + j * 32; g.moveTo(x - 24, y); g.quadraticCurveTo(x, y + 10, x + 24, y); } g.stroke();
 }
 function arenaDraw(A, g, R) {
   const W = A.W, t = W.time, me = W.heroOf(W.local);
-  for (const c of A.clouds) { const k = (t - c.t) / c.dur, al = k < 0.1 ? k / 0.1 : k > 0.85 ? (1 - k) / 0.15 : 1, x = c.o.x, y = c.o.y;
-    for (let i = 0; i < 11; i++) { const a = i * 0.57 + t * 0.9, rr = c.r * (0.3 + 0.32 * ((i * 37) % 10) / 10); g.fillStyle = `rgba(${30 + (i % 3) * 25},${245 - (i % 2) * 20},30,${0.5 * al})`; g.beginPath(); g.arc(x + Math.cos(a) * c.r * 0.45, y + Math.sin(a * 1.3) * c.r * 0.38 + 30, rr, 0, 7); g.fill(); }
-    for (let i = 0; i < 6; i++) { const q = (t * 0.7 + i / 6) % 1; g.fillStyle = `rgba(160,255,90,${0.8 * (1 - q) * al})`; g.beginPath(); g.arc(x + Math.cos(i * 2.1) * c.r * 0.6, y + 30 + q * 120, 8, 0, 7); g.fill(); }
-    g.strokeStyle = `rgba(90,255,40,${0.7 * al})`; g.lineWidth = 6; g.setLineDash([16, 12]); g.beginPath(); g.arc(x, y, c.r, t, t + 6.28); g.stroke(); g.setLineDash([]); }
+  arenaClouds(A, g, true); if (A.extraDraw) A.extraDraw(g);
   for (const p of A.proj) {
     const o = p.o;
     if (p.k === 'hook' || p.k === 'grab') { g.strokeStyle = p.k === 'grab' ? 'rgba(255,120,200,0.9)' : '#8a8f99'; g.lineWidth = 7; g.setLineDash([14, 8]); g.beginPath(); g.moveTo(o.x, o.y + 40);
-      if (p.sx != null) g.lineTo(p.sx, p.sy + 30); for (const q of p.trail || []) g.lineTo(q[0], q[1] + 30); g.lineTo(p.x, p.y + 30); g.stroke(); g.setLineDash([]);
+      if (p.sx != null) { const n = 18; for (let i = 1; i <= n; i++) { const q = arenaCurve(p, i / n * (p.s ?? 1)); g.lineTo(q[0], q[1] + 30); } } g.lineTo(p.x, p.y + 30); g.stroke(); g.setLineDash([]);
       g.save(); g.translate(p.x, p.y + 30); g.rotate(Math.atan2(p.dy, p.dx)); g.fillStyle = p.k === 'grab' ? '#ff7ac8' : '#d9dde5'; g.strokeStyle = '#3a3f48'; g.lineWidth = 4; g.beginPath(); g.moveTo(26, 0); g.lineTo(-8, 18); g.lineTo(0, 0); g.lineTo(-8, -18); g.closePath(); g.fill(); g.stroke(); g.restore(); }
     else if (p.k === 'arrow') { g.save(); g.translate(p.x, p.y + 40); g.rotate(Math.atan2(p.dy, p.dx)); const gl = g.createLinearGradient(-140, 0, 0, 0); gl.addColorStop(0, 'rgba(150,210,255,0)'); gl.addColorStop(1, 'rgba(190,235,255,0.9)'); g.fillStyle = gl; g.fillRect(-140, -7, 140, 14); g.fillStyle = '#eaf6ff'; g.beginPath(); g.moveTo(34, 0); g.lineTo(-6, 13); g.lineTo(-6, -13); g.closePath(); g.fill(); g.restore(); }
   }
   for (const f of A.fx) {
     const k = Math.max(0, (t - f.t) / f.dur);
     if (f.k === 'raze') { // a burst of shadow: a dark pool and black-violet wisps rising
-      g.fillStyle = `rgba(20,0,30,${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, 190 * (0.55 + 0.45 * k), 0, 7); g.fill();
+      g.fillStyle = `rgba(20,0,30,${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, (f.r || 190) * (0.55 + 0.45 * k), 0, 7); g.fill();
       g.strokeStyle = `rgba(150,60,220,${0.85 * (1 - k)})`; g.lineWidth = 8; g.stroke();
       for (let i = 0; i < 8; i++) { const a = i * 0.785 + f.x * 0.01, rr = 120 * k; g.fillStyle = `rgba(${40 + (i % 2) * 60},0,${70 + (i % 3) * 40},${0.75 * (1 - k)})`; g.beginPath(); g.arc(f.x + Math.cos(a) * rr, f.y + Math.sin(a) * rr * 0.6 + 90 * k, 34 * (1 - k * 0.6), 0, 7); g.fill(); }
       g.fillStyle = `rgba(0,0,0,${0.7 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y + 40 + 80 * k, 46 * (1 - k), 0, 7); g.fill(); }
-    else if (f.k === 'requiem') { for (let i = 0; i < 3; i++) { const q = Math.max(0, k - i * 0.12); g.strokeStyle = `rgba(${90 + i * 30},0,${150 + i * 30},${(1 - q) * 0.9})`; g.lineWidth = 22 - i * 6; g.beginPath(); g.arc(f.x, f.y, 650 * q, 0, 7); g.stroke(); } g.fillStyle = `rgba(20,0,40,${0.4 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, 650 * k, 0, 7); g.fill();
+    else if (f.k === 'requiem') { for (let i = 0; i < 3; i++) { const q = Math.max(0, k - i * 0.12); g.strokeStyle = `rgba(${90 + i * 30},0,${150 + i * 30},${(1 - q) * 0.9})`; g.lineWidth = 22 - i * 6; g.beginPath(); g.arc(f.x, f.y, (f.r || 650) * q, 0, 7); g.stroke(); } g.fillStyle = `rgba(20,0,40,${0.4 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, (f.r || 650) * k, 0, 7); g.fill();
       const n = Math.max(6, f.n * 2); for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, rr = 650 * k; g.fillStyle = `rgba(30,0,50,${0.8 * (1 - k)})`; g.beginPath(); g.arc(f.x + Math.cos(a) * rr, f.y + Math.sin(a) * rr, 26, 0, 7); g.fill(); } }
+    else if (f.k === 'mark') { g.strokeStyle = `rgba(255,120,40,${0.5 + 0.4 * Math.sin(t * 20)})`; g.lineWidth = 6; g.setLineDash([14, 10]); g.beginPath(); g.arc(f.x, f.y, f.r || 190, 0, 7); g.stroke(); g.setLineDash([]); }
+    else if (f.k === 'roar') { for (let i = 0; i < 3; i++) { const q = Math.min(1, k + i * 0.15); g.strokeStyle = `rgba(255,190,60,${0.8 * (1 - q)})`; g.lineWidth = 10 - i * 2; g.beginPath(); g.arc(f.x, f.y + 30, 520 * q, 0, 7); g.stroke(); } }
     else if (f.k === 'puff') { g.fillStyle = `rgba(${f.col || '255,240,160'},${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y + 30, 30 + 60 * k, 0, 7); g.fill(); }
     else if (f.k === 'bolt') { g.strokeStyle = `rgba(255,240,120,${1 - k})`; g.lineWidth = 9; g.beginPath(); g.moveTo(f.x, f.y + 50); for (let i = 1; i < 6; i++) { const q = i / 6; g.lineTo(f.x + (f.tx - f.x) * q + (Math.random() - 0.5) * 40, f.y + 50 + (f.ty - f.y) * q + (Math.random() - 0.5) * 40); } g.lineTo(f.tx, f.ty + 50); g.stroke(); }
     else if (f.k === 'num') { g.save(); g.translate(f.x, f.y + 70 + 60 * k); g.scale(1, -1); g.globalAlpha = 1 - k; g.font = '900 34px system-ui'; g.textAlign = 'center'; g.lineWidth = 6; g.strokeStyle = '#000'; g.strokeText(f.txt, 0, 0); g.fillStyle = '#ff5050'; g.fillText(f.txt, 0, 0); g.restore(); }
@@ -24424,6 +24498,8 @@ function arenaDraw(A, g, R) {
     if (A.isHunter(u)) { g.strokeStyle = A.C.kind === 'infect' ? 'rgba(90,255,60,0.9)' : 'rgba(255,40,40,0.85)'; g.lineWidth = 8; g.beginPath(); g.ellipse(u.x, u.y, 60, 26, 0, 0, 7); g.stroke(); }
     if (A.C.kind === 'team') { const w = 90, h = 11, x = u.x - w / 2, y = u.y - 34; g.fillStyle = 'rgba(0,0,0,0.65)'; g.fillRect(x - 2, y - 2, w + 4, h + 4); g.fillStyle = A.enemy(u, me || u) ? '#ff4d4d' : '#47e05a'; g.fillRect(x, y, w * Math.max(0, u.ahp / u.amax), h); }
   }
+  // danger: something flying at you, a yellow-red mark on your side it comes from
+  if (me && me.alive) for (const p of arenaThreats(A, me)) { const a = Math.atan2(p.y - me.y, p.x - me.x), r = 165, pul = 1 + 0.15 * Math.sin(t * 14); g.save(); g.translate(me.x + Math.cos(a) * r, me.y + 40 + Math.sin(a) * r); g.rotate(a + Math.PI); g.scale(pul, pul); g.fillStyle = 'rgba(255,210,40,0.95)'; g.strokeStyle = '#7a0000'; g.lineWidth = 5; g.beginPath(); g.moveTo(30, 0); g.lineTo(-12, 20); g.lineTo(-12, -20); g.closePath(); g.stroke(); g.fill(); g.restore(); }
   // the arrow around you that always points at the closest enemy (arrows, shadows, tag, zombies)
   if (me && me.alive && A.id !== 'pudge') { const e = A.nearestFoe(me); if (e) { const a = Math.atan2(e.y - me.y, e.x - me.x), d = Math.hypot(e.x - me.x, e.y - me.y), r = 120, pul = 1 + 0.08 * Math.sin(t * 8);
     g.save(); g.translate(me.x + Math.cos(a) * r, me.y + 40 + Math.sin(a) * r); g.rotate(a); g.scale(pul, pul); g.fillStyle = 'rgba(255,60,60,0.95)'; g.strokeStyle = 'rgba(0,0,0,0.8)'; g.lineWidth = 5; g.beginPath(); g.moveTo(34, 0); g.lineTo(-14, 22); g.lineTo(-4, 0); g.lineTo(-14, -22); g.closePath(); g.stroke(); g.fill(); g.restore();
@@ -24453,6 +24529,7 @@ function arenaHud(A, ui) {
     const al = A.heroes.filter(u => u.owner.team === me2), en = A.heroes.filter(u => u.owner.team !== me2);
     html = `<b style="color:#7dff8a">${A.score[me2]}</b> <b>vs</b> <b style="color:#ff7a7a">${A.score[1 - me2]}</b><small>${tl}</small><div class="kd"><div>${al.map(row).join('')}</div><div>${en.map(row).join('')}</div></div>`; }
   if (top._h !== html) { top._h = html; top.innerHTML = html; }
+  if (typeof arenaItemsHud === 'function') arenaItemsHud(A, ui);
 }
 function esc2(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 // a skill button: tap = cast where you look (with a little aim help); hold and drag = aim it yourself (blink: also how far)
@@ -24464,6 +24541,363 @@ function arenaBtn(A, el, ui) {
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', e => { st = null; A.aimPrev = null; });
 }
 if (typeof module !== 'undefined') module.exports = { setupArena, ARENA };
+
+// MapMix: runes and shops for the team arenas (Guerra de Flechas, de Sombras, de Ganchos).
+// The items come from the shops of the original maps (names in Spanish, effects scaled to our 100-hp heroes).
+// Online: the host owns gold, items and runes; the others send 'abuy' and item casts and draw the snapshot.
+'use strict';
+// ---------------- runes: they appear on the map from time to time, both teams can take them ----------------
+const RUNES = {
+  speed: { n: 'Aceleración', img: 'ru_speed', dur: 12, d: 'Corres 50% más rápido' },
+  dmg: { n: 'Doble daño', img: 'ru_dmg', dur: 12, d: 'Todo tu daño se duplica' },
+  regen: { n: 'Regeneración', img: 'ru_regen', dur: 8, d: 'Te curas 12 de vida por segundo, aunque te peguen' },
+  illu: { n: 'Ilusión', img: 'ru_illu', dur: 15, d: '2 copias tuyas que confunden y se comen los golpes' },
+  invis: { n: 'Invisibilidad', img: 'ru_invis', dur: 12, d: 'Los rivales no te ven; se pierde al atacar' },
+  arcana: { n: 'Arcana', img: 'ru_arcana', dur: 15, d: 'Tus poderes recargan 40% más rápido' },
+  shield: { n: 'Escudo', img: 'ru_shield', dur: 15, d: 'Un escudo absorbe 30 de daño (30% de tu vida)' },
+  summon: { n: 'Invocación', img: 'ru_summon', dur: 15, d: '2 lobos van solos hacia el rival y lo muerden un poco' },
+  vision: { n: 'Vigilancia', img: 'ru_vision', dur: 10, d: 'Ves a todos los rivales (aunque estén invisibles) con flechas' },
+  silence: { n: 'Silencio', img: 'ru_silence', dur: 12, d: 'Quien te pegue queda sin poderes 3 s' },
+};
+const RUNE_FIRST = 30, RUNE_EVERY = 60;
+// ---------------- the shops of each map ----------------
+// st: stats while carried (per level); act: a power you use from the bag; up: an upgrade that takes no bag slot
+// lv: costs per level (buy again to level up); max: how many times an upgrade can be bought
+const ITEMS = {
+  // Guerra de Flechas: Sabio (mejoras), Mercader (flechas especiales), Tienda Goblin, Tienda
+  m_rng: { n: 'Alcance', ic: '🎯', shop: 'Sabio', cost: 250, up: 1, max: 5, st: { arrowRange: 0.11 }, d: '+11% de alcance de tu flecha (hasta 5).' },
+  m_dmg: { n: 'Daño', ic: '💥', shop: 'Sabio', cost: 250, up: 1, max: 5, st: { arrowDmg: 0.2 }, d: '+20% de daño de flecha (hasta 5).' },
+  m_spd: { n: 'Velocidad', ic: '💨', shop: 'Sabio', cost: 250, up: 1, max: 5, st: { arrowSpd: 0.1 }, d: '+10% de velocidad de flecha (hasta 5).' },
+  a_fire: { n: 'Flecha de fuego', ic: '🔥', shop: 'Mercader', cost: 1000, arrow: 'fire', d: 'Cada 10 s tu flecha explota y quema a todos alrededor (35).' },
+  a_earth: { n: 'Flecha de tierra', ic: '🪨', shop: 'Mercader', cost: 1000, arrow: 'earth', d: 'Cada 10 s tu flecha frena 50% a todos alrededor 4 s.' },
+  a_poison: { n: 'Flecha venenosa', ic: '☠️', shop: 'Mercader', cost: 1000, arrow: 'poison', d: 'Cada 10 s tu flecha deja gas venenoso por donde vuela.' },
+  a_ice: { n: 'Flecha de hielo', ic: '❄️', shop: 'Mercader', cost: 1000, arrow: 'ice', d: 'Cada 10 s tu flecha frena 25% a quien pase cerca.' },
+  a_bolt: { n: 'Flecha de rayo', ic: '⚡', shop: 'Mercader', cost: 1000, arrow: 'bolt', d: 'Cada 10 s tu flecha suelta rayos que saltan 5 veces (15).' },
+  a_curse: { n: 'Flecha maldita', ic: '🧿', shop: 'Mercader', cost: 1000, arrow: 'curse', d: 'Cada 10 s: el que golpeas recibe +40% de daño 6 s.' },
+  a_vamp: { n: 'Flecha vampira', ic: '🩸', shop: 'Mercader', cost: 1000, arrow: 'vamp', d: 'Cada 10 s: al pegar te curas entre 30 y 60.' },
+  a_triple: { n: 'Flecha triple', ic: '🔱', shop: 'Mercader', cost: 1200, arrow: 'triple', d: 'Cada 10 s disparas 3 flechas en abanico.' },
+  a_mix: { n: 'Surtido', ic: '🎲', shop: 'Mercader', cost: 1350, arrow: 'mix', d: 'Cada 10 s una flecha especial al azar.' },
+  g_hood: { n: 'Capucha protectora', ic: '🧥', shop: 'Tienda Goblin', cost: 450, st: { regen: 1.5, dmgIn: -0.1 }, d: '-10% de daño recibido y +1,5 de vida por segundo.' },
+  g_evade: { n: 'Talismán de evasión', ic: '🍀', shop: 'Tienda Goblin', cost: 500, st: { evade: 0.25 }, d: '25% de esquivar un golpe.' },
+  g_bow: { n: 'Arco de sangre', ic: '🏹', shop: 'Tienda Goblin', cost: 600, st: { arrowDmg: 0.2, crit: 0.15 }, d: '+20% de daño y 15% de golpe doble.' },
+  g_mask: { n: 'Máscara de la muerte', ic: '💀', shop: 'Tienda Goblin', cost: 800, st: { life: 0.35 }, d: 'Te curas el 35% del daño que haces.' },
+  g_skull: { n: 'Calavera helada', ic: '🥶', shop: 'Tienda Goblin', cost: 650, st: { coldAura: 1 }, d: 'Los rivales cerca de ti van 20% más lentos.' },
+  g_stone: { n: 'Piedra de vida', ic: '💚', shop: 'Tienda Goblin', cost: 400, st: { hp: 25 }, d: '+25 de vida máxima.' },
+  g_orb: { n: 'Orbe de rayo', ic: '🔮', shop: 'Tienda Goblin', cost: 650, st: { slowHit: 0.3 }, d: '30% de que tu golpe frene al rival 2 s.' },
+  g_illu: { n: 'Báculo de ilusiones', ic: '🪞', shop: 'Tienda Goblin', cost: 650, act: 'illu', cd: 30, d: 'Úsalo: una copia tuya 15 s.' },
+  g_cyc: { n: 'Báculo del mago', ic: '🌪️', shop: 'Tienda Goblin', cost: 350, act: 'cyclone', cd: 30, d: 'Úsalo: un tornado deja al rival más cercano en el aire 2 s.' },
+  g_branch: { n: 'Rama de vida', ic: '🌿', shop: 'Tienda Goblin', cost: 500, act: 'heal40', cd: 35, d: 'Úsala: te curas 40.' },
+  g_moon: { n: 'Báculo de la luna', ic: '🌙', shop: 'Tienda Goblin', cost: 500, act: 'archers', cd: 35, d: 'Úsalo: 3 arqueras te ayudan 15 s.' },
+  r_claws: { n: 'Garras de tigre', ic: '🐯', shop: 'Tienda', cost: 600, st: { spd: 0.06 }, act: 'teamspeed', cd: 45, d: '+6% de velocidad. Úsalas: tu equipo cerca corre +25% 15 s.' },
+  r_ring: { n: 'Anillo de protección', ic: '💍', shop: 'Tienda', cost: 400, st: { dmgIn: -0.1 }, act: 'teamarmor', cd: 45, d: '-10% de daño. Úsalo: tu equipo cerca recibe -20% 10 s.' },
+  r_scep: { n: 'Cetro del leñador', ic: '🪓', shop: 'Tienda', cost: 500, act: 'nuke20', cd: 60, d: 'Úsalo: 20 de daño al rival más cercano.' },
+  r_tp: { n: 'Pergamino de portal', ic: '📜', shop: 'Tienda', cost: 75, act: 'home', cd: 60, d: 'Úsalo: vuelves a tu base.' },
+  // Guerra de Sombras: Mercader de mejoras + Mercado
+  n_aoe: { n: 'Más área', ic: '⭕', shop: 'Mercader de mejoras', cost: 300, up: 1, max: 6, st: { razeAoe: 25 }, d: 'Tus sombras abarcan +25 (hasta 6).' },
+  n_holy: { n: 'Réquiem sagrado', ic: '✝️', shop: 'Mercader de mejoras', cost: 750, up: 1, max: 1, st: { reqAoe: 100, reqDmg: 0.3 }, d: 'Réquiem +100 de área y +30% de daño.' },
+  n_prec: { n: 'Sombras precisas', ic: '🎯', shop: 'Mercader de mejoras', cost: 690, up: 1, max: 1, raze: 'prec', d: 'Sombras más chicas (125) pero con 60% más daño.' },
+  n_meteor: { n: 'Meteoros', ic: '☄️', shop: 'Mercader de mejoras', cost: 600, up: 1, max: 1, raze: 'meteor', d: 'Tus sombras caen 0,75 s después pero con +150 de área.' },
+  n_xl: { n: 'Sombra XL', ic: '🌑', shop: 'Mercader de mejoras', cost: 900, up: 1, max: 1, raze: 'xl', d: '+10 de daño y +50 de área.' },
+  n_def: { n: 'Sombra normal', ic: '↩️', shop: 'Mercader de mejoras', cost: 150, up: 1, max: 99, raze: 'none', d: 'Vuelves a tus sombras normales.' },
+  n_str: { n: 'Fuerza', ic: '💪', shop: 'Mercader de mejoras', cost: 600, up: 1, max: 10, st: { hp: 5 }, d: '+5 de vida máxima (hasta 10).' },
+  n_doom: { n: 'Báculo de condena', ic: '😈', shop: 'Mercado', cost: 600, act: 'doom', cd: 30, d: 'Úsalo: el rival más cercano queda sin poderes 4 s y pierde 5 por segundo.' },
+  n_refr: { n: 'Orbe refrescante', ic: '🔄', shop: 'Mercado', cost: 900, act: 'refresh', cd: 60, d: 'Úsalo: todos tus poderes listos al instante.' },
+  n_swap: { n: 'Cetro de intercambio', ic: '🔀', shop: 'Mercado', cost: 600, act: 'swap', cd: 30, d: 'Úsalo: cambias de lugar con el rival más cercano.' },
+  n_tango: { n: 'Tango', ic: '🌱', shop: 'Mercado', cost: 60, act: 'tango', cd: 1, uses: 3, d: 'Úsalo: +25 de vida en 20 s (3 usos).' },
+  n_pot: { n: 'Poción de curación', ic: '🧪', shop: 'Mercado', cost: 60, act: 'heal30', cd: 1, uses: 1, d: 'Úsala: +30 de vida al instante.' },
+  n_salve: { n: 'Ungüento', ic: '🫙', shop: 'Mercado', cost: 120, act: 'salve', cd: 1, uses: 1, d: 'Úsalo: +50 de vida en 8 s.' },
+  n_boots: { n: 'Botas de velocidad', ic: '👢', shop: 'Mercado', cost: 300, st: { spd: 0.13 }, d: '+13% de velocidad.' },
+  n_ward: { n: 'Centinela', ic: '🦉', shop: 'Mercado', cost: 90, act: 'ward', cd: 1, uses: 2, d: 'Úsalo: ves a los invisibles cerca de ti 20 s (2 usos).' },
+  // Guerra de Ganchos: Mejoras, Objetos (suben de nivel 1 a 5), Consumibles
+  p_str: { n: 'Fuerza', ic: '💪', shop: 'Mejoras', cost: 60, up: 1, max: 20, st: { hp: 3, hookDmg: 0.04 }, d: '+3 de vida y +4% de daño de gancho.' },
+  p_tome: { n: 'Libro de fuerza', ic: '📕', shop: 'Mejoras', cost: 500, up: 1, max: 5, st: { hp: 10, hookDmg: 0.12 }, d: '+10 de vida y +12% de daño de gancho.' },
+  p_claws: { n: 'Garras sangrientas', ic: '🩸', shop: 'Objetos', lv: [200, 400, 600, 800, 1000], st: { drag: 0.05 }, d: 'Tu gancho daña según lo lejos que arrastra (15% → 35%).' },
+  p_jaws: { n: 'Fauces vampíricas', ic: '🦷', shop: 'Objetos', lv: [210, 425, 640, 850, 1060], st: { hookLife: 0.05 }, d: 'Tu gancho te cura 20% → 40% del daño.' },
+  p_lamp: { n: 'Linterna veloz', ic: '🏮', shop: 'Objetos', lv: [190, 375, 560, 750, 940], st: { hookSpd: 0.08, hookDmg: 0.06 }, d: 'Gancho más rápido y con más daño.' },
+  p_paws: { n: 'Patas de lobo', ic: '🐾', shop: 'Objetos', lv: [190, 375, 560, 750, 940], st: { spd: 0.06 }, d: '+6% de velocidad por nivel.' },
+  p_barrel: { n: 'Barril explosivo', ic: '🛢️', shop: 'Objetos', lv: [200, 400, 600, 800, 1000], act: 'mine', cd: 12, d: 'Úsalo: dejas una mina que explota al pisarla (30 → 70).' },
+  p_totem: { n: 'Tótem de barricada', ic: '🗿', shop: 'Objetos', lv: [150, 300, 450, 600, 750], act: 'wall', cd: 25, d: 'Úsalo: levantas una barricada que desvía ganchos.' },
+  p_turb: { n: 'Turbina de rebote', ic: '🌀', shop: 'Objetos', lv: [210, 425, 640, 850, 1060], st: { bounce: 1 }, d: 'Tu gancho rebota en los bordes y pega más con cada rebote.' },
+  p_pot: { n: 'Poción de curación', ic: '🧪', shop: 'Consumibles', cost: 40, act: 'heal30', cd: 1, uses: 1, d: 'Úsala: +30 de vida.' },
+  p_salve: { n: 'Ungüento', ic: '🫙', shop: 'Consumibles', cost: 25, act: 'salve', cd: 1, uses: 1, d: 'Úsalo: +50 de vida en 8 s.' },
+  p_ward: { n: 'Centinela', ic: '🦉', shop: 'Consumibles', cost: 40, act: 'ward', cd: 1, uses: 2, d: 'Úsalo: ves a los invisibles cerca 20 s.' },
+};
+const SHOPS = {
+  mirana: ['Sabio', 'Mercader', 'Tienda Goblin', 'Tienda'],
+  nevermore: ['Mercader de mejoras', 'Mercado'],
+  pudge: ['Mejoras', 'Objetos', 'Consumibles'],
+};
+const ITEM_PREFIX = { mirana: ['m_', 'a_', 'g_', 'r_'], nevermore: ['n_'], pudge: ['p_'] };
+const BOT_BUYS = { mirana: ['m_dmg', 'g_stone', 'm_rng', 'g_bow', 'a_fire', 'g_evade', 'g_mask', 'r_claws', 'g_cyc', 'a_triple', 'm_spd', 'g_illu'], nevermore: ['n_str', 'n_aoe', 'n_boots', 'n_holy', 'n_pot', 'n_xl', 'n_doom', 'n_refr', 'n_swap'], pudge: ['p_claws', 'p_str', 'p_paws', 'p_jaws', 'p_lamp', 'p_barrel', 'p_totem', 'p_turb', 'p_pot'] };
+const GOLD_START = 200, GOLD_SEC = 3, GOLD_KILL = 150, GOLD_RUNE = 25;
+window.ARENA_RUNES = RUNES; window.ARENA_ITEMS = ITEMS; window.ARENA_SHOPS = SHOPS;
+const itemsOf = id => Object.keys(ITEMS).filter(k => (ITEM_PREFIX[id] || []).some(p => k.startsWith(p)));
+const lvCost = (it, lv) => it.lv ? it.lv[lv] : it.cost; /* price of the next level */
+
+function arenaItemsSetup(A, opts) {
+  const W = A.W, C = A.C; if (C.kind !== 'team' || !SHOPS[A.id]) return;
+  A.gold = {}; A.inv = {}; A.buff = {}; A.icd = {}; A.illus = []; A.summ = []; A.mines = []; A.walls = []; A.runes = []; A.runeT = RUNE_FIRST; A.spec = {};
+  for (const id of A.ids) { A.gold[id] = GOLD_START; A.inv[id] = []; A.buff[id] = {}; }
+  // a shop stall at each team's side, near where it comes back to life
+  const side = t => { const L = A.spots.filter(s => (s.x - A.midX) * (t === 0 ? -1 : 1) > (A.id === 'pudge' ? 250 : 1200)); const ax = L.reduce((a, s) => a + s.x, 0) / Math.max(1, L.length), ay = L.reduce((a, s) => a + s.y, 0) / Math.max(1, L.length); let best = L[0] || { x: 0, y: 0 }, bd = Infinity; for (const s of L) { const d = Math.hypot(s.x - ax, s.y - ay); if (d < bd) { bd = d; best = s; } } return { x: best.x, y: best.y }; };
+  A.shopAt = [side(0), side(1)];
+  // where runes appear: one place for each side of the river (hooks), else the top and the bottom of the middle
+  { const ys = A.spots.map(s => s.y), y0 = Math.min(...ys), y1 = Math.max(...ys), my = (y0 + y1) / 2; const pick = (x, y, f) => { let best = null, bd = Infinity; for (const s of A.spots) { if (f && !f(s)) continue; const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; best = s; } } return best; };
+    A.runeSpots = A.id === 'pudge' ? [pick(A.midX - 520, my, s => s.x < A.midX), pick(A.midX + 520, my, s => s.x > A.midX)] : [pick(A.midX, y0 + (y1 - y0) * 0.22), pick(A.midX, y1 - (y1 - y0) * 0.22)]; A.runeSpots = A.runeSpots.filter(Boolean); }
+  A.has = (u, k) => (A.inv[u.owner.id] || []).find(s => s.k === k);
+  // every stat of a hero: items (per level) + runes running now
+  A.stat = (u, k, d) => { const id = u.owner && u.owner.id; let v = d; const inv = A.inv[id]; if (inv) for (const s of inv) { const st = ITEMS[s.k] && ITEMS[s.k].st; if (st && st[k]) v += st[k] * (s.lv || 1) * (k === 'drag' || k === 'hookLife' ? 1 : 1) + ((k === 'drag' || k === 'hookLife') ? 0.1 : 0); }
+    const b = A.buff[id], t = W.time; if (b) { if (k === 'spd' && (b.speed > t)) v += 0.5; if (k === 'spd' && b.teamspeed > t) v += 0.25; if (k === 'dmgOut' && b.dmg > t) v *= 2; if (k === 'cdMul' && b.arcana > t) v *= 0.6; if (k === 'dmgIn' && b.teamarmor > t) v -= 0.2; if (k === 'dmgIn' && b.curse > t) v += 0.4; }
+    if (k === 'spd') { for (const e of A.alive()) if (A.enemy(u, e) && A.has(e, 'g_skull') && Math.hypot(e.x - u.x, e.y - u.y) < 450) { v -= 0.2; break; } }
+    return v; };
+  A.buy = (p, k) => arenaBuy(A, p, k);
+  A.useItem = (u, k, a) => arenaUseItem(A, u, k, a);
+  A.itemsTick = dt => arenaItemsTick(A, dt);
+  A.onHitMod = (by, u, dmg) => arenaHitMod(A, by, u, dmg);
+  A.onRevive = u => { if (u.owner.ai && !A.client) for (let i = 0; i < 3; i++) if (!arenaBotShop(A, u)) break; }; /* bots shop when they come back at their base */
+  A.onKill = (by, u) => { if (by && by !== u && A.gold[by.owner.id] != null) A.gold[by.owner.id] += GOLD_KILL; };
+  A.onArrowHit = (p, e) => arenaSpecialHit(A, p, e);
+  A.extraGround = g => arenaItemsGround(A, g);
+  A.extraDraw = g => arenaItemsDraw(A, g);
+  A.say('🛒 Tienda en tu base · runas en el mapa cada ' + RUNE_EVERY + ' s', 'ffffd34d');
+}
+
+function arenaBuy(A, p, k, force) {
+  const W = A.W, it = ITEMS[k], id = p.id, u = W.heroOf(p); if (!it || !u || A.gold[id] == null) return false;
+  if (!itemsOf(A.id).includes(k)) return false;
+  const near = force || Math.hypot(u.x - A.shopAt[p.team].x, u.y - A.shopAt[p.team].y) < 900 || !u.alive;
+  const tell = t => { if (p === W.local) A.say(t, 'ffff8080'); return false; };
+  if (!near) return tell('Acércate a la tienda de tu base 🛒');
+  const inv = A.inv[id], have = inv.find(s => s.k === k), lv = have ? have.lv : 0;
+  if (it.up && lv >= it.max) return tell('Ya está al máximo');
+  if (it.lv && lv >= it.lv.length) return tell('Ya está en nivel 5');
+  const cost = lvCost(it, lv); if (A.gold[id] < cost) return tell('Te falta oro 🪙');
+  if (!have && !it.up && inv.filter(s => !ITEMS[s.k].up).length >= 6) return tell('Tu bolso está lleno (6)');
+  A.gold[id] -= cost;
+  if (it.raze) { for (const s of inv.filter(s => ITEMS[s.k].raze)) inv.splice(inv.indexOf(s), 1); if (it.raze !== 'none') inv.push({ k, lv: 1 }); }
+  else if (it.arrow) { for (const s of inv.filter(s => ITEMS[s.k].arrow)) inv.splice(inv.indexOf(s), 1); inv.push({ k, lv: 1 }); A.spec[id] = 0; }
+  else if (have && it.uses) have.uses = (have.uses || 0) + it.uses;
+  else if (have) have.lv++;
+  else inv.push({ k, lv: 1, uses: it.uses || 0 });
+  if (it.st && it.st.hp) { u.amax = (C_HP(A)) + A.stat(u, 'hp', 0); u.ahp = Math.min(u.amax, u.ahp + it.st.hp); }
+  W.emit('sound', { name: 'buy' }); if (p === W.local) A.say('Compraste ' + it.n, 'ff7dff8a');
+  return true;
+}
+const C_HP = A => A.C.hp || 100;
+
+// ---------------- using an item from the bag ----------------
+function arenaUseItem(A, u, k, a) {
+  const W = A.W, id = u.owner.id, s = A.has(u, k), it = ITEMS[k]; if (!s || !it || !it.act) return false;
+  const key = 'it:' + k; if ((A.icd[id + key] || 0) > W.time) return false;
+  const foe = R => { let best = null, bd = R; for (const e of A.alive()) { if (!A.enemy(u, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; best = e; } } return best; };
+  const b = A.buff[id], t = W.time; let ok = true;
+  switch (it.act) {
+    case 'illu': arenaIllusion(A, u, 1); break;
+    case 'cyclone': { const e = foe(700); if (!e) { ok = false; break; } e.stunUntil = t + 2; e.cycUntil = t + 2; e.order = null; e.path = null; A.addFx({ k: 'puff', x: e.x, y: e.y, t, dur: 2, col: '200,230,255' }); break; }
+    case 'heal40': u.ahp = Math.min(u.amax, u.ahp + 40); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.6, col: '90,255,120' }); break;
+    case 'heal30': u.ahp = Math.min(u.amax, u.ahp + 30); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.6, col: '90,255,120' }); break;
+    case 'tango': b.hot = t + 20; b.hotRate = 25 / 20; break;
+    case 'salve': b.hot = t + 8; b.hotRate = 50 / 8; break;
+    case 'archers': for (let i = 0; i < 3; i++) A.summ.push({ k: 'archer', o: u, x: u.x + Math.cos(i * 2.1) * 90, y: u.y + Math.sin(i * 2.1) * 90, until: t + 15, sh: t + 1 + i * 0.3 }); break;
+    case 'teamspeed': for (const f of A.alive()) if (!A.enemy(u, f) && Math.hypot(f.x - u.x, f.y - u.y) < 900) A.buff[f.owner.id].teamspeed = t + 15; break;
+    case 'teamarmor': for (const f of A.alive()) if (!A.enemy(u, f) && Math.hypot(f.x - u.x, f.y - u.y) < 900) A.buff[f.owner.id].teamarmor = t + 10; break;
+    case 'nuke20': { const e = foe(800); if (!e) { ok = false; break; } A.addFx({ k: 'bolt', x: u.x, y: u.y, tx: e.x, ty: e.y, t, dur: 0.35 }); arenaHit(A, u, e, 20); break; }
+    case 'home': { const s2 = A.spawnOf(u.owner); arenaMove(A, u, s2.x, s2.y); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.6, col: '170,140,255' }); break; }
+    case 'doom': { const e = foe(700); if (!e) { ok = false; break; } e.silencedUntil = t + 4; A.buff[e.owner.id].doom = t + 4; A.buff[e.owner.id].doomBy = id; break; }
+    case 'refresh': for (const sk of A.skillsOf(u)) A.cd.delete(u.handle + ':' + sk.id); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.6, col: '120,200,255' }); break;
+    case 'swap': { const e = foe(900); if (!e || A.compAt(e.x, e.y) !== A.compAt(u.x, u.y)) { ok = false; break; } const x = u.x, y = u.y; arenaMove(A, u, e.x, e.y); arenaMove(A, e, x, y); A.addFx({ k: 'puff', x, y, t, dur: 0.5, col: '200,120,255' }); break; }
+    case 'ward': b.vision = t + 20; break;
+    case 'mine': A.mines.push({ o: u, x: u.x, y: u.y, arm: t + 1, dmg: 20 + 10 * s.lv }); break;
+    case 'wall': { const f = u.facing * Math.PI / 180; A.walls.push({ o: u, x: u.x + Math.cos(f) * 140, y: u.y + Math.sin(f) * 140, a: f + Math.PI / 2, hp: 60 + 15 * s.lv, until: t + 15 }); break; }
+    default: ok = false;
+  }
+  if (!ok) { if (u.owner === W.local) A.say('No hay nadie cerca', 'ffff8080'); return false; }
+  A.icd[id + key] = t + Math.max(1, (it.cd || 1) - (it.act === 'wall' || it.act === 'mine' ? (s.lv - 1) * 2 : 0));
+  if (it.uses) { s.uses--; if (s.uses <= 0) A.inv[id].splice(A.inv[id].indexOf(s), 1); }
+  u.invisUntil = 0; W.emit('sound', { name: 'coil' }); return true;
+}
+function arenaIllusion(A, u, n) { const W = A.W; for (let i = 0; i < n; i++) { const a = W.rand() * 6.28; A.illus.push({ src: u, x: u.x + Math.cos(a) * 80, y: u.y + Math.sin(a) * 80, until: W.time + 15, facing: u.facing, tx: null }); } A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.5, col: '200,160,255' }); }
+
+// ---------------- damage changes: double damage, armour, dodge, shields, lifesteal, silence ----------------
+function arenaHitMod(A, by, u, dmg) {
+  const W = A.W, t = W.time, bu = A.buff[u.owner.id] || {};
+  if (by && by !== u) {
+    if (W.rand() < A.stat(u, 'evade', 0)) { A.addFx({ k: 'num', x: u.x, y: u.y + 60, t, dur: 0.8, txt: '¡esquivó!' }); return 0; }
+    dmg *= A.stat(by, 'dmgOut', 1); if (W.rand() < A.stat(by, 'crit', 0)) dmg *= 2;
+    if (bu.silence > t) { by.silencedUntil = t + 3; A.addFx({ k: 'puff', x: by.x, y: by.y, t, dur: 0.6, col: '200,90,255' }); }
+    if (W.rand() < A.stat(by, 'slowHit', 0)) u.slowUntil = t + 2;
+  }
+  dmg *= Math.max(0.2, A.stat(u, 'dmgIn', 1));
+  if (bu.absorb > 0 && bu.shield > t) { const k = Math.min(bu.absorb, dmg); bu.absorb -= k; dmg -= k; }
+  if (by && by !== u && dmg > 0) { const ls = A.stat(by, 'life', 0); if (ls) by.ahp = Math.min(by.amax, by.ahp + dmg * ls); }
+  return dmg;
+}
+// special arrows of the arrows map
+function arenaSpecialHit(A, p, e) {
+  const W = A.W, t = W.time, o = p.o; let k = p.sp2; if (!k) return; if (k === 'mix') k = ['fire', 'earth', 'poison', 'ice', 'bolt', 'curse', 'vamp'][Math.floor(W.rand() * 7)];
+  if (k === 'fire') { A.addFx({ k: 'boom', x: e.x, y: e.y, t, dur: 0.6, r: 260 }); for (const f of A.alive()) if (f !== e && A.enemy(o, f) && Math.hypot(f.x - e.x, f.y - e.y) < 260) arenaHit(A, o, f, 35); }
+  if (k === 'earth') { A.addFx({ k: 'puff', x: e.x, y: e.y, t, dur: 0.7, col: '170,120,60' }); for (const f of A.alive()) if (A.enemy(o, f) && Math.hypot(f.x - e.x, f.y - e.y) < 260) f.slowUntil = t + 4; }
+  if (k === 'curse') A.buff[e.owner.id].curse = t + 6;
+  if (k === 'vamp') o.ahp = Math.min(o.amax, o.ahp + 30 + W.rand() * 30);
+  if (k === 'bolt') { let from = e, hit = new Set([e]); for (let j = 0; j < 5; j++) { let nx = null, nd = 600; for (const f of A.alive()) { if (hit.has(f) || !A.enemy(o, f)) continue; const d = Math.hypot(f.x - from.x, f.y - from.y); if (d < nd) { nd = d; nx = f; } } if (!nx) break; A.addFx({ k: 'bolt', x: from.x, y: from.y, tx: nx.x, ty: nx.y, t, dur: 0.35 }); arenaHit(A, o, nx, 15); hit.add(nx); from = nx; } }
+}
+
+// ---------------- every tick (host) ----------------
+function arenaItemsTick(A, dt) {
+  const W = A.W, t = W.time;
+  for (const id of A.ids) { if (A.gold[id] != null) A.gold[id] += GOLD_SEC * dt; }
+  // runes appear
+  A.runeT -= dt; if (A.runeT <= 0) { A.runeT = RUNE_EVERY; const keys = Object.keys(RUNES); for (const sp of A.runeSpots) if (!A.runes.some(r => r.x === sp.x && r.y === sp.y)) A.runes.push({ x: sp.x, y: sp.y, k: keys[Math.floor(W.rand() * keys.length)], t }); A.say('✨ ¡Aparecieron runas en el mapa!', 'ffbfa0ff'); }
+  for (const r of A.runes) { if (r.taken) continue; for (const u of A.alive()) if (Math.hypot(u.x - r.x, u.y - r.y) < 80) { r.taken = true; arenaTakeRune(A, u, r.k); break; } }
+  A.runes = A.runes.filter(r => !r.taken);
+  for (const u of A.heroes) {
+    const id = u.owner.id, b = A.buff[id]; if (!b) continue;
+    u.amax = C_HP(A) + A.stat(u, 'hp', 0); if (u.ahp > u.amax) u.ahp = u.amax;
+    if (!u.alive) continue;
+    const reg = A.stat(u, 'regen', 0) + (b.regen > t ? 12 : 0) + (b.hot > t ? b.hotRate : 0); if (reg) u.ahp = Math.min(u.amax, u.ahp + reg * dt);
+    if (b.doom > t) arenaHit(A, null, u, 5 * dt, 0, true, true);
+    if (b.vision > t) u.visionUntil = Math.max(u.visionUntil || 0, t + 0.2);
+    if (b.invis > t && !(u.invisUntil > t)) b.invis = 0; /* broke it by attacking */
+    if (!A.spec[id] && A.spec[id] !== 0) continue;
+  }
+  // the special arrow comes back every 10 s
+  for (const id in A.spec) if (A.spec[id] > 0 && A.spec[id] <= t) A.spec[id] = 0;
+  // illusions walk at the closest enemy (they vanish when hit or when time is up)
+  for (const il of A.illus) { if (il.dead || t > il.until || !il.src.alive) { il.dead = true; continue; } let best = null, bd = 1400; for (const e of A.alive()) { if (!A.enemy(il.src, e)) continue; const d = Math.hypot(e.x - il.x, e.y - il.y); if (d < bd) { bd = d; best = e; } }
+    const gx = best ? best.x + Math.cos(il.until * 3) * 260 : il.src.x + 200 * Math.cos(t + il.until), gy = best ? best.y + Math.sin(il.until * 3) * 260 : il.src.y + 200 * Math.sin(t + il.until);
+    const dx = gx - il.x, dy = gy - il.y, d = Math.hypot(dx, dy); if (d > 30) { const st = Math.min(d, (il.src.baseSpd || 360) * 0.9 * dt), nx = il.x + dx / d * st, ny = il.y + dy / d * st; if (W.walkable(nx, ny)) { il.x = nx; il.y = ny; } il.facing = Math.atan2(dy, dx) * 180 / Math.PI; il.moving = true; } else il.moving = false; }
+  A.illus = A.illus.filter(i => !i.dead);
+  // wolves bite, archers shoot
+  for (const s of A.summ) { if (t > s.until || !s.o.alive) { s.dead = true; continue; } let best = null, bd = s.k === 'archer' ? 750 : 1600; for (const e of A.alive()) { if (!A.enemy(s.o, e) || e.invisUntil > t) continue; const d = Math.hypot(e.x - s.x, e.y - s.y); if (d < bd) { bd = d; best = e; } }
+    if (s.k === 'wolf') { const gx = best ? best.x : s.o.x + 90, gy = best ? best.y : s.o.y; const dx = gx - s.x, dy = gy - s.y, d = Math.hypot(dx, dy); if (d > 70) { const st = Math.min(d - 60, 430 * dt); s.x += dx / d * st; s.y += dy / d * st; s.fx = dx > 0 ? 1 : -1; } else if (best) arenaHit(A, s.o, best, 3 * dt, 0, false, true); }
+    else { const dx = s.o.x - s.x, dy = s.o.y - s.y, d = Math.hypot(dx, dy); if (d > 160) { s.x += dx / d * Math.min(d, 380 * dt); s.y += dy / d * Math.min(d, 380 * dt); } if (best && t > s.sh) { s.sh = t + 2; A.addFx({ k: 'shot', x: s.x, y: s.y, tx: best.x, ty: best.y, t, dur: 0.3 }); arenaHit(A, s.o, best, 6); } } }
+  A.summ = A.summ.filter(s => !s.dead);
+  // mines and barricades
+  for (const m of A.mines) { if (t < m.arm || !m.o) continue; for (const e of A.alive()) if (A.enemy(m.o, e) && Math.hypot(e.x - m.x, e.y - m.y) < 120) { m.dead = true; A.addFx({ k: 'boom', x: m.x, y: m.y, t, dur: 0.6, r: 220 }); for (const f of A.alive()) if (A.enemy(m.o, f) && Math.hypot(f.x - m.x, f.y - m.y) < 220) arenaHit(A, m.o, f, m.dmg); W.emit('sound', { name: 'death' }); break; } }
+  A.mines = A.mines.filter(m => !m.dead && t - m.arm < 120);
+  A.walls = A.walls.filter(w => w.hp > 0 && t < w.until);
+}
+function arenaTakeRune(A, u, k) {
+  const W = A.W, t = W.time, id = u.owner.id, b = A.buff[id], R = RUNES[k]; if (!b) return;
+  if (A.gold[id] != null) A.gold[id] += GOLD_RUNE;
+  if (k === 'speed') b.speed = t + R.dur; if (k === 'dmg') b.dmg = t + R.dur; if (k === 'regen') b.regen = t + R.dur; if (k === 'arcana') b.arcana = t + R.dur; if (k === 'silence') b.silence = t + R.dur; if (k === 'vision') b.vision = t + R.dur;
+  if (k === 'invis') { b.invis = t + R.dur; u.invisUntil = t + R.dur; }
+  if (k === 'shield') { b.shield = t + R.dur; b.absorb = 30; }
+  if (k === 'illu') arenaIllusion(A, u, 2);
+  if (k === 'summon') for (let i = 0; i < 2; i++) A.summ.push({ k: 'wolf', o: u, x: u.x + (i ? 60 : -60), y: u.y, until: t + R.dur, fx: 1 });
+  A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.7, col: '220,180,255' }); W.emit('sound', { name: 'revive' });
+  A.say((u.owner === W.local ? 'Tomaste' : u.owner.name + ' tomó') + ' la runa de ' + R.n, u.owner.team === W.local.team ? 'ff7dff8a' : 'ffff9a7a');
+}
+
+// ---------------- drawing ----------------
+const _runeImg = {}; function runeImg(k) { if (!_runeImg[k]) { const im = new Image(); im.src = 'assets/fx/' + RUNES[k].img + '.webp'; _runeImg[k] = im; } return _runeImg[k]; }
+function arenaItemsGround(A, g) {
+  const W = A.W, t = W.time;
+  // shop stalls
+  if (A.shopAt) A.shopAt.forEach((s, tm) => { g.save(); g.translate(s.x, s.y); g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(0, -6, 90, 30, 0, 0, 7); g.fill(); g.fillStyle = '#6b3f1f'; g.fillRect(-70, -10, 140, 60); g.fillStyle = tm === W.local.team ? '#2fa84f' : '#b33a3a'; for (let i = 0; i < 7; i++) { g.fillStyle = i % 2 ? '#fff4d6' : (tm === W.local.team ? '#2fa84f' : '#b33a3a'); g.beginPath(); g.moveTo(-80 + i * 23, 50); g.lineTo(-80 + (i + 1) * 23, 50); g.lineTo(-80 + (i + 1) * 23 - 4, 92); g.lineTo(-80 + i * 23 + 4, 92); g.fill(); }
+    g.scale(1, -1); g.font = '900 34px system-ui'; g.textAlign = 'center'; g.fillText('🛒', 0, -110); g.restore(); });
+  // runes
+  for (const r of A.runes || []) { const im = runeImg(r.k), bob = 10 * Math.sin(t * 3 + r.x), s = 92; g.save(); g.translate(r.x, r.y); g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -4, 40, 14, 0, 0, 7); g.fill();
+    g.strokeStyle = `rgba(220,180,255,${0.5 + 0.3 * Math.sin(t * 5)})`; g.lineWidth = 5; g.beginPath(); g.ellipse(0, 0, 58, 22, 0, 0, 7); g.stroke(); g.translate(0, 60 + bob); g.scale(1, -1); if (im.complete && im.naturalWidth) g.drawImage(im, -s / 2, -s / 2, s, s); g.restore(); }
+  for (const m of A.mines || []) { if (m.o.owner.team !== W.local.team) continue; g.save(); g.translate(m.x, m.y); g.scale(1, -1); g.globalAlpha = 0.85; g.font = '40px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🛢️', 0, 0); g.restore(); } /* only your team sees its mines */
+}
+function arenaItemsDraw(A, g) {
+  const W = A.W, t = W.time, R = window.W && window.SW && window.SW.R;
+  for (const w of A.walls || []) { g.save(); g.translate(w.x, w.y); g.rotate(w.a); g.fillStyle = '#7a7466'; g.strokeStyle = '#3b382f'; g.lineWidth = 6; for (let i = -2; i <= 2; i++) { g.beginPath(); g.rect(i * 44 - 20, -18, 40, 36); g.fill(); g.stroke(); } g.restore(); }
+  for (const s of A.summ || []) { g.save(); g.translate(s.x, s.y + 30); g.scale(s.fx || 1, -1); g.font = '96px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s.k === 'wolf' ? '🐺' : '🏹', 0, 0); g.restore(); }
+  for (const il of A.illus || []) { const Rd = A.R; g.save(); g.globalAlpha = 0.62; g.translate(il.x, il.y); try { if (Rd && Rd.drawSprHero) { const f = Object.assign(Object.create(Object.getPrototypeOf(il.src)), il.src, { x: il.x, y: il.y, facing: il.facing, order: il.moving ? { type: 'move' } : null, _illu: true }); Rd.drawSprHero(g, f); } } catch (e) {} g.restore();
+    g.strokeStyle = 'rgba(190,150,255,0.7)'; g.lineWidth = 4; g.beginPath(); g.ellipse(il.x, il.y, 46, 18, 0, 0, 7); g.stroke(); }
+  for (const f of A.fx) { const k = Math.max(0, (t - f.t) / f.dur);
+    if (f.k === 'boom') { g.fillStyle = `rgba(255,${140 + 80 * (1 - k)},40,${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, (f.r || 220) * (0.4 + 0.6 * k), 0, 7); g.fill(); }
+    if (f.k === 'shot') { g.strokeStyle = `rgba(200,240,255,${1 - k})`; g.lineWidth = 5; g.beginPath(); g.moveTo(f.x, f.y + 50); g.lineTo(f.tx, f.ty + 40); g.stroke(); } }
+  // buffs on heroes
+  for (const u of A.heroes) { if (!u.alive || u.removed) continue; const b = A.buff && A.buff[u.owner.id]; if (!b) continue;
+    if (b.shield > t && b.absorb > 0) { g.strokeStyle = `rgba(110,190,255,0.75)`; g.lineWidth = 6; g.beginPath(); g.arc(u.x, u.y + 50, 74, 0, 7); g.stroke(); }
+    if (b.dmg > t) { g.fillStyle = 'rgba(255,60,40,0.22)'; g.beginPath(); g.ellipse(u.x, u.y, 60, 24, 0, 0, 7); g.fill(); }
+    if (b.speed > t || b.teamspeed > t) { g.strokeStyle = 'rgba(80,200,255,0.6)'; g.lineWidth = 4; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(u.x - 40, u.y + 20 + i * 22); g.lineTo(u.x - 80 - 20 * Math.sin(t * 9 + i), u.y + 20 + i * 22); g.stroke(); } }
+    if (u.silencedUntil > t || b.doom > t) { g.save(); g.translate(u.x, u.y + 130); g.scale(1, -1); g.font = '30px system-ui'; g.textAlign = 'center'; g.fillText(b.doom > t ? '😈' : '🤐', 0, 0); g.restore(); }
+    if (u.cycUntil > t) { g.strokeStyle = 'rgba(220,240,255,0.7)'; g.lineWidth = 5; for (let i = 0; i < 4; i++) { g.beginPath(); g.ellipse(u.x, u.y + 20 + i * 26, 30 + i * 12, 10 + i * 3, t * 6 + i, 0, 7); g.stroke(); } } }
+  // vision: arrows at every enemy (rune or ward)
+  const me = W.heroOf(W.local); if (me && me.alive && me.visionUntil > t) for (const e of A.alive()) { if (!A.enemy(me, e)) continue; const a = Math.atan2(e.y - me.y, e.x - me.x), r = 190; g.save(); g.translate(me.x + Math.cos(a) * r, me.y + 40 + Math.sin(a) * r); g.rotate(a); g.fillStyle = 'rgba(80,220,255,0.9)'; g.strokeStyle = '#003040'; g.lineWidth = 4; g.beginPath(); g.moveTo(26, 0); g.lineTo(-10, 16); g.lineTo(-3, 0); g.lineTo(-10, -16); g.closePath(); g.stroke(); g.fill(); g.restore(); }
+}
+
+// ---------------- online: what the others need ----------------
+function arenaItemsSnap(A) {
+  if (!A.gold) return null; const r = Math.round, t = A.W.time, rel = v => (v > t ? r((v - t) * 10) : 0);
+  const B = {}; for (const id of A.ids) { const b = A.buff[id] || {}; B[id] = [r(A.gold[id]), (A.inv[id] || []).map(s => [s.k, s.lv, s.uses || 0, rel(A.icd[id + 'it:' + s.k] || 0)]), rel(b.speed), rel(b.dmg), rel(b.regen), rel(b.arcana), rel(b.shield), r(b.absorb || 0), rel(b.silence), rel(b.vision), rel(b.doom), rel(b.curse), rel(b.teamspeed), rel(b.teamarmor), A.spec[id] || 0 ? rel(A.spec[id]) : 0]; }
+  return { B, ru: A.runes.map(x => [r(x.x), r(x.y), x.k]), rt: r(A.runeT), il: A.illus.map(i => [i.src.owner.id, r(i.x), r(i.y), r(i.facing), i.moving ? 1 : 0]), su: A.summ.map(s => [s.k[0], s.o.owner.id, r(s.x), r(s.y), s.fx || 1]), mi: A.mines.map(m => [m.o.owner.id, r(m.x), r(m.y)]), wa: A.walls.map(w => [r(w.x), r(w.y), Math.round(w.a * 100)]) };
+}
+function arenaItemsApply(A, s) {
+  if (!s || !A.gold) return; const W = A.W, t = W.time, ab = v => (v ? t + v / 10 : 0), byId = {}; for (const u of A.heroes) byId[u.owner.id] = u;
+  for (const id in s.B) { const q = s.B[id], b = A.buff[id] || (A.buff[id] = {}); A.gold[id] = q[0]; A.inv[id] = q[1].map(x => ({ k: x[0], lv: x[1], uses: x[2] })); q[1].forEach(x => { A.icd[id + 'it:' + x[0]] = ab(x[3]); });
+    [b.speed, b.dmg, b.regen, b.arcana, b.shield] = [ab(q[2]), ab(q[3]), ab(q[4]), ab(q[5]), ab(q[6])]; b.absorb = q[7]; [b.silence, b.vision, b.doom, b.curse, b.teamspeed, b.teamarmor] = [ab(q[8]), ab(q[9]), ab(q[10]), ab(q[11]), ab(q[12]), ab(q[13])]; A.spec[id] = ab(q[14]); }
+  A.runes = s.ru.map(x => ({ x: x[0], y: x[1], k: x[2] })); A.runeT = s.rt;
+  A.illus = s.il.map(x => ({ src: byId[x[0]], x: x[1], y: x[2], facing: x[3], moving: !!x[4] })).filter(i => i.src);
+  A.summ = s.su.map(x => ({ k: x[0] === 'w' ? 'wolf' : 'archer', o: byId[x[1]], x: x[2], y: x[3], fx: x[4] })).filter(i => i.o);
+  A.mines = s.mi.map(x => ({ o: byId[x[0]], x: x[1], y: x[2] })).filter(i => i.o); A.walls = s.wa.map(x => ({ x: x[0], y: x[1], a: x[2] / 100 }));
+}
+
+// ---------------- the screen: gold, the bag, the shop ----------------
+function arenaItemsHud(A, ui) {
+  if (!A.gold) return; const W = A.W, id = W.local.id, me = W.heroOf(W.local), t = W.time;
+  let inv = document.getElementById('arenaInv'); if (!inv) { inv = document.createElement('div'); inv.id = 'arenaInv'; document.body.appendChild(inv); }
+  inv.classList.remove('hidden');
+  const near = me && (Math.hypot(me.x - A.shopAt[W.local.team].x, me.y - A.shopAt[W.local.team].y) < 900 || !me.alive);
+  const bag = (A.inv[id] || []).filter(s => !ITEMS[s.k].up || ITEMS[s.k].arrow);
+  const key = bag.map(s => s.k + s.lv + ':' + (s.uses || 0)).join(',');
+  if (inv._k !== key) { inv._k = key;
+    inv.innerHTML = `<button class="ashop" data-shop="1"><span>🛒</span><b class="agold">0</b></button>` + bag.map(s => { const it = ITEMS[s.k]; return `<button class="aitem${it.act ? ' act' : ''}" data-it="${s.k}"><span>${it.ic}</span>${it.lv ? `<i>${s.lv}</i>` : ''}${it.uses ? `<i>${s.uses}</i>` : ''}<em class="icd"></em></button>`; }).join('');
+    inv.querySelectorAll('[data-it]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); const it = ITEMS[b.dataset.it]; if (it.act) ui.cast('it:' + b.dataset.it, null); else A.say(it.n + ': ' + it.d, 'ffcfe0ff'); }));
+    inv.querySelector('[data-shop]').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); arenaShopOpen(A, ui); }); }
+  { const g = inv.querySelector('.agold'), v = String(Math.floor(A.gold[id] || 0)); if (g.textContent !== v) g.textContent = v; inv.querySelector('.ashop').classList.toggle('near', !!near); }
+  for (const b of inv.querySelectorAll('[data-it]')) { const left = Math.max(0, (A.icd[id + 'it:' + b.dataset.it] || 0) - t), it = ITEMS[b.dataset.it]; b.style.setProperty('--cd', (it.cd && left > 0 ? Math.round(left / it.cd * 360) : 0) + 'deg'); b.classList.toggle('cool', left > 0); }
+  const sp = document.getElementById('arenaShop'); if (sp && !sp.classList.contains('hidden')) arenaShopFill(A, ui);
+}
+let _shopTab = 0;
+function arenaShopOpen(A, ui) {
+  let sp = document.getElementById('arenaShop'); if (!sp) { sp = document.createElement('div'); sp.id = 'arenaShop'; sp.className = 'hidden'; document.body.appendChild(sp); sp.addEventListener('pointerdown', e => e.stopPropagation()); }
+  sp.classList.toggle('hidden'); sp._k = null; arenaShopFill(A, ui);
+}
+function arenaShopFill(A, ui) {
+  const W = A.W, sp = document.getElementById('arenaShop'), id = W.local.id, me = W.heroOf(W.local); if (!sp || sp.classList.contains('hidden')) return;
+  const tabs = SHOPS[A.id], gold = Math.floor(A.gold[id] || 0), near = me && (Math.hypot(me.x - A.shopAt[W.local.team].x, me.y - A.shopAt[W.local.team].y) < 900 || !me.alive);
+  const key = _shopTab + '|' + gold + '|' + near + '|' + (A.inv[id] || []).map(s => s.k + s.lv + (s.uses || 0)).join(','); if (sp._k === key) return; sp._k = key;
+  const list = itemsOf(A.id).filter(k => ITEMS[k].shop === tabs[_shopTab]);
+  sp.innerHTML = `<div class="ashead"><b>🛒 Tienda</b><span>🪙 ${gold}</span><button data-x="1">✕</button></div>${near ? '' : '<div class="asfar">Ve a la tienda de tu base 🛒 para comprar (o compra mientras estás muerto)</div>'}<div class="astabs">${tabs.map((n, i) => `<button data-tab="${i}" class="${i === _shopTab ? 'on' : ''}">${n}</button>`).join('')}</div><div class="aslist">` +
+    list.map(k => { const it = ITEMS[k], have = (A.inv[id] || []).find(s => s.k === k), lv = have ? have.lv : 0, maxed = (it.up && lv >= it.max) || (it.lv && lv >= it.lv.length), cost = maxed ? 0 : lvCost(it, lv);
+      return `<div class="asrow"><span class="asic">${it.ic}</span><div><b>${it.n}${it.lv ? ` <i>Nv ${lv}/5</i>` : it.up && it.max > 1 ? ` <i>${lv}/${it.max}</i>` : have && !it.uses ? ' <i>✓</i>' : ''}</b><small>${it.d}</small></div><button data-buy="${k}" ${maxed || cost > gold || !near ? 'disabled' : ''}>${maxed ? 'MÁX' : '🪙 ' + cost}</button></div>`; }).join('') + '</div>';
+  sp.querySelector('[data-x]').addEventListener('click', () => sp.classList.add('hidden'));
+  sp.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _shopTab = +b.dataset.tab; sp._k = null; arenaShopFill(A, ui); }));
+  sp.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.buy; if (A.client) { if (window.arenaBuyNet) arenaBuyNet(k); } else A.buy(W.local, k); sp._k = null; setTimeout(() => arenaShopFill(A, ui), 60); }));
+}
+
+// ---------------- bots: shopping when they are at their base, and going for runes ----------------
+function arenaBotShop(A, u) { const id = u.owner.id, L = BOT_BUYS[A.id] || []; const seen = {};
+  for (let pass = 0; pass < 3; pass++) for (const k of L) { seen[k] = (seen[k] || 0) + 1; const it = ITEMS[k], have = (A.inv[id] || []).find(s => s.k === k), lv = have ? have.lv : 0;
+    if ((it.up && lv >= it.max) || (it.lv && lv >= it.lv.length) || (have && !it.lv && !it.up)) continue; if (it.up && lv >= (pass + 1) * 2) continue; /* spread the gold over several things */
+    if (A.gold[id] >= lvCost(it, lv)) { arenaBuy(A, u.owner, k, true); return true; } } return false; }
+function arenaItemsBot(A, b, u, D) {
+  if (!A.gold) return false; const W = A.W, id = u.owner.id;
+  if (A.shopAt && Math.hypot(u.x - A.shopAt[u.owner.team].x, u.y - A.shopAt[u.owner.team].y) < 650) arenaBotShop(A, u);
+  // use what they carry
+  for (const s of A.inv[id] || []) { const it = ITEMS[s.k]; if (!it.act || (A.icd[id + 'it:' + s.k] || 0) > W.time || Math.random() > D.cast * 0.3) continue; if ((it.act === 'heal30' || it.act === 'heal40' || it.act === 'salve' || it.act === 'tango') && u.ahp > u.amax * 0.5) continue; arenaUseItem(A, u, s.k); }
+  // a rune close by: go and take it
+  let best = null, bd = 900 + 600 * D.keep; for (const r of A.runes) { const d = Math.hypot(r.x - u.x, r.y - u.y); if (d < bd && A.compAt(r.x, r.y) === A.compAt(u.x, u.y)) { bd = d; best = r; } }
+  if (best && Math.random() < 0.4 + 0.6 * D.keep) { botGo(W, u, best.x, best.y); return true; }
+  return false;
+}
+
+// ---------------- map info: the powers (same pictures as the buttons), the runes and the shop ----------------
+window.arenaGuide = id => {
+  const C = ARENA[id]; if (!C) return ''; const ic = (img, e) => img ? `<img class="icimg" src="assets/fx/${img}.webp" alt="">` : `<span class="icemo">${e}</span>`;
+  const SK = { stun: 'Deja quieto 2 s al Pillador cerca de ti.', blink: 'Te teletransportas hacia donde apuntas.', shield: 'Nada te atrapa por 3 s.', invis: 'El Pillador no te ve 4 s.', grab: 'Lanzas la mano y traes al que toques.', dash: 'Corres mucho más rápido 1,6 s.', roar: 'Los que corren cerca quedan lentos 2,5 s.', cloud: 'Una nube verde te sigue 5 s: frena y daña poco a poco.', hook: 'Atrapa al primero que toque y lo arrastra en curva hacia ti.', leap: 'Un gran salto sobre árboles y muros.', arrow: 'Mientras más lejos llega, más daño y más aturde.', raze1: 'Sombra cerca de ti.', raze2: 'Sombra a media distancia.', raze3: 'Sombra lejos.', requiem: 'Explosión alrededor: más fuerte con más cargas (hasta 20).' };
+  const sk = (C.skills || []).concat(C.chaser || []).filter((s, i, a) => a.findIndex(x => x.id === s.id) === i);
+  let h = `<div class="glbl">⚡ Poderes</div><div class="gd gd2">` + sk.map(s => `<div class="gi">${ic(s.img, s.ic)}<div><b>${s.n}</b><small>${SK[s.id] || ''}</small></div></div>`).join('') + '</div>';
+  if (SHOPS[id]) { h += `<div class="glbl">✨ Runas (cada ${RUNE_EVERY} s, para ambos equipos)</div><div class="gd gd2">` + Object.entries(RUNES).map(([k, r]) => `<div class="gi">${ic(r.img)}<div><b>${r.n} · ${r.dur} s</b><small>${r.d}</small></div></div>`).join('') + '</div>';
+    h += `<div class="glbl">🛒 Tienda en tu base (${SHOPS[id].join(' · ')})</div><small class="gnote">Ganas 🪙 ${GOLD_KILL} por baja y ${GOLD_SEC} por segundo. Hay ${itemsOf(id).length} objetos: ${itemsOf(id).map(k => ITEMS[k].n).join(', ')}.</small>`; }
+  return h;
+};
+if (typeof module !== 'undefined') module.exports = { RUNES, ITEMS };
 
 // UI, input and main loop
 'use strict';
@@ -24565,7 +24999,13 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   window.addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (k.startsWith('arrow')) { keysDown.add(k); if (W) e.preventDefault(); } });
   window.addEventListener('keyup', e => keysDown.delete(e.key.toLowerCase()));
   window.addEventListener('blur', () => keysDown.clear());
-  function watchNext() { if (!W) return; const me = W.heroOf(W.local); const list = W.units.filter(u => u.hero && u !== me && u.alive && !u.removed && !u.hidden).sort((a, b) => a.owner.id - b.owner.id); if (!list.length) { showText('|cffcdb8dcNo queda nadie vivo para mirar.|r'); return; } const i = camWatch ? list.indexOf(camWatch) : -1; camWatch = list[(i + 1) % list.length]; R.freeCam = false; $('#watchName').textContent = camWatch.owner.name || 'Compañero'; }
+  const watchables = () => { const me = W.heroOf(W.local); return W.units.filter(u => u.hero && u !== me && u.alive && !u.removed && !u.hidden).sort((a, b) => a.owner.id - b.owner.id); };
+  function watchSet(u) { camWatch = u; R.freeCam = false; $('#watchName').textContent = u.owner.name || 'Compañero'; fillWatchList(); }
+  function watchNext() { if (!W) return; const list = watchables(); if (!list.length) { showText('|cffcdb8dcNo queda nadie vivo para mirar.|r'); return; } const L2 = list.length > 1 ? list.filter(u => u !== camWatch) : list; watchSet(L2[Math.floor(Math.random() * L2.length)]); } /* a random teammate */
+  function fillWatchList() { const box = $('#watchList'); if (!box || box.classList.contains('hidden') || !W) return; const all = W.units.filter(u => u.hero && u !== W.heroOf(W.local) && !u.removed && !u.hidden).sort((a, b) => a.owner.id - b.owner.id);
+    box.innerHTML = all.map(u => `<button data-p="${u.owner.id}" class="${u === camWatch ? 'on' : ''}${u.alive ? '' : ' out'}"><i style="background:${R.heroColor(u)}"></i>${(u.owner.name || 'Jugador').replace(/[<>&]/g, '')}</button>`).join('');
+    box.querySelectorAll('button').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); const u = W.heroOf(W.players[+b.dataset.p]); if (u && u.alive) watchSet(u); else showText('|cffcdb8dcEse jugador está muerto.|r'); })); }
+  setInterval(() => { try { fillWatchList(); } catch (e) {} }, 1500);
   // ---------- emotes: tap = last one used, hold = the 5 slots (only the free one for now) ----------
   // the default emote is our own art: the shroom kid cracking up (more emotes = the player's own designs later)
   function drawNeroShroom(c, S) {
@@ -24680,6 +25120,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     kitty5: [[ic('ic_jump'), 'Saltar', 'Pasas por encima de los lobos.'], [ic('ic_roar'), 'Gruñido', 'Espanta a los lobos cercanos.'], [ic('ic_invis'), 'Invisible', 'Casi invisible unos segundos.'], [ic('ic_stun'), 'Aturdir', 'Los lobos cerca quedan quietos 5 s.'], [ic('ic_dash'), 'Embestida', 'Corres mucho más rápido 3 s.'], ],
     bob: [[ic('ic_jump'), 'Saltar', 'Saltas alto sobre los cangrejos, hacia donde te deslizas.']] };
   window.guideHTML = id => { const g = (t, L) => L.length ? `<div class="glbl">${t}</div><div class="gd">` + L.map(([e, n, d]) => `<div class="gi">${e}<div><b>${n}</b><small>${d}</small></div></div>`).join('') + '</div>' : '';
+    if (window.ARENA && ARENA[id] && window.arenaGuide) return arenaGuide(id); /* arenas: powers with the button pictures, runes and the shop */
     return g('⚡ Poderes', POW[id] || []) + g(id === 'shroom25' ? '🔮 Secretos' : '🎒 Objetos', secretList(id)); };
   function fillPowers() { const id = W && W.profile.id; $('#pwShroom').style.display = 'none'; $('#pwRun').innerHTML = guideHTML(id); $('#pwSec').innerHTML = ''; }
   const KSKILLS = { aRes: ['🌀', 'Aura de Galope', 'Tú y los amigos cerca corren más rápido: +10% / +20% / +30%.'], aBri: ['✨', 'Aura de Chispa', 'Tú y los amigos cerca recargan los poderes más rápido: +20% / +40% / +60%.'], viento: ['🌬️', 'Paso Fantasma', 'Mejora tu Invisible: dura 8 / 10 / 12 s y corres +10% / +40% / +70% mientras estás invisible.'] };
@@ -24875,7 +25316,9 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mode = online ? online.game.mode : settings.mode, speed = online ? online.game.speed : settings.speed;
     let opts = { bots: settings.bots, maxFade: 3, playerName: settings.nick || 'Tú' };
     { const sl = Array.isArray(settings.botSlots) ? settings.botSlots : null, df = settings.botDiff || []; const act = sl ? [...Array(12).keys()].filter(i => i && sl[i]) : [...Array(settings.bots | 0).keys()].map(i => i + 1);
-      opts.botDiffList = act.map(i => df[i] || 'normal'); opts.arenaBotIds = act; opts.arenaDiff = Object.fromEntries(act.map(i => [i, df[i] || 'normal'])); opts.chaserMe = !!settings.chaserMe; opts.chaserDiff = df[0] || 'normal'; opts.arenaWin = settings.arenaWin || 'k15'; opts.botNames = settings.botNames; opts.bots = act.length; }
+      const chMap = window.ARENA && ARENA[settings.map] && (ARENA[settings.map].kind === 'tag' || ARENA[settings.map].kind === 'infect'); if (!chMap) settings.chaserMe = false;
+      if (settings.chaserMe && sl && sl[0]) act.push(12); /* you are the catcher / the virus: your runner slot is played by a bot */
+      opts.botDiffList = act.map(i => df[i] || 'normal'); opts.zombieTime = settings.zombieTime || 'z20'; opts.arenaBotIds = act; opts.arenaDiff = Object.fromEntries(act.map(i => [i, df[i] || 'normal'])); opts.chaserMe = !!settings.chaserMe; opts.chaserDiff = df[0] || 'normal'; opts.arenaWin = settings.arenaWin || 'k15'; opts.botNames = settings.botNames; opts.bots = act.length; }
     if (online) {
       const g = online.game; const humanIds = Object.values(g.slots);
       online.owned = [online.mySlot].concat(online.host ? g.botIds : []);
@@ -24886,11 +25329,11 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mapId = online ? (online.game.map || 'shroom25') : (settings.map || 'shroom25');
     const MDA = { zombie: window.MAPDATA_ZOMBIE, correk: window.MAPDATA_CORREK, pudge: window.MAPDATA_PUDGE, mirana: window.MAPDATA_MIRANA, nevermore: window.MAPDATA_NEVERMORE }; const md = MDA[mapId] ? MDA[mapId] : mapId === 'kitty5' && window.MAPDATA_KITTY5 ? window.MAPDATA_KITTY5 : mapId === 'bob' && window.MAPDATA_BOB ? window.MAPDATA_BOB : MAPDATA; document.body.dataset.map = md === MAPDATA ? 'shroom25' : mapId; document.body.dataset.fam = (md.profile && md.profile.family) || 'escape';
     W = startGame(md, opts);
-    if (W.arena && online) { if (W.arena.chaserP && W.arena.chaserP.id === 15) { if (online.host) online.owned.push(15); else W.remote.add(15); } window.arenaSend = (k, a) => online && online.net.pushEvent('acast', k, Math.round(a.dx * 100), Math.round(a.dy * 100), Math.round(a.dist || 0)); }
+    if (W.arena && online) { if (W.arena.chaserP && W.arena.chaserP.id === 15) { if (online.host) online.owned.push(15); else W.remote.add(15); } window.arenaSend = (k, a) => online && online.net.pushEvent('acast', k, Math.round(a.dx * 100), Math.round(a.dy * 100), Math.round(a.dist || 0)); window.arenaBuyNet = k => online && online.net.pushEvent('abuy', k); }
     { const def = Object.assign({ bob: 'rayo', kitty5: 'sinfreno' }, Object.fromEntries(Object.entries(window.ARENA || {}).map(([k, v]) => [k, v.music])))[W.profile.id] || 'fortaleza'; if (def !== 'fortaleza') sfx.setSong(def); } // every map starts with its own song (the pause menu can change it for this game only)
     $('#stats .t').textContent = W.arena ? W.arena.C.name.toUpperCase() : W.profile.id === 'kitty5' ? 'CORRE AMIGO CORRE' : W.profile.id === 'bob' ? 'CORRE POLAR' : 'ESCAPE FANTASÍA'; $('#stats .ver').textContent = W.profile.family === 'run' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
-    { const c = settings.myColor | 0; if (!online && c) { W.local.vcolor = c; const o = W.players[c]; if (o && o !== W.local) o.vcolor = W.local.id; } } /* the colour you picked in the lobby */
+    { const c = settings.myColor | 0; if (!online && c) { W.local.vcolor = c; const o = W.players[c]; if (o && o !== W.local) o.vcolor = W.local.id; } if (!online && settings.chaserMe && W.arena) { W.players[12].vcolor = W.local.vcolor ?? 0; W.local.vcolor = 14; } } /* the colour you picked in the lobby */
     if (!W.arena && !online && opts.botDiffList && W.ai && W.ai.bots) { const M = { facil: 0.88, normal: 1, dificil: 1.07, extremo: 1.15 }; W.ai.bots.forEach((b, i) => { b.diff = opts.botDiffList[i] || 'normal'; const h = W.heroOf(b.p); const k = M[opts.botDiffList[i]] || 1; if (h && k !== 1) { h.speed *= k; h.defSpeed = (h.defSpeed || h.speed / k) * k; } }); } /* bot level in the run / escape maps: how fast they are */
     W.on('text', showText);
     W.on('sound', s => sfx.play(s.name));
@@ -24953,6 +25396,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'dance' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendDance(a, u); }
       if (kind === 'bdance' && typeof a === 'number' && typeof e[3] === 'string') { const u = W.heroOf(W.players[a]); if (u && !online.owned.includes(a)) sendDance(e[3], u); }
       if (kind === 'cos' && slot != null && W.players[slot]) { const pl = W.players[slot]; if (typeof a === 'string') pl.aura = a; if (typeof e[3] === 'string') pl.deathFx = e[3]; if (typeof e[4] === 'string') pl.spawnFx = e[4]; if (typeof e[5] === 'string') pl.skins = { [W.profile.id]: e[5] }; if (typeof e[6] === 'number') pl.lvl = e[6] | 0; if (typeof e[7] === 'string') pl.nickFx = e[7]; }
+      if (kind === 'abuy' && slot != null && online.host && W.arena && W.arena.buy && typeof a === 'string') W.arena.buy(W.players[slot], a);
       if (kind === 'acast' && slot != null && online.host && W.arena && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) arenaCast(W.arena, u, a, { dx: (e[3] || 0) / 100, dy: (e[4] || 0) / 100, dist: e[5] || 0, exact: true }, true); }
       if (kind === 'spray' && slot != null && typeof a === 'string') addSpray(W.players[slot], a, e[3], e[4]);
       if (kind === 'bspray' && typeof a === 'number' && typeof e[3] === 'string' && !online.owned.includes(a)) addSpray(W.players[a], e[3], e[4], e[5]);
@@ -25300,7 +25744,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   window.addLvl = addLvl;
   function addPassXP(n) { addLvl(0, Math.round(n * 0.8)); const lv0 = Math.floor((settings.passXP || 0) / 100); settings.passXP = (settings.passXP || 0) + n; saveSettings(); if (Math.floor(settings.passXP / 100) > lv0 && lv0 < 29) { try { showText('🎖️ ¡Subiste al nivel ' + (lv0 + 2) + ' del Pase de Batalla!'); } catch (e) {} } }
   function stopGameKShop() { try { $('#kShop').classList.add('hidden'); } catch (e) {} }
-  function stopGame() { { const a = document.getElementById('arenaBar'), b = document.getElementById('arenaTop'); if (a) { a.classList.add('hidden'); a._key = null; } if (b) b.classList.add('hidden'); } stopGameKShop(); $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
+  function stopGame() { { const a = document.getElementById('arenaBar'), b = document.getElementById('arenaTop'); if (a) { a.classList.add('hidden'); a._key = null; } if (b) b.classList.add('hidden'); ['arenaInv', 'arenaShop', 'zbPanel'].forEach(i => { const e = document.getElementById(i); if (e) { e.classList.add('hidden'); e._k = null; } }); } stopGameKShop(); $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
   btn('#bMenuBack', () => { const o = online; stopGame(); if (o) o.net.leave(); if (window.Lobby && Lobby.backFromGame) Lobby.backFromGame(!!o); else $('#menu').classList.remove('hidden'); /* back to the menu you came from */ });
   btn('#bQuit', () => { const a = $('#leaveAsk'); a.classList.remove('hidden'); $('#leaveNo').onclick = () => a.classList.add('hidden'); $('#leaveYes').onclick = () => { a.classList.add('hidden'); doQuit(); }; });
   function doQuit() { const o = online; stopGame(); if (o) o.net.leave(); if (window.Lobby && Lobby.backFromGame) Lobby.backFromGame(!!o); else $('#menu').classList.remove('hidden'); /* back to the menu you came from */ }
@@ -25308,7 +25752,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   btn('#bCenter', () => { if (R) R.freeCam = false; camWatch = null; window.camFree = false; $('#bCam').classList.remove('on'); });
   window.camReset = () => { window.camFree = false; $('#bCam').classList.remove('on'); if (R) { R.freeCam = false; R.targetZoom = zoom0(); } camWatch = null; };
   btn('#bCam', () => { window.camFree = !window.camFree; $('#bCam').classList.toggle('on', window.camFree); if (!window.camFree && R) { R.freeCam = false; R.targetZoom = zoom0(); } showText(window.camFree ? '📷 Cámara libre: arrastra el dedo por la pantalla para mirar. Toca 📷 otra vez para volver.' : '📷 Cámara normal'); }); // free camera: it stays where you leave it
-  btn('#bWatch', watchNext);
+  btn('#bWatch', watchNext); btn('#bWatchList', () => { const b = $('#watchList'); b.classList.toggle('hidden'); $('#bWatchList').classList.toggle('on', !b.classList.contains('hidden')); $('#bWatchList').textContent = b.classList.contains('hidden') ? '▶' : '▼'; fillWatchList(); });
   if (!settings.kSongV2) { settings.kittySong = 'sinfreno'; settings.kSongV2 = 1; saveSettings(); } // the owner picked Sin Freno as the theme
   { const ks = $('#optKSong');  }
   btn('#bRoar', doRoar); btn('#bInvis', doInvis); btn('#bStun', doStun); btn('#bDash', doDash);
@@ -25430,10 +25874,10 @@ const MAP_LORE = {
   polar: { t: 'Escape Ártico', lore: 'Un glaciar que se resquebraja bajo tus pies. Desliza, frena y no caigas al agua helada.', how: 'Próximamente.' },
   polar3: { t: 'Escape Ártico: Tormenta', lore: 'La tormenta llegó al glaciar: viento, hielo y menos tiempo para pensar.', how: 'Próximamente.' },
   zombie: { t: 'Infección Zombi', lore: 'Una ciudad en ruinas. Un virus despierta y alguien se convierte en zombi… y cada mordida suma uno más.', how: '3 rondas de 2 min · a los 8 s alguien se vuelve zombi · si te muerden te vuelves zombi y cazas a los demás · sobrevivir la ronda da 3 puntos y cada mordida 1 punto · humanos: Aturdir 💫, Blink ✨ y Escudo 🛡️ · zombis: Agarrar 🖐️, Embestida ⚡ y Blink.' },
-  correk: { t: '¡Corre o Te Pillan!', lore: 'En el Bosque del Anillo uno de ustedes es el Pillador. Los demás corren por el anillo de árboles para que no los atrape.', how: '5 rondas de 60 s · cada ronda le toca a otro ser el Pillador · si te pilla quedas fuera hasta la ronda siguiente · Salto ✨, Aturdir 💫 y Escudo 🛡️ para escapar · aguantar la ronda da 2 puntos y cada pillada 1 punto.' },
-  pudge: { t: 'Guerra de Ganchos', lore: 'Dos orillas separadas por un río. Lanza tu gancho, atrapa a un rival y tráelo a tu lado.', how: 'Dos equipos · Gancho 🪝: atrapa al primero que toque (si es de tu equipo lo rescatas) · Trampa 💣: explota cuando un rival la pisa · gana el primer equipo en llegar a 15 bajas.' },
-  mirana: { t: 'Guerra de Flechas', lore: 'Un bosque helado lleno de árboles. Apunta bien: tu flecha vuela lejos y aturde.', how: 'Dos equipos · Flecha 🏹: mientras más lejos llega, más daño y más aturde · Salto 🐆: brinca para esquivar · gana el primer equipo en llegar a 15 bajas.' },
-  nevermore: { t: 'Guerra de Sombras', lore: 'Ruinas antiguas donde la sombra explota a tus pies.', how: 'Dos equipos · Ráfagas 🔥 cerca, media y lejos frente a ti · Réquiem 💀: gran explosión a tu alrededor · gana el primer equipo en llegar a 20 bajas.' },
+  correk: { t: '¡Corre o Te Pillan!', lore: 'En el Bosque del Anillo uno de ustedes es el Pillador. Los demás corren por el anillo de árboles para que no los atrape.', how: '5 rondas de 60 s · el Pillador persigue a todos · Aturdir, Blink, Escudo e Invisible para escapar · el Pillador tiene Agarrar, Embestida, Blink y Gruñido · si te pilla quedas fuera hasta la siguiente ronda.' },
+  pudge: { t: 'Guerra de Ganchos', lore: 'Dos orillas separadas por un río. Lanza tu gancho, atrapa a un rival y tráelo a tu lado.', how: 'Dos equipos separados por el río · lanza tu gancho, atrapa a un rival y tráelo a tu orilla · nube venenosa y blink · runas cada 60 s · tienda en tu base · gana por tiempo o por bajas (lo eliges antes de jugar).' },
+  mirana: { t: 'Guerra de Flechas', lore: 'Un bosque helado lleno de árboles. Apunta bien: tu flecha vuela lejos y aturde.', how: 'Dos equipos · tu flecha hace más daño y aturde más mientras más lejos llega · salto sobre árboles y muros · runas cada 60 s · tienda con flechas especiales · gana por tiempo o por bajas (lo eliges antes de jugar).' },
+  nevermore: { t: 'Guerra de Sombras', lore: 'Ruinas antiguas donde la sombra explota a tus pies.', how: 'Dos equipos · sombras cerca, media y lejos (2 te eliminan) · cada sombra que pega carga tu Réquiem (hasta 20) · runas cada 60 s · tienda de mejoras · gana por tiempo o por bajas (lo eliges antes de jugar).' },
   polarrf: { t: 'Pingüinos en Fuga', lore: 'Una colonia de pingüinos escapa del zoológico más frío del mundo.', how: 'Próximamente.' },
 };
 // rooms opened by the game itself: they look like players' rooms, change over time and are the same for everybody at the same moment
@@ -26280,43 +26724,48 @@ class Net {
   document.addEventListener('click', () => document.querySelectorAll('.ddl').forEach(l => { l.classList.add('hidden'); l.parentNode.classList.remove('open'); }));
   setTimeout(() => document.querySelectorAll('select').forEach(inlineSelect), 50);
   // solo: a classic pre-game lobby (names, colours, teams) before the game starts
-  let preBots = 11; const preSlot = Array(12).fill(false), DIFF = [['facil', 'IA Fácil'], ['normal', 'IA Normal'], ['dificil', 'IA Difícil'], ['extremo', 'IA Extremo']]; let preChaserMe = false;
-  const preDiff = Object.assign(Array(12).fill('normal'), (S.botDiff || []).slice(0, 12)); preDiff[0] = 'normal';
+  let preBots = 11; const preSlot = Array(13).fill(false), DIFF = [['facil', 'IA Fácil'], ['normal', 'IA Normal'], ['dificil', 'IA Difícil'], ['extremo', 'IA Extremo']]; let preChaserMe = false;
+  const preDiff = Object.assign(Array(13).fill('normal'), (S.botDiff || []).slice(0, 13));
   const setPreCount = n => { n = Math.max(0, Math.min(11, n)); for (let i = 1; i < 12; i++) preSlot[i] = i <= n; preBots = n; };
-  const preCount = () => preSlot.filter((v, i) => i && v).length;
+  const preCount = () => preSlot.filter((v, i) => i && i < 12 && v).length + (preChaserMe && preSlot[0] ? 1 : 0);
+  const DSUB = { facil: 'novato', normal: 'jugador normal', dificil: 'muy bueno', extremo: 'lee tus movimientos' };
+  /* a small list that floats over the page (fixed), so it never makes the page longer */
+  function floatList(anchor, html, cls) { document.querySelectorAll('.ldl').forEach(x => x.remove()); const l = document.createElement('div'); l.className = 'ldl ' + (cls || ''); l.innerHTML = html; document.body.appendChild(l);
+    const r = anchor.getBoundingClientRect(), lr = l.getBoundingClientRect(); let top = r.bottom + 4; if (top + lr.height > innerHeight - 8) top = Math.max(8, r.top - lr.height - 4); let left = Math.min(innerWidth - lr.width - 8, Math.max(8, r.right - lr.width));
+    l.style.top = top + 'px'; l.style.left = left + 'px'; return l; }
   function renderPre() { const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
-    preBots = preCount(); const AR = window.ARENA && ARENA[soloMap], teamMap = AR && AR.kind === 'team', tag = AR && AR.kind === 'tag', infect = AR && AR.kind === 'infect';
+    const AR = window.ARENA && ARENA[soloMap], teamMap = AR && AR.kind === 'team', tag = AR && AR.kind === 'tag', infect = AR && AR.kind === 'infect';
+    const meChaser = tag && preChaserMe, meVirus = infect && preChaserMe; preBots = preCount();
     const TEAM = { kitty5: ['Gatitos', 'Lobos del Rey Aullido'], bob: ['Focas', 'Cangrejos del puerto'], shroom25: ['Hongos', 'Payasos de feria'], correk: ['Los que corren', 'El Pillador'], zombie: ['Humanos', 'Zombis'] }[soloMap] || (teamMap ? ['Jugadores', 'Equipos'] : ['Jugadores', 'Enemigos']);
     const myC = S.myColor ?? 0, colOf = i => (i === 0 ? myC : i === myC ? 0 : i); /* your colour swaps places with whoever had it */
-    const meChaser = tag && preChaserMe;
-    let h = `<div class="lteam">${TEAM[0]}</div>`, n = 0; const diffBtn = i => { const d = DIFF.find(x => x[0] === preDiff[i]) || DIFF[1]; return `<button class="ldiff d-${d[0]}" data-diff="${i}">${d[1].slice(3)} ▾</button>`; };
-    for (let i = 0; i < 12; i++) { let who, kind, cls = '', extra = '';
-      const on = (i === 0 && !meChaser) || (i > 0 && preSlot[i]); const team = teamMap && on ? ((n++) % 2 ? ' · <b style="color:#ff8a8a">Eq. B</b>' : ' · <b style="color:#8affa0">Eq. A</b>') : '';
-      if (i === 0 && !meChaser) { who = '👑 <b style="color:#ffd34d">Nv ' + (window.playerLvl ? playerLvl() : 1) + '</b> ' + esc(S.nick || 'Tú') + ' (tú)'; kind = 'Anfitrión · 🪙 ' + (S.coins | 0) + team; cls = ' me'; }
-      else if (i === 0) { who = 'Libre'; kind = 'te cambiaste al Pillador'; cls = ' open'; }
-      else if (preSlot[i]) { who = '🤖 IA ' + i; kind = (team ? 'IA' : 'Bot (IA)') + team; cls = ' bot'; extra = diffBtn(i); }
+    const quick = `<span class="qdiff">${DIFF.map(([k, t]) => `<button data-qd="${k}" class="d-${k}">${t.slice(3)}</button>`).join('')}</span>`;
+    let h = `<div class="lteam">${TEAM[0]}${quick}</div>`, n = 0; const diffBtn = i => { const d = DIFF.find(x => x[0] === preDiff[i]) || DIFF[1]; return `<button class="ldiff d-${d[0]}" data-diff="${i}">${d[1].slice(3)} ▾</button>`; };
+    for (let i = 0; i < 12; i++) { let who, kind, cls = '', extra = ''; const away = i === 0 && (meChaser || meVirus); /* you took the catcher / virus slot: your runner slot is a free one */
+      const on = (i === 0 && !away) || (i > 0 && preSlot[i]) || (away && preSlot[0]); const team = teamMap && on ? ((n++) % 2 ? ' · <b style="color:#ff8a8a">Eq. B</b>' : ' · <b style="color:#8affa0">Eq. A</b>') : '';
+      if (i === 0 && !away) { who = '👑 <b style="color:#ffd34d">Nv ' + (window.playerLvl ? playerLvl() : 1) + '</b> ' + esc(S.nick || 'Tú') + ' (tú)'; kind = 'Anfitrión · 🪙 ' + (S.coins | 0) + team; cls = ' me'; }
+      else if (away && preSlot[0]) { who = '🤖 IA 12'; kind = 'Bot (IA)'; cls = ' bot'; extra = diffBtn(12); }
+      else if (preSlot[i] && i) { who = '🤖 IA ' + i; kind = (team ? 'IA' : 'Bot (IA)') + team; cls = ' bot'; extra = diffBtn(i); }
       else { who = 'Abierto'; kind = 'toca para poner bot'; cls = ' open'; }
-      h += `<div class="lrow${cls}${i ? ' tap' : ''}" data-slot="${i}"><span class="lc${i === 0 ? ' pick' : ''}" style="background:${COLS[colOf(i)]}"></span><b>${who}</b><small>${kind}</small>${extra}</div>`; }
-    if (tag) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meChaser ? ' me' : ' bot'}" id="preChaser"><span class="lc${meChaser ? ' pick' : ''}" style="background:${meChaser ? COLS[myC] : '#8b0000'}"></span><b>${meChaser ? '😈 ' + esc(S.nick || 'Tú') + ' (tú)' : '😈 IA Pillador'}</b><small>${meChaser ? 'eres el Pillador · toca para volver a correr' : 'toca para ser tú el Pillador'}</small>${meChaser ? '' : diffBtn(0)}</div>`;
-    else if (infect) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full bot"><span class="lc" style="background:#3d8a0b"></span><b>🧟 El virus</b><small>al empezar, alguien se convierte en zombi</small></div>`;
+      const c = colOf(i); h += `<div class="lrow${cls}${i || away ? ' tap' : ''}" data-slot="${i}"><span class="lc${c !== myC || away ? ' pick' : ' mine'}" data-col="${c}" style="background:${COLS[c]}"></span><b>${who}</b><small>${kind}</small>${extra}</div>`; }
+    if (tag) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meChaser ? ' me' : ' bot'}" id="preChaser"><span class="lc" style="background:#8b0000"></span><b>${meChaser ? '😈 ' + esc(S.nick || 'Tú') + ' (tú)' : '😈 IA Pillador'}</b><small>${meChaser ? 'eres el Pillador · toca para volver a correr' : 'toca para ser tú el Pillador'}</small>${meChaser ? '' : diffBtn(0)}</div>`;
+    else if (infect) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meVirus ? ' me' : ' bot'}" id="preChaser"><span class="lc" style="background:#3d8a0b"></span><b>${meVirus ? '🧟 ' + esc(S.nick || 'Tú') + ' (tú)' : '🧟 IA Zombi madre'}</b><small>${meVirus ? 'eres el virus · toca para volver a ser humano' : 'toca para ser tú el virus'}</small>${meVirus ? '' : diffBtn(0)}</div>`;
     else if (!teamMap) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full bot"><span class="lc" style="background:#8b5a2b"></span><b>🤖 IA enemigos</b><small>${TEAM[1]}</small></div>`;
     $('#preSlots').innerHTML = h; $('#preBots').textContent = preBots;
     $('#preSlots').querySelectorAll('.lrow.tap[data-slot]').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot; preSlot[i] = !preSlot[i]; renderPre(); })); /* each slot opens / closes on its own */
-    { const c = $('#preChaser'); if (c) c.addEventListener('click', () => { preChaserMe = !preChaserMe; renderPre(); }); }
-    $('#preSlots').querySelectorAll('.lc.pick').forEach(c => c.addEventListener('click', ev => { ev.stopPropagation(); document.querySelectorAll('.ldl').forEach(x => x.remove()); const l = document.createElement('div'); l.className = 'ldl lcol';
-      l.innerHTML = COLS.map((c2, k) => `<span class="${k === myC ? 'on' : ''}" data-c="${k}" style="background:${c2}"></span>`).join('');
-      l.querySelectorAll('[data-c]').forEach(o => o.addEventListener('click', e2 => { e2.stopPropagation(); S.myColor = +o.dataset.c; SW.saveSettings(); l.remove(); renderPre(); }));
-      c.parentNode.appendChild(l); }));
-    $('#preSlots').querySelectorAll('[data-diff]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); document.querySelectorAll('.ldl').forEach(x => x.remove()); const i = +b.dataset.diff; const l = document.createElement('div'); l.className = 'ldl';
-      l.innerHTML = DIFF.map(([k, t]) => `<div class="ddi${k === preDiff[i] ? ' on' : ''}" data-k="${k}">${t}<small>${{ facil: 'novato', normal: 'jugador normal', dificil: 'muy bueno', extremo: 'lee tus movimientos' }[k]}</small></div>`).join('');
-      l.querySelectorAll('[data-k]').forEach(o => o.addEventListener('click', e2 => { e2.stopPropagation(); preDiff[i] = o.dataset.k; S.botDiff = preDiff.slice(); SW.saveSettings(); l.remove(); renderPre(); }));
-      b.parentNode.appendChild(l); const r = l.getBoundingClientRect(); if (r.bottom > innerHeight - 8) l.classList.add('up'); /* never goes off the screen: opens upwards */ }));
-    { const wo = $('#preWin'); if (wo) { wo.classList.toggle('hidden', !teamMap); if (teamMap) { const v = S.arenaWin || 'k15'; wo.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('on', x.dataset.w === v)); } } }
+    { const c = $('#preChaser'); if (c) c.addEventListener('click', () => { preChaserMe = !preChaserMe; if (preChaserMe) preSlot[0] = true; renderPre(); }); }
+    /* tap any colour: you take it, and whoever had it gets yours */
+    $('#preSlots').querySelectorAll('.lc.pick').forEach(c => c.addEventListener('click', ev => { ev.stopPropagation(); S.myColor = +c.dataset.col; SW.saveSettings(); renderPre(); }));
+    $('#preSlots').querySelectorAll('[data-qd]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); for (let i = 0; i < 13; i++) preDiff[i] = b.dataset.qd; S.botDiff = preDiff.slice(); SW.saveSettings(); renderPre(); }));
+    $('#preSlots').querySelectorAll('[data-diff]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); const i = +b.dataset.diff;
+      const l = floatList(b, DIFF.map(([k, t]) => `<div class="ddi${k === preDiff[i] ? ' on' : ''}" data-k="${k}">${t}<small>${DSUB[k]}</small></div>`).join(''));
+      l.querySelectorAll('[data-k]').forEach(o => o.addEventListener('click', e2 => { e2.stopPropagation(); preDiff[i] = o.dataset.k; S.botDiff = preDiff.slice(); SW.saveSettings(); l.remove(); renderPre(); })); }));
+    { const wo = $('#preWin'); if (wo) { const zt = soloMap === 'zombie'; wo.classList.toggle('hidden', !teamMap && !zt); wo.classList.toggle('zt', zt); if (teamMap || zt) { const v = zt ? (S.zombieTime || 'z20') : (S.arenaWin || 'k15'); wo.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('on', x.dataset.w === v)); } } }
     const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[soloMap]) || {}; const m = MAPS.find(x => x.id === soloMap) || MAPS[0];
-    $('#prePrev').innerHTML = `<div class="pvic">${mapIcon(m) || '🗺'}</div><b>${esc(mapName(soloMap))}</b><div class="pvd"><span>Jugadores: ${preBots + 1}/12</span><span>Modo: ${$('#mode').value === 'practice' ? 'Práctica' : 'Original'}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
+    $('#prePrev').innerHTML = `<div class="pvic">${mapIcon(m) || '🗺'}</div><b>${esc(mapName(soloMap))}</b><div class="pvd"><span>Jugadores: ${preBots + 1}/${meChaser || meVirus ? 13 : 12}</span><span>Modo: ${$('#mode').value === 'practice' ? 'Práctica' : 'Original'}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
   document.addEventListener('click', () => document.querySelectorAll('.ldl').forEach(x => x.remove()));
-  $('#preWin') && $('#preWin').querySelectorAll('[data-w]').forEach(x => x.addEventListener('click', () => { S.arenaWin = x.dataset.w; SW.saveSettings(); renderPre(); }));
-  click('#bPlay', () => { if (soloMap === 'train') { if (window.ForgeUI) ForgeUI.playTrain(); return; } try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} setPreCount(S.bots ?? 11); if (Array.isArray(S.botSlots)) for (let i = 1; i < 12; i++) preSlot[i] = !!S.botSlots[i]; preChaserMe = false; renderPre(); show('pre'); });
+  addEventListener('scroll', () => document.querySelectorAll('.ldl').forEach(x => x.remove()), true);
+  $('#preWin') && $('#preWin').querySelectorAll('[data-w]').forEach(x => x.addEventListener('click', () => { if (x.dataset.w[0] === 'z') S.zombieTime = x.dataset.w; else S.arenaWin = x.dataset.w; SW.saveSettings(); renderPre(); }));
+  click('#bPlay', () => { if (soloMap === 'train') { if (window.ForgeUI) ForgeUI.playTrain(); return; } try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} setPreCount(S.bots ?? 11); if (Array.isArray(S.botSlots)) for (let i = 1; i < 12; i++) preSlot[i] = !!S.botSlots[i]; preSlot[0] = true; preChaserMe = false; renderPre(); show('pre'); });
   click('#preMinus', () => { for (let i = 11; i > 0; i--) if (preSlot[i]) { preSlot[i] = false; break; } renderPre(); }); click('#prePlus', () => { for (let i = 1; i < 12; i++) if (!preSlot[i]) { preSlot[i] = true; break; } renderPre(); });
   click('#preFill', () => { setPreCount(11); renderPre(); }); click('#preNone', () => { setPreCount(0); renderPre(); });
   const goStart = () => { S.bots = preCount(); S.botSlots = preSlot.slice(); S.botDiff = preDiff.slice(); S.chaserMe = preChaserMe; S.botNames = (soloMap === 'kitty5' ? null : BOT_NAMES12.slice()); S.mode = $('#mode').value; S.map = soloMap; S.lastMap = soloMap; SW.saveSettings(); SW.start(); };
