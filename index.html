@@ -454,6 +454,22 @@ body[data-fam=arena] #bBlink, body[data-fam=arena] #sosWrap{display:none!importa
 #arenaShop .asrow button{font:900 12px system-ui;border:0;border-radius:9px;background:linear-gradient(#ffe27a,#ffbf1f);color:#3a2600;padding:7px 8px;white-space:nowrap}#arenaShop .asrow button:disabled{filter:grayscale(1);opacity:.5}
 .gd2 .gi small{font-size:10.5px;line-height:1.2}.gd2 .icimg{width:28px!important;height:28px!important;border-radius:50%}.icemo{font-size:24px;width:30px;text-align:center;flex:none}.gnote{display:block;font-size:10.5px;opacity:.8;text-align:left;line-height:1.25}
 #lore .card{max-height:96vh!important}#lore .gd{gap:2px 6px}#lore .glbl{margin:5px 0 2px}
+
+/* Infección Zombi */
+body[data-akind=zsurv] #dead, body[data-akind=zsurv] #watchBar, body[data-akind=zsurv] #bBlink{display:none!important}
+#arenaBar.zbar{grid-template-columns:repeat(2,64px);grid-auto-rows:64px;gap:8px}#arenaBar.zbar .arenaB small{font-size:9px}#arenaBar .arenaB.on{box-shadow:0 0 0 3px #ffd34d}
+#arenaBar .zmenu{background:linear-gradient(#ffe27a,#ffbf1f)!important;border-color:#a86d00!important}#arenaBar .zmenu span{font-size:26px}#arenaBar .zmenu small{color:#3a2600!important}
+#arenaTop .zres{font-size:12px;color:#ffe27a;font-weight:800;margin-top:2px}
+#zbPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(390px,94vw);max-height:78vh;display:flex;flex-direction:column;background:linear-gradient(#1f2a1a,#0f150d);border:2px solid #6aaa5a;border-radius:16px;z-index:40;color:#fff;box-shadow:0 10px 40px #000a;padding:8px}#zbPanel.hidden{display:none}
+#zbPanel .ashead{display:flex;align-items:center;gap:8px;font-size:16px}#zbPanel .ashead span{margin-left:auto;color:#ffe27a;font-weight:900;font-size:13px}#zbPanel .ashead button{border:0;background:#3a5a2a;color:#fff;border-radius:8px;width:30px;height:30px;font-size:16px}
+#zbPanel .asfar{font-size:12px;color:#d8ffc8;margin:6px 0;text-align:left}#zbPanel .astabs{display:flex;gap:4px;margin:6px 0;flex-wrap:wrap}#zbPanel .astabs button{flex:1;font:800 11px system-ui;border-radius:8px;border:1px solid #5a8a4a;background:#203a18;color:#fff;padding:6px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#zbPanel .astabs button.on{background:#ffd34d;color:#222}
+#zbPanel .aslist{overflow-y:auto;display:flex;flex-direction:column;gap:5px}#zbPanel .asrow{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;text-align:left;background:#18261a;border-radius:10px;padding:5px}
+#zbPanel .asic{font-size:24px;text-align:center}#zbPanel .asrow b{font-size:13px}#zbPanel .asrow b i{color:#ffe27a;font-style:normal;font-size:11px}#zbPanel .asrow small{display:block;font-size:10.5px;opacity:.8;line-height:1.25}
+#zbPanel .asrow button{font:900 12px system-ui;border:0;border-radius:9px;background:linear-gradient(#ffe27a,#ffbf1f);color:#3a2600;padding:7px 8px;white-space:nowrap}#zbPanel .asrow button:disabled{filter:grayscale(1);opacity:.45}
+#zbPick{position:fixed;inset:0;z-index:41;background:rgba(5,8,4,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;color:#fff}#zbPick.hidden{display:none}
+#zbPick h3{margin:0 0 8px;font:900 18px system-ui;color:#c8ff9a}.zpg{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:min(420px,96vw);max-height:80vh;overflow:auto}
+.zpg button{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:6px;text-align:left;background:linear-gradient(#24361c,#162410);border:1px solid #5a8a4a;border-radius:12px;padding:6px;color:#fff}.zpg button span{grid-row:span 2;font-size:26px;align-self:center}.zpg button b{font-size:12.5px}.zpg button small{font-size:10px;opacity:.8;line-height:1.2}
+.zgl{display:flex;flex-wrap:wrap;gap:3px 8px;text-align:left}.zg{font-size:11.5px;white-space:nowrap}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -21263,10 +21279,10 @@ class BotManager {
     // glide (G) along long, clear, straight stretches: aim at the furthest waypoint in a straight safe line
     const gpath = (b.path && b.pi < b.path.length) ? b.path : null;
     b.gT = (b.gT || 0) - dt;
-    const rev = !!(b.goal && b.goal.revive); // going to revive someone: glide boldly
+    const rev = !!(b.goal && b.goal.revive), ex = b.diff === 'extremo'; // going to revive someone (or an extreme bot): glide boldly
     if (gpath && (gliding || b.glideCd <= 0) && !this.tileTimeLeftBad(h)) {
-      let j = b.pi; const scan = b.gT <= 0; if (scan) b.gT = gliding ? 0.08 : (rev ? 0.1 : 0.3);
-      for (let k = b.pi + 1; scan && k < Math.min(gpath.length, b.pi + 40); k++) { if (this.safeLineStrict(h.x, h.y, gpath[k].x, gpath[k].y) && this.glideClear(h, gpath[k], ens, rev)) j = k; else break; }
+      let j = b.pi; const scan = b.gT <= 0; if (scan) b.gT = gliding ? 0.08 : (rev || ex ? 0.12 : 0.3);
+      for (let k = b.pi + 1; scan && k < Math.min(gpath.length, b.pi + 40); k++) { if (this.safeLineStrict(h.x, h.y, gpath[k].x, gpath[k].y) && this.glideClear(h, gpath[k], ens, rev || ex)) j = k; else break; }
       const tp = gpath[j], dj = Math.hypot(tp.x - h.x, tp.y - h.y);
       if (gliding) { // keep running a long time: follow the path, turning at each corner, stop only when the way is not safe
         const steer = q => { h.facing = Math.atan2(q.y - h.y, q.x - h.x) * 180 / Math.PI; };
@@ -21277,7 +21293,7 @@ class BotManager {
         W.cmdCast(b.p, 'A005'); b.glideCd = b.diff === 'extremo' ? 0.05 : b.diff === 'facil' ? 1.4 : rev ? 0.2 : 0.4; return;
       }
       const minD = b.diff === 'extremo' ? 110 : b.diff === 'dificil' ? 160 : b.diff === 'facil' ? 520 : rev ? 200 : 220; // bots use Correr often, like real players (extreme ones almost always)
-      if (scan && dj > minD && this.safeLineStrict(h.x, h.y, tp.x, tp.y) && this.glideClear(h, tp, ens, rev) && this.segmentOk(h.x, h.y, tp.x, tp.y, 520)) {
+      if (scan && dj > minD && this.safeLineStrict(h.x, h.y, tp.x, tp.y) && this.glideClear(h, tp, ens, rev || ex) && this.segmentOk(h.x, h.y, tp.x, tp.y, 520)) {
         if (W.cmdCast(b.p, 'A005')) { b.pi = j; h.facing = Math.atan2(tp.y - h.y, tp.x - h.x) * 180 / Math.PI; return; }
       }
     }
@@ -21995,6 +22011,16 @@ SONGS.tormenta = { name: 'Tormenta de Sombras', bpm: 244, bass: 'drive', harm: t
   intro: bars(['i1', 'i2'], ['Dm', 'A']), introQuiet: 'i1', introFill: 'i2',
   loop: bars(['t1', 't2', 't3', 't4', 't1', 't2', 't3', 't4', 'u1', 'u2', 'u3', 'u4', 'u1', 'u2', 'u3', 'u4'],
     ['Dm', 'Bb', 'Gm', 'A', 'Dm', 'Bb', 'Gm', 'A', 'Dm', 'C', 'Bb', 'A', 'Dm', 'C', 'Bb', 'A']) };
+SONGS.desesperacion = { name: 'Desesperación', bpm: 228, bass: 'drive', harm: false, wave: ['p12', 'p25'], // Infección Zombi: running out of time, they are coming
+  drums: { k: 'x.xx.xx.x.xx.xx.', s: '....x..x....x..x', h: 'xxxxxxxxxxxxxxxx' },
+  lead: { i1: 'F#5 - G5 - F#5 - G5 - F#5 - G5 - C6 - B5 -', i2: 'F#5 - G5 - F#5 - G5 - D6 - C#6 - C6 - B5 -',
+    d1: 'B4 C5 B4 F#5 B4 C5 B4 G5 B4 C5 B4 F#5 E5 D5 C5 B4', d2: 'B4 C5 B4 F#5 B4 C5 B4 G5 B4 C5 B4 A#5 B5 A#5 G5 F#5',
+    d3: 'G4 A4 G4 D5 G4 A4 G4 E5 G4 A4 G4 D5 C5 B4 A4 G4', d4: 'F#4 G4 F#4 C#5 F#4 G4 F#4 D5 A#4 C#5 E5 F#5 A#5 - - -',
+    e1: 'B5 - B5 - C6 - B5 - A#5 - G5 - F#5 - - -', e2: 'B5 - B5 - D6 - C#6 - C6 - B5 - A#5 - - -',
+    e3: 'G5 - G5 - A5 - G5 - F#5 - E5 - D5 - - -', e4: 'F#5 - G5 - A#5 - C#6 - E6 - D6 - C#6 - A#5 -' },
+  intro: bars(['i1', 'i2'], ['Bm', 'F#']), introQuiet: 'i1', introFill: 'i2',
+  loop: bars(['d1', 'd2', 'd3', 'd4', 'd1', 'd2', 'd3', 'd4', 'e1', 'e2', 'e3', 'e4', 'e1', 'e2', 'e3', 'e4'],
+    ['Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'Em', 'F#']) };
 class Sfx {
   constructor() { this.ctx = null; this.muted = false; this.musicOn = true; this.last = {}; }
   init() {
@@ -22826,6 +22852,7 @@ class Renderer {
     g.save(); g.scale(1, -1); g.textAlign = 'center'; g.font = '800 26px Nunito, system-ui, sans-serif';
     for (const u of W.units) {
       if (!u.hero || u.removed || u.hidden || !u.alive) continue;
+      if (W.arena && typeof arenaVisible === 'function' && arenaVisible(W.arena, u) === false) continue; /* hidden enemies: no name either */
       if (!this.view || u.x < this.view.vx0 || u.x > this.view.vx1 || u.y < this.view.vy0 || u.y > this.view.vy1) continue;
       let ny = u.t.kind === 'kitty' ? 112 : u.t.kind === 'swimmer' ? 92 : 86;
       if (window.SPR && this.drawSprHero) { const C = SPR.MAN.chars[this.sprCharOf(u)]; if (C && C.hs) ny = (u._nameY != null ? u._nameY : C.hs * (C.sc || 1)) + 22; }
@@ -24058,7 +24085,7 @@ const ARENA = {
   correk: { name: '¡Corre o Te Pillan!', kind: 'tag', rounds: 5, roundT: 60, speed: 360, music: 'pesadilla',
     skills: [{ id: 'stun', ic: '💫', img: 'sk_stun', n: 'Aturdir', cd: 7, p: [1, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 3.5, p: [2, 3] }, { id: 'shield', ic: '🛡️', img: 'sk_shield', n: 'Escudo', cd: 9, p: [2, 2] }, { id: 'invis', ic: '👻', img: 'sk_invis', n: 'Invisible', cd: 12, p: [1, 2] }],
     chaser: [{ id: 'grab', ic: '🖐️', img: 'sk_hook', n: 'Agarrar', cd: 4, p: [1, 3] }, { id: 'dash', ic: '⚡', img: 'sk_dash', n: 'Embestida', cd: 3.5, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 4, p: [2, 2] }, { id: 'roar', ic: '🦁', img: 'sk_roar', n: 'Gruñido', cd: 10, p: [1, 2] }] },
-  zombie: { name: 'Infección Zombi', kind: 'infect', rounds: 3, roundT: 120, speed: 360, music: 'sombras',
+  zombie: { name: 'Infección Zombi', kind: 'zsurv', rounds: 1, roundT: 0, speed: 380, music: 'desesperacion', zoom: 0.85,
     skills: [{ id: 'stun', ic: '💫', n: 'Aturdir', cd: 9, p: [1, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 6, p: [2, 3] }, { id: 'shield', ic: '🛡️', n: 'Escudo', cd: 12, p: [2, 2] }],
     chaser: [{ id: 'grab', ic: '🖐️', n: 'Agarrar', cd: 6, p: [1, 3] }, { id: 'dash', ic: '⚡', n: 'Embestida', cd: 5, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 7, p: [2, 2] }] },
   pudge: { name: 'Guerra de Ganchos', kind: 'team', hp: 100, speed: 360, zoom: 0.78, music: 'guerra',
@@ -24097,6 +24124,7 @@ function setupArena(W, opts) {
     for (const sp of A.spots) { const k0 = A.cellOf(sp.x, sp.y); if (comp[k0] >= 0) continue; const c = size.length; let n = 0; const q = [k0]; comp[k0] = c; while (q.length) { const k = q.pop(); n++; const i = k % PW, j = (k / PW) | 0; for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const ni = i + di, nj = j + dj; if (ni < 0 || nj < 0 || ni >= PW || nj >= PW) continue; const nk = nj * PW + ni; if (comp[nk] >= 0 || !W.walkableCell(ni, nj)) continue; comp[nk] = c; q.push(nk); } } size.push(n); }
     const big = Math.max(...size, 1); A.spots = A.spots.filter(sp => size[comp[A.cellOf(sp.x, sp.y)]] >= big * 0.25); A.comp = comp; A.compAt = (x, y) => (x < -6144 || y < -6144 || x >= 6144 || y >= 6144) ? -1 : comp[A.cellOf(x, y)]; }
   A.midX = A.spots.reduce((s, p) => s + p.x, 0) / Math.max(1, A.spots.length);
+  if (C.kind === 'zsurv' && typeof zSetup === 'function') { A.mv = {}; A.mvSeen = {}; A.cd = new Map(); A.proj = []; A.clouds = []; return zSetup(A, opts); } /* Infección Zombi: its own full game (zombie.js) */
   // players: the humans (you, or everyone online) + the bots chosen in the lobby (each with its own level)
   const humans = (opts.humanIds && opts.humanIds.length ? opts.humanIds : [W.local.id]).slice();
   const botIds = (opts.arenaBotIds || opts.botIds || [1, 2, 3, 4, 5, 6, 7]).filter(i => !humans.includes(i) && i < 12);
@@ -24345,6 +24373,7 @@ function arenaTick(A, dt) {
 // where the camera should look: your own hook / arrow in flight, with you still on the screen; a hit on you brings it back to you
 function arenaThreats(A, me) { const out = []; for (const p of A.proj) { if (p.back || p.done || p.o === me || !A.enemy(p.o, me) || p.k === 'grab') continue; const rx = me.x - p.x, ry = me.y - p.y, along = rx * p.dx + ry * p.dy; if (along < -50 || along > 2200) continue; if (Math.abs(rx * p.dy - ry * p.dx) > 260) continue; out.push(p); } return out; }
 function arenaCam(A, cw, ch, z0) {
+  if (A.cam) return A.cam();
   const W = A.W, me = W.heroOf(W.local); if (!me) return null;
   if (A.look && me.alive) { const z = A.look; return { x: me.x + z.x, y: me.y + z.y, z: z0 * 0.72 }; }
   if (A.camSnap > W.time) return null;
@@ -24359,6 +24388,7 @@ function arenaCam(A, cw, ch, z0) {
 // ---------------- online ----------------
 // the host packs everything the others need to draw and to know who is alive
 function arenaSnap(A) {
+  if (A.snapFn) return A.snapFn();
   const W = A.W, r = n => Math.round(n), H = {};
   for (const u of A.heroes) { const id = u.owner.id; H[id] = [u.alive ? 1 : 0, r(u.ahp), A.kills[id], A.deaths[id], A.charges[id] || 0, r(Math.max(0, (u.stunUntil || 0) - W.time) * 10), (u.slowUntil > W.time ? 1 : 0) | (u.shieldUntil > W.time ? 2 : 0) | (u.healing ? 4 : 0) | (A.zomb.has(id) ? 8 : 0) | (u.dashUntil > W.time ? 16 : 0) | (u.invisUntil > W.time ? 32 : 0) | (u.visionUntil > W.time ? 64 : 0)]; }
   return { H, sc: A.score, rd: A.round, re: r(((A.roundEnd || 0) - W.time) * 10), pz: r(Math.max(0, (A.pause || 0) - W.time) * 10), tl: r(A.timeLeft), en: A.ended ? 1 : 0, cz: A.chaser ? A.chaser.owner.id : -1, ia: A.infAt ? r((A.infAt - W.time) * 10) : 0,
@@ -24367,6 +24397,7 @@ function arenaSnap(A) {
 }
 // the others: copy what the host says
 function arenaApply(A, s) {
+  if (A.applyFn) { if (A.client) A.applyFn(s); return; }
   if (!s || !A.client) return; A.snap = s; A.snapAt = A.W.time;
 }
 function arenaClientTick(A, dt) {
@@ -24456,12 +24487,14 @@ function arenaClouds(A, g, top) { const t = A.W.time;
 function arenaVisible(A, u) { const W = A.W, me = W.heroOf(W.local); if (!me || u === me || !A.enemy(me, u)) return undefined; if (u.invisUntil > W.time && !(me.visionUntil > W.time)) return false; if (A.dark) return A.dark(u, me); return undefined; }
 function arenaAlpha(A, u) { const t = A.W.time; let a = 1; if (u.invisUntil > t) a *= 0.4 + 0.08 * Math.sin(t * 9); if (A.clouds.some(c => c.o === u)) a *= 0.62; return a; } /* faded inside your poison cloud, but always there */
 function arenaGround(A, g, R) {
+  if (A.zGround) { A.R = R; return A.zGround(g, R); }
   const W = A.W; A.R = R; arenaClouds(A, g, false); if (A.extraGround) A.extraGround(g); if (A.id !== 'pudge') return; const [x0, y0, x1, y1] = A.bounds, t = W.time;
   const i0 = Math.max(0, Math.floor((x0 + 6144) / 32)), i1 = Math.min(W.PW - 1, Math.ceil((x1 + 6144) / 32)), j0 = Math.max(0, Math.floor((y0 + 6144) / 32)), j1 = Math.min(W.PW - 1, Math.ceil((y1 + 6144) / 32));
   g.fillStyle = '#1f5fa8'; g.beginPath(); for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const x = -6144 + i * 32; if (W.pbase[j * W.PW + i] || (Math.abs(x + 16) < 270 && !W.walkableCell(i, j))) g.rect(x - 0.5, -6144 + j * 32 - 0.5, 33, 33); } g.fill(); /* the river, and its edges you can't walk on */
   g.strokeStyle = 'rgba(190,230,255,0.35)'; g.lineWidth = 5; g.beginPath(); for (let j = j0; j <= j1; j += 3) for (let i = i0; i <= i1; i += 5) if (W.pbase[j * W.PW + i]) { const x = -6144 + i * 32 + 20 * Math.sin(t * 1.5 + j), y = -6144 + j * 32; g.moveTo(x - 24, y); g.quadraticCurveTo(x, y + 10, x + 24, y); } g.stroke();
 }
 function arenaDraw(A, g, R) {
+  if (A.zDraw) return A.zDraw(g, R);
   const W = A.W, t = W.time, me = W.heroOf(W.local);
   arenaClouds(A, g, true); if (A.extraDraw) A.extraDraw(g);
   for (const p of A.proj) {
@@ -24510,6 +24543,7 @@ function arenaDraw(A, g, R) {
 
 // ---------------- screen: score, kills / deaths, skill buttons ----------------
 function arenaHud(A, ui) {
+  if (A.hud) return A.hud(ui);
   const W = A.W, C = A.C, me = W.heroOf(W.local);
   let bar = document.getElementById('arenaBar');
   if (!bar) { bar = document.createElement('div'); bar.id = 'arenaBar'; document.body.appendChild(bar); }
@@ -24891,6 +24925,7 @@ function arenaItemsBot(A, b, u, D) {
 
 // ---------------- map info: the powers (same pictures as the buttons), the runes and the shop ----------------
 window.arenaGuide = id => {
+  if (id === 'zombie' && window.zombieGuide) return zombieGuide();
   const C = ARENA[id]; if (!C) return ''; const ic = (img, e) => img ? `<img class="icimg" src="${FX(img)}" alt="">` : `<span class="icemo">${e}</span>`;
   const SK = { stun: 'Deja quieto 2 s al Pillador cerca de ti.', blink: 'Te teletransportas hacia donde apuntas.', shield: 'Nada te atrapa por 3 s.', invis: 'El Pillador no te ve 4 s.', grab: 'Lanzas la mano y traes al que toques.', dash: 'Corres mucho más rápido 1,6 s.', roar: 'Los que corren cerca quedan lentos 2,5 s.', cloud: 'Una nube verde te sigue 5 s: frena y daña poco a poco.', hook: 'Atrapa al primero que toque y lo arrastra en curva hacia ti.', leap: 'Un gran salto sobre árboles y muros.', arrow: 'Mientras más lejos llega, más daño y más aturde.', raze1: 'Sombra cerca de ti.', raze2: 'Sombra a media distancia.', raze3: 'Sombra lejos.', requiem: 'Explosión alrededor: más fuerte con más cargas (hasta 20).' };
   const sk = (C.skills || []).concat(C.chaser || []).filter((s, i, a) => a.findIndex(x => x.id === s.id) === i);
@@ -24900,6 +24935,821 @@ window.arenaGuide = id => {
   return h;
 };
 if (typeof module !== 'undefined') module.exports = { RUNES, ITEMS };
+
+// MapMix: Infección Zombi — the full game of the original map (humans build a base and survive until sunrise;
+// the zombies buy items, make recipes and infect them). Every rule here comes from the original map's data
+// (classes, abilities, buildings, research, shops, recipes, income, timers), translated and scaled to MapMix.
+// Online: the host runs everything; the others send their commands ('zcmd') and draw the snapshot.
+'use strict';
+// ---------------- classes ----------------
+const ZH = { // the marines (humans)
+  droid: { n: 'Droide de batalla', ic: '🤖', dmg: [30, 35], cd: 0.3, rng: 520, sk: ['pgren', 'barrel'], d: 'Daño rápido · Granada de plasma, Barril explosivo' },
+  sniper: { n: 'Francotirador', ic: '🎯', dmg: [150, 150], cd: 1.0, rng: 1100, sk: ['mark', 'assas'], d: 'Mucho daño de lejos · Marca, Asesinar' },
+  plasma: { n: 'Artillero de plasma', ic: '⚡', dmg: [100, 100], cd: 0.8, rng: 650, sk: ['storm', 'after'], d: 'Daño y apoyo · Tormenta, Réplica' },
+  heavy: { n: 'Artillero pesado', ic: '💪', dmg: [60, 75], cd: 0.7, rng: 560, sk: ['roarh'], d: 'Daño · Rugido de batalla' },
+  ranger: { n: 'Guardabosques', ic: '🌲', dmg: [40, 60], cd: 0.5, rng: 600, sk: ['smoke', 'gren'], d: 'Apoyo · Bomba de humo, Granada' },
+  commando: { n: 'Comando', ic: '🛰️', dmg: [45, 50], cd: 0.5, rng: 600, sk: ['orbital', 'blind'], d: 'Daño en área · Rayo orbital, Disparo cegador' },
+  pyro: { n: 'Pirómano', ic: '🔥', dmg: [40, 50], cd: 0.4, rng: 460, sk: ['firewall', 'flame'], d: 'Daño en área · Muro de fuego, Lanzallamas' },
+  engineer: { n: 'Ingeniero', ic: '🔧', dmg: [40, 45], cd: 0.45, rng: 560, sk: ['sentry', 'repairbot'], d: 'Apoyo · Torreta, Robot reparador' },
+  medic: { n: 'Médico', ic: '💉', dmg: [40, 50], cd: 0.5, rng: 560, sk: ['adren', 'antidote'], d: 'Apoyo · Adrenalina, Antídoto' },
+  sheep: { n: 'Rebelde oveja', ic: '🐑', dmg: [55, 75], cd: 0.6, rng: 600, sk: ['missiles', 'ksheep'], d: 'Daño y apoyo · Misiles, Oveja kamikaze' },
+};
+const ZZ = { // the zombies
+  tank: { n: 'Zombi tanque', ic: '🛡️', dmg: [155, 155], cd: 2.2, spd: 280, hp: 5500, sk: ['harden', 'haste'], d: 'Tanque · Piel dura, Prisa' },
+  raptor: { n: 'Zombi raptor', ic: '🦖', dmg: [45, 55], cd: 0.6, spd: 380, hp: 3000, sk: ['shadow', 'rage'], d: 'Cazador · Caza en las sombras, Furia' },
+  balanced: { n: 'Zombi equilibrado', ic: '⚖️', dmg: [95, 115], cd: 1.3, spd: 350, hp: 4500, sk: ['exhaust', 'stance'], d: 'Cazador · Agotar, Postura (+20%)' },
+  faceless: { n: 'Zombi sin rostro', ic: '😶', dmg: [95, 115], cd: 1.5, spd: 350, hp: 4000, sk: ['fear', 'calldeath'], d: 'Apoyo · Miedo, Llamado de la muerte' },
+  deadly: { n: 'Zombi mortal', ic: '☠️', dmg: [106, 116], cd: 1.4, spd: 350, hp: 4000, sk: ['thirst', 'hellground'], d: 'Apoyo · Sed de sangre, Suelo infernal (revive solo)' },
+  necro: { n: 'Zombi nigromante', ic: '🧙', dmg: [76, 86], cd: 1.0, spd: 370, hp: 3700, sk: ['curse', 'army'], d: 'Apoyo · Maldición, Levantar un ejército' },
+  healer: { n: 'Zombi sanador', ic: '🩸', dmg: [106, 126], cd: 1.5, spd: 350, hp: 4300, sk: ['coil', 'rejuv'], d: 'Sanador · Espiral de sangre, Rejuvenecer' },
+};
+const HUM_HP = 650, HUM_SPD = 380;
+// ---------------- skills ----------------
+// t: 'self' | 'point' | 'foe' (nearest enemy in range) | 'ally' | 'passive'
+const ZSK = {
+  blink: { n: 'Blink', img: 'sk_blink', cd: 30, t: 'point', r: 700 },
+  ensnare: { n: 'Atrapar', ic: '🕸️', cd: 50, t: 'foe', r: 600 },
+  rapid: { n: 'Fuego rápido', ic: '🔫', cd: 50, t: 'self' },
+  pgren: { n: 'Granada de plasma', ic: '💣', cd: 40, t: 'point', r: 900 },
+  barrel: { n: 'Barril explosivo', ic: '🛢️', cd: 30, t: 'self' },
+  mark: { n: 'Marca del francotirador', ic: '🎯', cd: 30, t: 'foe', r: 1500 },
+  assas: { n: 'Asesinar', ic: '💀', cd: 25, t: 'foe', r: 3000 },
+  storm: { n: 'Tormenta', ic: '⛈️', cd: 20, t: 'point', r: 800 },
+  after: { n: 'Réplica', ic: '💥', t: 'passive' },
+  roarh: { n: 'Rugido de batalla', img: 'sk_roar', cd: 30, t: 'self' },
+  smoke: { n: 'Bomba de humo', ic: '🌫️', cd: 40, t: 'point', r: 700 },
+  gren: { n: 'Granada', ic: '🧨', cd: 25, t: 'point', r: 700 },
+  orbital: { n: 'Rayo orbital', ic: '🛰️', cd: 30, t: 'point', r: 900 },
+  blind: { n: 'Disparo cegador', ic: '😵', cd: 30, t: 'foe', r: 800 },
+  firewall: { n: 'Muro de fuego', ic: '🔥', cd: 30, t: 'self' },
+  flame: { n: 'Lanzallamas', ic: '🌋', t: 'passive' },
+  sentry: { n: 'Torreta', ic: '🗼', cd: 17, t: 'self' },
+  repairbot: { n: 'Robot reparador', ic: '🛠️', cd: 60, t: 'self' },
+  adren: { n: 'Adrenalina', ic: '💉', cd: 30, t: 'ally', r: 600 },
+  antidote: { n: 'Antídoto', ic: '🧪', cd: 25, t: 'ally', r: 600 },
+  missiles: { n: 'Misiles', ic: '🚀', cd: 30, t: 'self' },
+  ksheep: { n: 'Oveja kamikaze', ic: '🐑', cd: 20, t: 'self' },
+  madness: { n: 'Locura zombi', ic: '😡', cd: 40, t: 'self' },
+  recall: { n: 'Volver a la base', ic: '🏠', cd: 2, t: 'self' },
+  harden: { n: 'Piel dura', img: 'sk_shield', cd: 1, t: 'self' },
+  haste: { n: 'Prisa', img: 'sk_dash', cd: 15, t: 'self' },
+  shadow: { n: 'Caza en las sombras', img: 'sk_invis', cd: 30, t: 'self' },
+  rage: { n: 'Furia', ic: '😤', cd: 30, t: 'self' },
+  exhaust: { n: 'Agotar', ic: '🥵', cd: 20, t: 'foe', r: 700 },
+  stance: { n: 'Postura', ic: '⚖️', t: 'passive' },
+  fear: { n: 'Miedo', ic: '😱', cd: 40, t: 'point', r: 700 },
+  calldeath: { n: 'Llamado de la muerte', ic: '📯', cd: 40, t: 'self' },
+  thirst: { n: 'Sed de sangre', ic: '🩸', cd: 40, t: 'self' },
+  hellground: { n: 'Suelo infernal', ic: '♨️', cd: 35, t: 'point', r: 600 },
+  curse: { n: 'Maldición', ic: '🧿', cd: 30, t: 'point', r: 600 },
+  army: { n: 'Levantar un ejército', ic: '🧟', cd: 30, t: 'self' },
+  coil: { n: 'Espiral de sangre', ic: '🩸', cd: 9, t: 'ally', r: 700 },
+  rejuv: { n: 'Rejuvenecer', ic: '💚', cd: 15, t: 'ally', r: 700 },
+};
+const ZSK_D = { blink: 'Te teletransportas (30 s).', ensnare: 'Atas al zombi más cercano al suelo (2 s +1 por mejora).', rapid: 'Disparas el doble de rápido (2 s +1 por mejora).', pgren: 'Explota a los 3 s: 300 de daño y frena.', barrel: 'Barril invisible: 150 de daño y aturde 1 s.', mark: 'El zombi recibe +20% de daño y lo ves 20 s.', assas: 'Apuntas 2,5 s y haces 500 de daño.', storm: '200 de daño y los empuja.', after: '10% de que tu disparo haga +60 y aturda 2,5 s.', roarh: 'Tus amigos cerca hacen +30% de daño 15 s.', smoke: 'Los zombis dentro fallan la mitad de sus golpes 15 s.', gren: '30 de daño por segundo y les baja la armadura 6 s.', orbital: 'A los 2,5 s cae un rayo: 400 de daño.', blind: '50 de daño y el zombi falla todo 3 s.', firewall: 'Un muro de fuego: 40 por segundo 15 s.', flame: '12% de lanzar una ola de fuego (70).', sentry: 'Una torreta que dispara 40 s.', repairbot: 'Un robot repara tus edificios 40 s.', adren: 'Un amigo dispara 60% más rápido 15 s.', antidote: 'Un amigo o edificio no recibe daño 5 s.', missiles: '3 misiles a los zombis cercanos (200).', ksheep: 'Una oveja que explota (300).', madness: '-40% de daño recibido y te limpias 8 s.', recall: 'Vuelves a tu base en 2,25 s.', harden: '-40% de daño recibido, -20% velocidad (enciende/apaga).', haste: '+100 de velocidad 8 s (cuesta 400 de vida).', shadow: 'Invisible 20 s (se pierde al atacar).', rage: 'Atacas el doble de rápido y corres +30% 15 s.', exhaust: 'Un humano hace -50% de daño y va lento 8 s.', stance: '+20% de ataque y velocidad siempre.', fear: 'Los humanos en el área no disparan ni usan poderes 5 s.', calldeath: 'Los zombis cerca hacen el doble de daño 25 s.', thirst: 'Zombis cerca: +20% velocidad y +20 armadura 25 s.', hellground: 'Suelo de fuego 60 s: zombis dentro +40% ataque y velocidad.', curse: 'Los humanos en el área fallan 30% 10 s.', army: 'Levantas 10 zombis que pelean por ti.', coil: 'Curas a un zombi 10% de su vida.', rejuv: 'Curas a un zombi 1000 en 10 s.' };
+// ---------------- buildings ----------------
+// s: size (world units), hp, cost (gold, honor), req: research needed, up: what it upgrades into
+const ZB = {
+  barricade: { n: 'Barricada', ic: '🧱', s: 64, hp: 200, g: 15, up: ['adv'], d: 'Bloquea a los zombis. Se mejora.' },
+  adv: { n: 'Barricada avanzada', ic: '🧱', s: 64, hp: 400, g: 15, up: ['stone'], hide: 1 },
+  stone: { n: 'Barricada de piedra', ic: '🪨', s: 64, hp: 600, g: 40, req: ['walls', 1], up: ['super'], hide: 1 },
+  super: { n: 'Super barricada de piedra', ic: '🪨', s: 64, hp: 800, g: 50, req: ['walls', 2], up: ['burrow'], hide: 1 },
+  burrow: { n: 'Barricada con púas', ic: '🦔', s: 64, hp: 1000, g: 0, h: 1, req: ['walls', 3], hide: 1, d: 'Devuelve 30% del golpe. Reparación de emergencia (+350, 1 vez).' },
+  research: { n: 'Centro de investigación', ic: '🔬', s: 128, hp: 500, g: 100, d: 'Mejoras para tu base y tu marine.' },
+  exchange: { n: 'Oficina de cambio', ic: '💱', s: 128, hp: 300, g: 100, up: ['trade'], d: 'Cambia oro por honor y honor por oro.' },
+  trade: { n: 'Oficina comercial', ic: '🏪', s: 128, hp: 400, g: 100, hide: 1, d: 'Cambio + accesorios para tu marine + juego de dados.' },
+  factory: { n: 'Fábrica', ic: '🏭', s: 128, hp: 300, g: 150, d: '+2 de oro por segundo (más con la mejora de Ingresos, 5 niveles). Hasta 2 cuentan.' },
+  flag: { n: 'Bandera de marines', ic: '🚩', s: 96, hp: 300, g: 100, d: 'Aura para tus marines o edificios cercanos.' },
+  core: { n: 'Núcleo de energía', ic: '🔋', s: 96, hp: 300, g: 150, req: ['power', 1], up: ['gen'], d: '+2 de energía (cada torre usa 1).' },
+  gen: { n: 'Generador de energía', ic: '⚡', s: 96, hp: 400, g: 120, hide: 1, d: '+2 de energía más.' },
+  turret: { n: 'Torreta básica', ic: '🗼', s: 96, hp: 300, g: 100, pw: 1, up: ['rocket', 'electric', 'frost'], d: 'No dispara: mejórala. Máximo 4.' },
+  rocket: { n: 'Torreta de cohetes', ic: '🚀', s: 96, hp: 400, g: 300, pw: 1, dmg: [15, 25], cd: 1.0, rng: 800, hide: 1 },
+  electric: { n: 'Torreta eléctrica', ic: '⚡', s: 96, hp: 400, g: 300, pw: 1, dmg: [20, 25], cd: 0.5, rng: 800, hide: 1 },
+  frost: { n: 'Torreta de hielo', ic: '❄️', s: 96, hp: 400, g: 300, pw: 1, dmg: [25, 35], cd: 1.0, rng: 800, slow: 1, hide: 1 },
+  warehouse: { n: 'Almacén', ic: '📦', s: 128, hp: 400, g: 150, req: ['attach', 1], d: 'Vende armas y equipo para tu marine.' },
+};
+const ZB_BUILD = ['barricade', 'research', 'exchange', 'factory', 'flag', 'core', 'turret', 'warehouse'];
+// research (at the Research Center; income at the Factory): g = cost of level 1, gi = more per level, h = honor
+const ZR = {
+  walls: { n: 'Muros de piedra', ic: '🪨', max: 3, g: 200, gi: 200, h: 1, hi: 1, d: 'Nv1 piedra · Nv2 super piedra · Nv3 con púas' },
+  dmg: { n: 'Daño', ic: '💥', max: 10, g: 300, gi: 50, d: '+6% de daño (marine y torres)' },
+  range: { n: 'Alcance', ic: '🎯', max: 10, g: 300, gi: 50, d: '+5% de alcance' },
+  hp: { n: 'Resistencia', ic: '❤️', max: 10, g: 200, gi: 25, d: '+50 de vida' },
+  attach: { n: 'Accesorios', ic: '🎒', max: 1, g: 150, d: 'Bolso de 6 y permite el Almacén' },
+  power: { n: 'Tecnología de energía', ic: '🔋', max: 1, g: 100, h: 1, d: 'Permite el Núcleo de energía (para torres)' },
+  ensnare: { n: 'Atrapar', ic: '🕸️', max: 3, g: 150, gi: 50, d: '+1 s de Atrapar' },
+  rapid: { n: 'Fuego rápido', ic: '🔫', max: 3, g: 150, gi: 50, d: '+1 s de Fuego rápido' },
+  income: { n: 'Ingresos', ic: '🪙', max: 5, g: 200, gi: 100, at: 'factory', d: '+2 de oro por segundo' },
+};
+const FLAG_AURA = { cmd: ['Aura de mando', '+15% de daño a marines cerca'], endu: ['Aura de resistencia', '+10% de velocidad de ataque'], crip: ['Aura paralizante', '-2 de armadura a los zombis cerca'], fort: ['Aura de fortificación', '+1 de armadura a tus edificios cerca'] };
+// ---------------- items ----------------
+// st: stats while carried · act: power you use · shop: where it is sold
+const ZI = {
+  // humans: Almacén (warehouse) and Oficina comercial (attachments)
+  benelli: { n: 'Escopeta M2', ic: '🔫', shop: 'Almacén', g: 300, st: { dmg: 10, stunHit: 0.1 }, d: '+10 de daño, 10% de mini aturdir (+40).' },
+  wa2000: { n: 'Rifle semiautomático', ic: '🎯', shop: 'Almacén', g: 300, st: { dmg: 10, dmgPct: 0.08 }, d: '+10 de daño y +8% de daño.' },
+  prifle: { n: 'Rifle de plasma', ic: '⚡', shop: 'Almacén', g: 300, st: { dmg: 10, chain: 0.15 }, d: '+10 de daño, 15% de rayo a 2 zombis (80).' },
+  at4: { n: 'Lanzacohetes', ic: '🚀', shop: 'Almacén', g: 300, st: { rocket: 2.5 }, act: 'flare', cd: 60, d: 'Un cohete cada 2,5 s (70). Úsalo: bengala que ilumina 10 s.' },
+  drifle: { n: 'Rifle mortal', ic: '💀', shop: 'Almacén', g: 300, st: { dmg: 10, crit: 0.15 }, d: '+10 de daño, 15% de golpe doble.' },
+  m404: { n: 'Rifle pesado', ic: '🔩', shop: 'Almacén', g: 300, st: { dmg: 10, pierce: 4 }, d: '+10 de daño, baja 4 de armadura.' },
+  pathogen: { n: 'Rifle patógeno', ic: '🦠', shop: 'Almacén', g: 300, st: { dmg: 10, poison: 30 }, d: '+10 de daño, veneno 30/s y frena.' },
+  mboots: { n: 'Botas militares', ic: '🥾', shop: 'Almacén', g: 175, st: { spd: 35 }, act: 'sprint', cd: 40, d: '+35 de velocidad. Úsalas: carrera 3,5 s.' },
+  booster: { n: 'Potenciador de Blink', ic: '🌀', shop: 'Almacén', g: 150, st: { blinkCd: 10 }, d: 'Blink 10 s antes.' },
+  gmedal: { n: 'Medalla de oro', ic: '🥇', shop: 'Almacén', g: 100, st: { bounty: 100 }, d: '+100 de oro por cada zombi que mates.' },
+  sphere: { n: 'Esfera limpiadora', ic: '🔵', shop: 'Almacén', g: 300, st: { hp: 90, block: 1 }, d: '+90 de vida, bloquea un poder enemigo cada 25 s.' },
+  suit: { n: 'Traje de marine', ic: '🦺', shop: 'Oficina comercial', g: 400, st: { evade: 0.5 }, d: '50% de esquivar un golpe.' },
+  pgen2: { n: 'Generador portátil', ic: '🔋', shop: 'Oficina comercial', g: 200, st: { blinkCd: 10 }, d: 'Blink 10 s antes.' },
+  mleg: { n: 'Pierna mecánica', ic: '🦿', shop: 'Oficina comercial', g: 200, st: { spd: 30 }, d: '+30 de velocidad.' },
+  erifle: { n: 'Rifle eléctrico', ic: '🔌', shop: 'Oficina comercial', g: 300, st: { dmg: 10, chain: 0.15 }, d: '+10 de daño, 15% de rayo (80).' },
+  rlaunch: { n: 'Lanzacohetes de hombro', ic: '🎆', shop: 'Oficina comercial', g: 350, st: { rocket: 3.5 }, d: 'Un cohete cada 3,5 s (70).' },
+  pierce: { n: 'Balas perforantes', ic: '🔩', shop: 'Oficina comercial', g: 250, st: { dmg: 10, pierce: 4 }, d: '+10 de daño, -4 de armadura.' },
+  radio: { n: 'Balas radiactivas', ic: '☢️', shop: 'Oficina comercial', g: 300, st: { poison: 40 }, d: '40 de daño por segundo 3 s y frena.' },
+  // zombies: Cripta, Tumba de reliquias, Tienda embrujada, Tienda secreta, Vendedor de recetas
+  zboots: { n: 'Botas de velocidad', ic: '👢', shop: 'Cripta', g: 300, st: { spd: 35 }, d: '+35 de velocidad.' },
+  gloves: { n: 'Guantes de prisa', ic: '🧤', shop: 'Cripta', g: 400, st: { atk: 0.15 }, d: '+15% de velocidad de ataque.' },
+  lance: { n: 'Lanza larga', ic: '🔱', shop: 'Cripta', g: 350, st: { dmg: 25 }, d: '+25 de daño.' },
+  maul: { n: 'Mazo de ogro', ic: '🔨', shop: 'Cripta', g: 700, st: { bld: 0.3 }, d: '+30% de daño a edificios.' },
+  ring: { n: 'Anillo de protección', ic: '💍', shop: 'Cripta', g: 350, st: { armor: 5 }, d: '+5 de armadura.' },
+  shield: { n: 'Escudo de acero', ic: '🛡️', shop: 'Cripta', g: 450, st: { armor: 3, blockPct: 0.09 }, d: '+3 de armadura y 9% de bloqueo.' },
+  hstone: { n: 'Piedra de vida', ic: '💚', shop: 'Cripta', g: 500, st: { hp: 500 }, d: '+500 de vida.' },
+  gem: { n: 'Gema encantada', ic: '💎', shop: 'Cripta', g: 320, st: { regen: 10 }, d: '+10 de vida por segundo.' },
+  claws: { n: 'Garras de ataque', ic: '🐾', shop: 'Cripta', g: 520, st: { dmg: 37 }, d: '+37 de daño.' },
+  waraxe: { n: 'Hacha de guerra', ic: '🪓', shop: 'Cripta', g: 750, st: { dmg: 40, chaos: 0.1 }, d: '+40 de daño, 10% de destruir un edificio de un golpe.' },
+  dorb: { n: 'Orbe de dragón', ic: '🔮', shop: 'Cripta', g: 1000, st: { hp: 1000 }, d: '+1000 de vida.' },
+  ritual: { n: 'Ritual oscuro', ic: '📕', shop: 'Tumba de reliquias', g: 600, use: 'level', d: 'Sube 1 nivel a tu zombi (máximo 5).' },
+  gring: { n: 'Anillo de oro', ic: '💰', shop: 'Tumba de reliquias', g: 100, st: { pillage: 2 }, d: '+2 de oro por cada golpe a un edificio.' },
+  meta: { n: 'Metamorfosis', ic: '🔄', shop: 'Tumba de reliquias', g: 100, use: 'meta', d: 'Cambias de clase de zombi.' },
+  portal: { n: 'Pergamino de portal', ic: '📜', shop: 'Tumba de reliquias', g: 150, act: 'recall', cd: 60, d: 'Úsalo: vuelves a la base.' },
+  gold2honor: { n: 'Oro por honor', ic: '🎖️', shop: 'Tumba de reliquias', g: 1000, use: 'honor', d: '1 de honor por 1000 de oro.' },
+  honor2gold: { n: 'Honor por oro', ic: '🪙', shop: 'Tumba de reliquias', g: 0, h: 1, use: 'gold500', d: '500 de oro por 1 de honor.' },
+  borb: { n: 'Orbe de sangre', ic: '🩸', shop: 'Tienda embrujada', g: 380, st: { aura: 10 }, d: 'Aura: +10 de vida por segundo a los zombis cerca.' },
+  isword: { n: 'Espada de hierro', ic: '🗡️', shop: 'Tienda embrujada', g: 630, st: { dmg: 45 }, d: '+45 de daño.' },
+  pick: { n: 'Pico minero', ic: '⛏️', shop: 'Tienda embrujada', g: 420, st: { dmg: 30 }, d: '+30 de daño.' },
+  shoulders: { n: 'Hombreras bárbaras', ic: '🦴', shop: 'Tienda embrujada', g: 1350, st: { armor: 5, blockPct: 0.17 }, d: '+5 de armadura y 17% de bloqueo.' },
+  hammer: { n: 'Martillo del trueno', ic: '🔨', shop: 'Tienda embrujada', g: 2000, st: { dmg: 120, splash: 80 }, d: '+120 de daño, 25% de dañar 80 a edificios cercanos.' },
+  taxe: { n: 'Hacha titánica', ic: '🪓', shop: 'Tienda embrujada', g: 1500, st: { dmg: 100 }, act: 'demolish', cd: 25, d: '+100 de daño. Úsala: destruye el edificio más cercano.' },
+  wings: { n: 'Alas de vampiro', ic: '🦇', shop: 'Tienda embrujada', g: 1000, st: { armor: 6 }, act: 'drain', cd: 40, d: '+6 de armadura. Úsalas: te curas 1250 en 10 s.' },
+  dclaws: { n: 'Garras mortales', ic: '🩸', shop: 'Tienda embrujada', g: 1000, act: 'frenzy', cd: 30, d: 'Úsalas: atacas el doble de rápido 10 s.' },
+  cloak: { n: 'Capa de llamas', ic: '🔥', shop: 'Tienda embrujada', g: 1150, st: { armor: 5, burn: 45 }, d: '+5 de armadura, quema 45/s a los edificios cerca.' },
+  staff: { n: 'Bastón de reanimación', ic: '🪄', shop: 'Tienda secreta', g: 800, st: { regen: 10 }, act: 'regrow', cd: 40, d: '+10 de vida/s. Úsalo: 500 de vida en 10 s.' },
+  dheart: { n: 'Corazón de demonio', ic: '😈', shop: 'Tienda secreta', g: 600, act: 'demon', cd: 120, d: 'Úsalo: un demonio invisible y rápido te acompaña 120 s (frenesí a tus amigos).' },
+  wheart: { n: 'Corazón de bruja', ic: '🧙‍♀️', shop: 'Tienda secreta', g: 600, act: 'witch', cd: 120, d: 'Úsalo: una bruja invisible 120 s maldice a los humanos cerca.' },
+  gheart: { n: 'Corazón fantasma', ic: '👻', shop: 'Tienda secreta', g: 100, act: 'ghost', cd: 120, d: 'Úsalo: un fantasma muy rápido explora 60 s.' },
+  cball: { n: 'Bola de cristal', ic: '🔮', shop: 'Tienda secreta', g: 200, act: 'reveal', cd: 30, d: 'Úsala: ves una zona grande 10 s.' },
+  eye: { n: 'Ojo de los muertos', ic: '👁️', shop: 'Tienda secreta', g: 100, act: 'eye', cd: 1, uses: 2, d: 'Úsalo: un ojo invisible vigila 120 s (2 usos).' },
+  sward: { n: 'Guardia aturdidora', ic: '⚠️', shop: 'Tienda secreta', g: 200, act: 'sward', cd: 1, uses: 1, d: 'Úsala: trampa invisible que aturde 2 s.' },
+  pinvis: { n: 'Poción de invisibilidad', ic: '🫥', shop: 'Tienda secreta', g: 180, act: 'pinvis', cd: 5, uses: 1, d: 'Úsala: invisible 20 s.' },
+};
+// recipes (Vendedor de recetas): with the parts in your bag, the recipe joins them into the new item
+const ZREC = {
+  woodleg: { n: 'Pata de palo', ic: '🦵', g: 50, parts: ['gloves', 'zboots'], st: { spd: 60, atk: 0.4 }, d: '+60 de velocidad y +40% de ataque.' },
+  bspear: { n: 'Lanza de batalla', ic: '🔱', g: 150, parts: ['gloves', 'lance'], st: { dmg: 100, atk: 0.3 }, act: 'throw', cd: 9, d: '+100 de daño, +30% de ataque. Úsala: destruye una torreta o robot.' },
+  vanguard: { n: 'Vanguardia', ic: '🛡️', g: 0, parts: ['dorb', 'ring'], st: { hp: 1500, armor: 10 }, d: '+1500 de vida y +10 de armadura.' },
+  dshield: { n: 'Escudo del señor de la muerte', ic: '🛡️', g: 300, h: 1, parts: ['shield', 'gem'], st: { armor: 10, blockPct: 0.18, regen: 10 }, act: 'unholy', cd: 40, d: '+10 de armadura, 18% de bloqueo, +10 vida/s. Úsalo: +20 de armadura a los zombis cerca.' },
+  chaos: { n: 'Hacha del caos', ic: '🪓', g: 100, h: 2, parts: ['maul', 'waraxe'], st: { dmg: 100, bld: 0.4, chaos: 0.17 }, d: '+100 de daño, +40% a edificios, 17% de destruirlos de un golpe.' },
+  chaste: { n: 'Garras de prisa', ic: '🐾', g: 100, parts: ['gloves', 'claws', 'lance'], st: { dmg: 100, atk: 0.2, atkAura: 0.2 }, d: '+100 de daño, +20% de ataque, aura de ataque.' },
+  crown: { n: 'Corona del señor de la muerte', ic: '👑', g: 500, parts: ['hstone', 'gem'], st: { hp: 1000, regen: 20, reinc: 70 }, d: '+1000 de vida, +20 vida/s, revives solo (70 s).' },
+  immort: { n: 'Espada de inmortalidad', ic: '⚔️', g: 250, parts: ['claws', 'lance'], st: { dmg: 100, atkAura: 0.2 }, act: 'immortal', cd: 40, d: '+100 de daño, aura. Úsala: invulnerable 5 s.' },
+  dboots: { n: 'Botas demoníacas', ic: '👢', g: 400, parts: ['zboots'], st: { spd: 50, armor: 4 }, act: 'zsprint', cd: 15, d: '+50 de velocidad, +4 de armadura. Úsalas: +30% 8 s.' },
+  soulgem: { n: 'Gema de almas', ic: '💠', g: 0, parts: ['gem', 'borb', 'staff'], st: { regen: 20, aura: 20 }, act: 'massheal', cd: 45, d: '+20 vida/s, aura de vida. Úsala: cura 900 a los zombis cerca.' },
+  apoc: { n: 'Espada del apocalipsis', ic: '🗡️', g: 800, parts: ['isword', 'pick'], st: { dmg: 100 }, act: 'apoc', cd: 40, d: '+100 de daño. Úsala: +200 de daño y 50% de robo de vida 13 s.' },
+};
+const ZSHOPS = { // zombie shops in the middle of the map (original positions)
+  'Cripta': [-896, 192], 'Vendedor de recetas': [115, 142], 'Tumba de reliquias': [-896, -960], 'Tienda embrujada': [128, -896], 'Tienda secreta': [-622, -2824] };
+const NEUTRAL_FACTORIES = [[-2816, 832], [-896, -5184], [4672, 448], [4608, -2432], [-4096, -4544], [576, 3776], [-2496, 4736], [3712, -3328], [-4608, 1280], [1280, -2944], [-3200, -3648], [768, -1408], [4928, 1792], [3328, -2816], [-256, 3520], [-3648, 4160], [5248, 448], [2816, 4160], [2432, 3648], [1344, -4288]];
+const HUMAN_ZONE = [-400, -448], ZOMBIE_ZONE = [-400, -448]; /* in the original everybody appears in the middle (Create_Zone); the zombies wait there, next to their shops */
+const RAISE_T = 60, PICK_T = 20;
+window.ZOMBIE_DATA = { ZH, ZZ, ZSK, ZB, ZR, ZI, ZREC };
+
+// ---------------- setup ----------------
+function zSetup(A, opts) {
+  const W = A.W, C = A.C; A.z = true; document.body.dataset.akind = 'zsurv';
+  const tm = String(opts.zombieTime || 'z20'); A.gameT = (+tm.slice(1) || 20) * 60; A.t0 = W.time;
+  const humans = (opts.humanIds && opts.humanIds.length ? opts.humanIds : [W.local.id]).slice();
+  const botIds = (opts.arenaBotIds || opts.botIds || []).filter(i => !humans.includes(i) && i < 13);
+  const names = opts.names ? null : (opts.botNames || ARENA_BOT_NAMES), diffOf = i => ARENA_DIFF[(opts.arenaDiff || {})[i]] ? (opts.arenaDiff || {})[i] : (opts.chaserDiff && ARENA_DIFF[opts.chaserDiff] ? opts.chaserDiff : 'normal');
+  W.ai = { bots: [], active: opts.botsActive !== false && !A.client, extraIds: [], update() {} };
+  const ids = humans.concat(botIds); A.ids = ids.slice();
+  ids.forEach(pid => { const p = W.players[pid]; p.slot = 1; p.team = 0; if (botIds.includes(pid)) { p.ai = true; if (names) p.name = names[pid - 1] || ARENA_BOT_NAMES[(pid - 1) % 11] || ('Bot ' + pid); W.ai.bots.push({ p, t: Math.random(), diff: diffOf(pid) }); } p.allies = new Set([pid]); });
+  // who starts as a zombie: 1 (2 with 8 or more players) — you if you took "El virus"
+  const nZ = ids.length >= 8 ? 2 : 1; let heads = [];
+  if (opts.chaserMe && !opts.humanIds) heads.push(W.local.id);
+  const pool = ids.filter(i => !heads.includes(i) && (i !== W.local.id || opts.humanIds)); while (heads.length < nZ && pool.length) heads.push(pool.splice(Math.floor(W.rand() * pool.length), 1)[0]);
+  if (opts.zHeads) heads = opts.zHeads.slice();
+  A.zomb = new Set(); A.heads = new Set(heads); A.heroes = []; A.kills = {}; A.deaths = {}; A.gold = {}; A.honor = {}; A.res = {}; A.inv = {}; A.cls = {}; A.lvl = {}; A.buf = {}; A.cdz = {}; A.power = {}; A.dice = {};
+  A.blds = []; A.mins = []; A.zones = []; A.bid = 0; A.fx = []; A.fxLog = []; A.fxId = 0; A.later = []; A.vis = [];
+  A.facs = NEUTRAL_FACTORIES.map(([x, y], i) => { const q = W.nearestWalkable(x, y, 400) || { x, y }; return { i, x: q.x, y: q.y, own: -1, cap: null }; });
+  A.shops = Object.entries(ZSHOPS).map(([n, [x, y]]) => { const q = W.nearestWalkable(x, y, 600) || { x, y }; return { n, x: q.x, y: q.y }; });
+  const hz = W.nearestWalkable(HUMAN_ZONE[0], HUMAN_ZONE[1], 900) || A.spots[0], zz = W.nearestWalkable(ZOMBIE_ZONE[0], ZOMBIE_ZONE[1], 900) || A.spots[A.spots.length - 1];
+  A.hzone = hz; A.zzone = zz;
+  for (const pid of ids) { const p = W.players[pid], zb = A.heads.has(pid); const s = zSpawnPt(A, zb);
+    const u = W.createUnit(p, fourcc('E000'), s.x, s.y, 0); A.heroes.push(u); A.kills[pid] = 0; A.deaths[pid] = 0; A.gold[pid] = zb ? 4000 : 1000; A.honor[pid] = 0; A.res[pid] = {}; A.inv[pid] = []; A.lvl[pid] = 1; A.buf[pid] = {};
+    if (zb) zMakeZombie(A, u, true); else { zSetHuman(A, u); } arenaMove(A, u, s.x, s.y); }
+  A.isHunter = u => !!u && !!u.owner && A.zomb.has(u.owner.id);
+  for (const a of ids) for (const c of ids) if (A.zomb.has(a) === A.zomb.has(c)) W.players[a].allies.add(c);
+  A.enemy = (a, b) => !!a && !!b && a !== b && A.isHunter(a) !== A.isHunter(b);
+  A.alive = () => A.heroes.filter(u => u.alive && !u.removed);
+  A.nearestFoe = u => { let best = null, bd = Infinity; for (const e of A.alive()) { if (!A.enemy(u, e) || !zSees(A, u.owner, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; best = e; } } return best; };
+  A.say = (txt, col) => { W.emit('text', (col ? '|c' + col : '') + txt + (col ? '|r' : '')); if (!A.client) A.fxLog.push({ id: ++A.fxId, k: 'say', txt, col, t: W.time }); };
+  A.addFx = f => { A.fx.push(f); if (!A.client) A.fxLog.push(Object.assign({ id: ++A.fxId }, f, { u: undefined })); };
+  A.skillsOf = u => zSkillsOf(A, u); A.ready = (u, k) => Math.max(0, (A.cdz[u.owner.id + ':' + k] || 0) - W.time);
+  A.cmd = (p, s) => { if (A.client) { if (window.zcmdNet) zcmdNet(s); zLocalEcho(A, p, s); return; } zCmd(A, p, s); };
+  W.arenaCast = (p, k, aim) => { const u = W.heroOf(p); if (!u) return false; A.cmd(p, 'cast:' + k + ':' + Math.round(((aim && aim.dx) || 0) * 100) + ':' + Math.round(((aim && aim.dy) || 0) * 100)); return true; };
+  A.hud = ui => zHud(A, ui); A.cam = () => null; A.snapFn = () => zSnap(A); A.applyFn = s => { A.snap = s; };
+  A.zGround = (g, R) => zGround(A, g, R); A.zDraw = (g, R) => zDraw(A, g, R); A.dark = (u, me) => zSees(A, W.local, u) ? undefined : false;
+  A.phase = 'pick'; A.pickEnd = W.time + PICK_T; A.raiseAt = A.pickEnd + RAISE_T; A.stronger = false; A.lastSurv = false; A.ended = false;
+  for (const pid of ids) A.cls[pid] = null; /* everybody picks a class first */
+  A.say('🧟 Infección Zombi · elige tu clase. Los humanos sobreviven hasta el amanecer (' + Math.round(A.gameT / 60) + ' min)', 'ff8cff6a');
+  W.onTick = dt => zTick(A, dt);
+  return A;
+}
+function zSpawnPt(A, zb) { const W = A.W, c = zb ? A.zzone : A.hzone; for (let k = 0; k < 30; k++) { const a = W.rand() * 6.28, r = (zb ? 60 : 160) + W.rand() * 260, x = c.x + Math.cos(a) * r, y = c.y + Math.sin(a) * r; if (W.walkable(x, y)) return { x, y }; } return { x: c.x, y: c.y }; }
+function zSetHuman(A, u) { const id = u.owner.id; u.owner.forceChar = null; u.baseSpd = HUM_SPD; u.amax = HUM_HP; u.ahp = HUM_HP; u.atkT = 0; }
+function zMakeZombie(A, u, head) { const W = A.W, id = u.owner.id; A.zomb.add(id); u.owner.forceChar = (window.SPR && SPR.MAN && SPR.MAN.chars.orco) ? 'orco' : null; u.atkT = 0; u.amax = 3000; u.ahp = 3000; u.baseSpd = 350; if (!head) { A.gold[id] = 1000; A.honor[id] = 0; A.inv[id] = []; A.lvl[id] = 1; } A.cls[id] = null; }
+// ---------------- stats ----------------
+function zItemsOf(A, id) { return (A.inv[id] || []).map(s => ZI[s.k] || ZREC[s.k]).filter(Boolean); }
+function zStat(A, u, k) { let v = 0; for (const it of zItemsOf(A, u.owner.id)) if (it.st && it.st[k]) v = (k === 'spd' || k === 'evade' || k === 'blinkCd') ? Math.max(v, it.st[k]) : v + it.st[k]; return v; } /* movement speed, dodge and blink items don't stack (as in the original) */
+function zClass(A, u) { const c = A.cls[u.owner.id]; return A.isHunter(u) ? ZZ[c] : ZH[c]; }
+function zRecalc(A, u) {
+  const W = A.W, id = u.owner.id, c = zClass(A, u), b = A.buf[id] || {}, t = W.time, lv = A.lvl[id] || 1, res = A.res[id] || {}, Z = A.isHunter(u);
+  if (!c) { u.speed = 0; return; }
+  let hp = Z ? c.hp * (A.heads.has(id) ? 1 : 0.8) * (1 + 0.08 * (lv - 1)) + (A.stronger && A.heads.has(id) ? 2000 : 0) : HUM_HP + 50 * (res.hp || 0);
+  hp += zStat(A, u, 'hp'); const old = u.amax || hp; u.amax = Math.round(hp); if (u.amax !== old && u.alive) u.ahp = Math.min(u.amax, u.ahp * u.amax / old);
+  let spd = (Z ? c.spd : HUM_SPD) + zStat(A, u, 'spd'); if (Z && lv >= 3) spd *= lv >= 5 ? 1.1 : 1.05; if (Z && A.cls[id] === 'balanced') spd *= 1.2;
+  if (b.rage > t) spd *= 1.3; if (b.thirst > t) spd *= 1.2; if (b.hell > t) spd *= 1.4; if (b.harden) spd *= 0.8; if (b.haste > t) spd += 100; if (b.sprint > t) spd = 522; if (b.zsprint > t) spd *= 1.3;
+  if (u.slowUntil > t) spd *= 0.55; if (b.exhaust > t) spd *= 0.5; if (b.frost > t) spd *= 0.75; if (b.poisonT > t) spd *= 0.85;
+  u.speed = (u.rootUntil > t || (u.chan && u.chan.t > t)) ? 0 : Math.max(60, spd);
+  // attack
+  let dmg = (c.dmg[0] + c.dmg[1]) / 2 + zStat(A, u, 'dmg'); if (Z) { if (lv >= 3) dmg += lv >= 5 ? 100 : 50; dmg *= 1 + 0.08 * (lv - 1); } else { dmg *= 1 + 0.06 * (res.dmg || 0) + zStat(A, u, 'dmgPct'); dmg *= 1 + 0.05 * (A.lvl[id] - 1); }
+  if (b.roarh > t) dmg *= 1.3; if (b.calldeath > t) dmg *= 2; if (b.apoc > t) dmg += 200; if (b.exhaust > t) dmg *= 0.5; if (A.lastHero === u) dmg += A.cls[id] === 'sniper' ? 500 : 250;
+  if (!Z && zNearFlag(A, u, 'cmd')) dmg *= 1.15;
+  u.zdmg = dmg; let as = 1 + zStat(A, u, 'atk') + (Z && A.cls[id] === 'balanced' ? 0.2 : 0); if (b.rapid > t || b.rage > t || b.frenzy > t) as += 1; if (b.adren > t) as += 0.6; if (b.hell > t) as += 0.4; if (b.dfrenzy > t) as += 0.4; if (!Z && zNearFlag(A, u, 'endu')) as += 0.1; if (zAuraOf(A, u, 'atkAura')) as += 0.2;
+  if (b.frost > t) as *= 0.85; u.zcd = c.cd / as; u.zrng = Z ? 130 : c.rng * (1 + 0.05 * (res.range || 0));
+  u.zarmor = zStat(A, u, 'armor') + (b.thirst > t ? 20 : 0) + (b.unholy > t ? 20 : 0) - (b.grenA > t ? 5 : 0) - (b.pierced > t ? 4 : 0) - (Z && zNearFlagFoe(A, u) ? 2 : 0);
+}
+const zArmorMul = a => a >= 0 ? 1 / (1 + 0.06 * a) : 2 - Math.pow(0.94, -a);
+function zNearFlag(A, u, k) { return A.blds.some(b => b.k === 'flag' && b.aura === k && b.owner === u.owner.id && Math.hypot(b.x - u.x, b.y - u.y) < 1000) || A.blds.some(b => b.k === 'flag' && b.aura === k && !A.zomb.has(b.owner) && Math.hypot(b.x - u.x, b.y - u.y) < 1000); }
+function zNearFlagFoe(A, u) { return A.blds.some(b => b.k === 'flag' && b.aura === 'crip' && Math.hypot(b.x - u.x, b.y - u.y) < 700); }
+function zAuraOf(A, u, k) { for (const f of A.alive()) if (!A.enemy(f, u) && Math.hypot(f.x - u.x, f.y - u.y) < 900) for (const it of zItemsOf(A, f.owner.id)) if (it.st && it.st[k]) return true; return false; }
+
+// ---------------- what a hero can do (buttons) ----------------
+function zSkillsOf(A, u) { const c = zClass(A, u); if (!c) return []; const Z = A.isHunter(u); const L = c.sk.filter(k => ZSK[k].t !== 'passive').concat(Z ? ['madness', 'recall'] : ['blink', 'ensnare', 'rapid']); return L.map(k => Object.assign({ id: k }, ZSK[k])); }
+function zSkillCd(A, u, k) { let cd = ZSK[k].cd || 1; if (k === 'blink') cd = Math.max(6, cd - zStat(A, u, 'blinkCd')); return cd; }
+
+// ---------------- commands (host) ----------------
+function zCmd(A, p, s) {
+  const W = A.W, a = String(s).split(':'), id = p.id, u = W.heroOf(p), t = W.time; if (!u || A.ended) return false;
+  const tell = m => { if (p === W.local) A.say(m, 'ffff9a7a'); return false; };
+  const pay = (g, h) => { if ((A.gold[id] || 0) < (g || 0)) return tell('Te falta oro 🪙'); if ((A.honor[id] || 0) < (h || 0)) return tell('Te falta honor 🎖️'); A.gold[id] -= g || 0; A.honor[id] -= h || 0; return true; };
+  const Z = A.isHunter(u);
+  switch (a[0]) {
+    case 'pick': { const k = a[1]; const L = Z ? ZZ : ZH; if (A.cls[id] && !(a[2] === 'meta')) return false; if (k !== 'random' && !L[k]) return false; const ks = Object.keys(L); A.cls[id] = k === 'random' ? ks[Math.floor(W.rand() * ks.length)] : k; zRecalc(A, u); u.ahp = u.amax; if (p === W.local) A.say('Eres ' + L[A.cls[id]].n, 'ff9fffff'); return true; }
+    case 'cast': return zCast(A, u, a[1], { dx: (+a[2] || 0) / 100, dy: (+a[3] || 0) / 100 });
+    case 'build': { if (Z || !u.alive) return false; const k = a[1], B = ZB[k]; if (!B || B.hide) return false;
+      if (B.req && ((A.res[id] || {})[B.req[0]] || 0) < B.req[1]) return tell('Necesitas investigar ' + ZR[B.req[0]].n);
+      if (k === 'turret' && A.blds.filter(b => b.owner === id && ZB[b.k].pw).length >= 4) return tell('Máximo 4 torretas');
+      if (B.pw && zPowerFree(A, id) < B.pw) return tell('Necesitas energía: construye un Núcleo de energía');
+      const spot = zBuildSpot(A, u, B.s, a[2] != null ? { x: +a[2], y: +a[3] } : null); if (!spot) return tell('No hay espacio aquí');
+      if (!pay(B.g, B.h)) return false; zAddBld(A, k, id, spot.x, spot.y); W.emit('sound', { name: 'buy' }); return true; }
+    case 'up': { const b = A.blds.find(q => q.id === +a[1]); const k = a[2], B = ZB[k]; if (!b || b.owner !== id || !B || !(ZB[b.k].up || []).includes(k)) return false;
+      if (B.req && ((A.res[id] || {})[B.req[0]] || 0) < B.req[1]) return tell('Necesitas investigar ' + ZR[B.req[0]].n);
+      if (!pay(B.g, B.h)) return false; const f = b.hp / b.max; b.k = k; b.max = B.hp; b.hp = Math.round(B.hp * Math.max(f, 0.5)); A.addFx({ k: 'puff', x: b.x, y: b.y, t, dur: 0.6, col: '255,230,120' }); return true; }
+    case 'res': { const k = a[1], R = ZR[k]; if (!R || Z) return false; const lv = (A.res[id] || {})[k] || 0; if (lv >= R.max) return tell('Ya está al máximo');
+      if (!A.blds.some(b => (R.at ? b.owner === id : !A.zomb.has(b.owner)) && b.k === (R.at || 'research'))) return tell(R.at ? 'Construye una Fábrica' : 'Construye un Centro de investigación (sirve el de un compañero)');
+      if (!pay(R.g + (R.gi || 0) * lv, (R.h || 0) + (R.hi || 0) * lv)) return false; A.res[id][k] = lv + 1; if (p === W.local) A.say('Investigaste ' + R.n + ' nv ' + (lv + 1), 'ff7dff8a'); zRecalc(A, u); return true; }
+    case 'aura': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id || b.k !== 'flag' || !FLAG_AURA[a[2]]) return false; b.aura = a[2]; return true; }
+    case 'xg': { if (!A.blds.some(b => !A.zomb.has(b.owner) && (b.k === 'exchange' || b.k === 'trade'))) return tell('Construye una Oficina de cambio'); if (!pay(500, 0)) return false; A.honor[id]++; return true; }
+    case 'xh': { if (!A.blds.some(b => !A.zomb.has(b.owner) && (b.k === 'exchange' || b.k === 'trade'))) return false; if (!pay(0, 1)) return false; A.gold[id] += 250; return true; }
+    case 'dice': { if (!A.blds.some(b => !A.zomb.has(b.owner) && b.k === 'trade')) return false; A.dice[id] = A.dice[id] || 0; if (A.dice[id] >= 3) return tell('Ya jugaste 3 veces'); if ((A.gold[id] || 0) < 100) return tell('Necesitas 100 de oro'); A.dice[id]++; const r = 1 + Math.floor(W.rand() * 6); if (r === 6) { A.gold[id] += 300; } else A.gold[id] -= 100; A.say((p === W.local ? 'Sacaste ' : p.name + ' sacó ') + r + (r === 6 ? ' 🎲 ¡+300!' : ' 🎲 -100'), r === 6 ? 'ff7dff8a' : 'ffff9a7a'); return true; }
+    case 'demolish': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id) return false; b.demo = t + 5; return true; }
+    case 'erepair': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id || b.k !== 'burrow' || b.rep) return false; b.rep = 1; b.hp = Math.min(b.max, b.hp + 350); return true; }
+    case 'explo': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id || b.k !== 'factory' || b.explo) return false; b.explo = 1; return true; }
+    case 'cap': { if (Z || !u.alive) return false; const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - u.x, q.y - u.y) < 260); if (!f) return tell('Acércate a una fábrica pequeña'); u.chan = { t: t + 5, k: 'cap', f }; u.order = null; return true; }
+    case 'buy': { const k = a[1], it = ZI[k], rc = ZREC[k]; if (!it && !rc) return false;
+      if (it) { const shop = it.shop; const near = Z ? A.shops.some(sh => sh.n === shop && Math.hypot(sh.x - u.x, sh.y - u.y) < 520) || !u.alive || W.time < A.raiseAt || Math.hypot(u.x - A.zzone.x, u.y - A.zzone.y) < 900 : A.blds.some(b => !A.zomb.has(b.owner) && (shop === 'Almacén' ? b.k === 'warehouse' : b.k === 'trade') && Math.hypot(b.x - u.x, b.y - u.y) < 600);
+        if (!near) return tell(Z ? 'Ve a la tienda: ' + shop : 'Ve a tu ' + (shop === 'Almacén' ? 'Almacén' : 'Oficina comercial'));
+        if (Z !== !['Almacén', 'Oficina comercial'].includes(shop)) return false;
+        if (!Z && !((A.res[id] || {}).attach)) return tell('Investiga Accesorios para tener bolso');
+        if (it.use === 'honor') { if (!pay(it.g, 0)) return false; A.honor[id]++; return true; }
+        if (it.use === 'gold500') { if (!pay(0, 1)) return false; A.gold[id] += 500; return true; }
+        if (it.use === 'level') { if ((A.lvl[id] || 1) >= 5) return tell('Ya estás en nivel 5'); if (!pay(it.g, 0)) return false; A.lvl[id]++; zRecalc(A, u); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.8, col: '255,220,90' }); return true; }
+        if (it.use === 'meta') { if (!pay(it.g, 0)) return false; A.cls[id] = null; return true; }
+        const inv = A.inv[id]; const have = inv.find(q => q.k === k); if (have && it.uses) { if (!pay(it.g, 0)) return false; have.uses += it.uses; return true; }
+        if (inv.length >= 6) return tell('Tu bolso está lleno (6)'); if (!pay(it.g, it.h)) return false; inv.push({ k, uses: it.uses || 0 }); zRecalc(A, u); W.emit('sound', { name: 'buy' }); return true; }
+      // recipe: needs the parts
+      if (!Z || !(A.shops.some(sh => sh.n === 'Vendedor de recetas' && Math.hypot(sh.x - u.x, sh.y - u.y) < 520) || W.time < A.raiseAt || Math.hypot(u.x - A.zzone.x, u.y - A.zzone.y) < 900)) return tell('Ve al Vendedor de recetas');
+      const inv = A.inv[id], use = []; for (const part of rc.parts) { const q = inv.find(x => x.k === part && !use.includes(x)); if (!q) return tell('Te falta: ' + ZI[part].n); use.push(q); }
+      if (!pay(rc.g, rc.h)) return false; for (const q of use) inv.splice(inv.indexOf(q), 1); inv.push({ k, uses: 0 }); zRecalc(A, u); if (p === W.local) A.say('Creaste ' + rc.n, 'ffffd34d'); return true; }
+    case 'use': { const q = (A.inv[id] || [])[+a[1]]; if (!q) return false; return zUseItem(A, u, q); }
+    case 'sell': { const i = +a[1], q = (A.inv[id] || [])[i]; if (!q) return false; const it = ZI[q.k] || ZREC[q.k]; A.inv[id].splice(i, 1); A.gold[id] += Math.floor((it.g || 0) / 2); zRecalc(A, u); return true; }
+  }
+  return false;
+}
+function zLocalEcho(A, p, s) { const a = s.split(':'); if (a[0] === 'cast' && SELF_Z[a[1]]) { const u = A.W.heroOf(p); if (u) SELF_Z[a[1]](A, u, { dx: (+a[2] || 0) / 100, dy: (+a[3] || 0) / 100 }); } }
+const SELF_Z = { blink: (A, u, a) => arenaBlink(A, u, a) }; /* online: your own blink moves you at once on your phone */
+function zPowerFree(A, id) { let pw = 0, use = 0; for (const b of A.blds) { if (b.owner !== id) continue; if (b.k === 'core') pw += 2; if (b.k === 'gen') pw += 4; if (ZB[b.k].pw) use += ZB[b.k].pw; } return pw - use; }
+function zBuildSpot(A, u, S, at) {
+  const W = A.W, f = u.facing * Math.PI / 180, G = 64, base = at || { x: u.x + Math.cos(f) * (S / 2 + 70), y: u.y + Math.sin(f) * (S / 2 + 70) };
+  const free = (x, y) => { const h = S / 2; for (let yy = y - h + 8; yy < y + h; yy += 16) for (let xx = x - h + 8; xx < x + h; xx += 16) if (!W.walkable(xx, yy)) return false; for (const v of A.alive()) if (Math.abs(v.x - x) < h + 24 && Math.abs(v.y - y) < h + 24) return false; for (const s of A.shops) if (Math.hypot(s.x - x, s.y - y) < 260) return false; return true; };
+  for (let r = 0; r <= 4; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x = Math.round((base.x + dx * G) / (G / 2)) * (G / 2), y = Math.round((base.y + dy * G) / (G / 2)) * (G / 2); if (free(x, y)) return { x, y }; }
+  return null;
+}
+function zFree(A, x, y, S) { const W = A.W, h = S / 2; for (let yy = y - h + 8; yy < y + h; yy += 16) for (let xx = x - h + 8; xx < x + h; xx += 16) if (!W.walkable(xx, yy)) return false; for (const v of A.alive()) if (Math.abs(v.x - x) < h + 20 && Math.abs(v.y - y) < h + 20) return false; return true; }
+function zAddBld(A, k, owner, x, y) { const W = A.W, B = ZB[k], h = B.s / 2; const b = { id: ++A.bid, k, owner, x, y, hp: B.hp, max: B.hp, s: B.s, atkT: 0, born: W.time }; A.blds.push(b); W.blockRect(x - h, y - h, x + h, y + h, 1); if (k === 'flag') b.aura = 'cmd'; return b; }
+function zKillBld(A, b, by) { const W = A.W, h = b.s / 2; if (b.dead) return; b.dead = true; W.blockRect(b.x - h, b.y - h, b.x + h, b.y + h, -1); A.addFx({ k: 'boom', x: b.x, y: b.y, t: W.time, dur: 0.6, r: b.s });
+  if (b.explo) { for (const e of A.alive()) if (A.isHunter(e) && Math.hypot(e.x - b.x, e.y - b.y) < 400) zDamage(A, null, e, 500, 'spell'); }
+  if (by && by.owner && A.gold[by.owner.id] != null && zStat(A, by, 'pillage')) A.gold[by.owner.id] += 10; }
+
+// ---------------- skills ----------------
+function zCast(A, u, k, aim) {
+  const W = A.W, t = W.time, id = u.owner.id, b = A.buf[id], Z = A.isHunter(u); if (!u.alive || A.ended || !A.cls[id]) return false;
+  if (A.phase === 'pick') return false; if (Z && t < A.raiseAt) { if (u.owner === W.local) A.say('Los zombis despiertan en ' + Math.ceil(A.raiseAt - t) + ' s', 'ffff9a7a'); return false; }
+  if (u.stunUntil > t || b.fear > t || (b.silence > t)) { if (u.owner === W.local) A.say('No puedes usar poderes ahora', 'ffff9a7a'); return false; }
+  const S = zSkillsOf(A, u).find(s => s.id === k); if (!S) return false; if (A.ready(u, k) > 0) return false;
+  let dx = aim && aim.dx, dy = aim && aim.dy; if (!dx && !dy) { const f = u.facing * Math.PI / 180; dx = Math.cos(f); dy = Math.sin(f); } const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+  const foeIn = r => { let best = null, bd = r; for (const e of A.alive()) { if (!A.enemy(u, e) || !zSees(A, u.owner, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; best = e; } } return best; };
+  const allyIn = (r, hurt) => { let best = null, bd = r; for (const f of A.alive()) { if (A.enemy(u, f)) continue; const d = Math.hypot(f.x - u.x, f.y - u.y) + (hurt ? (f.ahp / f.amax) * 400 : 0); if (d < bd) { bd = d; best = f; } } return best || u; };
+  const pt = r => { const f2 = foeIn(r); if (f2 && !(aim && (aim.dx || aim.dy))) return { x: f2.x, y: f2.y }; return { x: u.x + dx * r * 0.85, y: u.y + dy * r * 0.85 }; };
+  let ok = true; u.invisUntil = k === 'shadow' ? u.invisUntil : 0;
+  switch (k) {
+    case 'blink': ok = arenaBlink(A, u, { dx, dy, dist: 650 }); break;
+    case 'ensnare': { const e = foeIn(600); if (!e) { ok = false; break; } e.rootUntil = t + 2 + ((A.res[id] || {}).ensnare || 0); A.addFx({ k: 'net', x: e.x, y: e.y, t, dur: 2 }); break; }
+    case 'rapid': b.rapid = t + 2 + ((A.res[id] || {}).rapid || 0); break;
+    case 'pgren': { const q = pt(900); A.later.push({ t: t + 3, fn: () => { A.addFx({ k: 'boom', x: q.x, y: q.y, t: W.time, dur: 0.6, r: 250, col: '120,200,255' }); for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - q.x, e.y - q.y) < 250) { zDamage(A, u, e, 300, 'spell'); e.slowUntil = W.time + 3; } } }); A.addFx({ k: 'mark', x: q.x, y: q.y, t, dur: 3, r: 250 }); break; }
+    case 'barrel': A.zones.push({ k: 'barrel', o: u, x: u.x, y: u.y, until: t + 100, team: 0 }); break;
+    case 'mark': { const e = foeIn(1500); if (!e) { ok = false; break; } A.buf[e.owner.id].marked = t + 20; break; }
+    case 'assas': { const e = foeIn(3000); if (!e) { ok = false; break; } u.chan = { t: t + 2.5, k: 'assas', e }; A.addFx({ k: 'aim', x: u.x, y: u.y, tx: e.x, ty: e.y, t, dur: 2.5 }); break; }
+    case 'storm': { const q = pt(800); A.addFx({ k: 'bolt', x: q.x, y: q.y + 600, tx: q.x, ty: q.y, t, dur: 0.4 }); for (const e of A.alive()) { if (!A.enemy(u, e)) continue; const d = Math.hypot(e.x - q.x, e.y - q.y); if (d < 260) { zDamage(A, u, e, 200, 'spell'); const kb = (260 - d) * 1.2, n = d || 1; zPush(A, e, (e.x - q.x) / n * kb, (e.y - q.y) / n * kb); } } break; }
+    case 'roarh': for (const f of A.alive()) if (!A.enemy(u, f) && Math.hypot(f.x - u.x, f.y - u.y) < 800) A.buf[f.owner.id].roarh = t + 15; A.addFx({ k: 'roar', x: u.x, y: u.y, t, dur: 0.7 }); break;
+    case 'smoke': { const q = pt(700); A.zones.push({ k: 'smoke', o: u, x: q.x, y: q.y, r: 320, until: t + 15 }); break; }
+    case 'gren': { const q = pt(700); A.zones.push({ k: 'gren', o: u, x: q.x, y: q.y, r: 250, until: t + 6 }); break; }
+    case 'orbital': { const q = pt(900); A.addFx({ k: 'mark', x: q.x, y: q.y, t, dur: 2.5, r: 170 }); A.later.push({ t: t + 2.5, fn: () => { A.addFx({ k: 'ray', x: q.x, y: q.y, t: W.time, dur: 0.6 }); for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - q.x, e.y - q.y) < 170) { zDamage(A, u, e, 400, 'spell'); e.stunUntil = Math.max(e.stunUntil || 0, W.time + 0.5); } } }); break; }
+    case 'blind': { const e = foeIn(800); if (!e) { ok = false; break; } zDamage(A, u, e, 50, 'spell'); A.buf[e.owner.id].blind = t + 3; break; }
+    case 'firewall': { const f = u.facing * Math.PI / 180; A.zones.push({ k: 'fire', o: u, x: u.x + Math.cos(f) * 260, y: u.y + Math.sin(f) * 260, a: f + Math.PI / 2, r: 280, until: t + 15 }); break; }
+    case 'sentry': zAddMin(A, 'sentry', u, u.x + 60, u.y, 40); break;
+    case 'repairbot': zAddMin(A, 'rbot', u, u.x - 60, u.y, 40); break;
+    case 'adren': { const f = allyIn(600); A.buf[f.owner.id].adren = t + 15; A.addFx({ k: 'puff', x: f.x, y: f.y, t, dur: 0.6, col: '255,120,160' }); break; }
+    case 'antidote': { let tg = null, bd = 600; for (const bb of A.blds) if (bb.owner === id && bb.hp < bb.max) { const d = Math.hypot(bb.x - u.x, bb.y - u.y); if (d < bd) { bd = d; tg = bb; } } if (tg) tg.inv = t + 5; else { const f = allyIn(600, true); A.buf[f.owner.id].anti = t + 5; } break; }
+    case 'missiles': { const L2 = A.alive().filter(e => A.enemy(u, e) && Math.hypot(e.x - u.x, e.y - u.y) < 1200).sort((p1, p2) => Math.hypot(p1.x - u.x, p1.y - u.y) - Math.hypot(p2.x - u.x, p2.y - u.y)); if (!L2.length) { ok = false; break; } for (let i = 0; i < 3; i++) { const e = L2[i % L2.length]; A.addFx({ k: 'shot', x: u.x, y: u.y, tx: e.x, ty: e.y, t: t + i * 0.12, dur: 0.4, col: '255,200,120' }); zDamage(A, u, e, 200, 'spell'); } break; }
+    case 'ksheep': zAddMin(A, 'sheep', u, u.x + 40, u.y + 40, 15); break;
+    case 'madness': b.madness = t + 8; u.slowUntil = 0; u.rootUntil = 0; b.exhaust = 0; b.blind = 0; b.cursed = 0; b.fear = 0; break;
+    case 'recall': u.chan = { t: t + 2.25, k: 'recall' }; A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 2.25, col: '140,255,120' }); break;
+    case 'harden': b.harden = !b.harden; break;
+    case 'haste': if (u.ahp <= 400) { ok = false; break; } u.ahp -= 400; b.haste = t + 8; break;
+    case 'shadow': u.invisUntil = t + 20; break;
+    case 'rage': b.rage = t + 15; break;
+    case 'exhaust': { const e = foeIn(700); if (!e) { ok = false; break; } A.buf[e.owner.id].exhaust = t + 8; break; }
+    case 'fear': { const q = pt(700); A.addFx({ k: 'roar', x: q.x, y: q.y, t, dur: 0.7 }); for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - q.x, e.y - q.y) < 320) A.buf[e.owner.id].fear = t + 5; break; }
+    case 'calldeath': for (const f of A.alive()) if (!A.enemy(u, f) && Math.hypot(f.x - u.x, f.y - u.y) < 800) A.buf[f.owner.id].calldeath = t + 25; A.addFx({ k: 'roar', x: u.x, y: u.y, t, dur: 0.7 }); break;
+    case 'thirst': for (const f of A.alive()) if (!A.enemy(u, f) && Math.hypot(f.x - u.x, f.y - u.y) < 800) A.buf[f.owner.id].thirst = t + 25; break;
+    case 'hellground': { const q = pt(600); A.zones.push({ k: 'hell', o: u, x: q.x, y: q.y, r: 350, until: t + 60 }); break; }
+    case 'curse': { const q = pt(600); for (const e of A.alive()) if (A.enemy(u, e) && Math.hypot(e.x - q.x, e.y - q.y) < 280) A.buf[e.owner.id].cursed = t + 10; A.addFx({ k: 'puff', x: q.x, y: q.y, t, dur: 0.8, col: '150,60,200' }); break; }
+    case 'army': { const mine = A.mins.filter(m => m.o === u && m.k === 'zmin').length; for (let i = 0; i < Math.min(10, 12 - mine); i++) zAddMin(A, 'zmin', u, u.x + Math.cos(i) * 120, u.y + Math.sin(i) * 120, 300); break; }
+    case 'coil': { const f = allyIn(700, true); f.ahp = Math.min(f.amax, f.ahp + f.amax * 0.1); A.addFx({ k: 'puff', x: f.x, y: f.y, t, dur: 0.6, col: '200,30,60' }); break; }
+    case 'rejuv': { const f = allyIn(700, true); const fb = A.buf[f.owner.id]; fb.hot = t + 10; fb.hotRate = 100; break; }
+    default: ok = false;
+  }
+  if (!ok) { if (u.owner === W.local) A.say('No hay a quién', 'ffff9a7a'); return false; }
+  A.cdz[id + ':' + k] = t + zSkillCd(A, u, k); W.emit('sound', { name: 'coil' }); return true;
+}
+function zPush(A, e, dx, dy) { const W = A.W; const nx = e.x + dx, ny = e.y + dy; if (W.walkable(nx, ny)) arenaMove(A, e, nx, ny); }
+function zAddMin(A, k, o, x, y, life) { const W = A.W, q = W.nearestWalkable(x, y, 200) || { x: o.x, y: o.y }; const M = { sentry: { hp: 300, dmg: 37, cd: 0.5, rng: 700 }, rbot: { hp: 200, spd: 350 }, sheep: { hp: 50, spd: 300 }, zmin: { hp: 150, dmg: 18, cd: 1.5, rng: 110, spd: 330 }, ghost: { hp: 100, spd: 522 }, demon: { hp: 400, spd: 522 }, witch: { hp: 400, spd: 450 }, eye: { hp: 50 }, sward: { hp: 50 } }[k];
+  const m = { id: ++A.bid, k, o, x: q.x, y: q.y, hp: M.hp, max: M.hp, until: W.time + life, atkT: 0, fx: 1 }; Object.assign(m, M); A.mins.push(m); return m; }
+function zUseItem(A, u, q) {
+  const W = A.W, t = W.time, id = u.owner.id, it = ZI[q.k] || ZREC[q.k], b = A.buf[id]; if (!it || !it.act) return false; const key = 'it:' + q.k; if ((A.cdz[id + ':' + key] || 0) > t) return false;
+  let ok = true; const f = u.facing * Math.PI / 180;
+  switch (it.act) {
+    case 'flare': A.vis.push({ x: u.x + Math.cos(f) * 700, y: u.y + Math.sin(f) * 700, r: 600, until: t + 10, team: 0 }); break;
+    case 'sprint': b.sprint = t + 3.5; break;
+    case 'recall': u.chan = { t: t + 3, k: 'recall' }; break;
+    case 'demolish': { let tg = null, bd = 350; for (const bb of A.blds) { if (A.zomb.has(bb.owner)) continue; const d = Math.hypot(bb.x - u.x, bb.y - u.y); if (d < bd) { bd = d; tg = bb; } } if (!tg) { ok = false; break; } zKillBld(A, tg, u); break; }
+    case 'drain': b.hot = t + 10; b.hotRate = 125; break;
+    case 'frenzy': b.frenzy = t + 10; break;
+    case 'regrow': b.hot = t + 10; b.hotRate = 50; break;
+    case 'demon': zAddMin(A, 'demon', u, u.x, u.y, 120); break;
+    case 'witch': zAddMin(A, 'witch', u, u.x, u.y, 120); break;
+    case 'ghost': zAddMin(A, 'ghost', u, u.x, u.y, 60); break;
+    case 'reveal': A.vis.push({ x: u.x + Math.cos(f) * 900, y: u.y + Math.sin(f) * 900, r: 1100, until: t + 10, team: 1 }); break;
+    case 'eye': zAddMin(A, 'eye', u, u.x, u.y, 120); break;
+    case 'sward': zAddMin(A, 'sward', u, u.x, u.y, 80); break;
+    case 'pinvis': u.invisUntil = t + 20; break;
+    case 'throw': { let tg = null, bd = 800; for (const m of A.mins) if (!A.zomb.has(m.o.owner.id) && (m.k === 'sentry' || m.k === 'rbot')) { const d = Math.hypot(m.x - u.x, m.y - u.y); if (d < bd) { bd = d; tg = m; } } for (const bb of A.blds) if (!A.zomb.has(bb.owner) && ZB[bb.k].dmg) { const d = Math.hypot(bb.x - u.x, bb.y - u.y); if (d < bd) { bd = d; tg = bb; } } if (!tg) { ok = false; break; } if (tg.k && ZB[tg.k]) zKillBld(A, tg, u); else tg.hp = 0; break; }
+    case 'unholy': for (const f2 of A.alive()) if (!A.enemy(u, f2) && Math.hypot(f2.x - u.x, f2.y - u.y) < 800) A.buf[f2.owner.id].unholy = t + 20; break;
+    case 'immortal': b.immortal = t + 5; break;
+    case 'zsprint': b.zsprint = t + 8; break;
+    case 'massheal': for (const f2 of A.alive()) if (!A.enemy(u, f2) && Math.hypot(f2.x - u.x, f2.y - u.y) < 800) f2.ahp = Math.min(f2.amax, f2.ahp + 900); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.8, col: '90,255,120' }); break;
+    case 'apoc': b.apoc = t + 13; break;
+    default: ok = false;
+  }
+  if (!ok) { if (u.owner === W.local) A.say('No hay nada cerca', 'ffff9a7a'); return false; }
+  A.cdz[id + ':' + key] = t + (it.cd || 1); if (it.uses) { q.uses--; if (q.uses <= 0) A.inv[id].splice(A.inv[id].indexOf(q), 1); } u.invisUntil = it.act === 'pinvis' ? u.invisUntil : 0; return true;
+}
+
+// ---------------- damage, death, infection ----------------
+function zDamage(A, by, u, dmg, kind) {
+  const W = A.W, t = W.time; if (!u.alive || A.ended || dmg <= 0) return;
+  const b = A.buf[u.owner.id] || {};
+  if (b.anti > t || b.immortal > t) return;
+  if (kind !== 'spell') { if (W.rand() < zStat(A, u, 'evade')) return; if (W.rand() < zStat(A, u, 'blockPct')) dmg *= 0.5; dmg *= zArmorMul(u.zarmor || 0); }
+  else if (b.madness > t) return;
+  if (b.harden) dmg *= 0.6; if (b.madness > t) dmg *= 0.6; if (b.marked > t) dmg *= 1.2;
+  u.ahp -= dmg; u.hitT = t; if (by && by.owner && A.buf[by.owner.id] && A.buf[by.owner.id].apoc > t) by.ahp = Math.min(by.amax, by.ahp + dmg * 0.5);
+  if (u.chan && u.chan.k === 'recall' && kind !== 'tick') u.chan = null;
+  if (u.ahp <= 0) { u.ahp = 0; zDie(A, u, by); }
+}
+function zDie(A, u, by) {
+  const W = A.W, t = W.time, id = u.owner.id, Z = A.isHunter(u);
+  if (Z && A.cls[id] === 'deadly' && !(A.buf[id].reincT > t)) { A.buf[id].reincT = t + 60; u.ahp = u.amax; A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 1, col: '255,200,90' }); A.say(u.owner.name + ' volvió a la vida', 'ffff9a7a'); return; }
+  if (Z && zStat(A, u, 'reinc') && !(A.buf[id].crownT > t)) { A.buf[id].crownT = t + 70; u.ahp = u.amax; A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 1, col: '255,200,90' }); return; }
+  u.graceUntil = 0; u.invisUntil = 0; u.chan = null; W.killUnit(u, by); if (u.alive) return;
+  A.deaths[id]++; const kid = by && by.owner ? by.owner.id : -1; if (kid >= 0 && kid !== id && A.kills[kid] != null) { A.kills[kid]++; A.lvl[kid] = Math.min(Z ? 10 : 10, (A.lvl[kid] || 1) + 1); const ku = W.heroOf(by.owner); if (ku) zRecalc(A, ku); }
+  if (Z) { // zombies come back in 10 s at their base
+    if (kid >= 0 && A.gold[kid] != null) A.gold[kid] += 50 + zStat(A, by, 'bounty');
+    A.say((by && by.owner ? by.owner.name + ' mató a ' : '') + u.owner.name + ' · vuelve en 10 s', 'ff7dff8a'); u.reviveAt = t + 10;
+  } else { // a human falls: infected
+    A.say(u.owner === W.local ? '¡Te comieron el cerebro! Ahora eres uno de ellos…' : '¡A ' + u.owner.name + ' le comieron el cerebro! Ahora es uno de ellos…', 'ffff5050'); W.emit('sound', { name: 'death' });
+    if (kid >= 0 && A.gold[kid] != null) A.gold[kid] += 200;
+    for (const b of A.blds) if (b.owner === id) zKillBld(A, b); /* his base falls with him */
+    A.mins = A.mins.filter(m => m.o !== u); for (const f of A.facs) if (f.own === id) f.own = -1;
+    zMakeZombie(A, u, false); u.reviveAt = t + 3; u.infected = true;
+    for (const c of A.ids) { W.players[c].allies.delete(id); W.players[id].allies.delete(c); } for (const c of A.ids) if (A.zomb.has(c)) { W.players[c].allies.add(id); W.players[id].allies.add(c); }
+    if (u.owner === W.local) A.say('🧟 ¡Te infectaron! Elige tu clase de zombi y caza a los humanos', 'ff8cff6a');
+  }
+}
+// ---------------- every tick ----------------
+function zTick(A, dt) {
+  const W = A.W, t = W.time;
+  for (const f of A.fx) if (t - f.t > f.dur) f.dead = true; A.fx = A.fx.filter(f => !f.dead);
+  if (A.client) { zClientTick(A, dt); return; }
+  A.fxLog = A.fxLog.filter(f => t - f.t < 2);
+  if (A.later.length) { const due = A.later.filter(l => l.t <= t); A.later = A.later.filter(l => l.t > t); due.forEach(l => l.fn()); }
+  if (A.ended) return;
+  // phases: pick a class → humans run (zombies wait) → night until sunrise
+  if (A.phase === 'pick' && t >= A.pickEnd) { for (const id of A.ids) if (!A.cls[id]) zCmd(A, W.players[id], 'pick:random'); A.phase = 'run'; A.say('🏃 ¡Los humanos tienen ' + RAISE_T + ' s para esconderse y construir!', 'ff9fffff'); }
+  if (A.phase === 'pick') { for (const b of W.ai.bots) if (!A.cls[b.p.id] && W.rand() < dt * 0.6) zCmd(A, b.p, 'pick:random'); for (const u of A.heroes) { u.order = null; u.path = null; } return; }
+  for (const id of A.ids) if (!A.cls[id] && W.heroOf(W.players[id]) && W.heroOf(W.players[id]).alive) { const p = W.players[id]; if (p.ai || t - (A.pickAt && A.pickAt[id] || 0) > PICK_T) zCmd(A, p, 'pick:random'); } /* after Metamorphosis / infection */
+  if (A.phase === 'run' && t >= A.raiseAt) { A.phase = 'night'; A.say('🧟 ¡Los zombis despertaron! Sobrevive hasta el amanecer', 'ffff4040'); W.emit('sound', { name: 'death' }); }
+  const left = A.gameT - (t - A.raiseAt);
+  if (A.phase === 'night' && !A.stronger && left <= 600 && A.gameT > 600) { A.stronger = true; A.say('☠️ Los zombis madre se hicieron más fuertes', 'ffff4040'); }
+  if (A.phase === 'night' && left <= 0) return zEnd(A, true);
+  // income (every second): humans 2 (or what their factories give), zombies 4
+  A.incT = (A.incT || 0) + dt; if (A.incT >= 1) { A.incT -= 1; if (A.phase !== 'pick') for (const id of A.ids) { if (A.zomb.has(id)) { if (A.phase === 'night') A.gold[id] += 4; continue; } const fac = A.blds.filter(b => b.owner === id && b.k === 'factory').length; A.gold[id] += 2 + 2 * (1 + ((A.res[id] || {}).income || 0)) * Math.min(fac, 2); A.gold[id] += 2 * A.facs.filter(f => f.own === id).length; } }
+  // heroes
+  for (const u of A.heroes) {
+    const id = u.owner.id, b = A.buf[id];
+    if (!u.alive) { if (u.reviveAt && t >= u.reviveAt) { u.reviveAt = 0; const s = zSpawnPt(A, true); arenaRevive(A, u, s.x, s.y); zRecalc(A, u); u.ahp = u.amax; if (u.infected) { u.infected = false; A.pickAt = A.pickAt || {}; A.pickAt[id] = t; } } continue; }
+    zRecalc(A, u);
+    if (A.isHunter(u) && t < A.raiseAt) { u.speed = 0; u.order = null; u.path = null; } /* zombies wait at their base until they rise */
+    // regeneration: zombies regenerate fast (Reanimation), plus items and heals over time
+    const reg = (A.isHunter(u) ? 25 : 2) + zStat(A, u, 'regen') + (b.hot > t ? b.hotRate : 0) + (zAuraOf(A, u, 'aura') ? 15 : 0); u.ahp = Math.min(u.amax, u.ahp + reg * dt);
+    if (b.poisonT > t) zDamage(A, b.poisonBy, u, (b.poisonDps || 30) * dt, 'tick');
+    // channels: assassinate, recall, capture
+    if (u.chan && t >= u.chan.t) { const ch = u.chan; u.chan = null;
+      if (ch.k === 'assas' && ch.e && ch.e.alive) { A.addFx({ k: 'shot', x: u.x, y: u.y, tx: ch.e.x, ty: ch.e.y, t, dur: 0.4, col: '255,80,80' }); zDamage(A, u, ch.e, 500, 'spell'); }
+      if (ch.k === 'recall') { const s = zSpawnPt(A, true); arenaMove(A, u, s.x, s.y); }
+      if (ch.k === 'cap' && ch.f && Math.hypot(ch.f.x - u.x, ch.f.y - u.y) < 320) { ch.f.own = id; A.say(u.owner.name + ' capturó una fábrica pequeña (+2 de oro/s)', 'ff7dff8a'); } }
+    if (u.stunUntil > t || u.rootUntil > t) { u.order = null; u.path = null; }
+    zAttack(A, u, dt);
+    // items that fire by themselves (rocket launchers)
+    const rk = zStat(A, u, 'rocket'); if (rk && t >= (u.rkT || 0)) { u.rkT = t + rk; let e = null, bd = 900; for (const f of A.alive()) if (A.enemy(u, f) && zSees(A, u.owner, f)) { const d = Math.hypot(f.x - u.x, f.y - u.y); if (d < bd) { bd = d; e = f; } } if (e) { A.addFx({ k: 'shot', x: u.x, y: u.y, tx: e.x, ty: e.y, t, dur: 0.35, col: '255,170,60' }); zDamage(A, u, e, 70, 'spell'); } }
+    const burn = zStat(A, u, 'burn'); if (burn) for (const bb of A.blds) if (!A.zomb.has(bb.owner) && Math.hypot(bb.x - u.x, bb.y - u.y) < 300) zHitBld(A, u, bb, burn * dt, true);
+  }
+  // buildings: turrets shoot, demolish timers, repair
+  for (const bb of A.blds) { if (bb.dead) continue; const B = ZB[bb.k]; if (bb.demo && t >= bb.demo) { zKillBld(A, bb); continue; }
+    if (B.dmg && !A.zomb.has(bb.owner) && t >= bb.atkT) { let e = null, bd = B.rng; for (const f of A.alive()) if (A.isHunter(f) && !(f.invisUntil > t)) { const d = Math.hypot(f.x - bb.x, f.y - bb.y); if (d < bd) { bd = d; e = f; } } if (!e) for (const m of A.mins) if (m.k === 'zmin') { const d = Math.hypot(m.x - bb.x, m.y - bb.y); if (d < bd) { bd = d; e = m; } }
+      if (e) { bb.atkT = t + B.cd; const res = A.res[bb.owner] || {}; const dmg = (B.dmg[0] + W.rand() * (B.dmg[1] - B.dmg[0])) * (1 + 0.06 * (res.dmg || 0)); A.addFx({ k: 'shot', x: bb.x, y: bb.y + 40, tx: e.x, ty: e.y, t, dur: 0.3, col: bb.k === 'frost' ? '160,230,255' : bb.k === 'electric' ? '200,200,255' : '255,180,80' }); if (e.hero) { zDamage(A, null, e, dmg, 'atk'); if (B.slow) A.buf[e.owner.id].frost = t + 3; } else e.hp -= dmg; } } }
+  A.blds = A.blds.filter(bb => !bb.dead);
+  // minions
+  zMinions(A, dt);
+  // zones (smoke, grenade, fire wall, hell ground, barrels)
+  for (const z of A.zones) { if (t > z.until) { z.dead = true; continue; }
+    if (z.k === 'barrel') { for (const e of A.alive()) if (A.isHunter(e) && Math.hypot(e.x - z.x, e.y - z.y) < 150) { z.dead = true; A.addFx({ k: 'boom', x: z.x, y: z.y, t, dur: 0.6, r: 250 }); for (const f of A.alive()) if (A.isHunter(f) && Math.hypot(f.x - z.x, f.y - z.y) < 250) { zDamage(A, z.o, f, 150, 'spell'); f.stunUntil = Math.max(f.stunUntil || 0, t + 1); } break; } continue; }
+    for (const e of A.alive()) { const inR = z.k === 'fire' ? zInSeg(e, z) : Math.hypot(e.x - z.x, e.y - z.y) < z.r; if (!inR) continue;
+      if (z.k === 'gren' && A.isHunter(e)) { zDamage(A, z.o, e, 30 * dt, 'tick'); A.buf[e.owner.id].grenA = t + 0.3; }
+      if (z.k === 'fire' && A.isHunter(e)) zDamage(A, z.o, e, 40 * dt, 'tick');
+      if (z.k === 'smoke' && A.isHunter(e)) A.buf[e.owner.id].smoke = t + 0.3;
+      if (z.k === 'hell' && !A.isHunter(e) === false) A.buf[e.owner.id].hell = t + 0.3; } }
+  A.zones = A.zones.filter(z => !z.dead); A.vis = A.vis.filter(v => v.until > t);
+  // last survivor: one human left gets a big bonus
+  const hum = A.heroes.filter(u => !A.isHunter(u));
+  if (!A.lastSurv && A.phase === 'night' && hum.length === 1 && A.ids.length >= 3) { A.lastSurv = true; const u = hum[0]; A.lastHero = u; A.gold[u.owner.id] += 500; A.say(u.owner.name + ' es el último sobreviviente: +' + (A.cls[u.owner.id] === 'sniper' ? 500 : 250) + ' de daño y +500 de oro', 'ff7fc8ff'); }
+  if (!hum.length && A.phase !== 'pick') return zEnd(A, false);
+  if (W.ai.active) zBots(A, dt);
+}
+function zInSeg(e, z) { const c = Math.cos(z.a), s = Math.sin(z.a), dx = e.x - z.x, dy = e.y - z.y, along = dx * c + dy * s, side = -dx * s + dy * c; return Math.abs(along) < z.r && Math.abs(side) < 70; }
+// a unit attacks the closest enemy (hero, minion or building) in its reach when it is standing still
+function zAttack(A, u, dt) {
+  const W = A.W, t = W.time, id = u.owner.id, b = A.buf[id], Z = A.isHunter(u); if (!A.cls[id] || t < (u.atkT || 0)) return;
+  if (Z && t < A.raiseAt) return; if (b.fear > t) return; if (u.chan) return;
+  const moving = !!(u.order && (u.path || u.order.type === 'move')) && !u.atkMove; if (moving && !u.owner.ai) return;
+  const R = u.zrng + 40; let tg = null, bd = R, isB = false;
+  for (const e of A.alive()) { if (!A.enemy(u, e) || !zSees(A, u.owner, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; tg = e; isB = false; } }
+  for (const m of A.mins) { if (Z === A.isHunter(m.o) || m.k === 'eye' || m.k === 'sward' || m.k === 'ghost' || m.k === 'demon' || m.k === 'witch') continue; const d = Math.hypot(m.x - u.x, m.y - u.y); if (d < bd) { bd = d; tg = m; isB = false; } }
+  if (Z || !tg) for (const bb of A.blds) { if (Z === A.zomb.has(bb.owner)) continue; const d = Math.hypot(bb.x - u.x, bb.y - u.y) - bb.s / 2; if (d < (Z ? 70 : R) && (!tg || d < bd - 40)) { bd = d; tg = bb; isB = true; } }
+  if (!tg) return;
+  u.atkT = t + u.zcd; u.facing = Math.atan2(tg.y - u.y, tg.x - u.x) * 180 / Math.PI; u.invisUntil = 0;
+  if (b.blind > t || (b.smoke > t && W.rand() < 0.5) || (b.cursed > t && W.rand() < 0.3)) { A.addFx({ k: 'num', x: tg.x, y: tg.y + 60, t, dur: 0.6, txt: 'falló' }); return; }
+  let dmg = u.zdmg * (0.9 + 0.2 * W.rand()); if (W.rand() < zStat(A, u, 'crit')) dmg *= 2;
+  if (!Z) A.addFx({ k: 'shot', x: u.x, y: u.y + 40, tx: tg.x, ty: tg.y, t, dur: 0.18, col: '255,240,170' }); else A.addFx({ k: 'claw', x: tg.x, y: tg.y, t, dur: 0.3 });
+  if (isB) { dmg *= 1 + zStat(A, u, 'bld'); if (W.rand() < zStat(A, u, 'chaos') * (A.cls[id] === 'raptor' ? 0.6 : 1)) { zKillBld(A, tg, u); return; } zHitBld(A, u, tg, dmg); if (zStat(A, u, 'pillage')) A.gold[id] += zStat(A, u, 'pillage'); if (zStat(A, u, 'splash') && W.rand() < 0.25) for (const o of A.blds) if (o !== tg && !A.zomb.has(o.owner) && Math.hypot(o.x - tg.x, o.y - tg.y) < 250) zHitBld(A, u, o, 80); return; }
+  if (!tg.hero) { tg.hp -= dmg; return; }
+  zDamage(A, u, tg, dmg, 'atk');
+  // on-hit effects of classes and items
+  if (!Z) { const tb = A.buf[tg.owner.id];
+    if (A.cls[id] === 'plasma' && W.rand() < 0.1) { zDamage(A, u, tg, 60, 'spell'); tg.stunUntil = Math.max(tg.stunUntil || 0, t + 2.5); }
+    if (A.cls[id] === 'pyro' && W.rand() < 0.12) { A.addFx({ k: 'boom', x: tg.x, y: tg.y, t, dur: 0.5, r: 200, col: '255,120,40' }); for (const e of A.alive()) if (A.isHunter(e) && Math.hypot(e.x - tg.x, e.y - tg.y) < 260) zDamage(A, u, e, 70, 'spell'); }
+    if (W.rand() < zStat(A, u, 'stunHit')) { zDamage(A, u, tg, 40, 'spell'); tg.stunUntil = Math.max(tg.stunUntil || 0, t + 0.2); }
+    if (W.rand() < zStat(A, u, 'chain')) { let from = tg; const hit = new Set([tg]); for (let j = 0; j < 2; j++) { let nx = null, nd = 500; for (const e of A.alive()) if (!hit.has(e) && A.isHunter(e)) { const d = Math.hypot(e.x - from.x, e.y - from.y); if (d < nd) { nd = d; nx = e; } } A.addFx({ k: 'bolt', x: from.x, y: from.y, tx: (nx || from).x, ty: (nx || from).y, t, dur: 0.3 }); zDamage(A, u, nx || from, 80, 'spell'); if (!nx) break; hit.add(nx); from = nx; } }
+    if (zStat(A, u, 'pierce')) tb.pierced = t + 3; if (zStat(A, u, 'poison')) { tb.poisonT = t + 3; tb.poisonDps = zStat(A, u, 'poison'); tb.poisonBy = u; } }
+}
+function zHitBld(A, by, b, dmg, quiet) { const W = A.W, t = W.time; if (b.dead || b.inv > t) return; const B = ZB[b.k]; if (zNearFort(A, b)) dmg *= 0.94;
+  b.hp -= dmg; b.hitT = t; if (b.k === 'burrow' && by && by.hero && !quiet) zDamage(A, null, by, dmg * 0.3, 'spell'); /* spikes */
+  if (b.hp <= 0) zKillBld(A, b, by); }
+function zNearFort(A, b) { return A.blds.some(f => f.k === 'flag' && f.aura === 'fort' && f.owner === b.owner && Math.hypot(f.x - b.x, f.y - b.y) < 1000); }
+function zMinions(A, dt) {
+  const W = A.W, t = W.time;
+  for (const m of A.mins) { if (t > m.until || m.hp <= 0 || !m.o) { m.dead = true; continue; } const Zm = A.isHunter(m.o);
+    const step = (tx, ty, sp) => { const dx = tx - m.x, dy = ty - m.y, d = Math.hypot(dx, dy); if (d < 8) return d; const s = Math.min(d, sp * dt), nx = m.x + dx / d * s, ny = m.y + dy / d * s; if (W.walkable(nx, ny)) { m.x = nx; m.y = ny; } else if (W.walkable(nx, m.y)) m.x = nx; else if (W.walkable(m.x, ny)) m.y = ny; m.fx = dx > 0 ? 1 : -1; return d; };
+    const foe = R => { let best = null, bd = R; for (const e of A.alive()) { if (A.isHunter(e) === Zm || e.invisUntil > t) continue; const d = Math.hypot(e.x - m.x, e.y - m.y); if (d < bd) { bd = d; best = e; } } return best; };
+    if (m.k === 'sentry') { const e = foe(m.rng); if (e && t >= m.atkT) { m.atkT = t + m.cd; let dmg = m.dmg; if (W.rand() < 0.1) dmg *= 2.5; A.addFx({ k: 'shot', x: m.x, y: m.y + 30, tx: e.x, ty: e.y, t, dur: 0.2, col: '255,220,120' }); zDamage(A, m.o, e, dmg, 'atk'); } }
+    else if (m.k === 'rbot') { let tg = null, bd = 1500; for (const b of A.blds) if (b.owner === m.o.owner.id && b.hp < b.max) { const d = Math.hypot(b.x - m.x, b.y - m.y); if (d < bd) { bd = d; tg = b; } } if (tg) { if (step(tg.x, tg.y, m.spd) < tg.s / 2 + 50) tg.hp = Math.min(tg.max, tg.hp + 40 * dt); } else step(m.o.x - 80, m.o.y, m.spd); }
+    else if (m.k === 'sheep') { const e = foe(1400); if (e) { if (step(e.x, e.y, m.spd) < 90) { m.dead = true; A.addFx({ k: 'boom', x: m.x, y: m.y, t, dur: 0.5, r: 200 }); for (const f of A.alive()) if (A.isHunter(f) && Math.hypot(f.x - m.x, f.y - m.y) < 220) zDamage(A, m.o, f, 300, 'spell'); } } else step(m.o.x + 60, m.o.y + 60, m.spd); }
+    else if (m.k === 'zmin') { const e = foe(900); if (e) { if (step(e.x, e.y, m.spd) < m.rng && t >= m.atkT) { m.atkT = t + m.cd; zDamage(A, m.o, e, m.dmg, 'atk'); } } else { let tg = null, bd = 900; for (const b of A.blds) if (!A.zomb.has(b.owner)) { const d = Math.hypot(b.x - m.x, b.y - m.y); if (d < bd) { bd = d; tg = b; } } if (tg) { if (step(tg.x, tg.y, m.spd) < tg.s / 2 + 60 && t >= m.atkT) { m.atkT = t + m.cd; zHitBld(A, m.o, tg, m.dmg); } } else step(m.o.x + Math.cos(m.id) * 140, m.o.y + Math.sin(m.id) * 140, m.spd); } }
+    else if (m.k === 'ghost') { const e = foe(5000); step(e ? e.x : m.o.x, e ? e.y : m.o.y, m.spd); }
+    else if (m.k === 'demon') { step(m.o.x + 90, m.o.y + 40, m.spd); for (const f of A.alive()) if (A.isHunter(f) && Math.hypot(f.x - m.x, f.y - m.y) < 600) A.buf[f.owner.id].dfrenzy = t + 0.5; }
+    else if (m.k === 'witch') { step(m.o.x - 90, m.o.y + 40, m.spd); for (const e of A.alive()) if (!A.isHunter(e) && Math.hypot(e.x - m.x, e.y - m.y) < 500) A.buf[e.owner.id].cursed = t + 0.5; }
+    else if (m.k === 'sward') { for (const e of A.alive()) if (!A.isHunter(e) && Math.hypot(e.x - m.x, e.y - m.y) < 250) { m.dead = true; A.addFx({ k: 'boom', x: m.x, y: m.y, t, dur: 0.5, r: 250, col: '255,255,120' }); for (const f of A.alive()) if (!A.isHunter(f) && Math.hypot(f.x - m.x, f.y - m.y) < 300) f.stunUntil = Math.max(f.stunUntil || 0, t + 2); break; } } }
+  A.mins = A.mins.filter(m => !m.dead);
+}
+function zEnd(A, humansWin) {
+  const W = A.W; if (A.ended) return; A.ended = true; const me = W.heroOf(W.local), Z = me && A.isHunter(me);
+  const win = humansWin ? !Z : Z; const hum = A.heroes.filter(u => !A.isHunter(u)).length;
+  A.say(humansWin ? '🌅 ¡AMANECIÓ! Los humanos sobrevivieron' : '🧟 ¡Los zombis dominaron el mundo!', humansWin ? 'ffffe27a' : 'ffff4040');
+  for (const u of A.heroes) { u.order = null; u.path = null; if (humansWin && A.isHunter(u) && u.alive) { u._netKill = true; W.killUnit(u); u._netKill = false; } }
+  setTimeout(() => { if (!W.ended) { W.ended = { win, msg: '', title: humansWin ? '¡SOBREVIVIERON!' : '¡GANARON LOS ZOMBIS!', text: (humansWin ? hum + ' humanos vieron el amanecer' : 'Infectaron a todos') + ' · Tus bajas: ' + (A.kills[W.local.id] || 0) }; W.emit('end', W.ended); } }, 1800);
+}
+// ---------------- what you can see: the night is dark ----------------
+function zSees(A, p, e) {
+  const W = A.W, t = W.time, myZ = A.zomb.has(p.id); if (!e || !e.owner) return true; if (A.zomb.has(e.owner.id) === myZ) return true;
+  if (e.invisUntil > t) { const bt = A.buf[e.owner.id]; if (!A.vis.some(v => (v.team === 1) === myZ && Math.hypot(v.x - e.x, v.y - e.y) < v.r)) return false; }
+  if (A.buf[e.owner.id] && A.buf[e.owner.id].marked > t && !myZ) return true;
+  for (const v of zVisionSrc(A, myZ)) if (Math.hypot(v.x - e.x, v.y - e.y) < v.r) return true; return false;
+}
+function zVisionSrc(A, Z) { const t = A.W.time; if (A._vsT === t && A._vsZ === Z) return A._vs; const L = [];
+  for (const u of A.heroes) if (u.alive && A.isHunter(u) === Z) L.push({ x: u.x, y: u.y, r: Z ? 1000 : 850 });
+  if (!Z) { for (const b of A.blds) if (!A.zomb.has(b.owner)) L.push({ x: b.x, y: b.y, r: ZB[b.k].dmg ? 850 : 450 }); for (const m of A.mins) if (!A.isHunter(m.o)) L.push({ x: m.x, y: m.y, r: 500 }); }
+  else for (const m of A.mins) if (A.isHunter(m.o)) L.push({ x: m.x, y: m.y, r: m.k === 'eye' ? 900 : m.k === 'ghost' ? 900 : 500 });
+  for (const v of A.vis) if ((v.team === 1) === Z) L.push(v);
+  A._vs = L; A._vsT = t; A._vsZ = Z; return L; }
+
+// ---------------- bots ----------------
+const ZBOT_PLAN = ['research', 'b', 'b', 'b', 'factory', 'b', 'ub', 'r:hp', 'exchange', 'xg', 'xg', 'ub', 'r:power', 'core', 'turret', 'u:rocket', 'b', 'r:dmg', 'r:walls', 'ub', 'turret', 'u:electric', 'r:attach', 'warehouse', 'i:suit', 'r:dmg', 'r:hp', 'ub', 'xg', 'r:walls', 'ub', 'r:range', 'r:income', 'r:dmg', 'gen', 'turret', 'u:frost', 'r:hp', 'r:dmg', 'r:walls', 'ub', 'ub', 'r:dmg'];
+const ZBOT_BUY = { all: ['claws', 'hstone', 'gloves', 'ring', 'zboots', 'gem', 'lance', 'isword', 'pick', 'dorb', 'maul', 'waraxe'], rec: ['chaste', 'woodleg', 'vanguard', 'apoc', 'crown', 'chaos'] };
+function zCamp(A) { // a good place for the humans' base: far from the zombies, with walls around
+  if (A.camp) return A.camp; const W = A.W; let best = null, bs = -Infinity;
+  for (let k = 0; k < 140; k++) { const s = A.spots[Math.floor(W.rand() * A.spots.length)]; if (!s) continue; const dz = Math.hypot(s.x - A.zzone.x, s.y - A.zzone.y); if (dz < 3800 || A.shops.some(sh => Math.hypot(sh.x - s.x, sh.y - s.y) < 2200)) continue; let shut = 0; for (let a = 0; a < 16; a++) for (const r of [260, 420]) if (!W.walkable(s.x + Math.cos(a * 0.3927) * r, s.y + Math.sin(a * 0.3927) * r)) shut++;
+    let open = 0; for (let a = 0; a < 16; a++) for (const r of [120, 250]) if (W.walkable(s.x + Math.cos(a * 0.3927) * r, s.y + Math.sin(a * 0.3927) * r)) open++; if (open < 30) continue; /* room inside for the buildings */
+    const sc = shut * 30 + dz * 0.02; if (sc > bs) { bs = sc; best = { x: s.x, y: s.y }; } }
+  const c0 = best || { x: A.hzone.x + 3000, y: A.hzone.y + 3000 }; A.camp = { x: Math.round(c0.x / 64) * 64 + 32, y: Math.round(c0.y / 64) * 64 + 32 }; A.ring = []; const R = 448; /* a closed square of barricades, tile by tile */
+  for (let i = -7; i < 7; i++) { A.ring.push({ x: A.camp.x + i * 64 + 32, y: A.camp.y - R }, { x: A.camp.x + i * 64 + 32, y: A.camp.y + R }, { x: A.camp.x - R, y: A.camp.y + i * 64 + 32 }, { x: A.camp.x + R, y: A.camp.y + i * 64 + 32 }); }
+  A.ring = A.ring.filter(r => W.walkable(r.x, r.y)); return A.camp;
+}
+function zBots(A, dt) {
+  const W = A.W, t = W.time; if (A.phase === 'pick') return;
+  for (const b of W.ai.bots) {
+    const u = W.heroOf(b.p); if (!u || !u.alive || !A.cls[b.p.id]) continue; const D = ARENA_DIFF[b.diff] || ARENA_DIFF.normal, id = b.p.id;
+    b.t -= dt; if (b.t > 0) continue; b.t = 0.25 + D.react * 0.8;
+    if (A.isHunter(u)) { zBotZombie(A, b, u, D); continue; }
+    zBotHuman(A, b, u, D);
+  }
+}
+function zBotHuman(A, b, u, D) {
+  const W = A.W, t = W.time, id = u.owner.id, c = zCamp(A), dc = Math.hypot(u.x - c.x, u.y - c.y);
+  const foe = A.nearestFoe(u), fd = foe ? Math.hypot(foe.x - u.x, foe.y - u.y) : Infinity;
+  // fight: powers on the zombies close by
+  if (foe && fd < 900) { for (const s of zSkillsOf(A, u)) { if (A.ready(u, s.id) > 0 || Math.random() > D.cast * 0.5) continue; if (s.id === 'blink') { if (u.ahp < u.amax * 0.35 && fd < 300) { const n = Math.hypot(c.x - u.x, c.y - u.y) || 1; zCmd(A, u.owner, 'cast:blink:' + Math.round((c.x - u.x) / n * 100) + ':' + Math.round((c.y - u.y) / n * 100)); } continue; } if (s.t === 'foe' && fd > (s.r || 600)) continue; zCmd(A, u.owner, 'cast:' + s.id + ':' + Math.round((foe.x - u.x) / fd * 100) + ':' + Math.round((foe.y - u.y) / fd * 100)); }
+    if (fd < u.zrng && dc < 700) { u.order = null; u.path = null; return; } /* stand and shoot */ }
+  // go home and build
+  if (dc > 300) { botGo(W, u, c.x + (id % 3 - 1) * 70, c.y + ((id >> 2) % 3 - 1) * 70); return; }
+  b.step = b.step || 0; const st = ZBOT_PLAN[b.step % ZBOT_PLAN.length]; if (b.step >= ZBOT_PLAN.length * 2) return;
+  const g = A.gold[id], next = () => { b.step++; b.fail = 0; }; if ((b.fail = (b.fail || 0) + 1) > 30) return next(); /* a step that can't be done is skipped */
+  const mine = k => A.blds.filter(q => q.owner === id && q.k === k);
+  if (st === 'b') { for (let n = 0; n < 4 && A.gold[id] >= 15; n++) { const slot = A.ring.find(r => !r.skip && !A.blds.some(q => Math.hypot(q.x - r.x, q.y - r.y) < 40)); if (!slot) break; if (zFree(A, slot.x, slot.y, 64)) { A.gold[id] -= 15; zAddBld(A, 'barricade', id, slot.x, slot.y); } else slot.skip = (slot.skip || 0) + 1; } next(); return; }
+  if (st === 'ub') { const q = A.blds.find(x => x.owner === id && ZB[x.k].up && ['barricade', 'adv', 'stone', 'super'].includes(x.k)); if (!q) return next(); const to = ZB[q.k].up[0]; if (zCmd(A, u.owner, 'up:' + q.id + ':' + to)) return; if (g > 2000) next(); return; }
+  if (st.startsWith('r:')) { if (zCmd(A, u.owner, 'res:' + st.slice(2)) || ((A.res[id] || {})[st.slice(2)] || 0) >= ZR[st.slice(2)].max) next(); else if (!mine(ZR[st.slice(2)].at || 'research').length) next(); return; }
+  if (st.startsWith('u:')) { const q = mine('turret')[0]; if (!q) return next(); if (zCmd(A, u.owner, 'up:' + q.id + ':' + st.slice(2))) next(); return; }
+  if (st.startsWith('i:')) { if (zCmd(A, u.owner, 'buy:' + st.slice(2))) next(); else if (g > 1500) next(); return; }
+  if (st === 'xg') { if ((A.honor[id] || 0) >= 2 || zCmd(A, u.owner, 'xg')) next(); return; }
+  if (ZB[st]) { if (mine(st).length && st !== 'turret') return next(); if (['research', 'exchange', 'warehouse', 'flag'].includes(st) && A.blds.some(q => q.k === st && !A.zomb.has(q.owner))) return next(); /* one for the whole team */ const S2 = ZB[st].s, out = st === 'factory'; let at = null; for (let k = 0; k < 30 && !at; k++) { let x, y; if (out) { const a = Math.random() * 6.28, rr = 620 + Math.random() * 300; x = Math.round((c.x + Math.cos(a) * rr) / 32) * 32; y = Math.round((c.y + Math.sin(a) * rr) / 32) * 32; } else { x = c.x + Math.round((Math.random() - 0.5) * 11) * 64; y = c.y + Math.round((Math.random() - 0.5) * 11) * 64; } if ((out || (Math.abs(x - c.x) < 400 - S2 / 2 && Math.abs(y - c.y) < 400 - S2 / 2 && Math.hypot(x - c.x, y - c.y) > 110)) && zFree(A, x, y, S2) && !A.blds.some(q => Math.abs(q.x - x) < (q.s + S2) / 2 && Math.abs(q.y - y) < (q.s + S2) / 2)) at = { x, y }; }
+    if (at && zCmd(A, u.owner, 'build:' + st + ':' + Math.round(at.x) + ':' + Math.round(at.y))) next(); else if (ZB[st].req && !((A.res[id] || {})[ZB[st].req[0]] >= ZB[st].req[1])) next(); return; }
+  next();
+}
+function zBotZombie(A, b, u, D) {
+  const W = A.W, t = W.time, id = u.owner.id;
+  // shopping (at the base before rising, or after coming back)
+  const atShops = A.shops.some(sh => Math.hypot(sh.x - u.x, sh.y - u.y) < 520) || Math.hypot(u.x - A.zzone.x, u.y - A.zzone.y) < 900;
+  if ((t < A.raiseAt || atShops) && A.gold[id] > 300) { for (const k of ZBOT_BUY.rec) if (!(A.inv[id] || []).some(q => q.k === k) && zCmd(A, u.owner, 'buy:' + k)) return; for (const k of ZBOT_BUY.all) if (A.gold[id] >= ZI[k].g && (A.inv[id] || []).length < 6 && !(A.inv[id] || []).some(q => q.k === k)) { if (zCmd(A, u.owner, 'buy:' + k)) return; } }
+  if ((A.lvl[id] || 1) < 5 && A.gold[id] > 1600 && atShops) zCmd(A, u.owner, 'buy:ritual');
+  if (t < A.raiseAt) return;
+  for (const q of A.inv[id] || []) { const it = ZI[q.k] || ZREC[q.k]; if (it.act && Math.random() < D.cast * 0.2 && !['recall', 'eye', 'sward', 'reveal', 'demolish', 'throw'].includes(it.act)) zCmd(A, u.owner, 'use:' + A.inv[id].indexOf(q)); }
+  // hunt the closest human; if a wall is in the way, break the wall
+  let tg = null, bd = Infinity; for (const e of A.alive()) if (!A.isHunter(e) && (zSees(A, u.owner, e) || (b.mem && b.mem.u === e && t - b.mem.t < 20))) { const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; tg = e; } }
+  if (tg) b.mem = { u: tg, t: zSees(A, u.owner, tg) ? t : (b.mem && b.mem.t) || t };
+  b.search = tg ? 0 : (b.search || 0) + 0.4; if (!tg && b.search > 90 - 50 * D.lead) { for (const e of A.alive()) if (!A.isHunter(e)) { const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; tg = e; } } } /* after searching a while they smell where the humans are */
+  if (!tg) { /* nobody in sight: search the map (good bots search smarter: towards human buildings they found) */ const seenB = A.blds.find(q => !A.zomb.has(q.owner) && zSeesPt(A, true, q.x, q.y)); if (seenB) { botGo(W, u, seenB.x, seenB.y); return; } if (!u.order || Math.random() < 0.02) { const s2 = A.spots[Math.floor(Math.random() * A.spots.length)]; if (s2) botGo(W, u, s2.x, s2.y); } return; }
+  if (u.ahp < u.amax * 0.25 && A.ready(u, 'madness') <= 0) zCmd(A, u.owner, 'cast:madness');
+  for (const s of zSkillsOf(A, u)) { if (A.ready(u, s.id) > 0 || Math.random() > D.cast * 0.5 || s.id === 'recall' || s.id === 'harden' || s.id === 'madness') continue; if ((s.t === 'foe' || s.t === 'point') && bd > (s.r || 700)) continue; if (s.t === 'self' && bd > 800 && s.id !== 'shadow' && s.id !== 'haste') continue; zCmd(A, u.owner, 'cast:' + s.id + ':' + Math.round((tg.x - u.x) / bd * 100) + ':' + Math.round((tg.y - u.y) / bd * 100)); }
+  if (A.cls[id] === 'tank' && !A.buf[id].harden && bd < 600) zCmd(A, u.owner, 'cast:harden');
+  b.pathT = (b.pathT || 0) - 1; let blocked = b.blocked;
+  if (b.pathT <= 0) { b.pathT = 4; const pth = W.findPath(u, tg.x, tg.y); const last = pth[pth.length - 1]; blocked = b.blocked = !last || Math.hypot(last.x - tg.x, last.y - tg.y) > 220; }
+  if (!blocked) { const lead = Math.min(0.6, bd / 900) * D.lead; botGo(W, u, tg.x + (tg._vx || 0) * lead, tg.y + (tg._vy || 0) * lead); return; }
+  // break in: the human building closest to me that is near the target
+  let bb = null, bbd = Infinity; for (const q of A.blds) if (!A.zomb.has(q.owner)) { const d = Math.hypot(q.x - u.x, q.y - u.y) + Math.hypot(q.x - tg.x, q.y - tg.y) * 0.5; if (d < bbd) { bbd = d; bb = q; } }
+  if (bb) { if (Math.hypot(bb.x - u.x, bb.y - u.y) - bb.s / 2 > 60) botGo(W, u, bb.x, bb.y); else { u.order = null; u.path = null; } }
+}
+
+// ---------------- drawing ----------------
+function zBldDraw(g, b, mine, A) {
+  const B = ZB[b.k], h = b.s / 2, t = A.W.time; g.save(); g.translate(b.x, b.y);
+  g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(-h + 6, -h - 8, b.s, b.s);
+  const wall = ['barricade', 'adv', 'stone', 'super', 'burrow'].includes(b.k);
+  if (wall) { const col = { barricade: ['#8a6a3a', '#5a4020'], adv: ['#9a7a45', '#5a4020'], stone: ['#8d8d8d', '#4d4d4d'], super: ['#a8a8b8', '#5d5d6d'], burrow: ['#7d7060', '#3d3020'] }[b.k]; g.fillStyle = col[0]; g.strokeStyle = col[1]; g.lineWidth = 4; g.fillRect(-h + 2, -h + 2, b.s - 4, b.s - 4); g.strokeRect(-h + 2, -h + 2, b.s - 4, b.s - 4); g.beginPath(); g.moveTo(-h + 2, 0); g.lineTo(h - 2, 0); g.moveTo(0, -h + 2); g.lineTo(0, 0); g.moveTo(-h / 2, 0); g.lineTo(-h / 2, h - 2); g.stroke();
+    if (b.k === 'burrow') { g.fillStyle = '#ddd'; for (let i = 0; i < 4; i++) { g.beginPath(); const a = i * 1.57; g.moveTo(Math.cos(a) * h, Math.sin(a) * h); g.lineTo(Math.cos(a + 0.2) * (h + 16), Math.sin(a + 0.2) * (h + 16)); g.lineTo(Math.cos(a + 0.4) * h, Math.sin(a + 0.4) * h); g.fill(); } } }
+  else { g.fillStyle = mine ? '#2c3e66' : '#3b2c52'; g.strokeStyle = mine ? '#7fb2ff' : '#b28cff'; if (A.zomb.has(b.owner)) { g.fillStyle = '#3a4a20'; g.strokeStyle = '#8cff6a'; } g.lineWidth = 5; g.beginPath(); g.roundRect ? g.roundRect(-h + 4, -h + 4, b.s - 8, b.s - 8, 12) : g.rect(-h + 4, -h + 4, b.s - 8, b.s - 8); g.fill(); g.stroke();
+    if (B.dmg || b.k === 'turret') { g.fillStyle = '#555c66'; g.beginPath(); g.arc(0, 6, h * 0.55, 0, 7); g.fill(); g.save(); g.rotate((b.aim || 0)); g.fillStyle = '#9aa3ad'; g.fillRect(0, 0, h * 0.9, 12); g.restore(); }
+    g.save(); g.scale(1, -1); g.font = Math.round(h * 0.9) + 'px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(B.ic, 0, B.dmg || b.k === 'turret' ? -h * 0.5 : 0); g.restore(); }
+  if (b.inv > t) { g.strokeStyle = 'rgba(120,255,160,0.8)'; g.lineWidth = 5; g.strokeRect(-h - 6, -h - 6, b.s + 12, b.s + 12); }
+  if (b.demo) { g.save(); g.scale(1, -1); g.font = '900 26px system-ui'; g.textAlign = 'center'; g.fillStyle = '#ff6060'; g.fillText(Math.ceil(b.demo - t), 0, -h - 24); g.restore(); }
+  if (b.hp < b.max) { const w = b.s, y = h + 10; g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 11); g.fillStyle = A.zomb.has(b.owner) ? '#8cff6a' : '#47b0ff'; g.fillRect(-w / 2, y, w * Math.max(0, b.hp / b.max), 7); }
+  g.restore();
+}
+function zGround(A, g, R) {
+  const W = A.W, t = W.time, me = W.heroOf(W.local), myZ = me && A.isHunter(me);
+  // zombie shops (only the zombies care) and the small neutral factories
+  for (const s of A.shops) { g.save(); g.translate(s.x, s.y); g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(0, -6, 110, 34, 0, 0, 7); g.fill(); g.fillStyle = '#3a2a1a'; g.fillRect(-80, -10, 160, 70); for (let i = 0; i < 7; i++) { g.fillStyle = i % 2 ? '#2a3a20' : '#5a1a6a'; g.beginPath(); g.moveTo(-90 + i * 26, 60); g.lineTo(-90 + (i + 1) * 26, 60); g.lineTo(-90 + (i + 1) * 26 - 4, 100); g.lineTo(-90 + i * 26 + 4, 100); g.fill(); }
+    g.scale(1, -1); g.font = '900 22px system-ui'; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = '#000'; g.strokeText(s.n, 0, -120); g.fillStyle = '#c8ff9a'; g.fillText(s.n, 0, -120); g.restore(); }
+  for (const f of A.facs) { g.save(); g.translate(f.x, f.y); g.fillStyle = f.own === W.local.id ? '#2a4a7a' : f.own >= 0 ? '#4a3a6a' : '#4a4a4a'; g.strokeStyle = '#222'; g.lineWidth = 4; g.fillRect(-56, -40, 112, 80); g.strokeRect(-56, -40, 112, 80); g.fillStyle = '#666'; g.fillRect(20, 40, 18, 40); g.scale(1, -1); g.font = '44px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🏭', 0, 0); g.restore(); }
+  for (const z of A.zones) { const k = Math.min(1, (z.until - t) / 2);
+    if (z.k === 'smoke') { g.fillStyle = `rgba(170,170,180,${0.45 * k})`; for (let i = 0; i < 7; i++) { g.beginPath(); g.arc(z.x + Math.cos(i + t * 0.5) * z.r * 0.4, z.y + Math.sin(i * 1.7 + t * 0.4) * z.r * 0.4, z.r * 0.55, 0, 7); g.fill(); } }
+    if (z.k === 'gren') { g.fillStyle = `rgba(255,120,40,${0.3 * k})`; g.beginPath(); g.arc(z.x, z.y, z.r, 0, 7); g.fill(); }
+    if (z.k === 'hell') { g.fillStyle = `rgba(255,60,20,${0.22 * k})`; g.beginPath(); g.arc(z.x, z.y, z.r, 0, 7); g.fill(); g.strokeStyle = `rgba(255,140,40,${0.6 * k})`; g.lineWidth = 6; g.stroke(); }
+    if (z.k === 'fire') { g.save(); g.translate(z.x, z.y); g.rotate(z.a); for (let i = -6; i <= 6; i++) { const fl = 30 + 18 * Math.sin(t * 9 + i); g.fillStyle = `rgba(255,${120 + (i % 3) * 40},30,0.75)`; g.beginPath(); g.ellipse(i * z.r / 6, 0, 30, fl, 0, 0, 7); g.fill(); } g.restore(); }
+    if (z.k === 'barrel' && !myZ) { g.save(); g.translate(z.x, z.y); g.scale(1, -1); g.globalAlpha = 0.6; g.font = '40px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🛢️', 0, 0); g.restore(); } }
+  for (const b of A.blds) if (zSeesPt(A, myZ, b.x, b.y) || A.zomb.has(b.owner) === myZ) zBldDraw(g, b, b.owner === W.local.id, A);
+}
+function zSeesPt(A, Z, x, y) { for (const v of zVisionSrc(A, Z)) if (Math.hypot(v.x - x, v.y - y) < v.r + 60) return true; return false; }
+let _zdark = null;
+function zDraw(A, g, R) {
+  const W = A.W, t = W.time, me = W.heroOf(W.local), myZ = me && A.isHunter(me);
+  for (const m of A.mins) { if (A.isHunter(m.o) !== myZ && !zSeesPt(A, myZ, m.x, m.y)) continue; if ((m.k === 'eye' || m.k === 'sward' || m.k === 'ghost' || m.k === 'demon' || m.k === 'witch') && A.isHunter(m.o) !== myZ) continue;
+    const ic = { sentry: '🗼', rbot: '🤖', sheep: '🐑', zmin: '🧟', ghost: '👻', demon: '😈', witch: '🧙‍♀️', eye: '👁️', sward: '⚠️' }[m.k];
+    g.save(); g.translate(m.x, m.y + 30); g.scale(m.fx || 1, -1); if (m.k === 'eye' || m.k === 'sward' || m.k === 'ghost' || m.k === 'demon' || m.k === 'witch') g.globalAlpha = 0.6; g.font = (m.k === 'zmin' ? 70 : 60) + 'px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ic, 0, 0); g.restore();
+    if (m.max && m.hp < m.max) { g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(m.x - 32, m.y - 30, 64, 9); g.fillStyle = A.isHunter(m.o) ? '#8cff6a' : '#47b0ff'; g.fillRect(m.x - 30, m.y - 28, 60 * Math.max(0, m.hp / m.max), 5); } }
+  for (const f of A.fx) { const k = Math.max(0, (t - f.t) / f.dur); if (k < 0) continue;
+    if (f.k === 'shot') { g.strokeStyle = `rgba(${f.col || '255,240,170'},${1 - k})`; g.lineWidth = 5; g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.tx, f.ty + 40); g.stroke(); }
+    else if (f.k === 'claw') { g.strokeStyle = `rgba(255,60,60,${1 - k})`; g.lineWidth = 6; for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(f.x - 30 + i * 14, f.y + 80); g.lineTo(f.x + 20 + i * 14, f.y + 20); g.stroke(); } }
+    else if (f.k === 'boom') { g.fillStyle = `rgba(${f.col || '255,170,60'},${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, (f.r || 200) * (0.4 + 0.6 * k), 0, 7); g.fill(); }
+    else if (f.k === 'mark') { g.strokeStyle = `rgba(255,80,40,${0.5 + 0.4 * Math.sin(t * 18)})`; g.lineWidth = 6; g.setLineDash([14, 10]); g.beginPath(); g.arc(f.x, f.y, f.r || 200, 0, 7); g.stroke(); g.setLineDash([]); }
+    else if (f.k === 'ray') { g.fillStyle = `rgba(160,220,255,${0.8 * (1 - k)})`; g.fillRect(f.x - 60, f.y, 120, 1400); g.fillStyle = `rgba(255,255,255,${0.9 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, 170, 0, 7); g.fill(); }
+    else if (f.k === 'net') { g.strokeStyle = `rgba(230,230,230,${0.8 * (1 - k)})`; g.lineWidth = 3; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(f.x - 50, f.y - 20 + i * 16); g.lineTo(f.x + 50, f.y + 60 - i * 16); g.stroke(); } }
+    else if (f.k === 'aim') { g.strokeStyle = `rgba(255,40,40,${0.6})`; g.lineWidth = 3; g.setLineDash([10, 10]); g.beginPath(); g.moveTo(f.x, f.y + 40); g.lineTo(f.tx, f.ty + 40); g.stroke(); g.setLineDash([]); }
+    else if (f.k === 'bolt') { g.strokeStyle = `rgba(200,220,255,${1 - k})`; g.lineWidth = 7; g.beginPath(); g.moveTo(f.x, f.y + 50); for (let i = 1; i < 6; i++) { const q = i / 6; g.lineTo(f.x + (f.tx - f.x) * q + (Math.random() - 0.5) * 40, f.y + 50 + (f.ty - f.y) * q + (Math.random() - 0.5) * 40); } g.stroke(); }
+    else if (f.k === 'roar') { g.strokeStyle = `rgba(255,190,60,${0.8 * (1 - k)})`; g.lineWidth = 8; g.beginPath(); g.arc(f.x, f.y + 30, 600 * k, 0, 7); g.stroke(); }
+    else if (f.k === 'puff') { g.fillStyle = `rgba(${f.col || '255,240,160'},${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y + 30, 30 + 60 * k, 0, 7); g.fill(); }
+    else if (f.k === 'num') { g.save(); g.translate(f.x, f.y + 70 + 60 * k); g.scale(1, -1); g.globalAlpha = 1 - k; g.font = '900 28px system-ui'; g.textAlign = 'center'; g.fillStyle = '#ddd'; g.fillText(f.txt, 0, 0); g.restore(); } }
+  // heroes: life bars, buffs, a ring under zombies
+  for (const u of A.heroes) { if (!u.alive || u.removed || (u !== me && !zSees(A, W.local, u))) continue; const Z = A.isHunter(u), b = A.buf[u.owner.id] || {};
+    if (Z) { g.strokeStyle = 'rgba(120,255,80,0.8)'; g.lineWidth = 6; g.beginPath(); g.ellipse(u.x, u.y, 58, 24, 0, 0, 7); g.stroke(); }
+    const w = 100, x = u.x - w / 2, y = u.y - 36; g.fillStyle = 'rgba(0,0,0,0.65)'; g.fillRect(x - 2, y - 2, w + 4, 13); g.fillStyle = Z ? '#7dff5a' : '#4db8ff'; g.fillRect(x, y, w * Math.max(0, u.ahp / (u.amax || 1)), 9);
+    if (b.harden) { g.strokeStyle = 'rgba(200,200,220,0.7)'; g.lineWidth = 6; g.beginPath(); g.arc(u.x, u.y + 50, 72, 0, 7); g.stroke(); }
+    if (u.rootUntil > t) { g.strokeStyle = 'rgba(230,230,230,0.8)'; g.lineWidth = 3; g.beginPath(); g.ellipse(u.x, u.y, 50, 20, 0, 0, 7); g.stroke(); }
+    if (u.chan) { const q = 1 - (u.chan.t - t) / (u.chan.k === 'cap' ? 5 : u.chan.k === 'assas' ? 2.5 : 2.25); g.strokeStyle = '#ffd34d'; g.lineWidth = 8; g.beginPath(); g.arc(u.x, u.y + 50, 80, -Math.PI / 2, -Math.PI / 2 + q * 6.28); g.stroke(); }
+    if ((A.lvl[u.owner.id] || 1) > 1) { g.save(); g.translate(u.x + 58, u.y - 30); g.scale(1, -1); g.font = '900 20px system-ui'; g.fillStyle = '#ffe27a'; g.fillText('Nv' + A.lvl[u.owner.id], 0, 0); g.restore(); } }
+  // the night: everything is dark except what your side can see
+  const cv = g.canvas, tr = g.getTransform(); if (!_zdark) _zdark = document.createElement('canvas'); if (_zdark.width !== cv.width || _zdark.height !== cv.height) { _zdark.width = cv.width; _zdark.height = cv.height; }
+  const d = _zdark.getContext('2d'); d.setTransform(1, 0, 0, 1, 0, 0); d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, cv.width, cv.height);
+  const left = A.gameT - (t - A.raiseAt), dawn = A.phase === 'night' ? Math.max(0, Math.min(1, 1 - left / 90)) : 0; /* the last 90 s the sky gets lighter */
+  d.fillStyle = `rgba(4,2,14,${0.9 - 0.5 * dawn})`; d.fillRect(0, 0, cv.width, cv.height); d.setTransform(tr); d.globalCompositeOperation = 'destination-out';
+  for (const v of zVisionSrc(A, !!myZ)) { const gr = d.createRadialGradient(v.x, v.y, v.r * 0.35, v.x, v.y, v.r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.beginPath(); d.arc(v.x, v.y, v.r, 0, 7); d.fill(); }
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(_zdark, 0, 0); g.restore();
+}
+
+// ---------------- the screen ----------------
+const zEsc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const zIc = s => s.img ? `<img class="sk" src="${FX(s.img)}" alt="">` : `<span>${s.ic}</span>`;
+function zHud(A, ui) {
+  const W = A.W, t = W.time, me = W.heroOf(W.local), id = W.local.id, Z = me && A.isHunter(me);
+  let top = document.getElementById('arenaTop'); if (!top) { top = document.createElement('div'); top.id = 'arenaTop'; top.className = 'pill'; document.body.appendChild(top); top.addEventListener('pointerdown', e => { e.stopPropagation(); top.classList.toggle('mini'); }); }
+  let bar = document.getElementById('arenaBar'); if (!bar) { bar = document.createElement('div'); bar.id = 'arenaBar'; document.body.appendChild(bar); }
+  top.classList.remove('hidden'); bar.classList.remove('hidden');
+  const hum = A.heroes.filter(u => !A.isHunter(u)).length, zs = A.heroes.length - hum, left = Math.max(0, A.gameT - (t - A.raiseAt)), mm = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+  const ph = A.phase === 'pick' ? 'Elige tu clase · ' + Math.max(0, Math.ceil(A.pickEnd - t)) + ' s' : t < A.raiseAt ? '🧟 despiertan en ' + Math.ceil(A.raiseAt - t) + ' s' : '🌅 amanecer en ' + mm(left);
+  const html = `<b>${ph}</b><br><small>🧑 ${hum} · 🧟 ${zs}</small><div class="zres">🪙 ${Math.floor(A.gold[id] || 0)} · 🎖️ ${A.honor[id] || 0}${!Z ? ' · 🔋 ' + Math.max(0, zPowerFree(A, id)) : ''}${(A.lvl[id] || 1) > 1 ? ' · Nv ' + A.lvl[id] : ''}</div>`;
+  if (top._h !== html) { top._h = html; top.innerHTML = html; }
+  // the power buttons
+  const S = me ? zSkillsOf(A, me) : [], POS = Z ? [[2, 3], [1, 3], [2, 2], [1, 2]] : [[2, 3], [1, 3], [2, 2], [1, 2], [2, 1]];
+  const cls = A.cls[id] || '', key = (Z ? 'z' : 'h') + cls + S.map(s => s.id).join(',');
+  if (bar._key !== key) { bar._key = key; bar.className = 'zbar';
+    bar.innerHTML = S.map((s, i) => `<div class="ab arenaB" data-k="${s.id}" style="grid-column:${(POS[i] || [1, 1])[0]};grid-row:${(POS[i] || [1, 1])[1]}">${zIc(s)}<small>${s.n}</small></div>`).join('') + (cls ? `<div class="ab arenaB zmenu" data-m="1" style="grid-column:${Z ? 2 : 1};grid-row:1"><span>${Z ? '🛒' : '🔨'}</span><small>${Z ? 'Tienda' : 'Construir'}</small></div>` : '');
+    for (const el of bar.querySelectorAll('[data-k]')) arenaBtn(A, el, ui);
+    const mb = bar.querySelector('[data-m]'); if (mb) mb.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); zPanel(A, true); }); }
+  for (const el of bar.querySelectorAll('[data-k]')) { const k = el.dataset.k, cd = me ? zSkillCd(A, me, k) : 1, l = me ? A.ready(me, k) : 0; el.classList.toggle('cool', (l > 0 && cd > 1.5) || !me || !me.alive || (Z && t < A.raiseAt)); el.style.setProperty('--cd', (l > 0 ? Math.round(l / cd * 360) : 0) + 'deg'); el.classList.toggle('on', k === 'harden' && !!(A.buf[id] || {}).harden); }
+  // the bag
+  let inv = document.getElementById('arenaInv'); if (!inv) { inv = document.createElement('div'); inv.id = 'arenaInv'; document.body.appendChild(inv); } inv.classList.remove('hidden');
+  const items = A.inv[id] || [], ik = items.map(q => q.k + q.uses).join(',');
+  if (inv._k !== ik) { inv._k = ik; inv.innerHTML = items.map((q, i) => { const it = ZI[q.k] || ZREC[q.k]; return `<button class="aitem${it.act ? ' act' : ''}" data-i="${i}"><span>${it.ic}</span>${q.uses ? `<i>${q.uses}</i>` : ''}</button>`; }).join('');
+    inv.querySelectorAll('[data-i]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); const q = (A.inv[id] || [])[+b.dataset.i]; if (!q) return; const it = ZI[q.k] || ZREC[q.k]; if (it.act) A.cmd(W.local, 'use:' + b.dataset.i); else A.say(it.n + ': ' + it.d, 'ffcfe0ff'); })); }
+  for (const b of inv.querySelectorAll('[data-i]')) { const q = items[+b.dataset.i]; if (!q) continue; const it = ZI[q.k] || ZREC[q.k], l = Math.max(0, (A.cdz[id + ':it:' + q.k] || 0) - t); b.classList.toggle('cool', l > 0); b.style.setProperty('--cd', (it.cd && l > 0 ? Math.round(l / it.cd * 360) : 0) + 'deg'); }
+  // pick a class
+  let pk = document.getElementById('zbPick'); if (!pk) { pk = document.createElement('div'); pk.id = 'zbPick'; document.body.appendChild(pk); pk.addEventListener('pointerdown', e => e.stopPropagation()); }
+  const need = me && !A.cls[id] && (me.alive || A.phase === 'pick');
+  pk.classList.toggle('hidden', !need);
+  if (need) { const L = Z ? ZZ : ZH, k2 = (Z ? 'z' : 'h') + Math.ceil(A.phase === 'pick' ? A.pickEnd - t : 0); if (pk._k !== k2) { pk._k = k2; pk.innerHTML = `<h3>${Z ? '🧟 Elige tu zombi' : '🧑 Elige tu marine'}${A.phase === 'pick' ? ' · ' + Math.max(0, Math.ceil(A.pickEnd - t)) + ' s' : ''}</h3><div class="zpg">` + Object.entries(L).map(([k, c]) => `<button data-c="${k}"><span>${c.ic}</span><b>${c.n}</b><small>${c.d}</small></button>`).join('') + `<button data-c="random"><span>🎲</span><b>Al azar</b><small>Una clase cualquiera</small></button></div>`;
+    pk.querySelectorAll('[data-c]').forEach(b => b.addEventListener('click', () => A.cmd(W.local, 'pick:' + b.dataset.c + (A.phase !== 'pick' && A.cls[id] === null ? '' : '')))); } }
+  const pn = document.getElementById('zbPanel'); if (pn && !pn.classList.contains('hidden')) zPanel(A, false);
+}
+let _zTab = 0;
+function zPanel(A, toggle) {
+  const W = A.W, t = W.time, me = W.heroOf(W.local), id = W.local.id; if (!me) return; const Z = A.isHunter(me);
+  let pn = document.getElementById('zbPanel'); if (!pn) { pn = document.createElement('div'); pn.id = 'zbPanel'; pn.className = 'hidden'; document.body.appendChild(pn); pn.addEventListener('pointerdown', e => e.stopPropagation()); }
+  if (toggle) { pn.classList.toggle('hidden'); pn._k = null; } if (pn.classList.contains('hidden')) return;
+  const g = Math.floor(A.gold[id] || 0), h = A.honor[id] || 0, res = A.res[id] || {};
+  const near = A.blds.filter(b => !A.zomb.has(b.owner) && (b.owner === id || ['research', 'exchange', 'trade', 'warehouse'].includes(b.k)) && Math.hypot(b.x - me.x, b.y - me.y) < 520).sort((a, b) => Math.hypot(a.x - me.x, a.y - me.y) - Math.hypot(b.x - me.x, b.y - me.y))[0];
+  const mid = Z && (W.time < A.raiseAt || Math.hypot(me.x - A.zzone.x, me.y - A.zzone.y) < 900); const shop = A.shops.filter(s => Math.hypot(s.x - me.x, s.y - me.y) < 520)[0];
+  const tabs = Z ? (mid ? Object.keys(ZSHOPS).map(n => n.replace('Tienda ', '').replace('Vendedor de ', '')).concat(['🎒 Bolso']) : ['🛒 Tienda', '🎒 Bolso']) : ['🔨 Construir', '🏠 ' + (near ? ZB[near.k].n : 'Cerca'), '🎒 Bolso'];
+  if (_zTab >= tabs.length) _zTab = 0;
+  const key = [_zTab, g, h, Z, near && near.id, near && near.k, near && near.aura, shop && shop.n, JSON.stringify(res), (A.inv[id] || []).map(q => q.k + q.uses).join(','), (A.dice[id] || 0)].join('|'); if (pn._k === key) return; pn._k = key;
+  const row = (ic, n, d, btn, act, dis) => `<div class="asrow"><span class="asic">${ic}</span><div><b>${n}</b><small>${d || ''}</small></div>${btn ? `<button data-a="${act}" ${dis ? 'disabled' : ''}>${btn}</button>` : ''}</div>`;
+  const cost = (gg, hh) => (gg ? '🪙 ' + gg : '') + (hh ? ' 🎖️ ' + hh : '') || 'Gratis';
+  let body = '';
+  if (!Z && _zTab === 0) { body += ZB_BUILD.map(k => { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1]; return row(B.ic, B.n, rq ? '🔒 Investiga ' + ZR[B.req[0]].n : B.d, cost(B.g, B.h), 'build:' + k, rq || g < B.g || h < (B.h || 0)); }).join('');
+    const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - me.x, q.y - me.y) < 260); if (f) body = row('🏭', 'Capturar fábrica pequeña', '5 s quieto · +2 de oro por segundo', 'Capturar', 'cap') + body; }
+  if (!Z && _zTab === 1) { if (!near) body = '<div class="asfar">Acércate a uno de tus edificios para mejorarlo, investigar o comprar.</div>'; else { const B = ZB[near.k];
+    body += `<div class="asfar">❤️ ${Math.ceil(near.hp)}/${near.max}</div>`;
+    const own = near.owner === id; if (!own) body += '<div class="asfar">Edificio de ' + zEsc(W.players[near.owner].name) + ' (lo puedes usar)</div>';
+    for (const k of own ? B.up || [] : []) { const U = ZB[k], rq = U.req && (res[U.req[0]] || 0) < U.req[1]; body += row(U.ic, 'Mejorar: ' + U.n, rq ? '🔒 Investiga ' + ZR[U.req[0]].n + ' ' + U.req[1] : (U.d || '❤️ ' + U.hp + (U.dmg ? ' · daño ' + U.dmg.join('-') : '')), cost(U.g, U.h), 'up:' + near.id + ':' + k, rq || g < U.g || h < (U.h || 0)); }
+    if (near.k === 'research' || near.k === 'factory') for (const [k, R] of Object.entries(ZR)) { if ((R.at || 'research') !== near.k) continue; const lv = res[k] || 0, gg = R.g + (R.gi || 0) * lv, hh = (R.h || 0) + (R.hi || 0) * lv; body += row(R.ic, R.n + ` <i>${lv}/${R.max}</i>`, R.d, lv >= R.max ? 'MÁX' : cost(gg, hh), 'res:' + k, lv >= R.max || g < gg || h < hh); }
+    if (near.k === 'exchange' || near.k === 'trade') { body += row('🎖️', 'Oro por honor', '1 de honor por 500 de oro', '🪙 500', 'xg', g < 500) + row('🪙', 'Honor por oro', '250 de oro por 1 de honor', '🎖️ 1', 'xh', h < 1); }
+    if (near.k === 'trade') { body += row('🎲', 'Juego de dados', 'Sale 6: +300 · sale 1-5: -100 · ' + (3 - (A.dice[id] || 0)) + ' juegos', 'Jugar', 'dice', (A.dice[id] || 0) >= 3 || g < 100); for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Oficina comercial') body += row(it.ic, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g || !res.attach); }
+    if (near.k === 'warehouse') for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Almacén') body += row(it.ic, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g);
+    if (near.k === 'flag' && own) for (const [k, [n, d]] of Object.entries(FLAG_AURA)) body += row(near.aura === k ? '✅' : '🚩', n, d, near.aura === k ? 'Activa' : 'Elegir', 'aura:' + near.id + ':' + k, near.aura === k);
+    if (near.k === 'burrow' && own && !near.rep) body += row('🛠️', 'Reparación de emergencia', '+350 de vida (1 vez)', 'Usar', 'erepair:' + near.id);
+    if (near.k === 'factory' && own && !near.explo) body += row('💣', 'Poner explosivo', 'Si la destruyen explota: 500 a los zombis cerca', 'Poner', 'explo:' + near.id);
+    if (own) body += row('🧨', 'Demoler', 'Se destruye en 5 s', 'Demoler', 'demolish:' + near.id); } }
+  const zshop = Z && mid && _zTab < 5 ? { n: Object.keys(ZSHOPS)[_zTab] } : shop;
+  if (Z && (_zTab === 0 || (mid && _zTab < 5))) { const shop = zshop; if (!shop) body = '<div class="asfar">Las tiendas de los zombis están en el centro del mapa: ' + A.shops.map(s => s.n).join(', ') + '.</div>';
+    else if (shop.n === 'Vendedor de recetas') body = Object.entries(ZREC).map(([k, r]) => { const have = r.parts.every(p => (A.inv[id] || []).some(q => q.k === p)); return row(r.ic, r.n, 'Junta: ' + r.parts.map(p => ZI[p].n).join(' + ') + ' · ' + r.d, cost(r.g, r.h), 'buy:' + k, !have || g < r.g || h < (r.h || 0)); }).join('');
+    else body = Object.entries(ZI).filter(([k, it]) => it.shop === shop.n).map(([k, it]) => row(it.ic, it.n, it.d, cost(it.g, it.h), 'buy:' + k, g < it.g || h < (it.h || 0))).join(''); }
+  if (_zTab === tabs.length - 1) { const items = A.inv[id] || []; body = (!Z && !res.attach) ? '<div class="asfar">Investiga 🎒 Accesorios en el Centro de investigación para tener bolso.</div>' : items.length ? items.map((q, i) => { const it = ZI[q.k] || ZREC[q.k]; return row(it.ic, it.n + (q.uses ? ' ×' + q.uses : ''), it.d, 'Vender', 'sell:' + i); }).join('') : '<div class="asfar">Tu bolso está vacío.</div>'; }
+  pn.innerHTML = `<div class="ashead"><b>${Z ? '🧟 Zombi' : '🔨 Tu base'}</b><span>🪙 ${g} · 🎖️ ${h}</span><button data-x="1">✕</button></div><div class="astabs">${tabs.map((n, i) => `<button data-tab="${i}" class="${i === _zTab ? 'on' : ''}">${n}</button>`).join('')}</div><div class="aslist">${body}</div>`;
+  pn.querySelector('[data-x]').addEventListener('click', () => pn.classList.add('hidden'));
+  pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _zTab = +b.dataset.tab; pn._k = null; zPanel(A, false); }));
+  pn.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => { A.cmd(W.local, b.dataset.a); pn._k = null; setTimeout(() => zPanel(A, false), 80); }));
+}
+
+// ---------------- online ----------------
+function zSnap(A) {
+  const W = A.W, t = W.time, r = Math.round, rel = v => (v > t ? r((v - t) * 10) : 0);
+  const H = {}; for (const u of A.heroes) { const id = u.owner.id, b = A.buf[id] || {}; H[id] = [u.alive ? 1 : 0, r(u.ahp), r(u.amax || 0), A.zomb.has(id) ? 1 : 0, A.cls[id] || '', A.lvl[id] || 1, r(A.gold[id] || 0), A.honor[id] || 0, A.kills[id], A.deaths[id], rel(u.stunUntil), rel(u.rootUntil), rel(u.invisUntil), b.harden ? 1 : 0, u.chan ? [u.chan.k, rel(u.chan.t)] : 0, A.heads.has(id) ? 1 : 0]; }
+  const CD = {}; for (const k in A.cdz) { const v = A.cdz[k]; if (v > t) CD[k] = rel(v); }
+  return { z: 1, ph: A.phase, pe: rel(A.pickEnd), ra: r((A.raiseAt - t) * 10), gt: A.gameT, st: A.stronger ? 1 : 0, en: A.ended ? 1 : 0, ls: A.lastHero ? A.lastHero.owner.id : -1, H, R: A.res, I: A.inv, CD, D: A.dice,
+    B: A.blds.map(b => [b.id, b.k, b.owner, b.x, b.y, r(b.hp), b.max, b.aura || 0, rel(b.inv || 0), rel(b.demo || 0), b.rep ? 1 : 0, b.explo ? 1 : 0]),
+    M: A.mins.map(m => [m.id, m.k, m.o.owner.id, r(m.x), r(m.y), r(m.hp), m.max, m.fx || 1]), Zn: A.zones.map(z => [z.k, z.o.owner.id, r(z.x), r(z.y), z.r || 0, r((z.a || 0) * 100), rel(z.until)]),
+    F: A.facs.map(f => f.own), V: A.vis.map(v => [r(v.x), r(v.y), v.r, rel(v.until), v.team]),
+    fx: A.fxLog.slice(-40).map(f => [f.id, f.k, r(f.x || 0), r(f.y || 0), r((t - f.t) * 10), f.k === 'say' ? f.txt : f.k === 'num' ? f.txt : 0, f.col || 0, r(f.tx || 0), r(f.ty || 0), r((f.dur || 0.5) * 10), r(f.r || 0)]), mv: A.mv };
+}
+function zClientTick(A, dt) {
+  const W = A.W, s = A.snap; if (!s || !s.z) return; A.snap = null; const t = W.time, ab = v => (v ? t + v / 10 : 0);
+  A.phase = s.ph; A.pickEnd = ab(s.pe); A.raiseAt = t + s.ra / 10; A.gameT = s.gt; A.stronger = !!s.st; A.res = s.R || {}; A.inv = s.I || {}; A.dice = s.D || {};
+  A.cdz = {}; for (const k in s.CD) A.cdz[k] = ab(s.CD[k]);
+  const byId = {}; for (const u of A.heroes) byId[u.owner.id] = u; A.lastHero = byId[s.ls] || null;
+  for (const id in s.H) { const u = byId[id]; if (!u) continue; const q = s.H[id]; const wasZ = A.zomb.has(+id);
+    if (q[3] && !wasZ) { A.zomb.add(+id); u.owner.forceChar = (window.SPR && SPR.MAN && SPR.MAN.chars.orco) ? 'orco' : null; } if (!q[3] && wasZ) { A.zomb.delete(+id); u.owner.forceChar = null; }
+    u.ahp = q[1]; u.amax = q[2]; A.cls[id] = q[4] || null; A.lvl[id] = q[5]; A.gold[id] = q[6]; A.honor[id] = q[7]; A.kills[id] = q[8]; A.deaths[id] = q[9]; u.stunUntil = ab(q[10]); u.rootUntil = ab(q[11]); u.invisUntil = ab(q[12]); (A.buf[id] = A.buf[id] || {}).harden = !!q[13]; u.chan = q[14] ? { k: q[14][0], t: ab(q[14][1]) } : null; if (q[15]) A.heads.add(+id);
+    if (!q[0] && u.alive) { u._netKill = true; W.killUnit(u); u._netKill = false; } if (q[0] && !u.alive) { const m = s.mv[id]; arenaRevive(A, u, m ? m[0] : u.x, m ? m[1] : u.y); }
+    if (u.owner === W.local) { zRecalcClient(A, u); } }
+  for (const id in s.mv) { const m = s.mv[id]; if ((A.mvSeen[id] || 0) >= m[2]) continue; A.mvSeen[id] = m[2]; const u = byId[id]; if (u && u.owner === W.local) { u.x = m[0]; u.y = m[1]; u.order = null; u.path = null; } }
+  // buildings: add / remove their blocks so you can't walk through them either
+  const seen = new Set(); for (const q of s.B) { seen.add(q[0]); let b = A.blds.find(x => x.id === q[0]); if (!b) { b = zAddBld(A, q[1], q[2], q[3], q[4]); b.id = q[0]; } if (b.k !== q[1]) { b.k = q[1]; } b.hp = q[5]; b.max = q[6]; b.aura = q[7] || null; b.inv = ab(q[8]); b.demo = q[9] ? ab(q[9]) : 0; b.rep = q[10]; b.explo = q[11]; }
+  for (const b of A.blds) if (!seen.has(b.id)) { const h = b.s / 2; W.blockRect(b.x - h, b.y - h, b.x + h, b.y + h, -1); b.dead = true; } A.blds = A.blds.filter(b => !b.dead);
+  A.mins = s.M.map(q => ({ id: q[0], k: q[1], o: byId[q[2]], x: q[3], y: q[4], hp: q[5], max: q[6], fx: q[7] })).filter(m => m.o);
+  A.zones = s.Zn.map(q => ({ k: q[0], o: byId[q[1]], x: q[2], y: q[3], r: q[4], a: q[5] / 100, until: ab(q[6]) })).filter(z => z.o);
+  s.F.forEach((o, i) => { if (A.facs[i]) A.facs[i].own = o; }); A.vis = s.V.map(q => ({ x: q[0], y: q[1], r: q[2], until: ab(q[3]), team: q[4] }));
+  for (const f of s.fx) { if (f[0] <= (A.fxSeen || 0)) continue; A.fxSeen = f[0]; if (f[1] === 'say') { W.emit('text', (f[6] ? '|c' + f[6] : '') + f[5] + (f[6] ? '|r' : '')); continue; }
+    A.fx.push({ k: f[1], x: f[2], y: f[3], t: t - f[4] / 10, txt: f[5] || '', col: f[6] || 0, tx: f[7], ty: f[8], dur: f[9] / 10 || 0.5, r: f[10] }); }
+  if (s.en && !A.ended) { A.ended = true; const me = W.heroOf(W.local), hw = A.heroes.some(u => !A.isHunter(u)); zEndClient(A, hw); }
+}
+function zRecalcClient(A, u) { const sp = u.speed; try { zRecalc(A, u); } catch (e) { u.speed = sp; } }
+function zEndClient(A, hw) { const W = A.W, me = W.heroOf(W.local), Z = me && A.isHunter(me); const win = hw ? !Z : Z; setTimeout(() => { if (!W.ended) { W.ended = { win, msg: '', title: hw ? '¡SOBREVIVIERON!' : '¡GANARON LOS ZOMBIS!', text: 'Tus bajas: ' + (A.kills[W.local.id] || 0) }; W.emit('end', W.ended); } }, 1800); }
+
+// ---------------- map info (one page) ----------------
+window.zombieGuide = () => {
+  const cl = L => Object.values(L).map(c => `<span class="zg">${c.ic} ${c.n}</span>`).join('');
+  return `<div class="glbl">🧑 Humanos (10 clases de marine)</div><div class="zgl">${cl(ZH)}</div><small class="gnote">Construyes: ${ZB_BUILD.map(k => ZB[k].ic + ' ' + ZB[k].n).join(', ')}. Las barricadas suben a piedra, súper piedra y con púas; las torretas a cohetes, eléctrica o hielo. Investigas daño, alcance, vida, energía, atrapar, fuego rápido e ingresos. Capturas fábricas pequeñas para tener más oro. Todos tienen Blink, Atrapar y Fuego rápido.</small>` +
+    `<div class="glbl">🧟 Zombis (7 clases)</div><div class="zgl">${cl(ZZ)}</div><small class="gnote">Compran en 5 tiendas del centro (${Object.keys(ZSHOPS).join(', ')}) y juntan objetos con recetas (${Object.keys(ZREC).length}). Suben de nivel al matar. Reviven a los 10 s. Todos tienen Locura zombi y Volver a la base.</small>` +
+    `<div class="glbl">🌙 Reglas</div><small class="gnote">Eliges el tiempo hasta el amanecer (15 a 30 min). Los humanos tienen 60 s antes de que despierten los zombis. Si un zombi te mata, te conviertes en zombi. Los humanos ganan si alguien ve el amanecer; los zombis si infectan a todos. El último sobreviviente gana +250 de daño y +500 de oro. 10 min antes del amanecer los zombis madre se hacen más fuertes. La noche es oscura: solo ves cerca de los tuyos.</small>`;
+};
+if (typeof module !== 'undefined') module.exports = { ZH, ZZ, ZB };
 
 // UI, input and main loop
 'use strict';
@@ -25318,20 +26168,20 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     const mode = online ? online.game.mode : settings.mode, speed = online ? online.game.speed : settings.speed;
     let opts = { bots: settings.bots, maxFade: 3, playerName: settings.nick || 'Tú' };
     { const sl = Array.isArray(settings.botSlots) ? settings.botSlots : null, df = settings.botDiff || []; const act = sl ? [...Array(12).keys()].filter(i => i && sl[i]) : [...Array(settings.bots | 0).keys()].map(i => i + 1);
-      const chMap = window.ARENA && ARENA[settings.map] && (ARENA[settings.map].kind === 'tag' || ARENA[settings.map].kind === 'infect'); if (!chMap) settings.chaserMe = false;
+      const chMap = window.ARENA && ARENA[settings.map] && (ARENA[settings.map].kind === 'tag' || ARENA[settings.map].kind === 'infect' || ARENA[settings.map].kind === 'zsurv'); if (!chMap) settings.chaserMe = false;
       if (settings.chaserMe && sl && sl[0]) act.push(12); /* you are the catcher / the virus: your runner slot is played by a bot */
       opts.botDiffList = act.map(i => df[i] || 'normal'); opts.zombieTime = settings.zombieTime || 'z20'; opts.arenaBotIds = act; opts.arenaDiff = Object.fromEntries(act.map(i => [i, df[i] || 'normal'])); opts.chaserMe = !!settings.chaserMe; opts.chaserDiff = df[0] || 'normal'; opts.arenaWin = settings.arenaWin || 'k15'; opts.botNames = settings.botNames; opts.bots = act.length; }
     if (online) {
       const g = online.game; const humanIds = Object.values(g.slots);
       online.owned = [online.mySlot].concat(online.host ? g.botIds : []);
       const remoteIds = humanIds.filter(i => i !== online.mySlot).concat(online.host ? [] : g.botIds);
-      opts = { seed: g.seed, localId: online.mySlot, humanIds, names: g.names, botIds: g.botIds, bots: g.botIds.length, botsActive: online.host, remoteIds, maxFade: 3, arenaWin: g.arenaWin, arenaClient: !online.host, arenaBotIds: g.botIds, arenaDiff: online.host ? Object.fromEntries(g.botIds.map((b, i) => [b, (settings.botDiff || [])[i + 1] || 'normal'])) : {} };
+      opts = { seed: g.seed, localId: online.mySlot, humanIds, names: g.names, botIds: g.botIds, bots: g.botIds.length, botsActive: online.host, remoteIds, maxFade: 3, arenaWin: g.arenaWin, zombieTime: g.zombieTime || 'z20', arenaClient: !online.host, arenaBotIds: g.botIds, arenaDiff: online.host ? Object.fromEntries(g.botIds.map((b, i) => [b, (settings.botDiff || [])[i + 1] || 'normal'])) : {} };
       online.lastSend = 0; online.hostGoneT = 0;
     }
     const mapId = online ? (online.game.map || 'shroom25') : (settings.map || 'shroom25');
     const MDA = { zombie: window.MAPDATA_ZOMBIE, correk: window.MAPDATA_CORREK, pudge: window.MAPDATA_PUDGE, mirana: window.MAPDATA_MIRANA, nevermore: window.MAPDATA_NEVERMORE }; const md = MDA[mapId] ? MDA[mapId] : mapId === 'kitty5' && window.MAPDATA_KITTY5 ? window.MAPDATA_KITTY5 : mapId === 'bob' && window.MAPDATA_BOB ? window.MAPDATA_BOB : MAPDATA; document.body.dataset.map = md === MAPDATA ? 'shroom25' : mapId; document.body.dataset.fam = (md.profile && md.profile.family) || 'escape';
     W = startGame(md, opts);
-    if (W.arena && online) { if (W.arena.chaserP && W.arena.chaserP.id === 15) { if (online.host) online.owned.push(15); else W.remote.add(15); } window.arenaSend = (k, a) => online && online.net.pushEvent('acast', k, Math.round(a.dx * 100), Math.round(a.dy * 100), Math.round(a.dist || 0)); window.arenaBuyNet = k => online && online.net.pushEvent('abuy', k); }
+    if (W.arena && online) { if (W.arena.chaserP && W.arena.chaserP.id === 15) { if (online.host) online.owned.push(15); else W.remote.add(15); } window.arenaSend = (k, a) => online && online.net.pushEvent('acast', k, Math.round(a.dx * 100), Math.round(a.dy * 100), Math.round(a.dist || 0)); window.arenaBuyNet = k => online && online.net.pushEvent('abuy', k); window.zcmdNet = s => online && online.net.pushEvent('zcmd', s); }
     { const def = Object.assign({ bob: 'rayo', kitty5: 'sinfreno' }, Object.fromEntries(Object.entries(window.ARENA || {}).map(([k, v]) => [k, v.music])))[W.profile.id] || 'fortaleza'; if (def !== 'fortaleza') sfx.setSong(def); } // every map starts with its own song (the pause menu can change it for this game only)
     $('#stats .t').textContent = W.arena ? W.arena.C.name.toUpperCase() : W.profile.id === 'kitty5' ? 'CORRE AMIGO CORRE' : W.profile.id === 'bob' ? 'CORRE POLAR' : 'ESCAPE FANTASÍA'; $('#stats .ver').textContent = W.profile.family === 'run' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
@@ -25398,6 +26248,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (kind === 'dance' && slot != null && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) sendDance(a, u); }
       if (kind === 'bdance' && typeof a === 'number' && typeof e[3] === 'string') { const u = W.heroOf(W.players[a]); if (u && !online.owned.includes(a)) sendDance(e[3], u); }
       if (kind === 'cos' && slot != null && W.players[slot]) { const pl = W.players[slot]; if (typeof a === 'string') pl.aura = a; if (typeof e[3] === 'string') pl.deathFx = e[3]; if (typeof e[4] === 'string') pl.spawnFx = e[4]; if (typeof e[5] === 'string') pl.skins = { [W.profile.id]: e[5] }; if (typeof e[6] === 'number') pl.lvl = e[6] | 0; if (typeof e[7] === 'string') pl.nickFx = e[7]; }
+      if (kind === 'zcmd' && slot != null && online.host && W.arena && W.arena.z && typeof a === 'string') zCmd(W.arena, W.players[slot], a);
       if (kind === 'abuy' && slot != null && online.host && W.arena && W.arena.buy && typeof a === 'string') W.arena.buy(W.players[slot], a);
       if (kind === 'acast' && slot != null && online.host && W.arena && typeof a === 'string') { const u = W.heroOf(W.players[slot]); if (u) arenaCast(W.arena, u, a, { dx: (e[3] || 0) / 100, dy: (e[4] || 0) / 100, dist: e[5] || 0, exact: true }, true); }
       if (kind === 'spray' && slot != null && typeof a === 'string') addSpray(W.players[slot], a, e[3], e[4]);
@@ -25746,7 +26597,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   window.addLvl = addLvl;
   function addPassXP(n) { addLvl(0, Math.round(n * 0.8)); const lv0 = Math.floor((settings.passXP || 0) / 100); settings.passXP = (settings.passXP || 0) + n; saveSettings(); if (Math.floor(settings.passXP / 100) > lv0 && lv0 < 29) { try { showText('🎖️ ¡Subiste al nivel ' + (lv0 + 2) + ' del Pase de Batalla!'); } catch (e) {} } }
   function stopGameKShop() { try { $('#kShop').classList.add('hidden'); } catch (e) {} }
-  function stopGame() { { const a = document.getElementById('arenaBar'), b = document.getElementById('arenaTop'); if (a) { a.classList.add('hidden'); a._key = null; } if (b) b.classList.add('hidden'); ['arenaInv', 'arenaShop', 'zbPanel'].forEach(i => { const e = document.getElementById(i); if (e) { e.classList.add('hidden'); e._k = null; } }); } stopGameKShop(); $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
+  function stopGame() { { const a = document.getElementById('arenaBar'), b = document.getElementById('arenaTop'); if (a) { a.classList.add('hidden'); a._key = null; } if (b) b.classList.add('hidden'); ['arenaInv', 'arenaShop', 'zbPanel', 'zbPick'].forEach(i => { const e = document.getElementById(i); if (e) { e.classList.add('hidden'); e._k = null; } }); } stopGameKShop(); $('#stickBase').classList.add('hidden'); $('#end').classList.add('hidden'); $('#pause').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cannon').classList.add('hidden'); W = null; online = null; audio.pause(); sfx.setSong('menu'); sfx.musicOn = settings.music; }
   btn('#bMenuBack', () => { const o = online; stopGame(); if (o) o.net.leave(); if (window.Lobby && Lobby.backFromGame) Lobby.backFromGame(!!o); else $('#menu').classList.remove('hidden'); /* back to the menu you came from */ });
   btn('#bQuit', () => { const a = $('#leaveAsk'); a.classList.remove('hidden'); $('#leaveNo').onclick = () => a.classList.add('hidden'); $('#leaveYes').onclick = () => { a.classList.add('hidden'); doQuit(); }; });
   function doQuit() { const o = online; stopGame(); if (o) o.net.leave(); if (window.Lobby && Lobby.backFromGame) Lobby.backFromGame(!!o); else $('#menu').classList.remove('hidden'); /* back to the menu you came from */ }
@@ -25875,7 +26726,7 @@ const MAP_LORE = {
   shroom27: { t: 'Escape Fantasía: Noche Eterna', lore: 'La luna nunca se fue. El bosque se volvió más oscuro y los hongos brillan para encontrarse entre las sombras.', how: 'Próximamente: nuevas etapas más difíciles.' },
   polar: { t: 'Escape Ártico', lore: 'Un glaciar que se resquebraja bajo tus pies. Desliza, frena y no caigas al agua helada.', how: 'Próximamente.' },
   polar3: { t: 'Escape Ártico: Tormenta', lore: 'La tormenta llegó al glaciar: viento, hielo y menos tiempo para pensar.', how: 'Próximamente.' },
-  zombie: { t: 'Infección Zombi', lore: 'Una ciudad en ruinas. Un virus despierta y alguien se convierte en zombi… y cada mordida suma uno más.', how: '3 rondas de 2 min · a los 8 s alguien se vuelve zombi · si te muerden te vuelves zombi y cazas a los demás · sobrevivir la ronda da 3 puntos y cada mordida 1 punto · humanos: Aturdir 💫, Blink ✨ y Escudo 🛡️ · zombis: Agarrar 🖐️, Embestida ⚡ y Blink.' },
+  zombie: { t: 'Infección Zombi', lore: 'Cae la noche sobre la ciudad. Un virus despertó a los muertos y tienen hambre de cerebros. Los marines tienen 60 segundos para encontrar un buen lugar, levantar barricadas y torres, y aguantar hasta que salga el sol.', how: 'Humanos: elige tu marine, construye tu base, investiga mejoras y sobrevive hasta el amanecer · Zombis: compra objetos, junta recetas e infecta a todos · si te matan siendo humano, te conviertes en zombi.' },
   correk: { t: '¡Corre o Te Pillan!', lore: 'En el Bosque del Anillo uno de ustedes es el Pillador. Los demás corren por el anillo de árboles para que no los atrape.', how: '5 rondas de 60 s · el Pillador persigue a todos · Aturdir, Blink, Escudo e Invisible para escapar · el Pillador tiene Agarrar, Embestida, Blink y Gruñido · si te pilla quedas fuera hasta la siguiente ronda.' },
   pudge: { t: 'Guerra de Ganchos', lore: 'Dos orillas separadas por un río. Lanza tu gancho, atrapa a un rival y tráelo a tu lado.', how: 'Dos equipos separados por el río · lanza tu gancho, atrapa a un rival y tráelo a tu orilla · nube venenosa y blink · runas cada 60 s · tienda en tu base · gana por tiempo o por bajas (lo eliges antes de jugar).' },
   mirana: { t: 'Guerra de Flechas', lore: 'Un bosque helado lleno de árboles. Apunta bien: tu flecha vuela lejos y aturde.', how: 'Dos equipos · tu flecha hace más daño y aturde más mientras más lejos llega · salto sobre árboles y muros · runas cada 60 s · tienda con flechas especiales · gana por tiempo o por bajas (lo eliges antes de jugar).' },
@@ -25984,7 +26835,7 @@ class Net {
     const nb = Math.max(0, Math.min(MAX_PLAYERS - hs.length, this.cfg.bots | 0));
     const botIds = SLOT_ORDER.slice(hs.length, hs.length + nb);
     (this.cfg.fake || []).slice(0, nb).forEach((n, k) => { names[botIds[k]] = String(n).slice(0, 16); }); // the AI 'players' who joined the waiting room
-    const game = { seed: (Math.random() * 4294967296) >>> 0, slots, names, botIds, map: this.cfg.map || 'shroom25', mode: this.cfg.mode, speed: this.cfg.speed, arenaWin: this.cfg.arenaWin || (window.SW && SW.settings && SW.settings.arenaWin) || 'k15', at: Date.now() + 1200, id: Math.random().toString(36).slice(2, 8) };
+    const game = { seed: (Math.random() * 4294967296) >>> 0, slots, names, botIds, map: this.cfg.map || 'shroom25', mode: this.cfg.mode, speed: this.cfg.speed, arenaWin: this.cfg.arenaWin || (window.SW && SW.settings && SW.settings.arenaWin) || 'k15', zombieTime: (window.SW && SW.settings && SW.settings.zombieTime) || 'z20', at: Date.now() + 1200, id: Math.random().toString(36).slice(2, 8) };
     this.st = 'play';
     this.room.presence({ st: 'play', game });
     this.announce();
@@ -26736,7 +27587,7 @@ class Net {
     const r = anchor.getBoundingClientRect(), lr = l.getBoundingClientRect(); let top = r.bottom + 4; if (top + lr.height > innerHeight - 8) top = Math.max(8, r.top - lr.height - 4); let left = Math.min(innerWidth - lr.width - 8, Math.max(8, r.right - lr.width));
     l.style.top = top + 'px'; l.style.left = left + 'px'; return l; }
   function renderPre() { const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
-    const AR = window.ARENA && ARENA[soloMap], teamMap = AR && AR.kind === 'team', tag = AR && AR.kind === 'tag', infect = AR && AR.kind === 'infect';
+    const AR = window.ARENA && ARENA[soloMap], teamMap = AR && AR.kind === 'team', tag = AR && AR.kind === 'tag', infect = AR && (AR.kind === 'infect' || AR.kind === 'zsurv');
     const meChaser = tag && preChaserMe, meVirus = infect && preChaserMe; preBots = preCount();
     const TEAM = { kitty5: ['Gatitos', 'Lobos del Rey Aullido'], bob: ['Focas', 'Cangrejos del puerto'], shroom25: ['Hongos', 'Payasos de feria'], correk: ['Los que corren', 'El Pillador'], zombie: ['Humanos', 'Zombis'] }[soloMap] || (teamMap ? ['Jugadores', 'Equipos'] : ['Jugadores', 'Enemigos']);
     const myC = S.myColor ?? 0, colOf = i => (i === 0 ? myC : i === myC ? 0 : i); /* your colour swaps places with whoever had it */
