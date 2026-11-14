@@ -317,31 +317,48 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 #roundBanner{position:fixed;left:50%;top:52%;transform:translate(-50%,-50%);z-index:40;pointer-events:none;opacity:0;padding:10px 34px 14px;border-radius:22px;background:linear-gradient(180deg,rgba(60,20,110,.28),rgba(25,8,50,.28));border:2px solid rgba(255,210,63,.55);box-shadow:0 0 30px rgba(255,190,60,.25);text-align:center;white-space:nowrap}#roundBanner b{display:block;font:900 50px Nunito,system-ui,sans-serif;letter-spacing:2px;background:linear-gradient(180deg,#fff6b0,#ffd23f 45%,#ff8a1f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #6b2c00)}#roundBanner small{display:block;font:800 15px Nunito,system-ui,sans-serif;color:#e9d8ff;letter-spacing:3px}#bCam{position:relative}#bCam .nox{position:absolute;left:18%;right:18%;top:50%;height:4px;margin-top:-2px;background:#ff3b3b;border-radius:3px;transform:rotate(-40deg);box-shadow:0 0 0 1.5px #2a0a0a}#bCam.on .nox{display:none}#bCam.on{background:#8a4dff;outline:2px solid #b3ff5a}#roundBanner.go{animation:rbn 1.8s ease-out forwards}@keyframes rbn{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}28%{transform:translate(-50%,-50%) scale(1)}65%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
 body:not(.hudfull) #team,body:not(.hudfull) #stats .pcrow,body:not(.hudfull) #tox{display:none!important}body:not(.hudfull) #stats{padding:6px 10px!important;min-width:0!important}body:not(.hudfull) #chatLog{max-width:min(230px,55vw)}body:not(.hudfull) #chatLog > :nth-last-child(n+3){display:none}body:not(.hudfull) #mm{width:110px!important;height:110px!important}body:not(.hudfull) #chatLog > *{opacity:.85;font-size:12px}
 
-#failScr{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:24px 18px calc(18px + env(safe-area-inset-bottom));text-align:center;color:#fff;font-family:inherit;background:radial-gradient(ellipse at 25% 20%,#3b6dff 0,rgba(59,109,255,0) 55%),radial-gradient(ellipse at 80% 35%,#ff3f8e 0,rgba(255,63,142,0) 55%),linear-gradient(160deg,#1c1f6b,#4a1255 55%,#1a0b22)}
+#failScr{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;color:#fff;font-family:inherit;background:radial-gradient(ellipse at 20% 15%,#3b6dff 0,rgba(59,109,255,0) 50%),radial-gradient(ellipse at 85% 80%,#ff3f8e 0,rgba(255,63,142,0) 50%),linear-gradient(160deg,#141a5c,#3a1150 55%,#12081c);overflow:hidden}
 #failScr.hidden{display:none}
-#failScr .fl-logo{margin:auto 0 0;font-weight:900;font-size:48px;letter-spacing:2px;line-height:1;filter:drop-shadow(0 4px 0 #7a3300) drop-shadow(0 8px 14px rgba(0,0,0,.45));background:linear-gradient(#fff6c9,#ffd23f 55%,#ff9d1c);-webkit-background-clip:text;background-clip:text;color:transparent}
-#failScr .fl-sub{font-weight:800;letter-spacing:6px;color:#cfe9ff;margin:6px 0 auto;font-size:14px}
-#failScr .fl-ico{font-size:84px;margin:10px 0 18px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))}
-#failScr .fl-msg{font-weight:800;font-size:17px;line-height:1.3;max-width:440px;text-shadow:0 2px 0 #000,0 0 6px rgba(0,0,0,.6);margin:0 0 16px}
-#failScr .fl-btns{display:flex;flex-direction:column;gap:10px;width:min(340px,100%)}
-#failScr button{border:0;border-radius:12px;padding:14px 16px;font-weight:900;font-size:18px;font-family:inherit;color:#fff;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.35)}
-#failScr .fl-help{background:linear-gradient(#59b4ff,#2a6fe0);text-shadow:0 2px 0 #123a80}
-#failScr .fl-retry{background:linear-gradient(#c6ff6a,#6fcf1d);color:#173300}
-#failScr .fl-back{background:rgba(255,255,255,.14);font-size:15px;padding:10px}
-#failScr .fl-bar{width:100%;max-width:520px;height:16px;border-radius:9px;background:rgba(0,0,0,.45);margin:18px 0 4px;overflow:hidden;border:2px solid rgba(255,255,255,.25)}
+#failScr .fl-stars{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff8,transparent),radial-gradient(2px 2px at 70% 20%,#fff6,transparent),radial-gradient(1.5px 1.5px at 40% 70%,#fff7,transparent),radial-gradient(2px 2px at 85% 55%,#fff5,transparent),radial-gradient(1.5px 1.5px at 10% 85%,#fff6,transparent);animation:flTw 4s ease-in-out infinite alternate}
+@keyframes flTw{to{opacity:.4}}
+#failScr .fl-card{position:relative;width:min(380px,100%);background:rgba(20,14,48,.72);backdrop-filter:blur(8px);border:2px solid rgba(255,211,63,.45);border-radius:26px;padding:24px 20px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12)}
+#failScr .fl-logo{font-weight:900;font-size:40px;letter-spacing:2px;line-height:1;filter:drop-shadow(0 3px 0 #7a3300) drop-shadow(0 6px 12px rgba(0,0,0,.45));background:linear-gradient(#fff6c9,#ffd23f 55%,#ff9d1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+#failScr .fl-logo small{display:block;font-size:12px;letter-spacing:7px;margin-top:4px;background:none;-webkit-text-fill-color:#cfe9ff;color:#cfe9ff;filter:none}
+#failScr .fl-ico{width:110px;height:110px;margin:18px auto 10px;border-radius:50%;display:grid;place-items:center;font-size:58px;background:radial-gradient(circle at 35% 30%,#5b4bd6,#2a1d6e);box-shadow:0 0 0 6px rgba(255,211,63,.18),0 0 40px rgba(120,100,255,.55);animation:flBob 2.2s ease-in-out infinite}
+@keyframes flBob{50%{transform:translateY(-6px) rotate(-6deg)}}
+#failScr .fl-title{margin:4px 0 6px;font-size:24px;font-weight:900;color:#ffd34d;text-shadow:0 2px 0 #000}
+#failScr .fl-msg{font-weight:700;font-size:15px;line-height:1.35;opacity:.92;margin:0 auto 18px;max-width:300px}
+#failScr .fl-btns{display:flex;flex-direction:column;gap:10px}
+#failScr button{border:0;border-radius:16px;padding:14px 16px;font-weight:900;font-size:18px;font-family:inherit;cursor:pointer;transition:transform .08s}
+#failScr button:active{transform:translateY(3px)}
+#failScr .fl-retry{background:linear-gradient(#c6ff6a,#6fcf1d);color:#173300;box-shadow:0 5px 0 #3d8a0b,0 8px 18px rgba(0,0,0,.35)}
+#failScr .fl-help{background:rgba(255,255,255,.12);color:#fff;font-size:16px;padding:11px;border:2px solid rgba(255,255,255,.22)!important}
+#failScr .fl-back{background:rgba(255,255,255,.08);color:#fff;font-size:15px;padding:10px}
+#failScr .fl-bar{height:8px;border-radius:5px;background:rgba(0,0,0,.4);margin:18px 0 8px;overflow:hidden}
 #failScr .fl-bar i{display:block;height:100%;width:99%;background:linear-gradient(90deg,#59b4ff,#b6ff5c)}
-#failScr .fl-code{font-size:11px;opacity:.6;margin-top:6px}
-#failHelp{position:fixed;inset:0;z-index:10000;background:#fff;color:#141414;overflow-y:auto;text-align:left;font-family:inherit}
+#failScr .fl-code{font-size:10px;opacity:.45;word-break:break-all;font-family:monospace}
+#failHelp{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(8,4,24,.82);backdrop-filter:blur(6px);font-family:inherit;color:#fff}
 #failHelp.hidden{display:none}
-#failHelp .fh-top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#24135e;color:#fff}
-#failHelp .fh-top b{font-size:20px;font-weight:900;color:#ffd23f}
-#failHelp .fh-top button{background:none;border:0;color:#fff;font-size:30px;line-height:1;cursor:pointer}
-#failHelp .fh-in{padding:20px 22px 40px;max-width:640px;margin:0 auto}
-#failHelp h2{font-size:28px;font-weight:900;margin:6px 0 10px}#failHelp h3{font-size:19px;font-weight:900;margin:22px 0 6px}
-#failHelp p,#failHelp li{font-size:15px;line-height:1.45}#failHelp ol{padding-left:22px;margin:6px 0}
-#failHelp .fh-code{background:#f1effa;border-radius:10px;padding:10px 12px;font-family:monospace;font-size:13px;word-break:break-all}
-#failHelp .fh-btn{display:block;width:100%;margin-top:18px;border:0;border-radius:12px;padding:14px;font-weight:900;font-size:17px;font-family:inherit;color:#fff;background:linear-gradient(#59b4ff,#2a6fe0);cursor:pointer}
-#failHelp .fh-foot{background:#111;color:#bbb;font-size:13px;padding:18px 22px}
+#failHelp .fh-card{width:min(440px,100%);max-height:100%;overflow-y:auto;border-radius:24px;background:linear-gradient(170deg,#25196b,#1a1040 60%,#140a2a);border:2px solid rgba(255,211,63,.4);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#failHelp .fh-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 6px}
+#failHelp .fh-top b{font-size:20px;font-weight:900;color:#ffd34d}
+#failHelp .fh-top button{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer}
+#failHelp .fh-in{padding:4px 16px 18px}
+#failHelp .fh-hero{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.07);border-radius:16px;padding:12px}
+#failHelp .fh-hero span{font-size:40px}
+#failHelp h2{font-size:19px;font-weight:900;margin:0 0 2px}
+#failHelp .fh-hero p{margin:0;font-size:13px;opacity:.85}
+#failHelp .fh-steps{display:grid;gap:8px;margin:12px 0}
+#failHelp .fh-steps div{display:grid;grid-template-columns:40px 1fr;column-gap:10px;align-items:center;background:rgba(0,0,0,.25);border-radius:14px;padding:9px 10px}
+#failHelp .fh-steps i{grid-row:1/span 2;font-style:normal;font-size:22px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.1)}
+#failHelp .fh-steps b{font-size:14px}#failHelp .fh-steps small{font-size:12px;opacity:.75}
+#failHelp .fh-sup{background:rgba(255,211,63,.08);border:1px dashed rgba(255,211,63,.45);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:4px}
+#failHelp .fh-sup b{color:#ffd34d}#failHelp .fh-sup small{opacity:.8;font-size:12px}
+#failHelp .fh-code{background:rgba(0,0,0,.35);border-radius:10px;padding:8px 10px;font-family:monospace;font-size:11px;word-break:break-all;opacity:.85;margin-top:4px}
+#failHelp .fh-btn{display:block;width:100%;border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px;font-family:inherit;cursor:pointer}
+#failHelp .fh-copy{margin-top:6px;background:linear-gradient(#59b4ff,#2a6fe0);color:#fff;box-shadow:0 4px 0 #1a4aa0}
+#failHelp .fh-go{margin-top:14px;background:linear-gradient(#c6ff6a,#6fcf1d);color:#173300;box-shadow:0 5px 0 #3d8a0b}
+#failHelp .fh-foot{text-align:center;font-size:11px;opacity:.5;padding:0 0 14px}
 .tabic{width:22px;height:22px;border-radius:6px;object-fit:cover;vertical-align:middle;margin:-4px 5px -2px 0}.chinfo .tabic{width:20px;height:20px}
 #shop{align-content:start}
 #qpick{position:fixed;inset:0;z-index:60;background:rgba(8,2,14,.78);display:flex;align-items:flex-end;justify-content:center;padding:14px 14px calc(70px + env(safe-area-inset-bottom))}
@@ -385,18 +402,21 @@ body #sprayWrap{left:max(14px,env(safe-area-inset-left))!important;right:auto!im
 <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
-<div id="failScr" class="hidden"><div class="fl-logo">MAPMIX</div><div class="fl-sub">ONLINE</div><div class="fl-ico">📡</div><div class="fl-msg" id="failMsg">El inicio está tardando más de lo esperado; reinicia el juego o revisa tu conexión.</div><div class="fl-btns"><button class="fl-help" id="failHelpB">Ayuda e información</button><button class="fl-retry" id="failRetry">🔄 Reintentar</button><button class="fl-back hidden" id="failBack">‹ Volver al menú</button></div><div class="fl-bar"><i id="failBarI"></i></div><div class="fl-code" id="failCode"></div></div>
-<div id="failHelp" class="hidden"><div class="fh-top"><b>MapMix · Ayuda</b><button id="failHelpX" aria-label="Cerrar">✕</button></div><div class="fh-in"><h2>Ha ocurrido un problema</h2><p id="failHelpWhy">No pudimos abrir el juego en este momento.</p><h3>Prueba esto</h3><ol><li>Revisa que tengas internet (wifi o datos) y vuelve a intentar.</li><li>Cierra el juego por completo y ábrelo de nuevo.</li><li>Si lo juegas en el navegador, recarga la página.</li><li>Libera espacio en tu celular y cierra otras apps abiertas.</li><li>Si usas el modo online, comprueba que tu amigo te haya compartido la sala.</li><li>Espera unos minutos: a veces el servidor está en mantenimiento.</li></ol><h3>¿Sigue sin funcionar?</h3><p>Avísanos y envíanos este código para que podamos revisarlo:</p><div class="fh-code" id="failHelpCode"></div><button class="fh-btn" id="failHelpCopy">📋 Copiar código</button><button class="fh-btn" id="failHelpRetry" style="background:linear-gradient(#c6ff6a,#6fcf1d);color:#173300">🔄 Volver a intentar</button></div><div class="fh-foot">MapMix Online · Perrin Studios</div></div>
+<div id="failScr" class="hidden"><div class="fl-stars"></div><div class="fl-card"><div class="fl-logo">MAPMIX<small>ONLINE</small></div><div class="fl-ico"><span id="failIco">🛠️</span></div><h2 class="fl-title" id="failTitle">¡Ups! Algo salió mal</h2><div class="fl-msg" id="failMsg">El juego no pudo abrirse.</div><div class="fl-btns"><button class="fl-retry" id="failRetry">🔄 Reintentar</button><button class="fl-help" id="failHelpB">❔ Ayuda</button><button class="fl-back hidden" id="failBack">‹ Volver al menú</button></div><div class="fl-bar"><i id="failBarI"></i></div><div class="fl-code" id="failCode"></div></div></div>
+<div id="failHelp" class="hidden"><div class="fh-card"><div class="fh-top"><b>❔ Ayuda</b><button id="failHelpX" aria-label="Cerrar">✕</button></div><div class="fh-in"><div class="fh-hero"><span>🧭</span><div><h2>Tranquilo, se arregla</h2><p id="failHelpWhy">No pudimos abrir el juego en este momento.</p></div></div>
+<div class="fh-steps"><div><i>📶</i><b>Revisa tu internet</b><small>Wifi o datos, y vuelve a intentar.</small></div><div><i>🔁</i><b>Ábrelo de nuevo</b><small>Cierra el juego por completo y vuelve a entrar.</small></div><div><i>🧹</i><b>Libera tu celular</b><small>Cierra otras apps abiertas.</small></div><div><i>👥</i><b>Modo online</b><small>Revisa que tu amigo te haya compartido la sala.</small></div><div><i>⏳</i><b>Espera un poco</b><small>A veces estamos actualizando el juego.</small></div></div>
+<div class="fh-sup"><b>¿Sigue sin funcionar?</b><small>Envíanos este código para revisarlo:</small><div class="fh-code" id="failHelpCode"></div><button class="fh-btn fh-copy" id="failHelpCopy">📋 Copiar código</button></div>
+<button class="fh-btn fh-go" id="failHelpRetry">🔄 Volver a intentar</button></div><div class="fh-foot">MapMix Online · Perrin Studios</div></div></div>
 <script>
 (function(){var $=function(i){return document.getElementById(i)},mode='boot',code='';
 window.MM_BOOTED=false;
 window.MMFAIL=function(kind,detail){try{mode=kind||'boot';code=('MM-'+(kind||'boot').toUpperCase()+'-'+Date.now().toString(36)+(detail?' · '+String(detail).slice(0,80):''));
-$('failMsg').textContent=kind==='online'?'No se pudo conectar al modo online; reintenta, revisa tu conexión o vuelve al menú para jugar solo.':kind==='error'?'Ocurrió un error al abrir el juego; reinicia el juego o pide ayuda.':'El inicio está tardando más de lo esperado; reinicia el juego o revisa tu conexión.';
+$('failTitle').textContent=kind==='online'?'Sin conexión online':kind==='error'?'¡Ups! Algo salió mal':'Está tardando mucho';$('failIco').textContent=kind==='online'?'📡':kind==='error'?'🛠️':'⏳';$('failMsg').textContent=kind==='online'?'No se pudo conectar al modo online; reintenta, revisa tu conexión o vuelve al menú para jugar solo.':kind==='error'?'El juego no pudo abrirse. Toca Reintentar: lo abriremos desde el menú principal.':'El inicio está tardando más de lo esperado; reinicia el juego o revisa tu conexión.';
 $('failHelpWhy').textContent=kind==='online'?'No pudimos conectarte con las salas online.':'No pudimos abrir el juego en este momento.';
 $('failBack').classList.toggle('hidden',kind!=='online');$('failCode').textContent=code;$('failHelpCode').textContent=code;$('failBarI').style.width=(kind==='online'?100:99)+'%';
 $('failScr').classList.remove('hidden');}catch(e){}};
 window.MMFAILHIDE=function(){$('failScr').classList.add('hidden');$('failHelp').classList.add('hidden');};
-var retry=function(){if(mode==='online'){MMFAILHIDE();try{window.mmRetryOnline&&mmRetryOnline();}catch(e){}}else location.reload();};
+var retry=function(){if(mode==='online'){MMFAILHIDE();try{window.mmRetryOnline&&mmRetryOnline();}catch(e){}}else{try{var k='shroom.settings4',st=JSON.parse(localStorage.getItem(k)||'{}');st.lastMap='shroom25';st.map='shroom25';localStorage.setItem(k,JSON.stringify(st));}catch(e){}location.reload();}}; /* safe retry: open on the main game, so a broken last screen can never lock you out */
 document.addEventListener('DOMContentLoaded',function(){
 $('failHelpB').onclick=function(){$('failHelp').classList.remove('hidden');$('failHelp').scrollTop=0;};
 $('failHelpX').onclick=function(){$('failHelp').classList.add('hidden');};
@@ -25784,7 +25804,7 @@ class Net {
     kitty5: [['tigreN', 'Tigre', 999], ['leon', 'León', 1299], ['puma', 'Puma', 899], ['jaguar', 'Jaguar', 1099], ['leopardo', 'Leopardo', 1099], ['pantera', 'Pantera Negra', 1299], ['guepardo', 'Guepardo', 1199], ['lince', 'Lince', 899], ['ocelote', 'Ocelote', 899], ['caracal', 'Caracal', 899], ['serval', 'Serval', 899], ['montes', 'Gato Montés', 699], ['domestico', 'Gato Doméstico', 599], ['nieves', 'Leopardo de las Nieves', 1199], ['nebuloso', 'Leopardo Nebuloso', 1099], ['jaguarundi', 'Jaguarundi', 799], ['margay', 'Margay', 799], ['pallas', 'Gato de Pallas', 899], ['pescador', 'Gato Pescador', 799], ['llama', 'Tigre de Fuego', 1999]],
     bob: [['dorada', 'Foca Dorada', 999], ['negra', 'Foca Noche', 699], ['rosa', 'Foca Chicle', 699], ['pinguino', 'Foca Pingüino', 799], ['arcoiris', 'Foca Multicolor', 1199], ['pirata', 'Foca Pirata', 899], ['vaquera', 'Foca Vaquera', 799], ['ballena', 'Ballena (prueba)', 1499]] };
   if (S.skin && !S.skins) { S.skins = { shroom25: S.skin }; SW.saveSettings(); }
-  let skCat = LASTOK, fitSkin = null, fitAng = 270, fitWalk = false, fitDrag = null;
+  let skCat = (window.charGame ? window.charGame(LASTOK) : LASTOK), fitSkin = null, fitAng = 270, fitWalk = false, fitDrag = null;
   const ownsSkin = (cat, id) => (S.bought || []).includes('skin:' + cat + ':' + id);
   // Colección: the characters of each game (alphabetical). The first one is free; the rest unlock with the player level, 3 every 5 levels.
   // the free main character first, then alphabetical: places 1-2 unlock at level 5, then 3 more every 5 levels
@@ -25798,15 +25818,15 @@ class Net {
   window.ownsChar = ownsChar;
   // re-draws without jumping: keeps every scroll position of the shop
   const keepScroll = fn => { const L = []; for (let e = $('#shopGrid'); e; e = e.parentElement) L.push([e, e.scrollTop]); const sx = [...document.querySelectorAll('#shopGrid .skcats')].map(e => e.scrollLeft); fn(); for (const [e, t] of L) e.scrollTop = t; document.querySelectorAll('#shopGrid .skcats').forEach((e, i) => { if (sx[i] != null) e.scrollLeft = sx[i]; }); }; /* the map tabs stay where they were scrolled, the page does not jump */
-  function renderSkins() { if (!renderSkins._in) { renderSkins._in = 1; try { keepScroll(renderSkins); } finally { renderSkins._in = 0; } return; } prevsSk.length = 0; const list = charList(skCat), cur = window.SPR ? SPR.charOf({}, skCat, { local: {} }) : '';
+  function renderSkins() { if (!renderSkins._in) { renderSkins._in = 1; try { keepScroll(renderSkins); } finally { renderSkins._in = 0; } return; } if (window.charGame) skCat = charGame(skCat); if (!SKIN_CATS.some(c => c[0] === skCat)) skCat = SKIN_CATS[0][0]; /* a map without its own characters opens the shop on a real tab */ prevsSk.length = 0; const list = charList(skCat), cur = window.SPR ? SPR.charOf({}, skCat, { local: {} }) : '';
     const mine = (S.skins || {})[skCat]; const equipped = window.SPR && SPR.valid(skCat, mine) && ownsChar(skCat, mine) ? mine : (window.SPR ? SPR.BASE_CHAR[skCat] : '');
     if (!fitSkin || fitSkin === 'base' || !(window.SPR && SPR.valid(skCat, fitSkin))) fitSkin = list[0] || equipped;
     const M = window.SPR ? SPR.MAN.chars : {}; const lv = window.playerLvl ? playerLvl() : 1;
     $('#shopGrid').innerHTML = `<div class="skcats">${SKIN_CATS.map(([id, n, lock]) => `<button data-cat="${id}" class="${id === skCat ? 'on' : ''}${lock ? ' lock' : ''}">${n}${lock ? ' 🔒' : ''}</button>`).join('')}</div>` +
-      (SKIN_CATS.find(c => c[0] === skCat)[2] ? `<div class="sknext">🔒 Este mapa llega pronto. Sus personajes estarán disponibles cuando se abra el mapa.</div>` :
+      (((SKIN_CATS.find(c => c[0] === skCat) || (skCat = SKIN_CATS[0][0], SKIN_CATS[0]))[2]) ? `<div class="sknext">🔒 Este mapa llega pronto. Sus personajes estarán disponibles cuando se abra el mapa.</div>` :
       `<div class="fitroom"><canvas id="fitCv" width="240" height="170"></canvas><div class="fitbar"><b id="fitName"></b></div><small>Tu nivel: ⭐ ${lv} · Desliza sobre el personaje para girarlo</small>${charDetail(skCat, fitSkin)}</div>` +
       (chTab === 'skins' ? (() => { const SK = Object.keys(M).filter(k => M[k].skinOf === fitSkin); return SK.length ? SK.map(k => `<div class="item tap sk${fitVar === k ? ' sel' : ''} lockd" data-var="${k}"><img class="apv" src="assets/spr/${M[k].thumb}" style="width:96px;height:96px;object-fit:contain"><b>${esc(M[k].name)}</b><div class="price" style="font-size:11px;text-decoration:none">⏳ Pronto disponible</div><div class="lockd">TOCA PARA VERLA</div></div>`).join('') : `<div class="sknext" style="width:100%">🎨 Este personaje todavía no tiene skins. ¡Pronto!</div>`; })() : '') + (chTab === 'skins' ? [] : list).map(id => { const C = M[id], need = charLvl(skCat, id), own = ownsChar(skCat, id); return `<div class="item tap sk${fitSkin === id ? ' sel' : ''}${own ? '' : ' lockd'}" data-skin="${id}"><img class="apv" src="assets/spr/${C.thumb}" style="width:96px;height:96px;object-fit:contain${own ? '' : ';filter:grayscale(.85) brightness(.7)'}"><b>${esc(C.name)}</b>${PREMIUM[id] ? (own ? '<div class="price owned" style="text-decoration:none">✅ Obtenido</div>' : READY.includes(id) ? `<div class="price" style="font-size:12px;text-decoration:none" data-pbuy="${id}">🪙 ${PREMIUM[id]} · ${'Comprar'}</div>` : `<div class="price" style="font-size:11px;text-decoration:none">🪙 ${PREMIUM[id]} · ⏳ Pronto</div>`) : own ? '<div class="price owned" style="text-decoration:none">✅ Obtenido</div>' : (need >= 999 ? '<div class="price" style="font-size:11px">⏳ Pronto disponible</div>' : `<div class="price" style="font-size:11px">🔒 Se desbloquea al nivel ${need}</div>`)}${equipped === id ? '<div class="lockd eq">EQUIPADO</div>' : own ? '<div class="lockd">TOCA PARA ELEGIR</div>' : ''}</div>`; }).join(''));
-    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat && !SKIN_CATS.find(c => c[0] === skCat)[2]) { shopHist.length = 0; shopHist.push(['cat', skCat]); } skCat = b.dataset.cat; fitSkin = null; fitVar = null; chTab = 'info'; renderSkins(); }));
+    $('#shopGrid').querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => { if (b.dataset.cat !== skCat && !(SKIN_CATS.find(c => c[0] === skCat) || [])[2]) { shopHist.length = 0; shopHist.push(['cat', skCat]); } skCat = b.dataset.cat; fitSkin = null; fitVar = null; chTab = 'info'; renderSkins(); }));
     $('#shopGrid').querySelectorAll('[data-pbuy]').forEach(pe => pe.addEventListener('click', e => { e.stopPropagation(); buyCharPopup(pe.dataset.pbuy); }));
     $('#shopGrid').querySelectorAll('[data-skin]').forEach(el => { el.addEventListener('click', () => { fitVar = null; const pid = el.dataset.skin; fitSkin = el.dataset.skin; fitExtra = null; chTab = 'info'; if (ownsChar(skCat, fitSkin)) { S.skins = S.skins || {}; S.skins[skCat] = fitSkin; SW.saveSettings(); } renderSkins(); }); });
     $('#shopGrid').querySelectorAll('[data-ct]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); chTab = b.dataset.ct; fitExtra = null; fitVar = null; renderSkins(); }));
