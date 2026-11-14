@@ -460,16 +460,18 @@ body[data-akind=zsurv] #dead, body[data-akind=zsurv] #watchBar, body[data-akind=
 #arenaBar.zbar{grid-template-columns:repeat(2,64px);grid-auto-rows:64px;gap:8px}#arenaBar.zbar .arenaB small{font-size:9px}#arenaBar .arenaB.on{box-shadow:0 0 0 3px #ffd34d}
 #arenaBar .zmenu{background:linear-gradient(#ffe27a,#ffbf1f)!important;border-color:#a86d00!important}#arenaBar .zmenu span{font-size:26px}#arenaBar .zmenu small{color:#3a2600!important}
 #arenaTop .zres{font-size:12px;color:#ffe27a;font-weight:800;margin-top:2px}
-#zbPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(390px,94vw);max-height:78vh;display:flex;flex-direction:column;background:linear-gradient(#1f2a1a,#0f150d);border:2px solid #6aaa5a;border-radius:16px;z-index:40;color:#fff;box-shadow:0 10px 40px #000a;padding:8px}#zbPanel.hidden{display:none}
-#zbPanel .ashead{display:flex;align-items:center;gap:8px;font-size:16px}#zbPanel .ashead span{margin-left:auto;color:#ffe27a;font-weight:900;font-size:13px}#zbPanel .ashead button{border:0;background:#3a5a2a;color:#fff;border-radius:8px;width:30px;height:30px;font-size:16px}
-#zbPanel .asfar{font-size:12px;color:#d8ffc8;margin:6px 0;text-align:left}#zbPanel .astabs{display:flex;gap:4px;margin:6px 0;flex-wrap:wrap}#zbPanel .astabs button{flex:1;font:800 11px system-ui;border-radius:8px;border:1px solid #5a8a4a;background:#203a18;color:#fff;padding:6px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#zbPanel .astabs button.on{background:#ffd34d;color:#222}
-#zbPanel .aslist{overflow-y:auto;display:flex;flex-direction:column;gap:5px}#zbPanel .asrow{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;text-align:left;background:#18261a;border-radius:10px;padding:5px}
-#zbPanel .asic{font-size:24px;text-align:center}#zbPanel .asrow b{font-size:13px}#zbPanel .asrow b i{color:#ffe27a;font-style:normal;font-size:11px}#zbPanel .asrow small{display:block;font-size:10.5px;opacity:.8;line-height:1.25}
-#zbPanel .asrow button{font:900 12px system-ui;border:0;border-radius:9px;background:linear-gradient(#ffe27a,#ffbf1f);color:#3a2600;padding:7px 8px;white-space:nowrap}#zbPanel .asrow button:disabled{filter:grayscale(1);opacity:.45}
+#zbPanel{position:fixed;left:max(8px,env(safe-area-inset-left));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 188px);width:226px;background:rgba(10,18,8,.86);border:2px solid #6aaa5a;border-radius:12px;z-index:30;color:#fff;padding:5px;box-shadow:0 4px 16px #0008}#zbPanel.hidden{display:none}
+#zbPanel .zch{display:flex;align-items:center;gap:4px}#zbPanel .zct{display:flex;gap:3px;flex-wrap:wrap}#zbPanel .zct button{width:30px;height:30px;padding:0;border-radius:8px;border:1px solid #5a8a4a;background:#203a18;display:grid;place-items:center;font-size:16px;overflow:hidden}#zbPanel .zct button.on{border-color:#ffd34d;box-shadow:0 0 0 2px #ffd34d}#zbPanel .zct img{width:26px;height:26px;border-radius:50%}
+#zbPanel .zcg{margin-left:auto;font:900 11px system-ui;color:#ffe27a;white-space:nowrap}#zbPanel .zcx{border:0;background:#3a5a2a;color:#fff;border-radius:7px;width:24px;height:24px;font-size:13px;padding:0}
+#zbPanel .zci{font-size:10.5px;line-height:1.25;margin:4px 0;min-height:26px;max-height:40px;overflow:hidden;color:#e4ffd8;text-align:left}
+#zbPanel .zcgrid{display:grid;grid-template-columns:repeat(4,50px);gap:4px;max-height:166px;overflow-y:auto;justify-content:center}#zbPanel .zcgrid button{position:relative;width:50px;height:50px;padding:0;border-radius:10px;border:2px solid #ffd34d;background:#1b2a14;display:grid;place-items:center;font-size:24px;overflow:hidden}
+#zbPanel .zcgrid img{width:44px;height:44px;border-radius:50%}#zbPanel .zcgrid i{position:absolute;left:0;right:0;bottom:0;font:900 9px system-ui;font-style:normal;background:rgba(0,0,0,.7);color:#ffe27a;line-height:12px}#zbPanel .zcgrid button.dis{filter:grayscale(1) brightness(.6);border-color:#555}
 #zbPick{position:fixed;inset:0;z-index:41;background:rgba(5,8,4,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;color:#fff}#zbPick.hidden{display:none}
 #zbPick h3{margin:0 0 8px;font:900 18px system-ui;color:#c8ff9a}.zpg{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:min(420px,96vw);max-height:80vh;overflow:auto}
 .zpg button{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:6px;text-align:left;background:linear-gradient(#24361c,#162410);border:1px solid #5a8a4a;border-radius:12px;padding:6px;color:#fff}.zpg button span{grid-row:span 2;font-size:26px;align-self:center}.zpg button b{font-size:12.5px}.zpg button small{font-size:10px;opacity:.8;line-height:1.2}
 .zgl{display:flex;flex-wrap:wrap;gap:3px 8px;text-align:left}.zg{font-size:11.5px;white-space:nowrap}
+.ab.cdq::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(255,255,255,.35) var(--cd,0deg),transparent 0)}
+.buyfx{position:fixed;z-index:999;transform:translate(-50%,-50%);font:900 30px system-ui;color:#7dff8a;text-shadow:0 0 8px #000;pointer-events:none;animation:buyfx .7s ease-out forwards}@keyframes buyfx{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}40%{transform:translate(-50%,-90%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -21280,7 +21282,8 @@ class BotManager {
     const gpath = (b.path && b.pi < b.path.length) ? b.path : null;
     b.gT = (b.gT || 0) - dt;
     const rev = !!(b.goal && b.goal.revive), ex = b.diff === 'extremo'; // going to revive someone (or an extreme bot): glide boldly
-    if (gpath && (gliding || b.glideCd <= 0) && !this.tileTimeLeftBad(h)) {
+    const exNear = ex && near && (b.field || (b.goal && b.goal.revive)) && !finalApproach; /* extreme bots near enemies: they plan their run in space and time below */
+    if (gpath && !exNear && (gliding || b.glideCd <= 0) && !this.tileTimeLeftBad(h)) {
       let j = b.pi; const scan = b.gT <= 0; if (scan) b.gT = gliding ? 0.08 : (rev || ex ? 0.12 : 0.3);
       for (let k = b.pi + 1; scan && k < Math.min(gpath.length, b.pi + 40); k++) { if (this.safeLineStrict(h.x, h.y, gpath[k].x, gpath[k].y) && this.glideClear(h, gpath[k], ens, rev || ex)) j = k; else break; }
       const tp = gpath[j], dj = Math.hypot(tp.x - h.x, tp.y - h.y);
@@ -21290,14 +21293,14 @@ class BotManager {
         const cur = gpath[b.pi], dc = Math.hypot(cur.x - h.x, cur.y - h.y);
         if (dc > 90 && (!scan || (this.safeLineStrict(h.x, h.y, cur.x, cur.y) && this.glideClear(h, cur, ens, rev)))) { steer(cur); return; }
         const nx = gpath[b.pi + 1]; if (nx && this.safeLineStrict(h.x, h.y, nx.x, nx.y) && this.glideClear(h, nx, ens, rev)) { b.pi++; steer(nx); return; }
-        W.cmdCast(b.p, 'A005'); b.glideCd = b.diff === 'extremo' ? 0.05 : b.diff === 'facil' ? 1.4 : rev ? 0.2 : 0.4; return;
+        W.cmdCast(b.p, 'A005'); b.glideCd = b.diff === 'extremo' ? 0.05 : b.diff === 'facil' ? 1.4 : rev ? 0.2 : 0.4; if (cur) this.goTo(h, cur); return; /* stop running but keep walking (never stand still) */
       }
       const minD = b.diff === 'extremo' ? 110 : b.diff === 'dificil' ? 160 : b.diff === 'facil' ? 520 : rev ? 200 : 220; // bots use Correr often, like real players (extreme ones almost always)
       if (scan && dj > minD && this.safeLineStrict(h.x, h.y, tp.x, tp.y) && this.glideClear(h, tp, ens, rev || ex) && this.segmentOk(h.x, h.y, tp.x, tp.y, 520)) {
         if (W.cmdCast(b.p, 'A005')) { b.pi = j; h.facing = Math.atan2(tp.y - h.y, tp.x - h.x) * 180 / Math.PI; return; }
       }
     }
-    if (gliding) { W.cmdCast(b.p, 'A005'); b.glideCd = 0.8; return; }
+    if (gliding && !exNear) { W.cmdCast(b.p, 'A005'); b.glideCd = ex ? 0.05 : 0.8; if (gpath && gpath[b.pi]) this.goTo(h, gpath[b.pi]); return; }
     if (near && !finalApproach && !b.field && b.goal) { // plain path (following the leader...): plan in space-time toward its goal too
       const gk = 'g' + Math.round(b.goal.x / 128) + ',' + Math.round(b.goal.y / 128);
       const fg = this.field(gk, [{ x0: b.goal.x - 40, y0: b.goal.y - 40, x1: b.goal.x + 40, y1: b.goal.y + 40 }]);
@@ -21307,14 +21310,15 @@ class BotManager {
       b.stT = (b.stT || 0) - dt;
       if (b.stT <= 0 && (this.stBudget = (this.stBudget == null ? 2 : this.stBudget)) > 0) {
         this.stBudget--; b.stT = 0.18; /* re-plan before the 0.25 s step is used up, so the bot never idles between steps (it must keep the planned pace) */
-        const mv = this.stPlan(b, h, b.field, ens, b.goal);
-        if (!mv || mv.stay) { if (h.order) W.issueImmediate(h, 851972); if (!mv) this.evade(b, h, ens); }
-        else this.goTo(h, mv); /* goTo itself avoids clipping toxic corners */
+        const canRun = ex && (gliding || b.glideCd <= 0); b.planSp = canRun ? 520 : 0; /* extreme: plan the run at Correr speed */
+        const mv = this.stPlan(b, h, b.field, ens, b.goal); b.planSp = 0;
+        if (!mv || mv.stay) { if (gliding) { W.cmdCast(b.p, 'A005'); b.glideCd = 0.05; } if (h.order) W.issueImmediate(h, 851972); if (!mv) this.evade(b, h, ens); }
+        else { if (canRun && !gliding && Math.hypot(mv.x - h.x, mv.y - h.y) > 24) W.cmdCast(b.p, 'A005'); else if (!canRun && gliding) { W.cmdCast(b.p, 'A005'); b.glideCd = 0.05; } this.goTo(h, mv); } /* goTo steers the run too */
         b.inST = true;
       }
       return;
     }
-    if (b.inST) { b.inST = false; b.path = null; b.goal = null; b.think = 0; return; }
+    if (b.inST) { b.inST = false; b.path = null; b.goal = null; b.think = 0; if (gliding && ex) { W.cmdCast(b.p, 'A005'); b.glideCd = 0.05; } return; }
     // follow path with danger checks
     if (!b.path || b.pi >= b.path.length) {
       // idle: dodge if something is coming
@@ -21451,7 +21455,7 @@ class BotManager {
     // grid search over (cell, time): where to step next so nothing touches us for the next few seconds.
     // Everything time-dependent is stamped once into a local occupancy grid so the search itself is just array lookups.
     const W = this.W, PW = W.PW, DT = 0.25, T = AI_T;
-    const step = h.speed * DT; const R = AI_R;
+    const step = (b.planSp || h.speed) * DT; const R = AI_R; /* extreme bots plan at running (Correr) speed */
     const ci = Math.floor((h.x + 6144) / 32), cj = Math.floor((h.y + 6144) / 32);
     const near = ens.filter(e => Math.hypot(e.x - h.x, e.y - h.y) < R * 32 + step * T + 200);
     const moves = [0, 0]; const mc = Math.max(1, Math.floor(step / 32));
@@ -22011,7 +22015,7 @@ SONGS.tormenta = { name: 'Tormenta de Sombras', bpm: 244, bass: 'drive', harm: t
   intro: bars(['i1', 'i2'], ['Dm', 'A']), introQuiet: 'i1', introFill: 'i2',
   loop: bars(['t1', 't2', 't3', 't4', 't1', 't2', 't3', 't4', 'u1', 'u2', 'u3', 'u4', 'u1', 'u2', 'u3', 'u4'],
     ['Dm', 'Bb', 'Gm', 'A', 'Dm', 'Bb', 'Gm', 'A', 'Dm', 'C', 'Bb', 'A', 'Dm', 'C', 'Bb', 'A']) };
-SONGS.desesperacion = { name: 'Desesperación', bpm: 228, bass: 'drive', harm: false, wave: ['p12', 'p25'], // Infección Zombi: running out of time, they are coming
+SONGS.desesperacion = { name: 'Desesperación', bpm: 228, bass: 'none', noArp: true, harm: false, wave: ['tri', 'p25'], /* no buzzy bass, no background arpeggio: just the beat and the tune */ // Infección Zombi: running out of time, they are coming
   drums: { k: 'x.xx.xx.x.xx.xx.', s: '....x..x....x..x', h: 'xxxxxxxxxxxxxxxx' },
   lead: { i1: 'F#5 - G5 - F#5 - G5 - F#5 - G5 - C6 - B5 -', i2: 'F#5 - G5 - F#5 - G5 - D6 - C#6 - C6 - B5 -',
     d1: 'B4 C5 B4 F#5 B4 C5 B4 G5 B4 C5 B4 F#5 E5 D5 C5 B4', d2: 'B4 C5 B4 F#5 B4 C5 B4 G5 B4 C5 B4 A#5 B5 A#5 G5 F#5',
@@ -22021,6 +22025,14 @@ SONGS.desesperacion = { name: 'Desesperación', bpm: 228, bass: 'drive', harm: f
   intro: bars(['i1', 'i2'], ['Bm', 'F#']), introQuiet: 'i1', introFill: 'i2',
   loop: bars(['d1', 'd2', 'd3', 'd4', 'd1', 'd2', 'd3', 'd4', 'e1', 'e2', 'e3', 'e4', 'e1', 'e2', 'e3', 'e4'],
     ['Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'Em', 'F#']) };
+SONGS.versus = { name: 'Versus', bpm: 108, bass: 'oct', noArp: true, harm: false, wave: ['tri', 'p25'], // Guerra de Ganchos: a fast battle beat, one against one
+  drums: { k: 'x.....x.x.....x.', s: '....x.......x..x', h: 'xxxxxxxxxxxxxxxx' },
+  lead: { i1: 'A4 - - A4 C5 - E5 - D5 - C5 - B4 - G4 -', i2: 'A4 - - A4 C5 - E5 - F5 - E5 - D5 - E5 -',
+    v1: 'A5 - A5 - G5 - E5 - . . A5 G5 E5 - D5 -', v2: 'C5 - D5 - E5 - . . E5 D5 C5 - B4 - G4 -', v3: 'F5 - F5 - E5 - C5 - . . F5 E5 C5 - A4 -', v4: 'E5 - . E5 F5 E5 D5 C5 B4 - G#4 - B4 - E5 -',
+    h1: 'A5 . C6 . A5 . E5 . G5 . E5 . D5 . C5 .', h2: 'D5 . F5 . D5 . A4 . E5 . G#5 . B5 . E5 .' },
+  intro: bars(['i1', 'i2'], ['Am', 'Am']), introQuiet: 'i1', introFill: 'i2',
+  loop: bars(['v1', 'v2', 'v3', 'v4', 'v1', 'v2', 'v3', 'v4', 'h1', 'h1', 'h2', 'h2', 'h1', 'h1', 'h2', 'v4'],
+    ['Am', 'Am', 'Dm', 'E', 'Am', 'Am', 'Dm', 'E', 'Am', 'Am', 'Dm', 'E', 'Am', 'Am', 'Dm', 'E']) };
 class Sfx {
   constructor() { this.ctx = null; this.muted = false; this.musicOn = true; this.last = {}; }
   init() {
@@ -22161,6 +22173,7 @@ class Sfx {
     else if (n === 'dx_luz') { this.tone(400, 1800, 0.7, 'sine', 0.15); this.tone(600, 2400, 0.7, 'triangle', 0.08, 0.05); this.noise(0.6, 0.12, 6000, 0.5); const A = [900, 1400, 3000]; this.voice(620, 420, 0.6, [A, A], 0.25, 0.05); }
     else if (n === 'dx_fuegos') { for (let r = 0; r < 3; r++) { this.tone(600, 2400, 0.25, 'sine', 0.06, r * 0.18); this.noise(0.35, 0.35, 900, 0.7, 0.3 + r * 0.18); this.tone(120, 50, 0.3, 'sine', 0.3, 0.3 + r * 0.18); } const O = [600, 1000, 2700]; this.voice(700, 400, 0.4, [O, O], 0.25); }
     else if (n === 'dx_flor') { [1047, 1319, 1568, 2093, 1568].forEach((f, i) => this.tone(f, f, 0.3, 'sine', 0.1, i * 0.08)); const O = [600, 1000, 2700], U = [370, 900, 2600]; this.voice(560, 380, 0.6, [O, U], 0.28, 0.1); }
+    else if (n === 'buy') { this.noise(0.06, 0.35, 4000, 1.5); this.tone(1568, 1568, 0.09, 'square', 0.12, 0.03); this.tone(2093, 2093, 0.22, 'square', 0.12, 0.11); this.tone(3136, 3136, 0.3, 'sine', 0.08, 0.11); } /* ka-ching: you bought something */
     else if (n === 'coin') { this.tone(1320, 1320, 0.07, 'square', 0.08); this.tone(1760, 1760, 0.12, 'square', 0.08, 0.06); }
     else if (n === 'stun') { this.tone(1800, 900, 0.3, 'square', 0.1); this.tone(2400, 1200, 0.3, 'triangle', 0.08, 0.08); this.noise(0.3, 0.2, 3000, 2); }
     else if (n === 'dash') { this.noise(0.4, 0.3, 1800, 0.6); this.tone(300, 1400, 0.3, 'sawtooth', 0.06); }
@@ -22271,7 +22284,7 @@ class Sfx {
       const D = song.drums;
       for (let k = 0; k < 16; k++) {
         const tt = t + k * S16;
-        if (!inIntro || li !== song.introQuiet) {
+        if (!song.noArp && (!inIntro || li !== song.introQuiet)) {
           const tn = ch.tones[[0, 1, 2, 1][k % 4]] + 24; voice('p50', mhz(tn), tt, S16 * 0.6, 0.04);
         }
         const r = ch.root - 12;
@@ -24088,12 +24101,12 @@ const ARENA = {
   zombie: { name: 'Infección Zombi', kind: 'zsurv', rounds: 1, roundT: 0, speed: 380, music: 'desesperacion', zoom: 0.85,
     skills: [{ id: 'stun', ic: '💫', n: 'Aturdir', cd: 9, p: [1, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 6, p: [2, 3] }, { id: 'shield', ic: '🛡️', n: 'Escudo', cd: 12, p: [2, 2] }],
     chaser: [{ id: 'grab', ic: '🖐️', n: 'Agarrar', cd: 6, p: [1, 3] }, { id: 'dash', ic: '⚡', n: 'Embestida', cd: 5, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 7, p: [2, 2] }] },
-  pudge: { name: 'Guerra de Ganchos', kind: 'team', hp: 100, speed: 360, zoom: 0.78, music: 'guerra',
+  pudge: { name: 'Guerra de Ganchos', kind: 'team', hp: 100, speed: 360, zoom: 0.78, music: 'versus',
     skills: [{ id: 'cloud', ic: '☠️', img: 'sk_cloud', n: 'Veneno', cd: 7, p: [1, 3] }, { id: 'hook', ic: '🪝', img: 'sk_hook', n: 'Gancho', cd: 2.4, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 4, p: [2, 2] }] },
   mirana: { name: 'Guerra de Flechas', kind: 'team', hp: 100, speed: 560, music: 'relampago',
     skills: [{ id: 'leap', ic: '🐆', img: 'sk_jump', n: 'Salto', cd: 3, p: [1, 3] }, { id: 'arrow', ic: '🏹', img: 'sk_arrow', n: 'Flecha', cd: 1.8, p: [2, 3] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 4, p: [2, 2] }] },
   nevermore: { name: 'Guerra de Sombras', kind: 'team', hp: 100, speed: 380, music: 'tormenta',
-    skills: [{ id: 'raze1', ic: '🌑', img: 'sk_raze2', n: 'Cerca', cd: 1, d: 200, p: [1, 3] }, { id: 'raze2', ic: '🌑', img: 'sk_raze2', n: 'Media', cd: 1, d: 450, p: [2, 3] }, { id: 'raze3', ic: '🌑', img: 'sk_raze2', n: 'Lejos', cd: 1, d: 700, p: [2, 2] },
+    skills: [{ id: 'raze1', ic: '🌑', img: 'sk_raze2', n: 'Cerca', cd: 2, d: 200, p: [1, 3] }, { id: 'raze2', ic: '🌑', img: 'sk_raze2', n: 'Media', cd: 2, d: 450, p: [2, 3] }, { id: 'raze3', ic: '🌑', img: 'sk_raze2', n: 'Lejos', cd: 2, d: 700, p: [2, 2] },
       { id: 'requiem', ic: '💀', img: 'sk_requiem', n: 'Réquiem', cd: 6, p: [1, 2] }, { id: 'blink', ic: '✨', img: 'sk_blink', n: 'Blink', cd: 4, p: [1, 1] }] },
 };
 const ARENA_BOT_NAMES = ['Bobby', 'Adem', 'Zack', 'Kyle', 'Michael', 'AJ', 'Chad', 'Kevin', 'Steven', 'Jason', 'Max'];
@@ -24167,7 +24180,8 @@ function arenaCurveLen(p) { let L = 0, q = arenaCurve(p, 0); for (let i = 1; i <
 function arenaStat(A, u, k, d) { return A.stat ? A.stat(u, k, d) : d; } /* items and runes change these (arena_items.js) */
 function arenaHookCatch(A, p) {
   const W = A.W, o = p.o;
-  if (A.walls) for (const w of A.walls) if (Math.hypot(w.x - p.x, w.y - p.y) < 110 && !p.back) { p.back = true; w.hp -= 34; A.addFx({ k: 'puff', x: p.x, y: p.y, t: W.time, dur: 0.4, col: '200,200,190' }); return true; } /* barricades turn hooks away */
+  if (A.runes && p.k === 'hook' && !p.back) for (const r of A.runes) if (r.flow && !r.taken && Math.hypot(r.x - p.x, r.y - p.y) < 85) { r.taken = true; A.runes = A.runes.filter(q => !q.taken); if (typeof arenaTakeRune === 'function') arenaTakeRune(A, o, r.k); p.back = true; return true; } /* hooks catch the river runes: the hook stops there */
+  if (A.walls) for (const w of A.walls) if (Math.hypot(w.x - p.x, w.y - p.y) < (w.mini ? 70 : 110) && !p.back) { p.back = true; w.hp -= 34; A.addFx({ k: 'puff', x: p.x, y: p.y, t: W.time, dur: 0.4, col: '200,200,190' }); return true; } /* barricades turn hooks away */
   for (const e of A.alive()) { if (e === o || e.jump || e.hooked) continue; if (p.k === 'grab' && !A.enemy(o, e)) continue; if (Math.hypot(e.x - p.x, e.y - p.y) < 60) { p.back = true; p.v = e; e.hooked = p; e.order = null; e.path = null; if (A.enemy(o, e) && p.k === 'hook') arenaHit(A, o, e, 34 * arenaStat(A, o, 'hookDmg', 1)); if (e.owner === W.local) A.camSnap = W.time + 99; W.emit('sound', { name: 'coil' }); return true; } }
   if (A.illus) for (const il of A.illus) if (!il.dead && A.enemy(o, il.src) && Math.hypot(il.x - p.x, il.y - p.y) < 60) { il.dead = true; A.addFx({ k: 'puff', x: il.x, y: il.y, t: W.time, dur: 0.5, col: '200,160,255' }); p.back = true; return true; }
   return false;
@@ -24242,7 +24256,7 @@ function arenaCast(A, u, k, aim, remote) {
   }
   if (k !== 'invis') u.invisUntil = 0; /* using a power shows you again */
   const ok = ({
-    hook() { A.proj.push({ id: ++A.pid, k: 'hook', o: u, x: u.x, y: u.y, sx: u.x, sy: u.y, fx: u.x, fy: u.y, s: 1, dx: a.dx, dy: a.dy, sp: 1800 * arenaStat(A, u, 'hookSpd', 1), max: 1250 * arenaStat(A, u, 'hookRange', 1), d: 0, back: false, bn: 0 }); W.emit('sound', { name: 'coil' }); return true; },
+    hook() { A.proj.push({ id: ++A.pid, k: 'hook', o: u, x: u.x, y: u.y, sx: u.x, sy: u.y, fx: u.x, fy: u.y, s: 1, dx: a.dx, dy: a.dy, sp: 1150 * arenaStat(A, u, 'hookSpd', 1), max: 1250 * arenaStat(A, u, 'hookRange', 1), d: 0, back: false, bn: 0 }); W.emit('sound', { name: 'coil' }); return true; },
     cloud() { A.clouds.push({ o: u, t: W.time, dur: 5, r: 170 }); A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.6, col: '90,255,60' }); return true; },
     arrow() { let sp2 = 0; const id = u.owner.id, sa = A.spec && A.has && (A.inv[id] || []).find(q => ARENA_ITEMS[q.k] && ARENA_ITEMS[q.k].arrow); if (sa && !(A.spec[id] > W.time)) { sp2 = ARENA_ITEMS[sa.k].arrow; A.spec[id] = W.time + 10; } /* a special arrow every 10 s */
       const mk = (dx, dy) => A.proj.push({ id: ++A.pid, k: 'arrow', o: u, x: u.x, y: u.y, dx, dy, sp: 1500 * arenaStat(A, u, 'arrowSpd', 1), max: 2800 * arenaStat(A, u, 'arrowRange', 1), d: 0, sp2: sp2 === 'triple' ? 0 : sp2 });
@@ -24342,13 +24356,13 @@ function arenaTick(A, dt) {
       else if (p.k === 'hook' || p.k === 'grab') { arenaHookCatch(A, p); const bnc = p.k === 'hook' ? arenaStat(A, o, 'bounce', 0) : 0; if (!p.back && bnc && p.bn < bnc + 1) { const B = A.bounds; let hitE = false; if (p.x < B[0] + 60 || p.x > B[2] - 60) { p.dx = -p.dx; hitE = true; } if (p.y < B[1] + 60 || p.y > B[3] - 60) { p.dy = -p.dy; hitE = true; } if (hitE) { p.bn++; p.sx = p.x; p.sy = p.y; } } }
       if (!p.done && p.d >= p.max) { if (p.k === 'arrow') p.done = true; else p.back = true; }
     } else { // coming back: along a curve from the farthest point to where you are NOW (the chain bends as you walk)
-      const L = arenaCurveLen(p); p.s -= p.sp * 1.1 * dt / Math.max(80, L);
+      const L = arenaCurveLen(p); p.s -= p.sp * 0.95 * dt / Math.max(80, L);
       if (p.s <= 0) { p.s = 0; p.done = true; } const q = arenaCurve(p, p.s); p.x = q[0]; p.y = q[1];
       if (!p.v && !p.done) arenaHookCatch(A, p); /* on the way back it still grabs whoever it touches */
       if (Math.hypot(o.x - p.x, o.y - p.y) < 50) p.done = true;
       const v = p.v; if (v && v.alive && !p.done) { v.x = p.x; v.y = p.y; }
       if (p.done && v) { v.hooked = null; if (v.owner === W.local) A.camSnap = W.time + 0.5; let nx = v.x, ny = v.y; if (!W.walkable(nx, ny) || A.compAt(nx, ny) !== A.compAt(o.x, o.y)) { const q2 = W.nearestWalkable(o.x + (v.x - o.x) * 0.3, o.y + (v.y - o.y) * 0.3, 400); if (q2) { nx = q2.x; ny = q2.y; } } arenaMove(A, v, nx, ny);
-        if (p.k === 'grab' && v.alive) arenaCatch(A, o, v); if (p.k === 'hook' && v.alive && A.enemy(o, v)) { const dmg = 33 * arenaStat(A, o, 'hookDmg', 1) * (1 + 0.1 * (p.bn || 0) * arenaStat(A, o, 'bounce', 0)) + arenaStat(A, o, 'drag', 0) * Math.hypot(p.fx - o.x, p.fy - o.y) / 30; arenaHit(A, o, v, dmg); const hl = arenaStat(A, o, 'hookLife', 0); if (hl) o.ahp = Math.min(o.amax, o.ahp + dmg * hl); } /* pulled all the way: the bite */ }
+        if (p.k === 'grab' && v.alive) arenaCatch(A, o, v); if (p.k === 'hook' && v.alive && A.enemy(o, v)) { const dmg = arenaStat(A, o, 'headshot', 0) ? 9999 : 33 * arenaStat(A, o, 'hookDmg', 1) * (1 + 0.1 * (p.bn || 0) * arenaStat(A, o, 'bounce', 0)) + arenaStat(A, o, 'drag', 0) * Math.hypot(p.fx - o.x, p.fy - o.y) / 30; arenaHit(A, o, v, dmg); const hl = arenaStat(A, o, 'hookLife', 0); if (hl) o.ahp = Math.min(o.amax, o.ahp + dmg * hl); } /* pulled all the way: the bite */ }
     }
   }
   A.proj = A.proj.filter(p => !p.done);
@@ -24378,11 +24392,13 @@ function arenaCam(A, cw, ch, z0) {
   if (A.look && me.alive) { const z = A.look; return { x: me.x + z.x, y: me.y + z.y, z: z0 * 0.72 }; }
   if (A.camSnap > W.time) return null;
   const p = A.proj.find(q => q.o === me && (q.k === 'hook' || q.k === 'arrow' || q.k === 'grab') && !q.done); if (!p) return null;
-  /* your shot and you on the screen, and also anything flying at you (so an arrow from behind is never hidden) */
-  let x0 = Math.min(p.x, me.x), x1 = Math.max(p.x, me.x), y0 = Math.min(p.y, me.y), y1 = Math.max(p.y, me.y);
-  for (const q of arenaThreats(A, me)) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); }
-  const z = Math.max(z0 * 0.36, Math.min(z0, (cw * 0.8) / (x1 - x0 + 260), (ch * 0.7) / (y1 - y0 + 360)));
-  return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, z };
+  /* you come first: the camera leans only part of the way to your shot (and to anything flying at you), and never zooms out too far */
+  const pull = p.k === 'arrow' ? 0.45 : 0.7, ax = me.x + (p.x - me.x) * pull, ay = me.y + (p.y - me.y) * pull;
+  let x0 = Math.min(ax, me.x), x1 = Math.max(ax, me.x), y0 = Math.min(ay, me.y), y1 = Math.max(ay, me.y);
+  for (const q of arenaThreats(A, me)) { const tx = me.x + (q.x - me.x) * 0.8, ty = me.y + (q.y - me.y) * 0.8; x0 = Math.min(x0, tx); x1 = Math.max(x1, tx); y0 = Math.min(y0, ty); y1 = Math.max(y1, ty); }
+  const z = Math.max(z0 * (p.k === 'arrow' ? 0.6 : 0.5), Math.min(z0, (cw * 0.8) / (x1 - x0 + 260), (ch * 0.7) / (y1 - y0 + 360)));
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, lim = (k, c, m, half) => Math.max(m - half * 0.8, Math.min(m + half * 0.8, c)); /* you always stay on the screen */
+  return { x: lim(0, cx, me.x, cw / z / 2), y: lim(0, cy, me.y, ch / z / 2), z };
 }
 
 // ---------------- online ----------------
@@ -24491,10 +24507,18 @@ function arenaGround(A, g, R) {
   const W = A.W; A.R = R; arenaClouds(A, g, false); if (A.extraGround) A.extraGround(g); if (A.id !== 'pudge') return; const [x0, y0, x1, y1] = A.bounds, t = W.time;
   const i0 = Math.max(0, Math.floor((x0 + 6144) / 32)), i1 = Math.min(W.PW - 1, Math.ceil((x1 + 6144) / 32)), j0 = Math.max(0, Math.floor((y0 + 6144) / 32)), j1 = Math.min(W.PW - 1, Math.ceil((y1 + 6144) / 32));
   g.fillStyle = '#1f5fa8'; g.beginPath(); for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const x = -6144 + i * 32; if (W.pbase[j * W.PW + i] || (Math.abs(x + 16) < 270 && !W.walkableCell(i, j))) g.rect(x - 0.5, -6144 + j * 32 - 0.5, 33, 33); } g.fill(); /* the river, and its edges you can't walk on */
-  g.strokeStyle = 'rgba(190,230,255,0.35)'; g.lineWidth = 5; g.beginPath(); for (let j = j0; j <= j1; j += 3) for (let i = i0; i <= i1; i += 5) if (W.pbase[j * W.PW + i]) { const x = -6144 + i * 32 + 20 * Math.sin(t * 1.5 + j), y = -6144 + j * 32; g.moveTo(x - 24, y); g.quadraticCurveTo(x, y + 10, x + 24, y); } g.stroke();
+  // the sea moves slowly; the river in the middle runs fast from top to bottom (the runes float down it)
+  g.strokeStyle = 'rgba(190,230,255,0.28)'; g.lineWidth = 5; g.beginPath(); for (let j = j0; j <= j1; j += 3) for (let i = i0; i <= i1; i += 5) if (W.pbase[j * W.PW + i]) { const x = -6144 + i * 32 + 26 * Math.sin(t * 0.9 + j * 0.7), y = -6144 + j * 32 + 10 * Math.sin(t * 0.6 + i); if (Math.abs(x - A.midX) < 300) continue; g.moveTo(x - 24, y); g.quadraticCurveTo(x, y + 12, x + 24, y); } g.stroke();
+  if (A.river) { const R = A.river, w = 250, x = R.x; const gr = g.createLinearGradient(x - w, 0, x + w, 0); gr.addColorStop(0, 'rgba(31,95,168,0)'); gr.addColorStop(0.25, 'rgba(40,120,200,0.55)'); gr.addColorStop(0.5, 'rgba(70,160,230,0.7)'); gr.addColorStop(0.75, 'rgba(40,120,200,0.55)'); gr.addColorStop(1, 'rgba(31,95,168,0)'); g.fillStyle = gr; g.fillRect(x - w, R.y0, w * 2, R.y1 - R.y0);
+    const L = R.y1 - R.y0, sp = 260; g.lineCap = 'round';
+    for (let k = 0; k < 26; k++) { const lane = ((k * 37) % 9 - 4) * 42, ph = (k * 113) % L, y = R.y1 - ((t * sp + ph) % L), len = 60 + (k % 4) * 30; g.strokeStyle = `rgba(220,245,255,${0.25 + 0.2 * (k % 3) / 2})`; g.lineWidth = 4 + (k % 3); g.beginPath(); g.moveTo(x + lane + 10 * Math.sin(y * 0.01 + t), y); g.lineTo(x + lane + 10 * Math.sin((y - len) * 0.01 + t), y - len); g.stroke(); }
+    for (let k = 0; k < 10; k++) { const y = R.y1 - ((t * sp * 0.8 + k * L / 10) % L); g.fillStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.ellipse(x + 120 * Math.sin(k * 2.3 + t * 0.7), y, 16, 6, 0, 0, 7); g.fill(); } g.lineCap = 'butt'; }
 }
 function arenaDraw(A, g, R) {
   if (A.zDraw) return A.zDraw(g, R);
+  if (A.C.kind === 'tag') for (const u of A.heroes) { if (u.alive || u.removed) continue; /* caught runners: a grave where they fell */
+    g.save(); g.translate(u.x, u.y); g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(0, -4, 46, 16, 0, 0, 7); g.fill(); g.fillStyle = '#8d8d95'; g.strokeStyle = '#4a4a52'; g.lineWidth = 5; g.beginPath(); g.moveTo(-30, 0); g.lineTo(-30, 60); g.arc(0, 60, 30, Math.PI, 0, true); g.lineTo(30, 0); g.closePath(); g.fill(); g.stroke();
+    g.scale(1, -1); g.fillStyle = '#3a3a42'; g.font = '900 20px system-ui'; g.textAlign = 'center'; g.fillText('RIP', 0, -38); g.fillStyle = '#fff'; g.font = '800 16px system-ui'; g.strokeStyle = '#000'; g.lineWidth = 4; g.strokeText(u.owner.name || '', 0, -102); g.fillText(u.owner.name || '', 0, -102); g.restore(); }
   const W = A.W, t = W.time, me = W.heroOf(W.local);
   arenaClouds(A, g, true); if (A.extraDraw) A.extraDraw(g);
   for (const p of A.proj) {
@@ -24554,7 +24578,7 @@ function arenaHud(A, ui) {
   const key = S.map(s => s.id).join(',');
   if (bar._key !== key) { bar._key = key; bar.innerHTML = S.map((s, i) => `<div class="ab arenaB" data-k="${s.id}" style="grid-column:${s.p[0]};grid-row:${s.p[1]}">${s.img ? `<img class="sk" src="${FX(s.img)}" alt="">` : `<span>${s.ic}</span>`}<b class="chg"></b><kbd>${'QWERT'[i]}</kbd><small>${s.n}</small></div>`).join('');
     for (const el of bar.children) arenaBtn(A, el, ui); }
-  for (const el of bar.children) { const s = S.find(x => x.id === el.dataset.k); const left = me ? A.ready(me, s.id) : 0; const noCh = s.id === 'requiem' && !(A.charges[W.local.id] > 0); el.classList.toggle('cool', (left > 0 && s.cd > 1.5) || !me || !me.alive || noCh); /* 1-second powers never darken: they are always ready */ el.style.setProperty('--cd', (s && left > 0 ? Math.round(left / s.cd * 360) : 0) + 'deg');
+  for (const el of bar.children) { const s = S.find(x => x.id === el.dataset.k); const left = me ? A.ready(me, s.id) : 0; const noCh = s.id === 'requiem' && !(A.charges[W.local.id] > 0); el.classList.toggle('cool', (left > 0 && s.cd > 1.5) || !me || !me.alive || noCh); el.classList.toggle('cdq', left > 0 && s.cd <= 1.5); /* short powers: a light sweep shows the cooldown without darkening */ el.style.setProperty('--cd', (s && left > 0 ? Math.round(left / s.cd * 360) : 0) + 'deg');
     if (s.id === 'requiem') { const c = el.querySelector('.chg'), n = A.charges[W.local.id] || 0; if (c && c.textContent !== String(n)) c.textContent = n; c.className = 'chg' + (n >= 10 ? ' full' : ''); } }
   let html;
   if (isChase(C)) { const left = Math.max(0, Math.ceil((A.roundEnd || 0) - W.time)); const inf = C.kind === 'infect'; const rank = A.heroes.filter(u => !(C.kind === 'tag' && u === A.chaser)).sort((x, y) => A.kills[y.owner.id] - A.kills[x.owner.id]);
@@ -24595,7 +24619,8 @@ const RUNES = {
   vision: { n: 'Vigilancia', img: 'ru_vision', dur: 10, d: 'Ves a todos los rivales (aunque estén invisibles) con flechas' },
   silence: { n: 'Silencio', img: 'ru_silence', dur: 12, d: 'Quien te pegue queda sin poderes 3 s' },
 };
-const RUNE_FIRST = 30, RUNE_EVERY = 60;
+const RUNE_FIRST = 12, RUNE_EVERY = 30, RIVER_EVERY = 20, RIVER_TIME = 18; /* hooks: a rune every 20 s floats down the river; arrows/shadows: every 30 s near the players */
+const runeEvery = id => id === 'pudge' ? RIVER_EVERY : RUNE_EVERY;
 // ---------------- the shops of each map ----------------
 // st: stats while carried (per level); act: a power you use from the bag; up: an upgrade that takes no bag slot
 // lv: costs per level (buy again to level up); max: how many times an upgrade can be bought
@@ -24654,6 +24679,9 @@ const ITEMS = {
   p_barrel: { n: 'Barril explosivo', ic: '🛢️', shop: 'Objetos', lv: [200, 400, 600, 800, 1000], act: 'mine', cd: 12, d: 'Úsalo: dejas una mina que explota al pisarla (30 → 70).' },
   p_totem: { n: 'Tótem de barricada', ic: '🗿', shop: 'Objetos', lv: [150, 300, 450, 600, 750], act: 'wall', cd: 25, d: 'Úsalo: levantas una barricada que desvía ganchos.' },
   p_turb: { n: 'Turbina de rebote', ic: '🌀', shop: 'Objetos', lv: [210, 425, 640, 850, 1060], st: { bounce: 1 }, d: 'Tu gancho rebota en los bordes y pega más con cada rebote.' },
+  p_mini: { n: 'Mini barricada', ic: '🧱', shop: 'Objetos', cost: 120, act: 'miniwall', cd: 10, d: 'Úsala: una barricada chiquita frente a ti que frena ganchos.' },
+  p_long: { n: 'Cadena larga', ic: '⛓️', shop: 'Objetos', lv: [250, 450, 650, 850, 1050], st: { hookRange: 0.12 }, d: 'Tu gancho llega 12% más lejos por nivel.' },
+  p_head: { n: 'Gancho asesino', ic: '💀', shop: 'Objetos', cost: 4000, st: { headshot: 1 }, d: 'Muy caro: el rival que enganches muere de un golpe.' },
   p_pot: { n: 'Poción de curación', ic: '🧪', shop: 'Consumibles', cost: 40, act: 'heal30', cd: 1, uses: 1, d: 'Úsala: +30 de vida.' },
   p_salve: { n: 'Ungüento', ic: '🫙', shop: 'Consumibles', cost: 25, act: 'salve', cd: 1, uses: 1, d: 'Úsalo: +50 de vida en 8 s.' },
   p_ward: { n: 'Centinela', ic: '🦉', shop: 'Consumibles', cost: 40, act: 'ward', cd: 1, uses: 2, d: 'Úsalo: ves a los invisibles cerca 20 s.' },
@@ -24677,6 +24705,7 @@ function arenaItemsSetup(A, opts) {
   // a shop stall at each team's side, near where it comes back to life
   const side = t => { const L = A.spots.filter(s => (s.x - A.midX) * (t === 0 ? -1 : 1) > (A.id === 'pudge' ? 250 : 1200)); const ax = L.reduce((a, s) => a + s.x, 0) / Math.max(1, L.length), ay = L.reduce((a, s) => a + s.y, 0) / Math.max(1, L.length); let best = L[0] || { x: 0, y: 0 }, bd = Infinity; for (const s of L) { const d = Math.hypot(s.x - ax, s.y - ay); if (d < bd) { bd = d; best = s; } } return { x: best.x, y: best.y }; };
   A.shopAt = [side(0), side(1)];
+  if (A.id === 'pudge') { let ya = Infinity, yb = -Infinity; for (let j = 0; j < W.PW; j++) { const y = -6144 + j * 32 + 16; if (y < A.bounds[1] || y > A.bounds[3]) continue; const i = Math.floor((A.midX + 6144) / 32); if (!W.walkableCell(i, j)) { ya = Math.min(ya, y); yb = Math.max(yb, y); } } A.river = { x: A.midX, y0: isFinite(ya) ? ya : A.bounds[1], y1: isFinite(yb) ? yb : A.bounds[3] }; }
   // where runes appear: one place for each side of the river (hooks), else the top and the bottom of the middle
   { const ys = A.spots.map(s => s.y), y0 = Math.min(...ys), y1 = Math.max(...ys), my = (y0 + y1) / 2; const pick = (x, y, f) => { let best = null, bd = Infinity; for (const s of A.spots) { if (f && !f(s)) continue; const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; best = s; } } return best; };
     A.runeSpots = A.id === 'pudge' ? [pick(A.midX - 520, my, s => s.x < A.midX), pick(A.midX + 520, my, s => s.x > A.midX)] : [pick(A.midX, y0 + (y1 - y0) * 0.22), pick(A.midX, y1 - (y1 - y0) * 0.22)]; A.runeSpots = A.runeSpots.filter(Boolean); }
@@ -24684,6 +24713,7 @@ function arenaItemsSetup(A, opts) {
   // every stat of a hero: items (per level) + runes running now
   A.stat = (u, k, d) => { const id = u.owner && u.owner.id; let v = d; const inv = A.inv[id]; if (inv) for (const s of inv) { const st = ITEMS[s.k] && ITEMS[s.k].st; if (st && st[k]) v += st[k] * (s.lv || 1) * (k === 'drag' || k === 'hookLife' ? 1 : 1) + ((k === 'drag' || k === 'hookLife') ? 0.1 : 0); }
     const b = A.buff[id], t = W.time; if (b) { if (k === 'spd' && (b.speed > t)) v += 0.5; if (k === 'spd' && b.teamspeed > t) v += 0.25; if (k === 'dmgOut' && b.dmg > t) v *= 2; if (k === 'cdMul' && b.arcana > t) v *= 0.6; if (k === 'dmgIn' && b.teamarmor > t) v -= 0.2; if (k === 'dmgIn' && b.curse > t) v += 0.4; }
+    if (A.lvl && A.lvl[id] > 1) { if (k === 'hookDmg') v += 0.05 * (A.lvl[id] - 1); if (k === 'hp') v += 3 * (A.lvl[id] - 1); }
     if (k === 'spd') { for (const e of A.alive()) if (A.enemy(u, e) && A.has(e, 'g_skull') && Math.hypot(e.x - u.x, e.y - u.y) < 450) { v -= 0.2; break; } }
     return v; };
   A.buy = (p, k) => arenaBuy(A, p, k);
@@ -24691,11 +24721,11 @@ function arenaItemsSetup(A, opts) {
   A.itemsTick = dt => arenaItemsTick(A, dt);
   A.onHitMod = (by, u, dmg) => arenaHitMod(A, by, u, dmg);
   A.onRevive = u => { if (u.owner.ai && !A.client) for (let i = 0; i < 3; i++) if (!arenaBotShop(A, u)) break; }; /* bots shop when they come back at their base */
-  A.onKill = (by, u) => { if (by && by !== u && A.gold[by.owner.id] != null) A.gold[by.owner.id] += GOLD_KILL; };
+  A.lvl = {}; A.onKill = (by, u) => { if (by && by !== u && A.gold[by.owner.id] != null) A.gold[by.owner.id] += GOLD_KILL; if (by && by !== u && A.id === 'pudge') { A.lvl[by.owner.id] = (A.lvl[by.owner.id] || 1) + 1; A.addFx({ k: 'puff', x: by.x, y: by.y, t: W.time, dur: 0.8, col: '255,220,90' }); if (by.owner === W.local) A.say('⬆️ ¡Subiste a nivel ' + A.lvl[by.owner.id] + '!', 'ffffe27a'); } }; /* hooks: every kill is a level */
   A.onArrowHit = (p, e) => arenaSpecialHit(A, p, e);
   A.extraGround = g => arenaItemsGround(A, g);
   A.extraDraw = g => arenaItemsDraw(A, g);
-  A.say('🛒 Tienda en tu base · runas en el mapa cada ' + RUNE_EVERY + ' s', 'ffffd34d');
+  A.say(A.id === 'pudge' ? '🛒 Tienda en tu base · cada 20 s baja una runa por el río: engánchala' : '🛒 Tienda en tu base · runas cerca de ti cada 30 s', 'ffffd34d');
 }
 
 function arenaBuy(A, p, k, force) {
@@ -24716,7 +24746,7 @@ function arenaBuy(A, p, k, force) {
   else if (have) have.lv++;
   else inv.push({ k, lv: 1, uses: it.uses || 0 });
   if (it.st && it.st.hp) { u.amax = (C_HP(A)) + A.stat(u, 'hp', 0); u.ahp = Math.min(u.amax, u.ahp + it.st.hp); }
-  W.emit('sound', { name: 'buy' }); if (p === W.local) A.say('Compraste ' + it.n, 'ff7dff8a');
+  if (p === W.local) A.say('Compraste ' + it.n, 'ff7dff8a');
   return true;
 }
 const C_HP = A => A.C.hp || 100;
@@ -24744,6 +24774,7 @@ function arenaUseItem(A, u, k, a) {
     case 'swap': { const e = foe(900); if (!e || A.compAt(e.x, e.y) !== A.compAt(u.x, u.y)) { ok = false; break; } const x = u.x, y = u.y; arenaMove(A, u, e.x, e.y); arenaMove(A, e, x, y); A.addFx({ k: 'puff', x, y, t, dur: 0.5, col: '200,120,255' }); break; }
     case 'ward': b.vision = t + 20; break;
     case 'mine': A.mines.push({ o: u, x: u.x, y: u.y, arm: t + 1, dmg: 20 + 10 * s.lv }); break;
+    case 'miniwall': { const f = u.facing * Math.PI / 180; A.walls.push({ o: u, x: u.x + Math.cos(f) * 110, y: u.y + Math.sin(f) * 110, a: f + Math.PI / 2, hp: 40, until: t + 10, mini: 1 }); break; }
     case 'wall': { const f = u.facing * Math.PI / 180; A.walls.push({ o: u, x: u.x + Math.cos(f) * 140, y: u.y + Math.sin(f) * 140, a: f + Math.PI / 2, hp: 60 + 15 * s.lv, until: t + 15 }); break; }
     default: ok = false;
   }
@@ -24783,8 +24814,13 @@ function arenaItemsTick(A, dt) {
   const W = A.W, t = W.time;
   for (const id of A.ids) { if (A.gold[id] != null) A.gold[id] += GOLD_SEC * dt; }
   // runes appear
-  A.runeT -= dt; if (A.runeT <= 0) { A.runeT = RUNE_EVERY; const keys = Object.keys(RUNES); for (const sp of A.runeSpots) if (!A.runes.some(r => r.x === sp.x && r.y === sp.y)) A.runes.push({ x: sp.x, y: sp.y, k: keys[Math.floor(W.rand() * keys.length)], t }); A.say('✨ ¡Aparecieron runas en el mapa!', 'ffbfa0ff'); }
-  for (const r of A.runes) { if (r.taken) continue; for (const u of A.alive()) if (Math.hypot(u.x - r.x, u.y - r.y) < 80) { r.taken = true; arenaTakeRune(A, u, r.k); break; } }
+  A.runeT -= dt;
+  if (A.river && A.runeT <= 0) { A.runeT = RIVER_EVERY; const keys = Object.keys(RUNES); A.runes.push({ x: A.river.x, y: A.river.y1 - 40, k: keys[Math.floor(W.rand() * keys.length)], t, flow: 1 }); A.say('✨ Una runa baja por el río: ¡engánchala!', 'ffbfa0ff'); }
+  if (A.river) { const v = (A.river.y1 - A.river.y0) / RIVER_TIME; for (const r of A.runes) if (r.flow) { r.y -= v * dt; r.x = A.river.x + 70 * Math.sin((t - r.t) * 0.9); if (r.y < A.river.y0 + 30) r.taken = true; } }
+  else if (A.runeT <= 0) { A.runeT = RUNE_EVERY; const keys = Object.keys(RUNES), al = A.alive(); for (let n = 0; n < 2 && al.length; n++) { const h = al[Math.floor(W.rand() * al.length)]; for (let k = 0; k < 20; k++) { const a = W.rand() * 6.28, rr = 300 + W.rand() * 450, x = h.x + Math.cos(a) * rr, y = h.y + Math.sin(a) * rr; if (W.walkable(x, y) && A.compAt(x, y) === A.compAt(h.x, h.y)) { A.runes.push({ x, y, k: keys[Math.floor(W.rand() * keys.length)], t }); break; } } } A.say('✨ ¡Aparecieron runas cerca!', 'ffbfa0ff'); }
+  A.runes = A.runes.filter(r => r.flow || t - (r.t || t) < 45); /* runes on the ground vanish after 45 s */
+  if (false) { const keys = Object.keys(RUNES); for (const sp of A.runeSpots) if (!A.runes.some(r => r.x === sp.x && r.y === sp.y)) A.runes.push({ x: sp.x, y: sp.y, k: keys[Math.floor(W.rand() * keys.length)], t }); A.say('✨ ¡Aparecieron runas en el mapa!', 'ffbfa0ff'); }
+  for (const r of A.runes) { if (r.taken || r.flow) continue; for (const u of A.alive()) if (Math.hypot(u.x - r.x, u.y - r.y) < 80) { r.taken = true; arenaTakeRune(A, u, r.k); break; } }
   A.runes = A.runes.filter(r => !r.taken);
   for (const u of A.heroes) {
     const id = u.owner.id, b = A.buff[id]; if (!b) continue;
@@ -24839,7 +24875,7 @@ function arenaItemsGround(A, g) {
 }
 function arenaItemsDraw(A, g) {
   const W = A.W, t = W.time, R = window.W && window.SW && window.SW.R;
-  for (const w of A.walls || []) { g.save(); g.translate(w.x, w.y); g.rotate(w.a); g.fillStyle = '#7a7466'; g.strokeStyle = '#3b382f'; g.lineWidth = 6; for (let i = -2; i <= 2; i++) { g.beginPath(); g.rect(i * 44 - 20, -18, 40, 36); g.fill(); g.stroke(); } g.restore(); }
+  for (const w of A.walls || []) { g.save(); g.translate(w.x, w.y); g.rotate(w.a); g.fillStyle = '#7a7466'; g.strokeStyle = '#3b382f'; g.lineWidth = 6; for (let i = w.mini ? -1 : -2; i <= (w.mini ? 0 : 2); i++) { g.beginPath(); g.rect(i * 44 - 20, -18, 40, 36); g.fill(); g.stroke(); } g.restore(); }
   for (const s of A.summ || []) { g.save(); g.translate(s.x, s.y + 30); g.scale(s.fx || 1, -1); g.font = '96px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s.k === 'wolf' ? '🐺' : '🏹', 0, 0); g.restore(); }
   for (const il of A.illus || []) { const Rd = A.R; g.save(); g.globalAlpha = 0.62; g.translate(il.x, il.y); try { if (Rd && Rd.drawSprHero) { const f = Object.assign(Object.create(Object.getPrototypeOf(il.src)), il.src, { x: il.x, y: il.y, facing: il.facing, order: il.moving ? { type: 'move' } : null, _illu: true }); Rd.drawSprHero(g, f); } } catch (e) {} g.restore();
     g.strokeStyle = 'rgba(190,150,255,0.7)'; g.lineWidth = 4; g.beginPath(); g.ellipse(il.x, il.y, 46, 18, 0, 0, 7); g.stroke(); }
@@ -24852,6 +24888,7 @@ function arenaItemsDraw(A, g) {
     if (b.dmg > t) { g.fillStyle = 'rgba(255,60,40,0.22)'; g.beginPath(); g.ellipse(u.x, u.y, 60, 24, 0, 0, 7); g.fill(); }
     if (b.speed > t || b.teamspeed > t) { g.strokeStyle = 'rgba(80,200,255,0.6)'; g.lineWidth = 4; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(u.x - 40, u.y + 20 + i * 22); g.lineTo(u.x - 80 - 20 * Math.sin(t * 9 + i), u.y + 20 + i * 22); g.stroke(); } }
     if (u.silencedUntil > t || b.doom > t) { g.save(); g.translate(u.x, u.y + 130); g.scale(1, -1); g.font = '30px system-ui'; g.textAlign = 'center'; g.fillText(b.doom > t ? '😈' : '🤐', 0, 0); g.restore(); }
+    if (A.lvl && A.lvl[u.owner.id] > 1) { g.save(); g.translate(u.x + 62, u.y + 150); g.scale(1, -1); g.font = '900 22px system-ui'; g.fillStyle = '#ffe27a'; g.strokeStyle = '#000'; g.lineWidth = 4; g.strokeText('Nv ' + A.lvl[u.owner.id], 0, 0); g.fillText('Nv ' + A.lvl[u.owner.id], 0, 0); g.restore(); }
     if (u.cycUntil > t) { g.strokeStyle = 'rgba(220,240,255,0.7)'; g.lineWidth = 5; for (let i = 0; i < 4; i++) { g.beginPath(); g.ellipse(u.x, u.y + 20 + i * 26, 30 + i * 12, 10 + i * 3, t * 6 + i, 0, 7); g.stroke(); } } }
   // vision: arrows at every enemy (rune or ward)
   const me = W.heroOf(W.local); if (me && me.alive && me.visionUntil > t) for (const e of A.alive()) { if (!A.enemy(me, e)) continue; const a = Math.atan2(e.y - me.y, e.x - me.x), r = 190; g.save(); g.translate(me.x + Math.cos(a) * r, me.y + 40 + Math.sin(a) * r); g.rotate(a); g.fillStyle = 'rgba(80,220,255,0.9)'; g.strokeStyle = '#003040'; g.lineWidth = 4; g.beginPath(); g.moveTo(26, 0); g.lineTo(-10, 16); g.lineTo(-3, 0); g.lineTo(-10, -16); g.closePath(); g.stroke(); g.fill(); g.restore(); }
@@ -24860,20 +24897,22 @@ function arenaItemsDraw(A, g) {
 // ---------------- online: what the others need ----------------
 function arenaItemsSnap(A) {
   if (!A.gold) return null; const r = Math.round, t = A.W.time, rel = v => (v > t ? r((v - t) * 10) : 0);
-  const B = {}; for (const id of A.ids) { const b = A.buff[id] || {}; B[id] = [r(A.gold[id]), (A.inv[id] || []).map(s => [s.k, s.lv, s.uses || 0, rel(A.icd[id + 'it:' + s.k] || 0)]), rel(b.speed), rel(b.dmg), rel(b.regen), rel(b.arcana), rel(b.shield), r(b.absorb || 0), rel(b.silence), rel(b.vision), rel(b.doom), rel(b.curse), rel(b.teamspeed), rel(b.teamarmor), A.spec[id] || 0 ? rel(A.spec[id]) : 0]; }
-  return { B, ru: A.runes.map(x => [r(x.x), r(x.y), x.k]), rt: r(A.runeT), il: A.illus.map(i => [i.src.owner.id, r(i.x), r(i.y), r(i.facing), i.moving ? 1 : 0]), su: A.summ.map(s => [s.k[0], s.o.owner.id, r(s.x), r(s.y), s.fx || 1]), mi: A.mines.map(m => [m.o.owner.id, r(m.x), r(m.y)]), wa: A.walls.map(w => [r(w.x), r(w.y), Math.round(w.a * 100)]) };
+  const B = {}; for (const id of A.ids) { const b = A.buff[id] || {}; B[id] = [r(A.gold[id]), (A.inv[id] || []).map(s => [s.k, s.lv, s.uses || 0, rel(A.icd[id + 'it:' + s.k] || 0)]), rel(b.speed), rel(b.dmg), rel(b.regen), rel(b.arcana), rel(b.shield), r(b.absorb || 0), rel(b.silence), rel(b.vision), rel(b.doom), rel(b.curse), rel(b.teamspeed), rel(b.teamarmor), A.spec[id] || 0 ? rel(A.spec[id]) : 0, A.lvl ? A.lvl[id] || 1 : 1]; }
+  return { B, ru: A.runes.map(x => [r(x.x), r(x.y), x.k, x.flow ? 1 : 0]), rt: r(A.runeT), il: A.illus.map(i => [i.src.owner.id, r(i.x), r(i.y), r(i.facing), i.moving ? 1 : 0]), su: A.summ.map(s => [s.k[0], s.o.owner.id, r(s.x), r(s.y), s.fx || 1]), mi: A.mines.map(m => [m.o.owner.id, r(m.x), r(m.y)]), wa: A.walls.map(w => [r(w.x), r(w.y), Math.round(w.a * 100), w.mini ? 1 : 0]) };
 }
 function arenaItemsApply(A, s) {
   if (!s || !A.gold) return; const W = A.W, t = W.time, ab = v => (v ? t + v / 10 : 0), byId = {}; for (const u of A.heroes) byId[u.owner.id] = u;
   for (const id in s.B) { const q = s.B[id], b = A.buff[id] || (A.buff[id] = {}); A.gold[id] = q[0]; A.inv[id] = q[1].map(x => ({ k: x[0], lv: x[1], uses: x[2] })); q[1].forEach(x => { A.icd[id + 'it:' + x[0]] = ab(x[3]); });
-    [b.speed, b.dmg, b.regen, b.arcana, b.shield] = [ab(q[2]), ab(q[3]), ab(q[4]), ab(q[5]), ab(q[6])]; b.absorb = q[7]; [b.silence, b.vision, b.doom, b.curse, b.teamspeed, b.teamarmor] = [ab(q[8]), ab(q[9]), ab(q[10]), ab(q[11]), ab(q[12]), ab(q[13])]; A.spec[id] = ab(q[14]); }
-  A.runes = s.ru.map(x => ({ x: x[0], y: x[1], k: x[2] })); A.runeT = s.rt;
+    [b.speed, b.dmg, b.regen, b.arcana, b.shield] = [ab(q[2]), ab(q[3]), ab(q[4]), ab(q[5]), ab(q[6])]; b.absorb = q[7]; [b.silence, b.vision, b.doom, b.curse, b.teamspeed, b.teamarmor] = [ab(q[8]), ab(q[9]), ab(q[10]), ab(q[11]), ab(q[12]), ab(q[13])]; A.spec[id] = ab(q[14]); if (A.lvl) A.lvl[id] = q[15] || 1; }
+  A.runes = s.ru.map(x => ({ x: x[0], y: x[1], k: x[2], flow: !!x[3] })); A.runeT = s.rt;
   A.illus = s.il.map(x => ({ src: byId[x[0]], x: x[1], y: x[2], facing: x[3], moving: !!x[4] })).filter(i => i.src);
   A.summ = s.su.map(x => ({ k: x[0] === 'w' ? 'wolf' : 'archer', o: byId[x[1]], x: x[2], y: x[3], fx: x[4] })).filter(i => i.o);
-  A.mines = s.mi.map(x => ({ o: byId[x[0]], x: x[1], y: x[2] })).filter(i => i.o); A.walls = s.wa.map(x => ({ x: x[0], y: x[1], a: x[2] / 100 }));
+  A.mines = s.mi.map(x => ({ o: byId[x[0]], x: x[1], y: x[2] })).filter(i => i.o); A.walls = s.wa.map(x => ({ x: x[0], y: x[1], a: x[2] / 100, mini: !!x[3] }));
 }
 
 // ---------------- the screen: gold, the bag, the shop ----------------
+/* every shop: a ka-ching and a short flash on what you bought */
+window.zBought = (btn, W) => { try { W.emit('sound', { name: 'buy' }); } catch (e) {} if (!btn) return; const r = btn.getBoundingClientRect(), f = document.createElement('div'); f.className = 'buyfx'; f.textContent = '✔'; f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 700); };
 function arenaItemsHud(A, ui) {
   if (!A.gold) return; const W = A.W, id = W.local.id, me = W.heroOf(W.local), t = W.time;
   let inv = document.getElementById('arenaInv'); if (!inv) { inv = document.createElement('div'); inv.id = 'arenaInv'; document.body.appendChild(inv); }
@@ -24904,7 +24943,7 @@ function arenaShopFill(A, ui) {
       return `<div class="asrow"><span class="asic">${it.ic}</span><div><b>${it.n}${it.lv ? ` <i>Nv ${lv}/5</i>` : it.up && it.max > 1 ? ` <i>${lv}/${it.max}</i>` : have && !it.uses ? ' <i>✓</i>' : ''}</b><small>${it.d}</small></div><button data-buy="${k}" ${maxed || cost > gold || !near ? 'disabled' : ''}>${maxed ? 'MÁX' : '🪙 ' + cost}</button></div>`; }).join('') + '</div>';
   sp.querySelector('[data-x]').addEventListener('click', () => sp.classList.add('hidden'));
   sp.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _shopTab = +b.dataset.tab; sp._k = null; arenaShopFill(A, ui); }));
-  sp.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.buy; if (A.client) { if (window.arenaBuyNet) arenaBuyNet(k); } else A.buy(W.local, k); sp._k = null; setTimeout(() => arenaShopFill(A, ui), 60); }));
+  sp.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.buy; zBought(b, W); if (A.client) { if (window.arenaBuyNet) arenaBuyNet(k); } else A.buy(W.local, k); sp._k = null; setTimeout(() => arenaShopFill(A, ui), 60); }));
 }
 
 // ---------------- bots: shopping when they are at their base, and going for runes ----------------
@@ -24917,6 +24956,8 @@ function arenaItemsBot(A, b, u, D) {
   if (A.shopAt && Math.hypot(u.x - A.shopAt[u.owner.team].x, u.y - A.shopAt[u.owner.team].y) < 650) arenaBotShop(A, u);
   // use what they carry
   for (const s of A.inv[id] || []) { const it = ITEMS[s.k]; if (!it.act || (A.icd[id + 'it:' + s.k] || 0) > W.time || Math.random() > D.cast * 0.3) continue; if ((it.act === 'heal30' || it.act === 'heal40' || it.act === 'salve' || it.act === 'tango') && u.ahp > u.amax * 0.5) continue; arenaUseItem(A, u, s.k); }
+  // hooks: aim at a rune floating down the river
+  if (A.river && A.ready && A.ready(u, 'hook') <= 0) for (const r of A.runes) if (r.flow) { const lead = Math.hypot(r.x - u.x, r.y - u.y) / 1150, ty = r.y - (A.river.y1 - A.river.y0) / RIVER_TIME * lead, d = Math.hypot(r.x - u.x, ty - u.y); if (d < 1200 && Math.random() < 0.25 + 0.5 * D.keep) { arenaCast(A, u, 'hook', { dx: (r.x - u.x) / d, dy: (ty - u.y) / d, exact: true }); return false; } }
   // a rune close by: go and take it
   let best = null, bd = 900 + 600 * D.keep; for (const r of A.runes) { const d = Math.hypot(r.x - u.x, r.y - u.y); if (d < bd && A.compAt(r.x, r.y) === A.compAt(u.x, u.y)) { bd = d; best = r; } }
   if (best && Math.random() < 0.4 + 0.6 * D.keep) { botGo(W, u, best.x, best.y); return true; }
@@ -24930,7 +24971,7 @@ window.arenaGuide = id => {
   const SK = { stun: 'Deja quieto 2 s al Pillador cerca de ti.', blink: 'Te teletransportas hacia donde apuntas.', shield: 'Nada te atrapa por 3 s.', invis: 'El Pillador no te ve 4 s.', grab: 'Lanzas la mano y traes al que toques.', dash: 'Corres mucho más rápido 1,6 s.', roar: 'Los que corren cerca quedan lentos 2,5 s.', cloud: 'Una nube verde te sigue 5 s: frena y daña poco a poco.', hook: 'Atrapa al primero que toque y lo arrastra en curva hacia ti.', leap: 'Un gran salto sobre árboles y muros.', arrow: 'Mientras más lejos llega, más daño y más aturde.', raze1: 'Sombra cerca de ti.', raze2: 'Sombra a media distancia.', raze3: 'Sombra lejos.', requiem: 'Explosión alrededor: más fuerte con más cargas (hasta 20).' };
   const sk = (C.skills || []).concat(C.chaser || []).filter((s, i, a) => a.findIndex(x => x.id === s.id) === i);
   let h = `<div class="glbl">⚡ Poderes</div><div class="gd gd2">` + sk.map(s => `<div class="gi">${ic(s.img, s.ic)}<div><b>${s.n}</b><small>${SK[s.id] || ''}</small></div></div>`).join('') + '</div>';
-  if (SHOPS[id]) { h += `<div class="glbl">✨ Runas (cada ${RUNE_EVERY} s, para ambos equipos)</div><div class="gd gd2">` + Object.entries(RUNES).map(([k, r]) => `<div class="gi">${ic(r.img)}<div><b>${r.n} · ${r.dur} s</b><small>${r.d}</small></div></div>`).join('') + '</div>';
+  if (SHOPS[id]) { h += `<div class="glbl">✨ Runas (${id === 'pudge' ? 'cada ' + RIVER_EVERY + ' s bajan por el río: engánchalas' : 'cada ' + RUNE_EVERY + ' s cerca de los jugadores'}, al azar)</div><div class="gd gd2">` + Object.entries(RUNES).map(([k, r]) => `<div class="gi">${ic(r.img)}<div><b>${r.n} · ${r.dur} s</b><small>${r.d}</small></div></div>`).join('') + '</div>';
     h += `<div class="glbl">🛒 Tienda en tu base (${SHOPS[id].join(' · ')})</div><small class="gnote">Ganas 🪙 ${GOLD_KILL} por baja y ${GOLD_SEC} por segundo. Hay ${itemsOf(id).length} objetos: ${itemsOf(id).map(k => ITEMS[k].n).join(', ')}.</small>`; }
   return h;
 };
@@ -25119,6 +25160,9 @@ const ZSHOPS = { // zombie shops in the middle of the map (original positions)
 const NEUTRAL_FACTORIES = [[-2816, 832], [-896, -5184], [4672, 448], [4608, -2432], [-4096, -4544], [576, 3776], [-2496, 4736], [3712, -3328], [-4608, 1280], [1280, -2944], [-3200, -3648], [768, -1408], [4928, 1792], [3328, -2816], [-256, 3520], [-3648, 4160], [5248, 448], [2816, 4160], [2432, 3648], [1344, -4288]];
 const HUMAN_ZONE = [-400, -448], ZOMBIE_ZONE = [-400, -448]; /* in the original everybody appears in the middle (Create_Zone); the zombies wait there, next to their shops */
 const RAISE_T = 60, PICK_T = 20;
+Object.entries({"barricade": "zi_barricade", "adv": "zi_barricade", "stone": "zi_stone", "super": "zi_stone", "burrow": "zi_stone", "research": "zi_research", "exchange": "zi_exchange", "trade": "zi_exchange", "factory": "zi_factory", "flag": "zi_flag", "core": "zi_core", "gen": "zi_core", "turret": "zi_turret", "rocket": "zi_turret", "electric": "zi_turret", "frost": "zi_turret", "warehouse": "zi_warehouse"}).forEach(([k, v]) => { ZB[k].img = v; }); Object.entries({"walls": "zi_stone", "dmg": "zi_dmg", "range": "zi_range", "hp": "zi_hp", "attach": "zi_attach", "power": "zi_power", "ensnare": "zi_ensnare", "rapid": "zi_rapid", "income": "zi_factory"}).forEach(([k, v]) => { ZR[k].img = v; }); Object.entries({"droid": "zi_droid", "plasma": "zi_storm", "heavy": "zi_heavy", "ranger": "zi_ranger", "pyro": "zi_pyro", "engineer": "zi_engineer", "medic": "zi_medic", "sheep": "zi_sheep", "sniper": "zi_range", "commando": "zi_scan"}).forEach(([k, v]) => { ZH[k].img = v; }); Object.entries({"ensnare": "zi_ensnare", "rapid": "zi_rapid", "barrel": "zi_barrel", "pgren": "zi_pgren", "storm": "zi_storm", "firewall": "zi_pyro", "adren": "zi_medic", "antidote": "zi_shield", "repairbot": "zi_engineer", "sentry": "zi_turret", "missiles": "zi_heavy", "ksheep": "zi_sheep", "smoke": "zi_ranger", "gren": "zi_barrel", "mark": "zi_range", "orbital": "zi_scan", "blink": "zi_blink"}).forEach(([k, v]) => { ZSK[k].img = v; }); /* the picture set made for this map */
+const BUILD_T = { barricade: 3, adv: 3, stone: 4, super: 4, burrow: 5, research: 8, exchange: 6, trade: 5, factory: 8, flag: 5, core: 6, gen: 5, turret: 5, rocket: 6, electric: 6, frost: 6, warehouse: 7 }; /* seconds to build (as in the original, buildings take time) */
+const FLAG_IMG = { cmd: 'zi_acmd', endu: 'zi_aendu', crip: 'zi_acrip', fort: 'zi_afort' };
 window.ZOMBIE_DATA = { ZH, ZZ, ZSK, ZB, ZR, ZI, ZREC };
 
 // ---------------- setup ----------------
@@ -25210,23 +25254,23 @@ function zCmd(A, p, s) {
       if (k === 'turret' && A.blds.filter(b => b.owner === id && ZB[b.k].pw).length >= 4) return tell('Máximo 4 torretas');
       if (B.pw && zPowerFree(A, id) < B.pw) return tell('Necesitas energía: construye un Núcleo de energía');
       const spot = zBuildSpot(A, u, B.s, a[2] != null ? { x: +a[2], y: +a[3] } : null); if (!spot) return tell('No hay espacio aquí');
-      if (!pay(B.g, B.h)) return false; zAddBld(A, k, id, spot.x, spot.y); W.emit('sound', { name: 'buy' }); return true; }
-    case 'up': { const b = A.blds.find(q => q.id === +a[1]); const k = a[2], B = ZB[k]; if (!b || b.owner !== id || !B || !(ZB[b.k].up || []).includes(k)) return false;
+      if (!pay(B.g, B.h)) return false; zAddBld(A, k, id, spot.x, spot.y, true); return true; }
+    case 'up': { const b = A.blds.find(q => q.id === +a[1]); const k = a[2], B = ZB[k]; if (!b || b.owner !== id || !B || !(ZB[b.k].up || []).includes(k)) return false; if (b.bt) return tell('Espera a que termine de construirse');
       if (B.req && ((A.res[id] || {})[B.req[0]] || 0) < B.req[1]) return tell('Necesitas investigar ' + ZR[B.req[0]].n);
-      if (!pay(B.g, B.h)) return false; const f = b.hp / b.max; b.k = k; b.max = B.hp; b.hp = Math.round(B.hp * Math.max(f, 0.5)); A.addFx({ k: 'puff', x: b.x, y: b.y, t, dur: 0.6, col: '255,230,120' }); return true; }
+      if (!pay(B.g, B.h)) return false; const f = b.hp / b.max; b.k = k; b.max = B.hp; b.hp = Math.round(B.hp * Math.max(f, 0.5)); b.bt = { t0: t, dur: BUILD_T[k] || 4 }; A.addFx({ k: 'puff', x: b.x, y: b.y, t, dur: 0.6, col: '255,230,120' }); return true; }
     case 'res': { const k = a[1], R = ZR[k]; if (!R || Z) return false; const lv = (A.res[id] || {})[k] || 0; if (lv >= R.max) return tell('Ya está al máximo');
-      if (!A.blds.some(b => (R.at ? b.owner === id : !A.zomb.has(b.owner)) && b.k === (R.at || 'research'))) return tell(R.at ? 'Construye una Fábrica' : 'Construye un Centro de investigación (sirve el de un compañero)');
+      if (!A.blds.some(b => !b.bt && (R.at ? b.owner === id : !A.zomb.has(b.owner)) && b.k === (R.at || 'research'))) return tell(R.at ? 'Construye una Fábrica' : 'Construye un Centro de investigación (sirve el de un compañero)');
       if (!pay(R.g + (R.gi || 0) * lv, (R.h || 0) + (R.hi || 0) * lv)) return false; A.res[id][k] = lv + 1; if (p === W.local) A.say('Investigaste ' + R.n + ' nv ' + (lv + 1), 'ff7dff8a'); zRecalc(A, u); return true; }
     case 'aura': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id || b.k !== 'flag' || !FLAG_AURA[a[2]]) return false; b.aura = a[2]; return true; }
-    case 'xg': { if (!A.blds.some(b => !A.zomb.has(b.owner) && (b.k === 'exchange' || b.k === 'trade'))) return tell('Construye una Oficina de cambio'); if (!pay(500, 0)) return false; A.honor[id]++; return true; }
-    case 'xh': { if (!A.blds.some(b => !A.zomb.has(b.owner) && (b.k === 'exchange' || b.k === 'trade'))) return false; if (!pay(0, 1)) return false; A.gold[id] += 250; return true; }
+    case 'xg': { if (!A.blds.some(b => !b.bt && !A.zomb.has(b.owner) && (b.k === 'exchange' || b.k === 'trade'))) return tell('Construye una Oficina de cambio'); if (!pay(500, 0)) return false; A.honor[id]++; return true; }
+    case 'xh': { if (!A.blds.some(b => !b.bt && !A.zomb.has(b.owner) && (b.k === 'exchange' || b.k === 'trade'))) return false; if (!pay(0, 1)) return false; A.gold[id] += 250; return true; }
     case 'dice': { if (!A.blds.some(b => !A.zomb.has(b.owner) && b.k === 'trade')) return false; A.dice[id] = A.dice[id] || 0; if (A.dice[id] >= 3) return tell('Ya jugaste 3 veces'); if ((A.gold[id] || 0) < 100) return tell('Necesitas 100 de oro'); A.dice[id]++; const r = 1 + Math.floor(W.rand() * 6); if (r === 6) { A.gold[id] += 300; } else A.gold[id] -= 100; A.say((p === W.local ? 'Sacaste ' : p.name + ' sacó ') + r + (r === 6 ? ' 🎲 ¡+300!' : ' 🎲 -100'), r === 6 ? 'ff7dff8a' : 'ffff9a7a'); return true; }
-    case 'demolish': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id) return false; b.demo = t + 5; return true; }
+    case 'demolish': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id) return false; zKillBld(A, b, null, true); A.gold[id] += Math.floor((ZB[b.k].g || 0) * 0.25); return true; }
     case 'erepair': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id || b.k !== 'burrow' || b.rep) return false; b.rep = 1; b.hp = Math.min(b.max, b.hp + 350); return true; }
     case 'explo': { const b = A.blds.find(q => q.id === +a[1]); if (!b || b.owner !== id || b.k !== 'factory' || b.explo) return false; b.explo = 1; return true; }
     case 'cap': { if (Z || !u.alive) return false; const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - u.x, q.y - u.y) < 260); if (!f) return tell('Acércate a una fábrica pequeña'); u.chan = { t: t + 5, k: 'cap', f }; u.order = null; return true; }
     case 'buy': { const k = a[1], it = ZI[k], rc = ZREC[k]; if (!it && !rc) return false;
-      if (it) { const shop = it.shop; const near = Z ? A.shops.some(sh => sh.n === shop && Math.hypot(sh.x - u.x, sh.y - u.y) < 520) || !u.alive || W.time < A.raiseAt || Math.hypot(u.x - A.zzone.x, u.y - A.zzone.y) < 900 : A.blds.some(b => !A.zomb.has(b.owner) && (shop === 'Almacén' ? b.k === 'warehouse' : b.k === 'trade') && Math.hypot(b.x - u.x, b.y - u.y) < 600);
+      if (it) { const shop = it.shop; const near = Z ? A.shops.some(sh => sh.n === shop && Math.hypot(sh.x - u.x, sh.y - u.y) < 520) || !u.alive || W.time < A.raiseAt || Math.hypot(u.x - A.zzone.x, u.y - A.zzone.y) < 900 : A.blds.some(b => !b.bt && !A.zomb.has(b.owner) && (shop === 'Almacén' ? b.k === 'warehouse' : b.k === 'trade') && Math.hypot(b.x - u.x, b.y - u.y) < 600);
         if (!near) return tell(Z ? 'Ve a la tienda: ' + shop : 'Ve a tu ' + (shop === 'Almacén' ? 'Almacén' : 'Oficina comercial'));
         if (Z !== !['Almacén', 'Oficina comercial'].includes(shop)) return false;
         if (!Z && !((A.res[id] || {}).attach)) return tell('Investiga Accesorios para tener bolso');
@@ -25235,7 +25279,7 @@ function zCmd(A, p, s) {
         if (it.use === 'level') { if ((A.lvl[id] || 1) >= 5) return tell('Ya estás en nivel 5'); if (!pay(it.g, 0)) return false; A.lvl[id]++; zRecalc(A, u); A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.8, col: '255,220,90' }); return true; }
         if (it.use === 'meta') { if (!pay(it.g, 0)) return false; A.cls[id] = null; return true; }
         const inv = A.inv[id]; const have = inv.find(q => q.k === k); if (have && it.uses) { if (!pay(it.g, 0)) return false; have.uses += it.uses; return true; }
-        if (inv.length >= 6) return tell('Tu bolso está lleno (6)'); if (!pay(it.g, it.h)) return false; inv.push({ k, uses: it.uses || 0 }); zRecalc(A, u); W.emit('sound', { name: 'buy' }); return true; }
+        if (inv.length >= 6) return tell('Tu bolso está lleno (6)'); if (!pay(it.g, it.h)) return false; inv.push({ k, uses: it.uses || 0 }); zRecalc(A, u); return true; }
       // recipe: needs the parts
       if (!Z || !(A.shops.some(sh => sh.n === 'Vendedor de recetas' && Math.hypot(sh.x - u.x, sh.y - u.y) < 520) || W.time < A.raiseAt || Math.hypot(u.x - A.zzone.x, u.y - A.zzone.y) < 900)) return tell('Ve al Vendedor de recetas');
       const inv = A.inv[id], use = []; for (const part of rc.parts) { const q = inv.find(x => x.k === part && !use.includes(x)); if (!q) return tell('Te falta: ' + ZI[part].n); use.push(q); }
@@ -25247,7 +25291,7 @@ function zCmd(A, p, s) {
 }
 function zLocalEcho(A, p, s) { const a = s.split(':'); if (a[0] === 'cast' && SELF_Z[a[1]]) { const u = A.W.heroOf(p); if (u) SELF_Z[a[1]](A, u, { dx: (+a[2] || 0) / 100, dy: (+a[3] || 0) / 100 }); } }
 const SELF_Z = { blink: (A, u, a) => arenaBlink(A, u, a) }; /* online: your own blink moves you at once on your phone */
-function zPowerFree(A, id) { let pw = 0, use = 0; for (const b of A.blds) { if (b.owner !== id) continue; if (b.k === 'core') pw += 2; if (b.k === 'gen') pw += 4; if (ZB[b.k].pw) use += ZB[b.k].pw; } return pw - use; }
+function zPowerFree(A, id) { let pw = 0, use = 0; for (const b of A.blds) { if (b.owner !== id) continue; if (b.k === 'core' && !b.bt) pw += 2; if (b.k === 'gen') pw += b.bt ? 2 : 4; if (ZB[b.k].pw) use += ZB[b.k].pw; } return pw - use; }
 function zBuildSpot(A, u, S, at) {
   const W = A.W, f = u.facing * Math.PI / 180, G = 64, base = at || { x: u.x + Math.cos(f) * (S / 2 + 70), y: u.y + Math.sin(f) * (S / 2 + 70) };
   const free = (x, y) => { const h = S / 2; for (let yy = y - h + 8; yy < y + h; yy += 16) for (let xx = x - h + 8; xx < x + h; xx += 16) if (!W.walkable(xx, yy)) return false; for (const v of A.alive()) if (Math.abs(v.x - x) < h + 24 && Math.abs(v.y - y) < h + 24) return false; for (const s of A.shops) if (Math.hypot(s.x - x, s.y - y) < 260) return false; return true; };
@@ -25255,15 +25299,15 @@ function zBuildSpot(A, u, S, at) {
   return null;
 }
 function zFree(A, x, y, S) { const W = A.W, h = S / 2; for (let yy = y - h + 8; yy < y + h; yy += 16) for (let xx = x - h + 8; xx < x + h; xx += 16) if (!W.walkable(xx, yy)) return false; for (const v of A.alive()) if (Math.abs(v.x - x) < h + 20 && Math.abs(v.y - y) < h + 20) return false; return true; }
-function zAddBld(A, k, owner, x, y) { const W = A.W, B = ZB[k], h = B.s / 2; const b = { id: ++A.bid, k, owner, x, y, hp: B.hp, max: B.hp, s: B.s, atkT: 0, born: W.time }; A.blds.push(b); W.blockRect(x - h, y - h, x + h, y + h, 1); if (k === 'flag') b.aura = 'cmd'; return b; }
-function zKillBld(A, b, by) { const W = A.W, h = b.s / 2; if (b.dead) return; b.dead = true; W.blockRect(b.x - h, b.y - h, b.x + h, b.y + h, -1); A.addFx({ k: 'boom', x: b.x, y: b.y, t: W.time, dur: 0.6, r: b.s });
+function zAddBld(A, k, owner, x, y, building) { const W = A.W, B = ZB[k], h = B.s / 2; const b = { id: ++A.bid, k, owner, x, y, hp: building ? Math.max(10, B.hp * 0.1) : B.hp, max: B.hp, s: B.s, atkT: 0, born: W.time }; if (building) b.bt = { t0: W.time, dur: BUILD_T[k] || 5 }; A.blds.push(b); W.blockRect(x - h, y - h, x + h, y + h, 1); if (k === 'flag') b.aura = 'cmd'; return b; }
+function zKillBld(A, b, by, demo) { const W = A.W, h = b.s / 2; if (b.dead) return; b.dead = true; W.blockRect(b.x - h, b.y - h, b.x + h, b.y + h, -1); A.addFx({ k: 'boom', x: b.x, y: b.y, t: W.time, dur: 0.6, r: b.s }); A.addFx({ k: 'debris', x: b.x, y: b.y, t: W.time, dur: 0.9, r: b.s, col: ['barricade', 'adv'].includes(b.k) ? '138,106,58' : '140,140,150' }); W.emit('sound', { name: demo ? 'dx_ko' : 'death' }); A.blds = A.blds.filter(q => q !== b);
   if (b.explo) { for (const e of A.alive()) if (A.isHunter(e) && Math.hypot(e.x - b.x, e.y - b.y) < 400) zDamage(A, null, e, 500, 'spell'); }
   if (by && by.owner && A.gold[by.owner.id] != null && zStat(A, by, 'pillage')) A.gold[by.owner.id] += 10; }
 
 // ---------------- skills ----------------
 function zCast(A, u, k, aim) {
   const W = A.W, t = W.time, id = u.owner.id, b = A.buf[id], Z = A.isHunter(u); if (!u.alive || A.ended || !A.cls[id]) return false;
-  if (A.phase === 'pick') return false; if (Z && t < A.raiseAt) { if (u.owner === W.local) A.say('Los zombis despiertan en ' + Math.ceil(A.raiseAt - t) + ' s', 'ffff9a7a'); return false; }
+  if (Z && t < A.raiseAt) { if (u.owner === W.local) A.say('Los zombis despiertan en ' + Math.ceil(A.raiseAt - t) + ' s', 'ffff9a7a'); return false; }
   if (u.stunUntil > t || b.fear > t || (b.silence > t)) { if (u.owner === W.local) A.say('No puedes usar poderes ahora', 'ffff9a7a'); return false; }
   const S = zSkillsOf(A, u).find(s => s.id === k); if (!S) return false; if (A.ready(u, k) > 0) return false;
   let dx = aim && aim.dx, dy = aim && aim.dy; if (!dx && !dy) { const f = u.facing * Math.PI / 180; dx = Math.cos(f); dy = Math.sin(f); } const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
@@ -25349,7 +25393,7 @@ function zUseItem(A, u, q) {
 function zDamage(A, by, u, dmg, kind) {
   const W = A.W, t = W.time; if (!u.alive || A.ended || dmg <= 0) return;
   const b = A.buf[u.owner.id] || {};
-  if (b.anti > t || b.immortal > t) return;
+  if (b.anti > t || b.immortal > t) return; if (A.isHunter(u) && t < A.raiseAt) return; /* sleeping zombies can't be hurt */
   if (kind !== 'spell') { if (W.rand() < zStat(A, u, 'evade')) return; if (W.rand() < zStat(A, u, 'blockPct')) dmg *= 0.5; dmg *= zArmorMul(u.zarmor || 0); }
   else if (b.madness > t) return;
   if (b.harden) dmg *= 0.6; if (b.madness > t) dmg *= 0.6; if (b.marked > t) dmg *= 1.2;
@@ -25386,14 +25430,14 @@ function zTick(A, dt) {
   if (A.ended) return;
   // phases: pick a class → humans run (zombies wait) → night until sunrise
   if (A.phase === 'pick' && t >= A.pickEnd) { for (const id of A.ids) if (!A.cls[id]) zCmd(A, W.players[id], 'pick:random'); A.phase = 'run'; A.say('🏃 ¡Los humanos tienen ' + RAISE_T + ' s para esconderse y construir!', 'ff9fffff'); }
-  if (A.phase === 'pick') { for (const b of W.ai.bots) if (!A.cls[b.p.id] && W.rand() < dt * 0.6) zCmd(A, b.p, 'pick:random'); for (const u of A.heroes) { u.order = null; u.path = null; } return; }
+  if (A.phase === 'pick') { for (const b of W.ai.bots) if (!A.cls[b.p.id] && W.rand() < dt * 0.6) zCmd(A, b.p, 'pick:random'); for (const u of A.heroes) if (!A.cls[u.owner.id] || A.isHunter(u)) { u.order = null; u.path = null; } else { zRecalc(A, u); zAttack(A, u, dt); } return; }
   for (const id of A.ids) if (!A.cls[id] && W.heroOf(W.players[id]) && W.heroOf(W.players[id]).alive) { const p = W.players[id]; if (p.ai || t - (A.pickAt && A.pickAt[id] || 0) > PICK_T) zCmd(A, p, 'pick:random'); } /* after Metamorphosis / infection */
   if (A.phase === 'run' && t >= A.raiseAt) { A.phase = 'night'; A.say('🧟 ¡Los zombis despertaron! Sobrevive hasta el amanecer', 'ffff4040'); W.emit('sound', { name: 'death' }); }
   const left = A.gameT - (t - A.raiseAt);
   if (A.phase === 'night' && !A.stronger && left <= 600 && A.gameT > 600) { A.stronger = true; A.say('☠️ Los zombis madre se hicieron más fuertes', 'ffff4040'); }
   if (A.phase === 'night' && left <= 0) return zEnd(A, true);
   // income (every second): humans 2 (or what their factories give), zombies 4
-  A.incT = (A.incT || 0) + dt; if (A.incT >= 1) { A.incT -= 1; if (A.phase !== 'pick') for (const id of A.ids) { if (A.zomb.has(id)) { if (A.phase === 'night') A.gold[id] += 4; continue; } const fac = A.blds.filter(b => b.owner === id && b.k === 'factory').length; A.gold[id] += 2 + 2 * (1 + ((A.res[id] || {}).income || 0)) * Math.min(fac, 2); A.gold[id] += 2 * A.facs.filter(f => f.own === id).length; } }
+  A.incT = (A.incT || 0) + dt; if (A.incT >= 1) { A.incT -= 1; if (A.phase !== 'pick') for (const id of A.ids) { if (A.zomb.has(id)) { if (A.phase === 'night') A.gold[id] += 4; continue; } const fac = A.blds.filter(b => b.owner === id && b.k === 'factory' && !b.bt).length; A.gold[id] += 2 + 2 * (1 + ((A.res[id] || {}).income || 0)) * Math.min(fac, 2); A.gold[id] += 2 * A.facs.filter(f => f.own === id).length; } }
   // heroes
   for (const u of A.heroes) {
     const id = u.owner.id, b = A.buf[id];
@@ -25415,7 +25459,8 @@ function zTick(A, dt) {
     const burn = zStat(A, u, 'burn'); if (burn) for (const bb of A.blds) if (!A.zomb.has(bb.owner) && Math.hypot(bb.x - u.x, bb.y - u.y) < 300) zHitBld(A, u, bb, burn * dt, true);
   }
   // buildings: turrets shoot, demolish timers, repair
-  for (const bb of A.blds) { if (bb.dead) continue; const B = ZB[bb.k]; if (bb.demo && t >= bb.demo) { zKillBld(A, bb); continue; }
+  for (const bb of A.blds) { if (bb.dead) continue; const B = ZB[bb.k];
+    if (bb.bt) { const q = (t - bb.bt.t0) / bb.bt.dur; bb.hp = Math.min(bb.max, bb.hp + bb.max * 0.9 * dt / bb.bt.dur); if (q >= 1) { bb.bt = null; if (bb.owner === W.local.id) A.say('✅ Listo: ' + B.n, 'ff7dff8a'); } else continue; } /* still under construction */
     if (B.dmg && !A.zomb.has(bb.owner) && t >= bb.atkT) { let e = null, bd = B.rng; for (const f of A.alive()) if (A.isHunter(f) && !(f.invisUntil > t)) { const d = Math.hypot(f.x - bb.x, f.y - bb.y); if (d < bd) { bd = d; e = f; } } if (!e) for (const m of A.mins) if (m.k === 'zmin') { const d = Math.hypot(m.x - bb.x, m.y - bb.y); if (d < bd) { bd = d; e = m; } }
       if (e) { bb.atkT = t + B.cd; const res = A.res[bb.owner] || {}; const dmg = (B.dmg[0] + W.rand() * (B.dmg[1] - B.dmg[0])) * (1 + 0.06 * (res.dmg || 0)); A.addFx({ k: 'shot', x: bb.x, y: bb.y + 40, tx: e.x, ty: e.y, t, dur: 0.3, col: bb.k === 'frost' ? '160,230,255' : bb.k === 'electric' ? '200,200,255' : '255,180,80' }); if (e.hero) { zDamage(A, null, e, dmg, 'atk'); if (B.slow) A.buf[e.owner.id].frost = t + 3; } else e.hp -= dmg; } } }
   A.blds = A.blds.filter(bb => !bb.dead);
@@ -25443,7 +25488,7 @@ function zAttack(A, u, dt) {
   if (Z && t < A.raiseAt) return; if (b.fear > t) return; if (u.chan) return;
   const moving = !!(u.order && (u.path || u.order.type === 'move')) && !u.atkMove; if (moving && !u.owner.ai) return;
   const R = u.zrng + 40; let tg = null, bd = R, isB = false;
-  for (const e of A.alive()) { if (!A.enemy(u, e) || !zSees(A, u.owner, e)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; tg = e; isB = false; } }
+  for (const e of A.alive()) { if (!A.enemy(u, e) || !zSees(A, u.owner, e) || (A.isHunter(e) && t < A.raiseAt)) continue; const d = Math.hypot(e.x - u.x, e.y - u.y); if (d < bd) { bd = d; tg = e; isB = false; } }
   for (const m of A.mins) { if (Z === A.isHunter(m.o) || m.k === 'eye' || m.k === 'sward' || m.k === 'ghost' || m.k === 'demon' || m.k === 'witch') continue; const d = Math.hypot(m.x - u.x, m.y - u.y); if (d < bd) { bd = d; tg = m; isB = false; } }
   if (Z || !tg) for (const bb of A.blds) { if (Z === A.zomb.has(bb.owner)) continue; const d = Math.hypot(bb.x - u.x, bb.y - u.y) - bb.s / 2; if (d < (Z ? 70 : R) && (!tg || d < bd - 40)) { bd = d; tg = bb; isB = true; } }
   if (!tg) return;
@@ -25569,6 +25614,7 @@ function zBotZombie(A, b, u, D) {
 }
 
 // ---------------- drawing ----------------
+const _zImg = {}; function zImgDraw(g, n, x, y, S) { if (!n) return; let im = _zImg[n]; if (!im) { im = _zImg[n] = new Image(); im.src = FX(n); } if (!im.complete || !im.naturalWidth) return; g.save(); g.translate(x, y); g.scale(1, -1); g.drawImage(im, -S / 2, -S / 2, S, S); g.restore(); }
 function zBldDraw(g, b, mine, A) {
   const B = ZB[b.k], h = b.s / 2, t = A.W.time; g.save(); g.translate(b.x, b.y);
   g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(-h + 6, -h - 8, b.s, b.s);
@@ -25577,10 +25623,11 @@ function zBldDraw(g, b, mine, A) {
     if (b.k === 'burrow') { g.fillStyle = '#ddd'; for (let i = 0; i < 4; i++) { g.beginPath(); const a = i * 1.57; g.moveTo(Math.cos(a) * h, Math.sin(a) * h); g.lineTo(Math.cos(a + 0.2) * (h + 16), Math.sin(a + 0.2) * (h + 16)); g.lineTo(Math.cos(a + 0.4) * h, Math.sin(a + 0.4) * h); g.fill(); } } }
   else { g.fillStyle = mine ? '#2c3e66' : '#3b2c52'; g.strokeStyle = mine ? '#7fb2ff' : '#b28cff'; if (A.zomb.has(b.owner)) { g.fillStyle = '#3a4a20'; g.strokeStyle = '#8cff6a'; } g.lineWidth = 5; g.beginPath(); g.roundRect ? g.roundRect(-h + 4, -h + 4, b.s - 8, b.s - 8, 12) : g.rect(-h + 4, -h + 4, b.s - 8, b.s - 8); g.fill(); g.stroke();
     if (B.dmg || b.k === 'turret') { g.fillStyle = '#555c66'; g.beginPath(); g.arc(0, 6, h * 0.55, 0, 7); g.fill(); g.save(); g.rotate((b.aim || 0)); g.fillStyle = '#9aa3ad'; g.fillRect(0, 0, h * 0.9, 12); g.restore(); }
-    g.save(); g.scale(1, -1); g.font = Math.round(h * 0.9) + 'px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(B.ic, 0, B.dmg || b.k === 'turret' ? -h * 0.5 : 0); g.restore(); }
+    zImgDraw(g, b.k === 'flag' && b.aura ? FLAG_IMG[b.aura] : B.img, 0, B.dmg || b.k === 'turret' ? h * 0.55 : 0, B.dmg || b.k === 'turret' ? h * 0.9 : h * 1.45); }
   if (b.inv > t) { g.strokeStyle = 'rgba(120,255,160,0.8)'; g.lineWidth = 5; g.strokeRect(-h - 6, -h - 6, b.s + 12, b.s + 12); }
-  if (b.demo) { g.save(); g.scale(1, -1); g.font = '900 26px system-ui'; g.textAlign = 'center'; g.fillStyle = '#ff6060'; g.fillText(Math.ceil(b.demo - t), 0, -h - 24); g.restore(); }
-  if (b.hp < b.max) { const w = b.s, y = h + 10; g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 11); g.fillStyle = A.zomb.has(b.owner) ? '#8cff6a' : '#47b0ff'; g.fillRect(-w / 2, y, w * Math.max(0, b.hp / b.max), 7); }
+  if (b.bt) { const q = Math.min(1, (t - b.bt.t0) / b.bt.dur), w = Math.max(80, b.s), y = h + 26; g.fillStyle = 'rgba(0,0,0,0.65)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 13); g.fillStyle = '#ffd34d'; g.fillRect(-w / 2, y, w * q, 9); g.strokeStyle = 'rgba(255,211,77,0.8)'; g.lineWidth = 3; g.setLineDash([8, 6]); g.strokeRect(-h - 4, -h - 4, b.s + 8, b.s + 8); g.setLineDash([]);
+    g.save(); g.scale(1, -1); g.font = '900 20px system-ui'; g.textAlign = 'center'; g.fillStyle = '#ffe27a'; g.strokeStyle = '#000'; g.lineWidth = 4; const tx = '🔨 ' + Math.ceil(b.bt.dur * (1 - q)) + ' s'; g.strokeText(tx, 0, -y - 22); g.fillText(tx, 0, -y - 22); g.restore(); }
+  { const w = Math.max(64, b.s), y = h + 10; g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 11); const meZ = A.zomb.has(A.W.local.id), foe = A.zomb.has(b.owner) !== meZ; g.fillStyle = foe ? '#ff4040' : b.owner === A.W.local.id ? '#47ff6a' : '#47b0ff'; g.fillRect(-w / 2, y, w * Math.max(0, b.hp / b.max), 7); }
   g.restore();
 }
 function zGround(A, g, R) {
@@ -25607,6 +25654,7 @@ function zDraw(A, g, R) {
     if (m.max && m.hp < m.max) { g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(m.x - 32, m.y - 30, 64, 9); g.fillStyle = A.isHunter(m.o) ? '#8cff6a' : '#47b0ff'; g.fillRect(m.x - 30, m.y - 28, 60 * Math.max(0, m.hp / m.max), 5); } }
   for (const f of A.fx) { const k = Math.max(0, (t - f.t) / f.dur); if (k < 0) continue;
     if (f.k === 'shot') { g.strokeStyle = `rgba(${f.col || '255,240,170'},${1 - k})`; g.lineWidth = 5; g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.tx, f.ty + 40); g.stroke(); }
+    else if (f.k === 'debris') { for (let i = 0; i < 12; i++) { const a = i * 0.52 + f.x, sp = (f.r || 100) * (0.6 + (i % 4) * 0.25), x = f.x + Math.cos(a) * sp * k, y = f.y + Math.sin(a) * sp * k * 0.6 + 120 * k - 160 * k * k; g.fillStyle = `rgba(${f.col || '140,140,150'},${1 - k})`; g.fillRect(x - 9, y - 9, 18, 18); } g.fillStyle = `rgba(120,110,100,${0.5 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y + 30, (f.r || 100) * (0.5 + k), 0, 7); g.fill(); }
     else if (f.k === 'claw') { g.strokeStyle = `rgba(255,60,60,${1 - k})`; g.lineWidth = 6; for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(f.x - 30 + i * 14, f.y + 80); g.lineTo(f.x + 20 + i * 14, f.y + 20); g.stroke(); } }
     else if (f.k === 'boom') { g.fillStyle = `rgba(${f.col || '255,170,60'},${0.6 * (1 - k)})`; g.beginPath(); g.arc(f.x, f.y, (f.r || 200) * (0.4 + 0.6 * k), 0, 7); g.fill(); }
     else if (f.k === 'mark') { g.strokeStyle = `rgba(255,80,40,${0.5 + 0.4 * Math.sin(t * 18)})`; g.lineWidth = 6; g.setLineDash([14, 10]); g.beginPath(); g.arc(f.x, f.y, f.r || 200, 0, 7); g.stroke(); g.setLineDash([]); }
@@ -25619,8 +25667,8 @@ function zDraw(A, g, R) {
     else if (f.k === 'num') { g.save(); g.translate(f.x, f.y + 70 + 60 * k); g.scale(1, -1); g.globalAlpha = 1 - k; g.font = '900 28px system-ui'; g.textAlign = 'center'; g.fillStyle = '#ddd'; g.fillText(f.txt, 0, 0); g.restore(); } }
   // heroes: life bars, buffs, a ring under zombies
   for (const u of A.heroes) { if (!u.alive || u.removed || (u !== me && !zSees(A, W.local, u))) continue; const Z = A.isHunter(u), b = A.buf[u.owner.id] || {};
-    if (Z) { g.strokeStyle = 'rgba(120,255,80,0.8)'; g.lineWidth = 6; g.beginPath(); g.ellipse(u.x, u.y, 58, 24, 0, 0, 7); g.stroke(); }
-    const w = 100, x = u.x - w / 2, y = u.y - 36; g.fillStyle = 'rgba(0,0,0,0.65)'; g.fillRect(x - 2, y - 2, w + 4, 13); g.fillStyle = Z ? '#7dff5a' : '#4db8ff'; g.fillRect(x, y, w * Math.max(0, u.ahp / (u.amax || 1)), 9);
+    const foe = Z !== !!myZ; g.strokeStyle = foe ? 'rgba(255,50,50,0.95)' : 'rgba(80,255,120,0.75)'; g.lineWidth = foe ? 8 : 5; g.beginPath(); g.ellipse(u.x, u.y, 60, 25, 0, 0, 7); g.stroke(); if (foe) { g.fillStyle = 'rgba(255,0,0,0.18)'; g.fill(); } /* enemies always in red */
+    const w = 100, x = u.x - w / 2, y = u.y - 36; g.fillStyle = 'rgba(0,0,0,0.65)'; g.fillRect(x - 2, y - 2, w + 4, 13); g.fillStyle = foe ? '#ff4040' : u === me ? '#47ff6a' : '#4db8ff'; g.fillRect(x, y, w * Math.max(0, u.ahp / (u.amax || 1)), 9);
     if (b.harden) { g.strokeStyle = 'rgba(200,200,220,0.7)'; g.lineWidth = 6; g.beginPath(); g.arc(u.x, u.y + 50, 72, 0, 7); g.stroke(); }
     if (u.rootUntil > t) { g.strokeStyle = 'rgba(230,230,230,0.8)'; g.lineWidth = 3; g.beginPath(); g.ellipse(u.x, u.y, 50, 20, 0, 0, 7); g.stroke(); }
     if (u.chan) { const q = 1 - (u.chan.t - t) / (u.chan.k === 'cap' ? 5 : u.chan.k === 'assas' ? 2.5 : 2.25); g.strokeStyle = '#ffd34d'; g.lineWidth = 8; g.beginPath(); g.arc(u.x, u.y + 50, 80, -Math.PI / 2, -Math.PI / 2 + q * 6.28); g.stroke(); }
@@ -25650,7 +25698,7 @@ function zHud(A, ui) {
   const S = me ? zSkillsOf(A, me) : [], POS = Z ? [[2, 3], [1, 3], [2, 2], [1, 2]] : [[2, 3], [1, 3], [2, 2], [1, 2], [2, 1]];
   const cls = A.cls[id] || '', key = (Z ? 'z' : 'h') + cls + S.map(s => s.id).join(',');
   if (bar._key !== key) { bar._key = key; bar.className = 'zbar';
-    bar.innerHTML = S.map((s, i) => `<div class="ab arenaB" data-k="${s.id}" style="grid-column:${(POS[i] || [1, 1])[0]};grid-row:${(POS[i] || [1, 1])[1]}">${zIc(s)}<small>${s.n}</small></div>`).join('') + (cls ? `<div class="ab arenaB zmenu" data-m="1" style="grid-column:${Z ? 2 : 1};grid-row:1"><span>${Z ? '🛒' : '🔨'}</span><small>${Z ? 'Tienda' : 'Construir'}</small></div>` : '');
+    bar.innerHTML = S.map((s, i) => `<div class="ab arenaB" data-k="${s.id}" style="grid-column:${(POS[i] || [1, 1])[0]};grid-row:${(POS[i] || [1, 1])[1]}">${zIc(s)}<small>${s.n}</small></div>`).join('') + (cls ? `<div class="ab arenaB zmenu" data-m="1" style="grid-column:${Z ? 2 : 1};grid-row:1">${Z ? '<span>🛒</span>' : `<img class="sk" src="${FX('zi_build')}" alt="">`}<small>${Z ? 'Tienda' : 'Construir'}</small></div>` : '');
     for (const el of bar.querySelectorAll('[data-k]')) arenaBtn(A, el, ui);
     const mb = bar.querySelector('[data-m]'); if (mb) mb.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); zPanel(A, true); }); }
   for (const el of bar.querySelectorAll('[data-k]')) { const k = el.dataset.k, cd = me ? zSkillCd(A, me, k) : 1, l = me ? A.ready(me, k) : 0; el.classList.toggle('cool', (l > 0 && cd > 1.5) || !me || !me.alive || (Z && t < A.raiseAt)); el.style.setProperty('--cd', (l > 0 ? Math.round(l / cd * 360) : 0) + 'deg'); el.classList.toggle('on', k === 'harden' && !!(A.buf[id] || {}).harden); }
@@ -25668,43 +25716,50 @@ function zHud(A, ui) {
     pk.querySelectorAll('[data-c]').forEach(b => b.addEventListener('click', () => A.cmd(W.local, 'pick:' + b.dataset.c + (A.phase !== 'pick' && A.cls[id] === null ? '' : '')))); } }
   const pn = document.getElementById('zbPanel'); if (pn && !pn.classList.contains('hidden')) zPanel(A, false);
 }
-let _zTab = 0;
+let _zTab = 0, _zInfo = '';
+/* a small command card (like the one in Warcraft): it stays over the stick and never covers your hero */
 function zPanel(A, toggle) {
   const W = A.W, t = W.time, me = W.heroOf(W.local), id = W.local.id; if (!me) return; const Z = A.isHunter(me);
   let pn = document.getElementById('zbPanel'); if (!pn) { pn = document.createElement('div'); pn.id = 'zbPanel'; pn.className = 'hidden'; document.body.appendChild(pn); pn.addEventListener('pointerdown', e => e.stopPropagation()); }
-  if (toggle) { pn.classList.toggle('hidden'); pn._k = null; } if (pn.classList.contains('hidden')) return;
+  if (toggle) { pn.classList.toggle('hidden'); pn._k = null; _zInfo = ''; } if (pn.classList.contains('hidden')) return;
   const g = Math.floor(A.gold[id] || 0), h = A.honor[id] || 0, res = A.res[id] || {};
   const near = A.blds.filter(b => !A.zomb.has(b.owner) && (b.owner === id || ['research', 'exchange', 'trade', 'warehouse'].includes(b.k)) && Math.hypot(b.x - me.x, b.y - me.y) < 520).sort((a, b) => Math.hypot(a.x - me.x, a.y - me.y) - Math.hypot(b.x - me.x, b.y - me.y))[0];
-  const mid = Z && (W.time < A.raiseAt || Math.hypot(me.x - A.zzone.x, me.y - A.zzone.y) < 900); const shop = A.shops.filter(s => Math.hypot(s.x - me.x, s.y - me.y) < 520)[0];
-  const tabs = Z ? (mid ? Object.keys(ZSHOPS).map(n => n.replace('Tienda ', '').replace('Vendedor de ', '')).concat(['🎒 Bolso']) : ['🛒 Tienda', '🎒 Bolso']) : ['🔨 Construir', '🏠 ' + (near ? ZB[near.k].n : 'Cerca'), '🎒 Bolso'];
+  const mid = Z && (W.time < A.raiseAt || Math.hypot(me.x - A.zzone.x, me.y - A.zzone.y) < 900), shop = A.shops.filter(s => Math.hypot(s.x - me.x, s.y - me.y) < 520)[0];
+  const SHOPIC = { 'Cripta': '⚰️', 'Vendedor de recetas': '📜', 'Tumba de reliquias': '🪦', 'Tienda embrujada': '👻', 'Tienda secreta': '🗝️' };
+  const tabs = Z ? (mid ? Object.keys(ZSHOPS).map(n => ({ ic: SHOPIC[n], n })) : [{ ic: '🛒', n: 'Tienda' }]).concat([{ img: 'zi_bag', n: 'Bolso' }]) : [{ img: 'zi_build', n: 'Construir' }, { img: near ? (ZB[near.k].img || 'zi_build') : 'zi_research', n: near ? ZB[near.k].n : 'Cerca' }, { img: 'zi_bag', n: 'Bolso' }];
   if (_zTab >= tabs.length) _zTab = 0;
-  const key = [_zTab, g, h, Z, near && near.id, near && near.k, near && near.aura, shop && shop.n, JSON.stringify(res), (A.inv[id] || []).map(q => q.k + q.uses).join(','), (A.dice[id] || 0)].join('|'); if (pn._k === key) return; pn._k = key;
-  const row = (ic, n, d, btn, act, dis) => `<div class="asrow"><span class="asic">${ic}</span><div><b>${n}</b><small>${d || ''}</small></div>${btn ? `<button data-a="${act}" ${dis ? 'disabled' : ''}>${btn}</button>` : ''}</div>`;
-  const cost = (gg, hh) => (gg ? '🪙 ' + gg : '') + (hh ? ' 🎖️ ' + hh : '') || 'Gratis';
-  let body = '';
-  if (!Z && _zTab === 0) { body += ZB_BUILD.map(k => { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1]; return row(B.ic, B.n, rq ? '🔒 Investiga ' + ZR[B.req[0]].n : B.d, cost(B.g, B.h), 'build:' + k, rq || g < B.g || h < (B.h || 0)); }).join('');
-    const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - me.x, q.y - me.y) < 260); if (f) body = row('🏭', 'Capturar fábrica pequeña', '5 s quieto · +2 de oro por segundo', 'Capturar', 'cap') + body; }
-  if (!Z && _zTab === 1) { if (!near) body = '<div class="asfar">Acércate a uno de tus edificios para mejorarlo, investigar o comprar.</div>'; else { const B = ZB[near.k];
-    body += `<div class="asfar">❤️ ${Math.ceil(near.hp)}/${near.max}</div>`;
-    const own = near.owner === id; if (!own) body += '<div class="asfar">Edificio de ' + zEsc(W.players[near.owner].name) + ' (lo puedes usar)</div>';
-    for (const k of own ? B.up || [] : []) { const U = ZB[k], rq = U.req && (res[U.req[0]] || 0) < U.req[1]; body += row(U.ic, 'Mejorar: ' + U.n, rq ? '🔒 Investiga ' + ZR[U.req[0]].n + ' ' + U.req[1] : (U.d || '❤️ ' + U.hp + (U.dmg ? ' · daño ' + U.dmg.join('-') : '')), cost(U.g, U.h), 'up:' + near.id + ':' + k, rq || g < U.g || h < (U.h || 0)); }
-    if (near.k === 'research' || near.k === 'factory') for (const [k, R] of Object.entries(ZR)) { if ((R.at || 'research') !== near.k) continue; const lv = res[k] || 0, gg = R.g + (R.gi || 0) * lv, hh = (R.h || 0) + (R.hi || 0) * lv; body += row(R.ic, R.n + ` <i>${lv}/${R.max}</i>`, R.d, lv >= R.max ? 'MÁX' : cost(gg, hh), 'res:' + k, lv >= R.max || g < gg || h < hh); }
-    if (near.k === 'exchange' || near.k === 'trade') { body += row('🎖️', 'Oro por honor', '1 de honor por 500 de oro', '🪙 500', 'xg', g < 500) + row('🪙', 'Honor por oro', '250 de oro por 1 de honor', '🎖️ 1', 'xh', h < 1); }
-    if (near.k === 'trade') { body += row('🎲', 'Juego de dados', 'Sale 6: +300 · sale 1-5: -100 · ' + (3 - (A.dice[id] || 0)) + ' juegos', 'Jugar', 'dice', (A.dice[id] || 0) >= 3 || g < 100); for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Oficina comercial') body += row(it.ic, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g || !res.attach); }
-    if (near.k === 'warehouse') for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Almacén') body += row(it.ic, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g);
-    if (near.k === 'flag' && own) for (const [k, [n, d]] of Object.entries(FLAG_AURA)) body += row(near.aura === k ? '✅' : '🚩', n, d, near.aura === k ? 'Activa' : 'Elegir', 'aura:' + near.id + ':' + k, near.aura === k);
-    if (near.k === 'burrow' && own && !near.rep) body += row('🛠️', 'Reparación de emergencia', '+350 de vida (1 vez)', 'Usar', 'erepair:' + near.id);
-    if (near.k === 'factory' && own && !near.explo) body += row('💣', 'Poner explosivo', 'Si la destruyen explota: 500 a los zombis cerca', 'Poner', 'explo:' + near.id);
-    if (own) body += row('🧨', 'Demoler', 'Se destruye en 5 s', 'Demoler', 'demolish:' + near.id); } }
-  const zshop = Z && mid && _zTab < 5 ? { n: Object.keys(ZSHOPS)[_zTab] } : shop;
-  if (Z && (_zTab === 0 || (mid && _zTab < 5))) { const shop = zshop; if (!shop) body = '<div class="asfar">Las tiendas de los zombis están en el centro del mapa: ' + A.shops.map(s => s.n).join(', ') + '.</div>';
-    else if (shop.n === 'Vendedor de recetas') body = Object.entries(ZREC).map(([k, r]) => { const have = r.parts.every(p => (A.inv[id] || []).some(q => q.k === p)); return row(r.ic, r.n, 'Junta: ' + r.parts.map(p => ZI[p].n).join(' + ') + ' · ' + r.d, cost(r.g, r.h), 'buy:' + k, !have || g < r.g || h < (r.h || 0)); }).join('');
-    else body = Object.entries(ZI).filter(([k, it]) => it.shop === shop.n).map(([k, it]) => row(it.ic, it.n, it.d, cost(it.g, it.h), 'buy:' + k, g < it.g || h < (it.h || 0))).join(''); }
-  if (_zTab === tabs.length - 1) { const items = A.inv[id] || []; body = (!Z && !res.attach) ? '<div class="asfar">Investiga 🎒 Accesorios en el Centro de investigación para tener bolso.</div>' : items.length ? items.map((q, i) => { const it = ZI[q.k] || ZREC[q.k]; return row(it.ic, it.n + (q.uses ? ' ×' + q.uses : ''), it.d, 'Vender', 'sell:' + i); }).join('') : '<div class="asfar">Tu bolso está vacío.</div>'; }
-  pn.innerHTML = `<div class="ashead"><b>${Z ? '🧟 Zombi' : '🔨 Tu base'}</b><span>🪙 ${g} · 🎖️ ${h}</span><button data-x="1">✕</button></div><div class="astabs">${tabs.map((n, i) => `<button data-tab="${i}" class="${i === _zTab ? 'on' : ''}">${n}</button>`).join('')}</div><div class="aslist">${body}</div>`;
+  const key = [_zTab, g, h, Z, near && near.id, near && near.k, near && near.aura, near && !!near.bt, shop && shop.n, mid, JSON.stringify(res), (A.inv[id] || []).map(q => q.k + q.uses).join(','), (A.dice[id] || 0), _zInfo].join('|'); if (pn._k === key) return; pn._k = key;
+  const L = []; const add = (o, n, d, cost, act, dis) => L.push({ o, n, d, cost, act, dis });
+  const cost = (gg, hh) => (gg ? gg : '') + (hh ? (gg ? '+' : '') + hh + '🎖️' : '') || 'gratis';
+  let note = '';
+  if (!Z && _zTab === 0) { const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - me.x, q.y - me.y) < 260); if (f) add({ img: 'zi_smallfac' }, 'Capturar fábrica pequeña', '5 s quieto · +2 de oro por segundo', '5 s', 'cap');
+    for (const k of ZB_BUILD) { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1]; add(B, B.n, rq ? '🔒 Investiga ' + ZR[B.req[0]].n : B.d, cost(B.g, B.h), 'build:' + k, rq || g < B.g || h < (B.h || 0)); } }
+  if (!Z && _zTab === 1) { if (!near) note = 'Acércate a un edificio tuyo (o al Centro, Oficina o Almacén de un compañero).'; else { const B = ZB[near.k], own = near.owner === id;
+    note = (own ? '' : 'De ' + zEsc(W.players[near.owner].name) + ' · ') + B.n + ' ❤️ ' + Math.ceil(near.hp) + '/' + near.max + (near.bt ? ' · 🔨 construyendo' : '');
+    if (!near.bt) {
+      for (const k of own ? B.up || [] : []) { const U = ZB[k], rq = U.req && (res[U.req[0]] || 0) < U.req[1]; add(U, 'Mejorar: ' + U.n, rq ? '🔒 Investiga ' + ZR[U.req[0]].n + ' ' + U.req[1] : (U.d || '❤️ ' + U.hp + (U.dmg ? ' · daño ' + U.dmg.join('-') : '')), cost(U.g, U.h), 'up:' + near.id + ':' + k, rq || g < U.g || h < (U.h || 0)); }
+      if (near.k === 'research' || near.k === 'factory') for (const [k, R] of Object.entries(ZR)) { if ((R.at || 'research') !== near.k) continue; const lv = res[k] || 0, gg = R.g + (R.gi || 0) * lv, hh = (R.h || 0) + (R.hi || 0) * lv; add(R, R.n + ' ' + lv + '/' + R.max, R.d, lv >= R.max ? 'MÁX' : cost(gg, hh), 'res:' + k, lv >= R.max || g < gg || h < hh); }
+      if (near.k === 'exchange' || near.k === 'trade') { add({ ic: '🎖️' }, 'Oro por honor', '1 de honor por 500 de oro', '500', 'xg', g < 500); add({ ic: '🪙' }, 'Honor por oro', '250 de oro por 1 de honor', '1🎖️', 'xh', h < 1); }
+      if (near.k === 'trade') { add({ ic: '🎲' }, 'Juego de dados', 'Sale 6: +300 · 1-5: -100 · quedan ' + (3 - (A.dice[id] || 0)), '100', 'dice', (A.dice[id] || 0) >= 3 || g < 100); for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Oficina comercial') add(it, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g || !res.attach); }
+      if (near.k === 'warehouse') for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Almacén') add(it, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g);
+      if (near.k === 'flag' && own) for (const [k, [n, d]] of Object.entries(FLAG_AURA)) add({ img: FLAG_IMG[k] }, n + (near.aura === k ? ' ✅' : ''), d, near.aura === k ? 'activa' : 'elegir', 'aura:' + near.id + ':' + k, near.aura === k);
+      if (near.k === 'burrow' && own && !near.rep) add({ ic: '🛠️' }, 'Reparación de emergencia', '+350 de vida (1 vez)', 'usar', 'erepair:' + near.id);
+      if (near.k === 'factory' && own && !near.explo) add({ ic: '💣' }, 'Poner explosivo', 'Si la destruyen explota: 500 a los zombis cerca', 'poner', 'explo:' + near.id); }
+    if (own) add({ img: 'zi_demolish' }, 'Demoler', 'Se destruye al instante (te devuelve 25%)', 'ya', 'demolish:' + near.id); } }
+  if (Z && _zTab < tabs.length - 1) { const sh = mid ? { n: Object.keys(ZSHOPS)[_zTab] } : shop;
+    if (!sh) note = 'Las tiendas zombi están en el centro del mapa.'; else { note = sh.n;
+      if (sh.n === 'Vendedor de recetas') for (const [k, r] of Object.entries(ZREC)) { const have = r.parts.every(p => (A.inv[id] || []).some(q => q.k === p)); add(r, r.n, 'Junta: ' + r.parts.map(p => ZI[p].n).join(' + ') + ' · ' + r.d, cost(r.g, r.h), 'buy:' + k, !have || g < r.g || h < (r.h || 0)); }
+      else for (const [k, it] of Object.entries(ZI)) if (it.shop === sh.n) add(it, it.n, it.d, cost(it.g, it.h), 'buy:' + k, g < it.g || h < (it.h || 0)); } }
+  if (_zTab === tabs.length - 1) { const items = A.inv[id] || []; if (!Z && !res.attach) note = 'Investiga Accesorios en el Centro de investigación para tener bolso.'; else if (!items.length) note = 'Tu bolso está vacío.'; else { note = 'Toca para vender (mitad de precio)'; items.forEach((q, i) => { const it = ZI[q.k] || ZREC[q.k]; add(it, it.n + (q.uses ? ' ×' + q.uses : ''), it.d, '+' + Math.floor((it.g || 0) / 2), 'sell:' + i); }); } }
+  const icon = o => o.img ? `<img src="${FX(o.img)}" alt="">` : `<span>${o.ic || '❔'}</span>`;
+  pn.innerHTML = `<div class="zch"><div class="zct">${tabs.map((tb, i) => `<button data-tab="${i}" class="${i === _zTab ? 'on' : ''}" title="${zEsc(tb.n)}">${icon(tb)}</button>`).join('')}</div><span class="zcg">🪙${g}${h ? ' 🎖️' + h : ''}</span><button class="zcx" data-x="1">✕</button></div>
+    <div class="zci">${_zInfo || (note ? zEsc(note) : '<b>' + zEsc(tabs[_zTab].n) + '</b> · toca un icono')}</div>
+    <div class="zcgrid">${L.map((e, i) => `<button data-i="${i}" class="${e.dis ? 'dis' : ''}">${icon(e.o)}<i>${zEsc(e.cost)}</i></button>`).join('')}</div>`;
   pn.querySelector('[data-x]').addEventListener('click', () => pn.classList.add('hidden'));
-  pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _zTab = +b.dataset.tab; pn._k = null; zPanel(A, false); }));
-  pn.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => { A.cmd(W.local, b.dataset.a); pn._k = null; setTimeout(() => zPanel(A, false), 80); }));
+  pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _zTab = +b.dataset.tab; _zInfo = ''; pn._k = null; zPanel(A, false); }));
+  pn.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => { const e = L[+b.dataset.i]; _zInfo = '<b>' + zEsc(e.n) + '</b> · ' + zEsc(e.cost) + '<br>' + zEsc(e.d || '');
+    if (!e.dis && e.act) { A.cmd(W.local, e.act); if (/^(build|buy|res|up|xg|xh|aura)/.test(e.act)) zBought(b, W); if (/^demolish/.test(e.act)) _zInfo = '💥 Demolido'; } else if (e.dis) _zInfo += '<br><span style="color:#ff9a7a">No puedes todavía</span>';
+    pn._k = null; setTimeout(() => zPanel(A, false), 80); }));
 }
 
 // ---------------- online ----------------
@@ -25713,7 +25768,7 @@ function zSnap(A) {
   const H = {}; for (const u of A.heroes) { const id = u.owner.id, b = A.buf[id] || {}; H[id] = [u.alive ? 1 : 0, r(u.ahp), r(u.amax || 0), A.zomb.has(id) ? 1 : 0, A.cls[id] || '', A.lvl[id] || 1, r(A.gold[id] || 0), A.honor[id] || 0, A.kills[id], A.deaths[id], rel(u.stunUntil), rel(u.rootUntil), rel(u.invisUntil), b.harden ? 1 : 0, u.chan ? [u.chan.k, rel(u.chan.t)] : 0, A.heads.has(id) ? 1 : 0]; }
   const CD = {}; for (const k in A.cdz) { const v = A.cdz[k]; if (v > t) CD[k] = rel(v); }
   return { z: 1, ph: A.phase, pe: rel(A.pickEnd), ra: r((A.raiseAt - t) * 10), gt: A.gameT, st: A.stronger ? 1 : 0, en: A.ended ? 1 : 0, ls: A.lastHero ? A.lastHero.owner.id : -1, H, R: A.res, I: A.inv, CD, D: A.dice,
-    B: A.blds.map(b => [b.id, b.k, b.owner, b.x, b.y, r(b.hp), b.max, b.aura || 0, rel(b.inv || 0), rel(b.demo || 0), b.rep ? 1 : 0, b.explo ? 1 : 0]),
+    B: A.blds.map(b => [b.id, b.k, b.owner, b.x, b.y, r(b.hp), b.max, b.aura || 0, rel(b.inv || 0), b.bt ? [r((t - b.bt.t0) * 10), r(b.bt.dur * 10)] : 0, b.rep ? 1 : 0, b.explo ? 1 : 0]),
     M: A.mins.map(m => [m.id, m.k, m.o.owner.id, r(m.x), r(m.y), r(m.hp), m.max, m.fx || 1]), Zn: A.zones.map(z => [z.k, z.o.owner.id, r(z.x), r(z.y), z.r || 0, r((z.a || 0) * 100), rel(z.until)]),
     F: A.facs.map(f => f.own), V: A.vis.map(v => [r(v.x), r(v.y), v.r, rel(v.until), v.team]),
     fx: A.fxLog.slice(-40).map(f => [f.id, f.k, r(f.x || 0), r(f.y || 0), r((t - f.t) * 10), f.k === 'say' ? f.txt : f.k === 'num' ? f.txt : 0, f.col || 0, r(f.tx || 0), r(f.ty || 0), r((f.dur || 0.5) * 10), r(f.r || 0)]), mv: A.mv };
@@ -25730,7 +25785,7 @@ function zClientTick(A, dt) {
     if (u.owner === W.local) { zRecalcClient(A, u); } }
   for (const id in s.mv) { const m = s.mv[id]; if ((A.mvSeen[id] || 0) >= m[2]) continue; A.mvSeen[id] = m[2]; const u = byId[id]; if (u && u.owner === W.local) { u.x = m[0]; u.y = m[1]; u.order = null; u.path = null; } }
   // buildings: add / remove their blocks so you can't walk through them either
-  const seen = new Set(); for (const q of s.B) { seen.add(q[0]); let b = A.blds.find(x => x.id === q[0]); if (!b) { b = zAddBld(A, q[1], q[2], q[3], q[4]); b.id = q[0]; } if (b.k !== q[1]) { b.k = q[1]; } b.hp = q[5]; b.max = q[6]; b.aura = q[7] || null; b.inv = ab(q[8]); b.demo = q[9] ? ab(q[9]) : 0; b.rep = q[10]; b.explo = q[11]; }
+  const seen = new Set(); for (const q of s.B) { seen.add(q[0]); let b = A.blds.find(x => x.id === q[0]); if (!b) { b = zAddBld(A, q[1], q[2], q[3], q[4]); b.id = q[0]; } if (b.k !== q[1]) { b.k = q[1]; } b.hp = q[5]; b.max = q[6]; b.aura = q[7] || null; b.inv = ab(q[8]); b.bt = q[9] ? { t0: t - q[9][0] / 10, dur: q[9][1] / 10 } : null; b.rep = q[10]; b.explo = q[11]; }
   for (const b of A.blds) if (!seen.has(b.id)) { const h = b.s / 2; W.blockRect(b.x - h, b.y - h, b.x + h, b.y + h, -1); b.dead = true; } A.blds = A.blds.filter(b => !b.dead);
   A.mins = s.M.map(q => ({ id: q[0], k: q[1], o: byId[q[2]], x: q[3], y: q[4], hp: q[5], max: q[6], fx: q[7] })).filter(m => m.o);
   A.zones = s.Zn.map(q => ({ k: q[0], o: byId[q[1]], x: q[2], y: q[3], r: q[4], a: q[5] / 100, until: ab(q[6]) })).filter(z => z.o);
@@ -25990,7 +26045,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     html += `<div class="krow"><div class="ic">💰</div><div><b>¿Te faltan fichas?</b><small>Cambia monedas 🪙 de la tienda del menú por fichas 🔮.</small></div><button data-more="1" disabled>Próximamente</button></div>`;
     $('#kShopList').innerHTML = html;
     $('#kShopList').querySelectorAll('[data-kt]').forEach(b => b.addEventListener('click', () => { kTab = b.dataset.kt; renderKShop(); }));
-    $('#kShopList').querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { if (W.kittyBuy(h, b.dataset.buy)) { if (online) online.net.pushEvent('kbuy', b.dataset.buy); showText('🛒 Compraste: ' + KITEMS[b.dataset.buy][1]); } renderKShop(); }));
+    $('#kShopList').querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => { if (W.kittyBuy(h, b.dataset.buy)) { window.zBought && zBought(b, W); if (online) online.net.pushEvent('kbuy', b.dataset.buy); showText('🛒 Compraste: ' + KITEMS[b.dataset.buy][1]); } renderKShop(); }));
     $('#kShopList').querySelectorAll('[data-learn]').forEach(b => b.addEventListener('click', () => { if (W.kittyLearn(h, b.dataset.learn)) { if (online) online.net.pushEvent('klearn', b.dataset.learn); showText('⭐ Aprendiste: ' + KSKILLS[b.dataset.learn][1] + ' nivel ' + h.skills[b.dataset.learn]); } renderKShop(); })); }
   function kittyHud(h) { { const kb = $('#kitBar'), ks = $('#kitSlot'); if (kb && ks && kb.parentNode !== ks) ks.appendChild(kb); } const on = W.profile.family === 'run'; $('#kitBar').classList.toggle('hidden', !on); if (!on) return;
     $('#kGold').textContent = '🔮 ' + (h.gold || 0); const inv = h.kinv || []; const key = inv.join(',') + '|' + (h.mineCharges ?? 3); if ($('#kInv').dataset.k !== key) { $('#kInv').dataset.k = key; $('#kInv').innerHTML = [0, 1, 2, 3, 4, 5].map(i => `<div class="ks" data-i="${i}">${inv[i] ? icImg(inv[i]) + (inv[i] === 'minas' ? `<sup>${h.mineCharges ?? 3}</sup>` : '') : ''}</div>`).join('');
@@ -27577,10 +27632,12 @@ class Net {
   document.addEventListener('click', () => document.querySelectorAll('.ddl').forEach(l => { l.classList.add('hidden'); l.parentNode.classList.remove('open'); }));
   setTimeout(() => document.querySelectorAll('select').forEach(inlineSelect), 50);
   // solo: a classic pre-game lobby (names, colours, teams) before the game starts
+  // slots are fixed colours (slot 0 red, 1 blue, …). You sit in the slot of your colour; tapping another colour moves your whole box there.
   let preBots = 11; const preSlot = Array(13).fill(false), DIFF = [['facil', 'IA Fácil'], ['normal', 'IA Normal'], ['dificil', 'IA Difícil'], ['extremo', 'IA Extremo']]; let preChaserMe = false;
-  const preDiff = Object.assign(Array(13).fill('normal'), (S.botDiff || []).slice(0, 13));
-  const setPreCount = n => { n = Math.max(0, Math.min(11, n)); for (let i = 1; i < 12; i++) preSlot[i] = i <= n; preBots = n; };
-  const preCount = () => preSlot.filter((v, i) => i && i < 12 && v).length + (preChaserMe && preSlot[0] ? 1 : 0);
+  const preDiff = Object.assign(Array(13).fill('normal'), (S.preDiffSlots || S.botDiff || []).slice(0, 13)); /* index = slot; 12 = the IA catcher / virus */
+  const mySlot = () => Math.max(0, Math.min(11, S.myColor | 0));
+  const setPreCount = n => { n = Math.max(0, Math.min(11, n)); const me = mySlot(); let k = 0; for (let i = 0; i < 12; i++) { if (i === me) { preSlot[i] = preChaserMe && preSlot[i]; continue; } preSlot[i] = k < n; if (k < n) k++; } preBots = n; };
+  const preCount = () => preSlot.filter((v, i) => i < 12 && v && (i !== mySlot() || preChaserMe)).length;
   const DSUB = { facil: 'novato', normal: 'jugador normal', dificil: 'muy bueno', extremo: 'lee tus movimientos' };
   /* a small list that floats over the page (fixed), so it never makes the page longer */
   function floatList(anchor, html, cls) { document.querySelectorAll('.ldl').forEach(x => x.remove()); const l = document.createElement('div'); l.className = 'ldl ' + (cls || ''); l.innerHTML = html; document.body.appendChild(l);
@@ -27590,38 +27647,43 @@ class Net {
     const AR = window.ARENA && ARENA[soloMap], teamMap = AR && AR.kind === 'team', tag = AR && AR.kind === 'tag', infect = AR && (AR.kind === 'infect' || AR.kind === 'zsurv');
     const meChaser = tag && preChaserMe, meVirus = infect && preChaserMe; preBots = preCount();
     const TEAM = { kitty5: ['Gatitos', 'Lobos del Rey Aullido'], bob: ['Focas', 'Cangrejos del puerto'], shroom25: ['Hongos', 'Payasos de feria'], correk: ['Los que corren', 'El Pillador'], zombie: ['Humanos', 'Zombis'] }[soloMap] || (teamMap ? ['Jugadores', 'Equipos'] : ['Jugadores', 'Enemigos']);
-    const myC = S.myColor ?? 0, colOf = i => (i === 0 ? myC : i === myC ? 0 : i); /* your colour swaps places with whoever had it */
+    const me = mySlot();
     const quick = `<span class="qdiff">${DIFF.map(([k, t]) => `<button data-qd="${k}" class="d-${k}">${t.slice(3)}</button>`).join('')}</span>`;
-    let h = `<div class="lteam">${TEAM[0]}${quick}</div>`, n = 0; const diffBtn = i => { const d = DIFF.find(x => x[0] === preDiff[i]) || DIFF[1]; return `<button class="ldiff d-${d[0]}" data-diff="${i}">${d[1].slice(3)} ▾</button>`; };
-    for (let i = 0; i < 12; i++) { let who, kind, cls = '', extra = ''; const away = i === 0 && (meChaser || meVirus); /* you took the catcher / virus slot: your runner slot is a free one */
-      const on = (i === 0 && !away) || (i > 0 && preSlot[i]) || (away && preSlot[0]); const team = teamMap && on ? ((n++) % 2 ? ' · <b style="color:#ff8a8a">Eq. B</b>' : ' · <b style="color:#8affa0">Eq. A</b>') : '';
-      if (i === 0 && !away) { who = '👑 <b style="color:#ffd34d">Nv ' + (window.playerLvl ? playerLvl() : 1) + '</b> ' + esc(S.nick || 'Tú') + ' (tú)'; kind = 'Anfitrión · 🪙 ' + (S.coins | 0) + team; cls = ' me'; }
-      else if (away && preSlot[0]) { who = '🤖 IA 12'; kind = 'Bot (IA)'; cls = ' bot'; extra = diffBtn(12); }
-      else if (preSlot[i] && i) { who = '🤖 IA ' + i; kind = (team ? 'IA' : 'Bot (IA)') + team; cls = ' bot'; extra = diffBtn(i); }
-      else { who = 'Abierto'; kind = 'toca para poner bot'; cls = ' open'; }
-      const c = colOf(i); h += `<div class="lrow${cls}${i || away ? ' tap' : ''}" data-slot="${i}"><span class="lc${c !== myC || away ? ' pick' : ' mine'}" data-col="${c}" style="background:${COLS[c]}"></span><b>${who}</b><small>${kind}</small>${extra}</div>`; }
-    if (tag) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meChaser ? ' me' : ' bot'}" id="preChaser"><span class="lc" style="background:#8b0000"></span><b>${meChaser ? '😈 ' + esc(S.nick || 'Tú') + ' (tú)' : '😈 IA Pillador'}</b><small>${meChaser ? 'eres el Pillador · toca para volver a correr' : 'toca para ser tú el Pillador'}</small>${meChaser ? '' : diffBtn(0)}</div>`;
-    else if (infect) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meVirus ? ' me' : ' bot'}" id="preChaser"><span class="lc" style="background:#3d8a0b"></span><b>${meVirus ? '🧟 ' + esc(S.nick || 'Tú') + ' (tú)' : '🧟 IA Zombi madre'}</b><small>${meVirus ? 'eres el virus · toca para volver a ser humano' : 'toca para ser tú el virus'}</small>${meVirus ? '' : diffBtn(0)}</div>`;
+    let h = `<div class="lteam">${TEAM[0]}${quick}</div>`, n = 0, ia = 0; const diffBtn = i => { const d = DIFF.find(x => x[0] === preDiff[i]) || DIFF[1]; return `<button class="ldiff d-${d[0]}" data-diff="${i}">${d[1].slice(3)} ▾</button>`; };
+    for (let i = 0; i < 12; i++) { let who, kind, cls = '', extra = ''; const mine = i === me, away = mine && (meChaser || meVirus); /* you took the catcher / virus: your slot is played by a bot */
+      const on = (mine && !away) || preSlot[i]; const team = teamMap && on ? ((n++) % 2 ? ' · <b style="color:#ff8a8a">Eq. B</b>' : ' · <b style="color:#8affa0">Eq. A</b>') : '';
+      if (mine && !away) { who = '👑 <b style="color:#ffd34d">Nv ' + (window.playerLvl ? playerLvl() : 1) + '</b> ' + esc(S.nick || 'Tú') + ' (tú)'; kind = 'Anfitrión · 🪙 ' + (S.coins | 0) + team; cls = ' me'; }
+      else if (preSlot[i]) { who = '🤖 IA ' + (++ia); kind = (team ? 'IA' : 'Bot (IA)') + team; cls = ' bot'; extra = diffBtn(i); }
+      else { who = 'Abierto'; kind = 'toca para poner bot · toca el color para ir aquí'; cls = ' open'; }
+      h += `<div class="lrow${cls}${!mine || away ? ' tap' : ''}" data-slot="${i}"><span class="lc${mine ? ' mine' : ' pick'}" data-col="${i}" style="background:${COLS[i]}"></span><b>${who}</b><small>${kind}</small>${extra}</div>`; }
+    if (tag) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meChaser ? ' me' : ' bot'}" id="preChaser"><span class="lc" style="background:#8b0000"></span><b>${meChaser ? '😈 ' + esc(S.nick || 'Tú') + ' (tú)' : '😈 IA Pillador'}</b><small>${meChaser ? 'eres el Pillador · toca para volver a correr' : 'toca para ser tú el Pillador'}</small>${meChaser ? '' : diffBtn(12)}</div>`;
+    else if (infect) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full tap${meVirus ? ' me' : ' bot'}" id="preChaser"><span class="lc" style="background:#3d8a0b"></span><b>${meVirus ? '🧟 ' + esc(S.nick || 'Tú') + ' (tú)' : '🧟 IA Zombi madre'}</b><small>${meVirus ? 'eres el virus · toca para volver a ser humano' : 'toca para ser tú el virus'}</small>${meVirus ? '' : diffBtn(12)}</div>`;
     else if (!teamMap) h += `<div class="lteam">${TEAM[1]}</div><div class="lrow full bot"><span class="lc" style="background:#8b5a2b"></span><b>🤖 IA enemigos</b><small>${TEAM[1]}</small></div>`;
     $('#preSlots').innerHTML = h; $('#preBots').textContent = preBots;
     $('#preSlots').querySelectorAll('.lrow.tap[data-slot]').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot; preSlot[i] = !preSlot[i]; renderPre(); })); /* each slot opens / closes on its own */
-    { const c = $('#preChaser'); if (c) c.addEventListener('click', () => { preChaserMe = !preChaserMe; if (preChaserMe) preSlot[0] = true; renderPre(); }); }
-    /* tap any colour: you take it, and whoever had it gets yours */
-    $('#preSlots').querySelectorAll('.lc.pick').forEach(c => c.addEventListener('click', ev => { ev.stopPropagation(); S.myColor = +c.dataset.col; SW.saveSettings(); renderPre(); }));
-    $('#preSlots').querySelectorAll('[data-qd]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); for (let i = 0; i < 13; i++) preDiff[i] = b.dataset.qd; S.botDiff = preDiff.slice(); SW.saveSettings(); renderPre(); }));
+    { const c = $('#preChaser'); if (c) c.addEventListener('click', () => { preChaserMe = !preChaserMe; preSlot[me] = preChaserMe; renderPre(); }); }
+    /* tap another colour: your whole box moves there; your old slot keeps the bot that was there (or stays free) */
+    $('#preSlots').querySelectorAll('.lc.pick').forEach(c => c.addEventListener('click', ev => { ev.stopPropagation(); const i = +c.dataset.col, old = me; if (i === old) return;
+      const hadBot = preSlot[i]; preSlot[old] = preChaserMe ? preSlot[old] || hadBot : hadBot; [preDiff[old], preDiff[i]] = [preDiff[i], preDiff[old]]; preSlot[i] = false; if (preChaserMe) preSlot[i] = true;
+      S.myColor = i; S.preDiffSlots = preDiff.slice(); SW.saveSettings(); renderPre(); }));
+    $('#preSlots').querySelectorAll('[data-qd]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); for (let i = 0; i < 13; i++) preDiff[i] = b.dataset.qd; S.preDiffSlots = preDiff.slice(); SW.saveSettings(); renderPre(); }));
     $('#preSlots').querySelectorAll('[data-diff]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); const i = +b.dataset.diff;
       const l = floatList(b, DIFF.map(([k, t]) => `<div class="ddi${k === preDiff[i] ? ' on' : ''}" data-k="${k}">${t}<small>${DSUB[k]}</small></div>`).join(''));
-      l.querySelectorAll('[data-k]').forEach(o => o.addEventListener('click', e2 => { e2.stopPropagation(); preDiff[i] = o.dataset.k; S.botDiff = preDiff.slice(); SW.saveSettings(); l.remove(); renderPre(); })); }));
+      l.querySelectorAll('[data-k]').forEach(o => o.addEventListener('click', e2 => { e2.stopPropagation(); preDiff[i] = o.dataset.k; S.preDiffSlots = preDiff.slice(); SW.saveSettings(); l.remove(); renderPre(); })); }));
     { const wo = $('#preWin'); if (wo) { const zt = soloMap === 'zombie'; wo.classList.toggle('hidden', !teamMap && !zt); wo.classList.toggle('zt', zt); if (teamMap || zt) { const v = zt ? (S.zombieTime || 'z20') : (S.arenaWin || 'k15'); wo.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('on', x.dataset.w === v)); } } }
     const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[soloMap]) || {}; const m = MAPS.find(x => x.id === soloMap) || MAPS[0];
     $('#prePrev').innerHTML = `<div class="pvic">${mapIcon(m) || '🗺'}</div><b>${esc(mapName(soloMap))}</b><div class="pvd"><span>Jugadores: ${preBots + 1}/${meChaser || meVirus ? 13 : 12}</span><span>Modo: ${$('#mode').value === 'practice' ? 'Práctica' : 'Original'}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
   document.addEventListener('click', () => document.querySelectorAll('.ldl').forEach(x => x.remove()));
   addEventListener('scroll', () => document.querySelectorAll('.ldl').forEach(x => x.remove()), true);
   $('#preWin') && $('#preWin').querySelectorAll('[data-w]').forEach(x => x.addEventListener('click', () => { if (x.dataset.w[0] === 'z') S.zombieTime = x.dataset.w; else S.arenaWin = x.dataset.w; SW.saveSettings(); renderPre(); }));
-  click('#bPlay', () => { if (soloMap === 'train') { if (window.ForgeUI) ForgeUI.playTrain(); return; } try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} setPreCount(S.bots ?? 11); if (Array.isArray(S.botSlots)) for (let i = 1; i < 12; i++) preSlot[i] = !!S.botSlots[i]; preSlot[0] = true; preChaserMe = false; renderPre(); show('pre'); });
-  click('#preMinus', () => { for (let i = 11; i > 0; i--) if (preSlot[i]) { preSlot[i] = false; break; } renderPre(); }); click('#prePlus', () => { for (let i = 1; i < 12; i++) if (!preSlot[i]) { preSlot[i] = true; break; } renderPre(); });
+  click('#bPlay', () => { if (soloMap === 'train') { if (window.ForgeUI) ForgeUI.playTrain(); return; } try { window.shuffleBotNames && shuffleBotNames(); } catch (e) {} preChaserMe = false;
+    if (Array.isArray(S.preSlots)) for (let i = 0; i < 12; i++) preSlot[i] = !!S.preSlots[i] && i !== mySlot(); else setPreCount(S.bots ?? 11); renderPre(); show('pre'); });
+  click('#preMinus', () => { for (let i = 11; i >= 0; i--) if (preSlot[i] && i !== mySlot()) { preSlot[i] = false; break; } renderPre(); }); click('#prePlus', () => { for (let i = 0; i < 12; i++) if (!preSlot[i] && i !== mySlot()) { preSlot[i] = true; break; } renderPre(); });
   click('#preFill', () => { setPreCount(11); renderPre(); }); click('#preNone', () => { setPreCount(0); renderPre(); });
-  const goStart = () => { S.bots = preCount(); S.botSlots = preSlot.slice(); S.botDiff = preDiff.slice(); S.chaserMe = preChaserMe; S.botNames = (soloMap === 'kitty5' ? null : BOT_NAMES12.slice()); S.mode = $('#mode').value; S.map = soloMap; S.lastMap = soloMap; SW.saveSettings(); SW.start(); };
+  /* the game counts players by id (you are id 0, painted in your colour); slot i ↔ id: your slot ↔ 0, slot 0 ↔ your colour */
+  const goStart = () => { const me = mySlot(), pid = i => (i === me ? 0 : i === 0 ? me : i); const bs = Array(13).fill(false), bd = Array(13).fill('normal');
+    for (let i = 0; i < 12; i++) { bs[pid(i)] = !!preSlot[i]; bd[pid(i)] = preDiff[i]; } if (preChaserMe) { bd[12] = preDiff[me]; bd[0] = preDiff[12]; } else bd[0] = preDiff[12];
+    S.bots = preCount(); S.botSlots = bs; S.botDiff = bd; S.preSlots = preSlot.slice(); S.preDiffSlots = preDiff.slice(); S.chaserMe = preChaserMe; S.botNames = (soloMap === 'kitty5' ? null : BOT_NAMES12.slice()); S.mode = $('#mode').value; S.map = soloMap; S.lastMap = soloMap; SW.saveSettings(); SW.start(); };
   /* quick pick before every match: only the characters (and skins) the player owns for this map */
   function quickPick() { const cat = window.charGame ? window.charGame(soloMap) : soloMap, list = window.SPR ? charList(cat).filter(id => ownsChar(cat, id)) : []; if (!list.length) return goStart();
     const M = SPR.MAN.chars; const me0 = {}; let sel = SPR.charOf(me0, cat, { local: me0 }); /* the last one you picked */ if (!list.includes(sel)) sel = list[0];
