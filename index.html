@@ -42096,7 +42096,8 @@ const RUNES = {
   invis: { n: 'Invisibilidad', img: 'ru_invis', dur: 10, d: 'Los rivales no te ven; se pierde al atacar' },
   arcana: { n: 'Arcana', img: 'ru_arcana', dur: 10, d: 'Tus poderes recargan 40% más rápido' },
   shield: { n: 'Escudo', img: 'ru_shield', dur: 10, d: 'Un escudo absorbe 30 de daño (30% de tu vida)' },
-  summon: { n: 'Invocación', img: 'ru_summon', dur: 10, d: '2 copias tuyas van solas hacia el rival y lo muerden (no cruzan muros, árboles ni el río)' },
+// (Invocación removed: only Ilusión makes copies)
+//   summon: { n: 'Invocación', img: 'ru_summon', dur: 10, d: '2 copias tuyas van solas hacia el rival y lo muerden (no cruzan muros, árboles ni el río)' },
   vision: { n: 'Vigilancia', img: 'ru_vision', dur: 10, d: 'Ves a todos los rivales (aunque estén invisibles) con flechas' },
   silence: { n: 'Silencio', img: 'ru_silence', dur: 10, d: 'Quien te pegue queda sin poderes 3 s' },
 };
@@ -43172,25 +43173,50 @@ const ZC_PROP = [].concat(
   Array.from({ length: 4 }, (_, i) => ['zsma' + String(i).padStart(2, '0'), 92, 52, 26]), Array.from({ length: 12 }, (_, i) => ['zsma' + String(i + 4).padStart(2, '0'), 64, 36, 20]),
   [['zspa04', 190, 130, 60], ['zspa05', 180, 120, 60], ['zspa06', 230, 170, 70], ['zspb00', 230, 150, 70], ['zspb01', 190, 130, 64], ['zspb02', 110, 70, 36], ['zspb03', 230, 160, 70], ['zspc02', 230, 150, 70], ['zspc05', 200, 140, 66], ['zspc14', 220, 150, 64], ['zspc03', 250, 180, 70],
    ['zspa07', 140, 110, 40], ['zspa08', 130, 70, 30], ['zspa12', 80, 50, 20], ['zspa13', 70, 46, 30], ['zspa14', 100, 70, 40], ['zspa15', 130, 100, 30], ['zspb04', 140, 90, 60], ['zspb05', 150, 110, 60], ['zspb06', 160, 120, 80], ['zspb07', 150, 100, 60], ['zspb08', 130, 70, 30], ['zspb09', 70, 44, 34], ['zspb10', 120, 90, 46], ['zspb11', 90, 60, 34], ['zspb12', 160, 120, 70], ['zspb13', 90, 64, 40], ['zspb14', 90, 66, 40], ['zspb15', 110, 80, 30], ['zspc04', 150, 100, 70], ['zspc06', 160, 120, 70], ['zspc08', 160, 120, 40], ['zspc09', 120, 90, 50], ['zspc10', 200, 150, 60], ['zspc11', 160, 120, 50], ['zspc12', 150, 120, 40], ['zspc13', 160, 120, 70], ['zspc15', 160, 120, 60]]);
+const ZC_AR = {"zcF100":0.677,"zcF101":0.843,"zcF102":0.93,"zcF103":0.643,"zcF104":0.687,"zcF105":0.743,"zcF106":0.687,"zcF107":0.63,"zcF108":0.77,"zcF109":0.89,"zcF110":0.7,"zcF111":0.78,"zcF200":0.81,"zcF201":0.857,"zcF202":0.737,"zcF203":0.797,"zcF204":0.77,"zcF205":0.867,"zcF206":0.643,"zcF207":0.617,"zcF208":0.757,"zcF209":0.793,"zcF210":0.683,"zcF211":0.67,"zcL00":1.382,"zcL01":1.648,"zcL02":1.604,"zcL03":1.44,"zcL04":1.565,"zcL05":1.487,"zcL06":1.503,"zcL07":1.442,"zcL08":1.241,"zcL09":1.363,"zcL10":1.252,"zcL11":1.294,"zcL12":1.325,"zcL13":1.302,"zcL14":1.333,"zcL15":1.22,"zcL16":1.224,"zcL17":1.364,"zcL18":1.387,"zcL19":1.307,"zcL20":1.327,"zcL21":1.319,"zcL22":1.233,"zcL23":1.207,"zcL24":1.393,"zcL25":1.389,"zcL26":1.444,"zcL27":1.439,"zcL28":1.369,"zcL29":1.384,"zcL30":1.387,"zcL31":1.36,"zcR00":1.442,"zcR01":1.409,"zcR02":1.464,"zcR03":1.389,"zcR04":1.518,"zcR05":1.377,"zcR06":1.457,"zcR07":1.451,"zcR08":1.327,"zcR09":1.317,"zcR10":1.228,"zcR11":1.261,"zcR12":1.384,"zcR13":1.329,"zcR14":1.327,"zcR15":1.296,"zcR16":1.236,"zcR17":1.319,"zcR18":1.323,"zcR19":1.317,"zcR20":1.296,"zcR21":1.3,"zcR22":1.227,"zcR23":1.278,"zcR24":1.333,"zcR25":1.528,"zcR26":1.596,"zcR27":1.58,"zcR28":1.729,"zcR29":1.479,"zcR30":1.51,"zcR31":1.566,"zcR32":1.369,"zcT00":2.62,"zcT01":2.54,"zcT02":2.35,"zcT03":2.375,"zcT04":2.645,"zcT05":2.491,"zcT06":2.579,"zcT07":2.44,"zcT08":2.455,"zcT09":2.131,"zcT10":2.046,"zcT11":2.202,"zcT12":2.574,"zcT13":2.83,"zcT14":2.791,"zcT15":2.49,"zcT16":2.237,"zcT17":2.691,"zcT18":2.731,"zcT19":2.955,"zcT20":2.484,"zcT21":2.842,"zcT22":2.521,"zcT23":2.525,"zcT24":2.957,"zcT25":2.945,"zcT26":2.957,"zcT27":2.765,"zcT28":3.0,"zcT29":2.435,"zcT30":2.444,"zcT31":2.618,"zcT32":2.241,"zcT33":2.567,"zcT34":2.067,"zcT35":2.135,"zcRS00":1.818,"zcRS01":2.326,"zcRS02":2.362,"zcRS03":2.439,"zcRS04":2.098,"zcRS05":1.531,"zcRS06":1.911,"zcRS07":1.765,"zcRS08":2.174,"zcRS09":1.923,"zcRS10":1.829,"zcRS11":1.875,"zcK00":1.281,"zcK01":1.359,"zcK02":1.44,"zcK03":1.181,"zcK04":1.5,"zcK05":1.318,"zcK06":1.369,"zcK07":1.249,"zcK08":1.143,"zcK09":1.199,"zcK10":1.177,"zcK11":1.178,"zcK12":1.241,"zcK13":1.219,"zcK14":1.226,"zcK15":1.075,"zcK16":1.11,"zcK17":1.269,"zcK18":1.204,"zcK19":1.339,"zcK20":1.25,"zcK21":1.327,"zcK22":1.204,"zcK23":1.076,"zcK24":1.331,"zcK25":1.352,"zcK26":1.442,"zcK27":1.341,"zcK28":1.347,"zcK29":1.32,"zcK30":1.292,"zcK31":1.204}; /* height / width of each building drawing */
+const ZC_SET = k => Object.keys(ZC_AR).filter(n => n.startsWith('zc' + k) && /\d\d$/.test(n) && !(k === 'R' && n.startsWith('zcRS')));
+/* buildings on every wall, like a city seen from the front:
+   - the side of a wall that looks DOWN onto a street: building fronts (one next to the other)
+   - the sides that look LEFT / RIGHT: buildings turned that way, one behind the other
+   - the side that looks UP and the inside of thick blocks: the backs and roofs
+   thin walls get one row; thick walls get a row on each side */
+function zCityBlocks(A, D, rnd) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32, items = [];
+  const F = ZC_SET('F'), R = ZC_SET('R').concat(ZC_SET('RS'), ZC_SET('RS')), L = ZC_SET('L'), T = ZC_SET('T'), K = ZC_SET('K'), RS = ZC_SET('RS');
+  const pick = a => a[Math.floor(rnd() * a.length)];
+  const wall = (i, j) => i < 0 || j < 0 || i >= PW || j >= PH || D[j * PW + i] === 0, st = (i, j) => !wall(i, j);
+  const thU = (i, j) => { let n = 0; while (n < 30 && wall(i, j + n)) n++; return n; }, thD = (i, j) => { let n = 0; while (n < 30 && wall(i, j - n)) n++; return n; };
+  const thL = (i, j) => { let n = 0; while (n < 30 && wall(i - n, j)) n++; return n; }, thR = (i, j) => { let n = 0; while (n < 30 && wall(i + n, j)) n++; return n; };
+  const streetW = (i, j, dx) => { let n = 0; while (n < 25 && st(i + dx * (n + 1), j)) n++; return n; };
+  const add = (im, x, yb, w, fx, lay) => { const h = w * (ZC_AR[im] || 1); items.push({ im, x, yb, w, h, fx: fx || 1, lay: lay || 0 }); return h; };
+  // 1) fronts along walls that have a street below them
+  for (let j = 1; j < PH - 1; j++) { let i = 1; while (i < PW - 1) { if (!(wall(i, j) && st(i, j - 1))) { i++; continue; } let e = i; while (e < PW - 1 && wall(e, j) && st(e, j - 1)) e++;
+      let pos = i; while (pos < e) { const rem = e - pos; let n = rem <= 8 ? rem : 5 + Math.floor(rnd() * 3); if (rem - n > 0 && rem - n < 3) n = rem - 3 > 3 ? rem - 3 : rem;
+        let t = 30; for (let q = pos; q < pos + n; q++) t = Math.min(t, thU(q, j)); const im = pick(F); let w = n * C + 6, h = w * ZC_AR[im]; const mh = t * C + 26; if (h > mh) { h = mh; w = h / ZC_AR[im]; }
+        add(im, M0 + (pos + n / 2) * C, M0 + j * C - 4, w, 1, 2); pos += n; } i = e; } }
+  // 2) sides: street to the right -> buildings looking right; street to the left -> looking left
+  for (const dir of [1, -1]) for (let i = 1; i < PW - 1; i++) { let j = 1; while (j < PH - 1) { const ok = jj => wall(i, jj) && st(i + dir, jj) && !st(i, jj - 1); if (!ok(j)) { j++; continue; } let e = j; while (e < PH - 1 && ok(e)) e++;
+      const tx = dir > 0 ? thL(i, j) : thR(i, j), other = dir > 0 ? st(i - tx, j) : st(i + tx, j);
+      if (other && tx <= 4) { /* thin wall with streets on both sides: one row only, looking at the wider street */ const wR = streetW(i, j, dir), wO = streetW(i - dir * (tx - 1), j, -dir); if (wO > wR || (wO === wR && dir < 0)) { j = e; continue; } }
+      const wc = Math.max(C, Math.min(other && tx > 4 ? tx * C / 2 : tx * C, 3.4 * C)); let y = M0 + j * C - 2; const yTop = M0 + e * C;
+      while (y < yTop - 6) { const narrow = wc < 2.3 * C; const im = narrow ? pick(dir > 0 ? T.concat(RS) : T) : pick(dir > 0 ? R : L); const fx = dir < 0 && (narrow || RS.includes(im)) ? -1 : 1;
+        const x = dir > 0 ? M0 + (i + 1) * C - wc / 2 : M0 + i * C + wc / 2; const h = add(im, x, y, wc + 4, fx, 1); y += Math.max(C, h * 0.5); } j = e; } }
+  // 3) backs: walls with a street above them (only when the wall is thick enough to have a back row)
+  for (let j = 1; j < PH - 1; j++) { let i = 1; while (i < PW - 1) { const ok = ii => wall(ii, j) && st(ii, j + 1) && thD(ii, j) >= 4; if (!ok(i)) { i++; continue; } let e = i; while (e < PW - 1 && ok(e)) e++;
+      let pos = i; while (pos < e) { const n = Math.min(e - pos, 3 + Math.floor(rnd() * 2)); const im = pick(K); let w = n * C + 4, h = w * ZC_AR[im]; const t = thD(pos, j), mh = t * C * 0.5; if (h > mh) { w = w * mh / h; h = mh; } add(im, M0 + (pos + n / 2) * C, M0 + (j + 1) * C - h, w, 1, 0); pos += n; } i = e; } }
+  // 4) the inside of big blocks: roofs and backs, packed
+  for (let j = 1; j < PH - 4; j += 3) for (let i = 1; i < PW - 4; i += 3) { let deep = true; for (let b = -2; b < 5 && deep; b++) for (let a = -2; a < 5; a++) if (!wall(i + a, j + b)) { deep = false; break; } if (!deep) continue; const im = pick(K); const w = 3 * C + 6; add(im, M0 + (i + 1.5) * C, M0 + j * C, w, 1, -1); }
+  items.sort((a, b) => (b.yb - a.yb) || (a.lay - b.lay)); return items; }
+for (const it of ZC_PROP) { const f = /^zsm[pz]/.test(it[0]) ? 0.72 : it[1] >= 180 ? 0.66 : it[1] >= 100 ? 0.8 : 0.9; it[1] *= f; it[2] *= f; it[3] *= f; } /* houses are the biggest thing; vehicles and the rest smaller */
 function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32; let sd = 7654321; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   // how far each street cell is from a wall (sidewalks next to the buildings, the road in the middle)
   const D = new Uint8Array(PW * PH).fill(255), Q = []; for (let k = 0; k < PW * PH; k++) if (W.pbase[k]) { D[k] = 0; Q.push(k); }
   for (let q = 0; q < Q.length; q++) { const k = Q[q], d = D[k]; if (d >= 12) continue; const i = k % PW, j = (k / PW) | 0; for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= PW || b >= PH) continue; const n = b * PW + a; if (D[n] > d + 1) { D[n] = d + 1; Q.push(n); } } }
   A.cityD = D;
   { const RL = new Uint8Array(PW * PH); for (let j = 1; j < PH - 1; j++) for (let i = 1; i < PW - 1; i++) { const k = j * PW + i, d = D[k]; if (d < 5 || d === 255) continue; const v = d >= D[k - 1] && d >= D[k + 1] && (D[k - 1] < d || D[k + 1] < d) && Math.abs(D[k - PW] - d) <= 1 && Math.abs(D[k + PW] - d) <= 1 && D[k - 1] !== d && D[k + 1] !== d, hz = d >= D[k - PW] && d >= D[k + PW] && (D[k - PW] < d || D[k + PW] < d) && Math.abs(D[k - 1] - d) <= 1 && Math.abs(D[k + 1] - d) <= 1 && D[k - PW] !== d && D[k + PW] !== d; if (v && !hz) RL[k] = 1; else if (hz && !v) RL[k] = 2; } A.cityRL = RL; } /* 1: a road going up-down, 2: a road going left-right (its middle line) */
-  // buildings packed one next to the other on every wall block
-  const occ = new Uint8Array(PW * PH), B = []; const lo = 4;
-  for (const sz of [10, 8, 6, 5, 4, 3, 2]) { const L = []; for (let j = lo; j < PH - lo - sz; j += 1) for (let i = lo; i < PW - lo - sz; i += 1) L.push(j * PW + i);
-    for (let n = L.length - 1; n > 0; n--) { const m = Math.floor(rnd() * (n + 1)); const tmp = L[n]; L[n] = L[m]; L[m] = tmp; }
-    for (const k0 of L) { const i0 = k0 % PW, j0 = (k0 / PW) | 0; let ok = true; for (let j = j0; j < j0 + sz && ok; j++) for (let i = i0; i < i0 + sz; i++) { const k = j * PW + i; if (!W.pbase[k] || occ[k]) { ok = false; break; } } if (!ok) continue;
-      let edge = false; for (let j = j0 - 2; j < j0 + sz + 2 && !edge; j++) for (let i = i0 - 2; i < i0 + sz + 2; i++) { if (i < 0 || j < 0 || i >= PW || j >= PH) continue; if (!W.pbase[j * PW + i]) { edge = true; break; } }
-      if (!edge && sz < 10) continue; /* small ones only along the streets; deep inside the blocks only the big ones */
-      for (let j = j0; j < j0 + sz; j++) for (let i = i0; i < i0 + sz; i++) occ[j * PW + i] = 1;
-      B.push({ x: M0 + (i0 + sz / 2) * C, y: M0 + (j0 + sz / 2) * C, s: sz * C, im: ZC_BLD[Math.floor(rnd() * ZC_BLD.length)] }); } } /* only buildings on the walls */
-  B.sort((a, b) => b.y - a.y); A.cityB = B;
+  A.cityB = zCityBlocks(A, D, rnd); const lo = 4;
   // the dead, the wrecks and the junk on the streets: obstacles you walk around (always with room to pass)
   const P = [], far = (x, y) => Math.hypot(x - hz.x, y - hz.y) > 650 && Math.hypot(x - zz.x, y - zz.y) > 650 && !A.facs.some(f => Math.hypot(f.x - x, f.y - y) < 280) && !A.shops.some(f => Math.hypot(f.x - x, f.y - y) < 280);
-  const CARS = ZC_PROP.filter(it => it[1] >= 180);
+  const CARS = ZC_PROP.filter(it => it[1] >= 110 && /^zsp/.test(it[0]));
   for (let k = 0; k < 6000 && P.length < 90; k++) { /* cars parked or crashed along the curb */ const it = CARS[Math.floor(rnd() * CARS.length)]; const i = lo + Math.floor(rnd() * (PW - 2 * lo)), j = lo + Math.floor(rnd() * (PH - 2 * lo)), d = D[j * PW + i]; if (d !== 4 && d !== 5) continue; const x = M0 + (i + 0.5) * C, y = M0 + (j + 0.5) * C;
     const fw = it[2] / 2, fh = it[3] / 2; if (!far(x, y)) continue; let ok = true; for (let yy = y - fh - 40; yy <= y + fh + 40 && ok; yy += 20) for (let xx = x - fw - 40; xx <= x + fw + 40; xx += 20) if (!W.walkable(xx, yy)) { ok = false; break; } if (!ok) continue;
     if (P.some(p => Math.abs(p.x - x) < (p.fw + fw + 90) && Math.abs(p.y - y) < (p.fh + fh + 90))) continue; P.push({ x, y, im: it[0], w: it[1], fw, fh, fx: rnd() < 0.5 ? -1 : 1 }); W.blockRect(x - fw, y - fh, x + fw, y + fh, 1); }
@@ -43216,7 +43242,7 @@ function zCityPaint(A, g, x0, y0, x1, y1) { const W = A.W, PW = W.PW, PH = W.PH 
     else if (d === 4) { if (i + 1 < PW && D[k + 1] === 3) line.rect(x + C - 2, y, 4, C); if (i > 0 && D[k - 1] === 3) line.rect(x - 2, y, 4, C); if (j + 1 < PH && D[k + PW] === 3) line.rect(x, y + C - 2, C, 4); if (j > 0 && D[k - PW] === 3) line.rect(x, y - 2, C, 4); } /* the white edge line of the road */
     if (d >= 5 && RL && RL[k]) { if ((RL[k] & 1) && j % 3 !== 0) line.rect(x + C / 2 - 3, y, 6, C); if ((RL[k] & 2) && i % 3 !== 0) line.rect(x, y + C / 2 - 3, C, 6); } }
   g.fillStyle = P.walk; g.fill(walk); g.fillStyle = '#a7a39c'; g.fill(curb); g.fillStyle = P.block; g.fill(blk); g.fillStyle = 'rgba(235,235,230,0.8)'; g.fill(line);
-  for (const b of A.cityB || []) { const w = b.s * 1.42; if (b.x + w < x0 || b.x - w > x1 || b.y + w < y0 || b.y - w > y1) continue; const im = zCI(b.im); if (!im) { A._cityMiss = true; continue; } const h = w * im.naturalHeight / im.naturalWidth; g.save(); g.translate(b.x, b.y); g.scale(1, -1); g.drawImage(im, -w / 2, -h / 2 - b.s * 0.06, w, h); g.restore(); }
+  for (const b of A.cityB || []) { if (b.x + b.w < x0 || b.x - b.w > x1 || b.yb + b.h < y0 || b.yb > y1) continue; const im = zCI(b.im); if (!im) { A._cityMiss = true; continue; } g.save(); g.translate(b.x, b.yb); g.scale(b.fx, -1); g.drawImage(im, -b.w / 2, -b.h, b.w, b.h); g.restore(); }
   for (const p of A.cityP || []) { if (p.x + p.w < x0 || p.x - p.w > x1 || p.y + p.w < y0 || p.y - p.w > y1) continue; const im = zCI(p.im); if (!im) { A._cityMiss = true; continue; } const w = p.w, h = w * im.naturalHeight / im.naturalWidth; g.save(); g.translate(p.x, p.y); g.scale(p.fx, -1); g.drawImage(im, -w / 2, -h / 2 - 6, w, h); g.restore(); } }
 /* the city is drawn once in big pieces and then only copied: smooth on phones */
 function zCityGround(A, g, R, vx0, vy0, vx1, vy1) { const CS = 1024, SC = 0.7; A._cc = A._cc || new Map(); const cc = A._cc; A._ccTick = (A._ccTick || 0) + 1; let built = 0;
