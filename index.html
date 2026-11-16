@@ -515,6 +515,7 @@ body.tcine #hud > *:not(#sprayWrap):not(#emoteWrap), body.tcine #stickBase{opaci
 #online #roomList{flex:1 1 auto!important;min-height:0;max-height:none!important;overflow-y:auto}
 #online .mchat .mlog{height:84px!important;min-height:0}
 #online .row2{margin:6px 0}#online .lbl{margin:4px 0 2px}
+.icimg{width:100%;height:100%;max-width:56px;max-height:56px;object-fit:contain;border-radius:50%;vertical-align:middle;display:inline-block}span>.icimg{width:1.6em;height:1.6em}.aitem span>.icimg,.ashop span>.icimg,.asic>.icimg,.zpg span>.icimg{width:100%;height:100%;max-width:none;max-height:none}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -42170,6 +42171,7 @@ const ITEMS = {
   p_salve: { n: 'Ungüento', ic: '🫙', shop: 'Consumibles', cost: 25, act: 'salve', cd: 1, uses: 1, d: 'Úsalo: +50 de vida en 8 s.' },
   p_ward: { n: 'Centinela', ic: '🦉', shop: 'Consumibles', cost: 40, act: 'ward', cd: 1, uses: 2, d: 'Úsalo: ves a los invisibles cerca 20 s.' },
 };
+{ const H = new Set(["it2_a_bolt", "it2_a_curse", "it2_a_earth", "it2_a_fire", "it2_a_ice", "it2_a_mix", "it2_a_poison", "it2_a_triple", "it2_a_vamp", "it2_g_bow", "it2_g_branch", "it2_g_cyc", "it2_g_evade", "it2_g_hood", "it2_g_illu", "it2_g_mask", "it2_g_moon", "it2_g_orb", "it2_g_skull", "it2_g_stone", "it2_m_dmg", "it2_m_rng", "it2_m_spd", "it2_n_aoe", "it2_n_boots", "it2_n_def", "it2_n_doom", "it2_n_holy", "it2_n_meteor", "it2_n_pot", "it2_n_prec", "it2_n_refr", "it2_n_salve", "it2_n_str", "it2_n_swap", "it2_n_tango", "it2_n_ward", "it2_n_xl", "it2_p_barrel", "it2_p_claws", "it2_p_fast", "it2_p_head", "it2_p_jaws", "it2_p_lamp", "it2_p_long", "it2_p_mini", "it2_p_move", "it2_p_paws", "it2_p_pot", "it2_p_salve", "it2_p_str", "it2_p_tome", "it2_p_totem", "it2_p_turb", "it2_p_ward", "it2_r_claws", "it2_r_ring", "it2_r_scep", "it2_r_tp"]); for (const k in ITEMS) if (H.has('it2_' + k)) { const n = 'it2_' + k; Object.defineProperty(ITEMS[k], 'ic', { configurable: true, get: () => `<img class="icimg" src="${FX(n)}" alt="">` }); } } /* Perrin's shop icons */
 const SHOPS = {
   mirana: ['Sabio', 'Mercader', 'Tienda Goblin', 'Tienda'],
   nevermore: ['Mercader de mejoras', 'Mercado'],
@@ -42443,7 +42445,7 @@ function arenaItemsHud(A, ui) {
   const bag = (A.inv[id] || []).filter(s => !ITEMS[s.k].up || ITEMS[s.k].arrow);
   const key = bag.map(s => s.k + s.lv + ':' + (s.uses || 0)).join(',');
   if (inv._k !== key) { inv._k = key;
-    inv.innerHTML = `<button class="ashop" data-shop="1"><span>🛒</span><b class="agold">0</b></button>` + bag.map(s => { const it = ITEMS[s.k]; return `<button class="aitem${it.act ? ' act' : ''}" data-it="${s.k}"><span>${it.ic}</span>${it.lv ? `<i>${s.lv}</i>` : ''}${it.uses ? `<i>${s.uses}</i>` : ''}<em class="icd"></em></button>`; }).join('');
+    inv.innerHTML = `<button class="ashop" data-shop="1"><span><img class="icimg" src="${FX('ui_shop')}" alt=""></span><b class="agold">0</b></button>` + bag.map(s => { const it = ITEMS[s.k]; return `<button class="aitem${it.act ? ' act' : ''}" data-it="${s.k}"><span>${it.ic}</span>${it.lv ? `<i>${s.lv}</i>` : ''}${it.uses ? `<i>${s.uses}</i>` : ''}<em class="icd"></em></button>`; }).join('');
     inv.querySelectorAll('[data-it]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); const it = ITEMS[b.dataset.it]; if (it.act) ui.cast('it:' + b.dataset.it, null); else A.say(it.n + ': ' + it.d, 'ffcfe0ff'); }));
     inv.querySelector('[data-shop]').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); arenaShopOpen(A, ui); }); }
   { const g = inv.querySelector('.agold'), v = String(Math.floor(A.gold[id] || 0)); if (g.textContent !== v) g.textContent = v; inv.querySelector('.ashop').classList.toggle('near', !!near); }
@@ -42678,12 +42680,18 @@ const ZREC = {
   soulgem: { n: 'Gema de almas', ic: '💠', g: 0, parts: ['gem', 'borb', 'staff'], st: { regen: 20, aura: 20 }, act: 'massheal', cd: 45, d: '+20 vida/s, aura de vida. Úsala: cura 900 a los zombis cerca.' },
   apoc: { n: 'Espada del apocalipsis', ic: '🗡️', g: 800, parts: ['isword', 'pick'], st: { dmg: 100 }, act: 'apoc', cd: 40, d: '+100 de daño. Úsala: +200 de daño y 50% de robo de vida 13 s.' },
 };
+/* the icons Perrin drew replace the emojis (classes, powers, shop) */
+const FX_HAVE = new Set(["it2_a_bolt", "it2_a_curse", "it2_a_earth", "it2_a_fire", "it2_a_ice", "it2_a_mix", "it2_a_poison", "it2_a_triple", "it2_a_vamp", "it2_g_bow", "it2_g_branch", "it2_g_cyc", "it2_g_evade", "it2_g_hood", "it2_g_illu", "it2_g_mask", "it2_g_moon", "it2_g_orb", "it2_g_skull", "it2_g_stone", "it2_m_dmg", "it2_m_rng", "it2_m_spd", "it2_n_aoe", "it2_n_boots", "it2_n_def", "it2_n_doom", "it2_n_holy", "it2_n_meteor", "it2_n_pot", "it2_n_prec", "it2_n_refr", "it2_n_salve", "it2_n_str", "it2_n_swap", "it2_n_tango", "it2_n_ward", "it2_n_xl", "it2_p_barrel", "it2_p_claws", "it2_p_fast", "it2_p_head", "it2_p_jaws", "it2_p_lamp", "it2_p_long", "it2_p_mini", "it2_p_move", "it2_p_paws", "it2_p_pot", "it2_p_salve", "it2_p_str", "it2_p_tome", "it2_p_totem", "it2_p_turb", "it2_p_ward", "it2_r_claws", "it2_r_ring", "it2_r_scep", "it2_r_tp", "ui_shop", "zh_commando", "zh_plasma", "zh_sniper", "zi_acmd", "zi_acrip", "zi_aendu", "zi_afort", "zi_attach", "zi_bag", "zi_barrel", "zi_barricade", "zi_blink", "zi_build", "zi_core", "zi_demolish", "zi_dmg", "zi_droid", "zi_emote", "zi_engineer", "zi_ensnare", "zi_exchange", "zi_factory", "zi_flag", "zi_heavy", "zi_hp", "zi_map", "zi_medic", "zi_pgren", "zi_power", "zi_pyro", "zi_range", "zi_ranger", "zi_rapid", "zi_research", "zi_scan", "zi_sheep", "zi_shield", "zi_smallfac", "zi_spray", "zi_stone", "zi_storm", "zi_turret", "zi_warehouse", "zk_adren", "zk_after", "zk_antidote", "zk_army", "zk_assas", "zk_blind", "zk_calldeath", "zk_coil", "zk_curse", "zk_exhaust", "zk_fear", "zk_firewall", "zk_flame", "zk_gren", "zk_hellground", "zk_ksheep", "zk_madness", "zk_mark", "zk_missiles", "zk_orbital", "zk_rage", "zk_rejuv", "zk_repairbot", "zk_sentry", "zk_smoke", "zk_stance", "zk_thirst", "zt_at4", "zt_benelli", "zt_booster", "zt_borb", "zt_cball", "zt_claws", "zt_cloak", "zt_dclaws", "zt_dheart", "zt_dorb", "zt_drifle", "zt_erifle", "zt_eye", "zt_gem", "zt_gheart", "zt_gloves", "zt_gmedal", "zt_gold2honor", "zt_gring", "zt_hammer", "zt_honor2gold", "zt_hstone", "zt_isword", "zt_lance", "zt_m404", "zt_maul", "zt_mboots", "zt_meta", "zt_mleg", "zt_pathogen", "zt_pgen2", "zt_pick", "zt_pierce", "zt_pinvis", "zt_portal", "zt_prifle", "zt_radio", "zt_ring", "zt_ritual", "zt_rlaunch", "zt_shield", "zt_shoulders", "zt_sphere", "zt_staff", "zt_suit", "zt_sward", "zt_taxe", "zt_wa2000", "zt_waraxe", "zt_wheart", "zt_wings", "zt_zboots", "zz_balanced", "zz_deadly", "zz_faceless", "zz_healer", "zz_necro", "zz_raptor", "zz_tank"]);
+function useIcons(T, pre, alt) { for (const k in T) { const o = T[k]; const n = [pre + k].concat(alt ? [alt + k] : []).find(x => FX_HAVE.has(x)); if (!n) continue; o.img = o.img && !/^zi_|^sk_/.test(o.img) ? o.img : n; Object.defineProperty(o, 'ic', { configurable: true, get: () => `<img class="icimg" src="${FX(n)}" alt="">` }); } }
+useIcons(ZH, 'zh_', 'zi_'); useIcons(ZZ, 'zz_'); useIcons(ZI, 'zt_');
+for (const k in ZSK) if (FX_HAVE.has('zk_' + k)) ZSK[k].img = 'zk_' + k;
 const ZSHOPS = { // zombie shops in the middle of the map (original positions)
   'Cripta': [-896, 192], 'Vendedor de recetas': [115, 142], 'Tumba de reliquias': [-896, -960], 'Tienda embrujada': [128, -896], 'Tienda secreta': [-622, -2824] };
 const NEUTRAL_FACTORIES = [[-2816, 832], [-896, -5184], [4672, 448], [4608, -2432], [-4096, -4544], [576, 3776], [-2496, 4736], [3712, -3328], [-4608, 1280], [1280, -2944], [-3200, -3648], [768, -1408], [4928, 1792], [3328, -2816], [-256, 3520], [-3648, 4160], [5248, 448], [2816, 4160], [2432, 3648], [1344, -4288]];
 const HUMAN_ZONE = [-400, -448], ZOMBIE_ZONE = [-400, -448]; /* in the original everybody appears in the middle (Create_Zone); the zombies wait there, next to their shops */
 const RAISE_T = 15, PICK_T = 15; /* the zombies wake up 30 s after the start */
 Object.entries({"barricade": "zi_barricade", "adv": "zi_barricade", "stone": "zi_stone", "super": "zi_stone", "burrow": "zi_stone", "research": "zi_research", "exchange": "zi_exchange", "trade": "zi_exchange", "factory": "zi_factory", "flag": "zi_flag", "core": "zi_core", "gen": "zi_core", "turret": "zi_turret", "rocket": "zi_turret", "electric": "zi_turret", "frost": "zi_turret", "warehouse": "zi_warehouse"}).forEach(([k, v]) => { ZB[k].img = v; }); Object.entries({"walls": "zi_stone", "dmg": "zi_dmg", "range": "zi_range", "hp": "zi_hp", "attach": "zi_attach", "power": "zi_power", "ensnare": "zi_ensnare", "rapid": "zi_rapid", "income": "zi_factory"}).forEach(([k, v]) => { ZR[k].img = v; }); Object.entries({"droid": "zi_droid", "plasma": "zi_storm", "heavy": "zi_heavy", "ranger": "zi_ranger", "pyro": "zi_pyro", "engineer": "zi_engineer", "medic": "zi_medic", "sheep": "zi_sheep", "sniper": "zi_range", "commando": "zi_scan"}).forEach(([k, v]) => { ZH[k].img = v; }); Object.entries({"ensnare": "zi_ensnare", "rapid": "zi_rapid", "barrel": "zi_barrel", "pgren": "zi_pgren", "storm": "zi_storm", "firewall": "zi_pyro", "adren": "zi_medic", "antidote": "zi_shield", "repairbot": "zi_engineer", "sentry": "zi_turret", "missiles": "zi_heavy", "ksheep": "zi_sheep", "smoke": "zi_ranger", "gren": "zi_barrel", "mark": "zi_range", "orbital": "zi_scan", "blink": "zi_blink"}).forEach(([k, v]) => { ZSK[k].img = v; }); /* the picture set made for this map */
+useIcons(ZH, 'zh_', 'zi_'); useIcons(ZZ, 'zz_'); for (const k in ZSK) if (FX_HAVE.has('zk_' + k)) ZSK[k].img = 'zk_' + k; for (const k of ['sniper', 'plasma', 'commando']) ZH[k].img = 'zh_' + k; /* Perrin's icons win */
 const BUILD_T = { barricade: 3, adv: 3, stone: 4, super: 4, burrow: 5, research: 8, exchange: 6, trade: 5, factory: 8, flag: 5, core: 6, gen: 5, turret: 5, rocket: 6, electric: 6, frost: 6, warehouse: 7 }; /* seconds to build (as in the original, buildings take time) */
 const FLAG_IMG = { cmd: 'zi_acmd', endu: 'zi_aendu', crip: 'zi_acrip', fort: 'zi_afort' };
 window.ZOMBIE_DATA = { ZH, ZZ, ZSK, ZB, ZR, ZI, ZREC };
@@ -42767,7 +42775,7 @@ function zSkillCd(A, u, k) { let cd = ZSK[k].cd || 1; if (k === 'blink') cd = Ma
 // ---------------- commands (host) ----------------
 function zCmd(A, p, s) {
   const W = A.W, a = String(s).split(':'), id = p.id, u = W.heroOf(p), t = W.time; if (!u || A.ended) return false;
-  const tell = m => { if (p === W.local) A.say(m, 'ffff9a7a'); return false; };
+  const tell = m => { if (p === W.local) A.say('❌ ' + m, 'ffff5a5a'); return false; };
   const pay = (g, h) => { if ((A.gold[id] || 0) < (g || 0)) return tell('Te falta oro 🪙'); if ((A.honor[id] || 0) < (h || 0)) return tell('Te falta honor 🎖️'); A.gold[id] -= g || 0; A.honor[id] -= h || 0; return true; };
   const Z = A.isHunter(u);
   switch (a[0]) {
@@ -42836,7 +42844,7 @@ function zKillBld(A, b, by, demo) { const W = A.W, h = b.s / 2; if (b.dead) retu
 // ---------------- skills ----------------
 function zCast(A, u, k, aim) {
   const W = A.W, t = W.time, id = u.owner.id, b = A.buf[id], Z = A.isHunter(u); if (!u.alive || A.ended || !A.cls[id]) return false;
-  if (Z && t < A.raiseAt) { if (u.owner === W.local) A.say('Los zombis despiertan en ' + Math.ceil(A.raiseAt - t) + ' s', 'ffff9a7a'); return false; }
+  if (t < A.raiseAt && k !== 'blink') { if (u.owner === W.local) A.say((Z ? 'Despiertas' : 'Los poderes se activan cuando despiertan los zombis') + ' en ' + Math.ceil(A.raiseAt - t) + ' s', 'ffff9a7a'); return false; } /* no powers (fire, smoke, lines…) before the zombies wake up */
   if (u.stunUntil > t || b.fear > t || (b.silence > t)) { if (u.owner === W.local) A.say('No puedes usar poderes ahora', 'ffff9a7a'); return false; }
   const S = zSkillsOf(A, u).find(s => s.id === k); if (!S) return false; if (A.ready(u, k) > 0) return false;
   let dx = aim && aim.dx, dy = aim && aim.dy; if (!dx && !dy) { const f = u.facing * Math.PI / 180; dx = Math.cos(f); dy = Math.sin(f); } const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
@@ -43199,17 +43207,18 @@ function zCityBlocks(A, D, rnd) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 
       if (other && tx <= 4) { /* thin wall with streets on both sides: one row only, looking at the wider street */ const wR = streetW(i, j, dir), wO = streetW(i - dir * (tx - 1), j, -dir); if (wO > wR || (wO === wR && dir < 0)) { j = e; continue; } }
       const wc = Math.max(C, Math.min(other && tx > 4 ? tx * C / 2 : tx * C, 3.4 * C)); let y = M0 + j * C - 2; const yTop = M0 + e * C;
       while (y < yTop - 6) { const narrow = wc < 2.3 * C; const im = narrow ? pick(dir > 0 ? T.concat(RS) : T) : pick(dir > 0 ? R : L); const fx = dir < 0 && (narrow || RS.includes(im)) ? -1 : 1;
-        const x = dir > 0 ? M0 + (i + 1) * C - wc / 2 : M0 + i * C + wc / 2; const h = add(im, x, y, wc + 4, fx, 1); y += Math.max(C, h * 0.5); } j = e; } }
+        const x = dir > 0 ? M0 + (i + 1) * C - wc / 2 : M0 + i * C + wc / 2; let w = wc + 6, hh = w * (ZC_AR[im] || 1); const room = yTop + (st(i, e) ? 2 : 40) - y; if (room < C * 0.8) break; if (hh > room) { w *= room / hh; hh = room; } add(im, x, y, w, fx, 1); y += Math.max(C * 0.8, hh * 0.42); } j = e; } }
   // 3) backs: walls with a street above them (only when the wall is thick enough to have a back row)
   for (let j = 1; j < PH - 1; j++) { let i = 1; while (i < PW - 1) { const ok = ii => wall(ii, j) && st(ii, j + 1) && thD(ii, j) >= 4; if (!ok(i)) { i++; continue; } let e = i; while (e < PW - 1 && ok(e)) e++;
       let pos = i; while (pos < e) { const n = Math.min(e - pos, 3 + Math.floor(rnd() * 2)); const im = pick(K); let w = n * C + 4, h = w * ZC_AR[im]; const t = thD(pos, j), mh = t * C * 0.5; if (h > mh) { w = w * mh / h; h = mh; } add(im, M0 + (pos + n / 2) * C, M0 + (j + 1) * C - h, w, 1, 0); pos += n; } i = e; } }
-  // 4) the inside of big blocks: roofs and backs, packed
-  for (let j = 1; j < PH - 4; j += 3) for (let i = 1; i < PW - 4; i += 3) { let deep = true; for (let b = -2; b < 5 && deep; b++) for (let a = -2; a < 5; a++) if (!wall(i + a, j + b)) { deep = false; break; } if (!deep) continue; const im = pick(K); const w = 3 * C + 6; add(im, M0 + (i + 1.5) * C, M0 + j * C, w, 1, -1); }
-  items.sort((a, b) => (b.yb - a.yb) || (a.lay - b.lay)); return items; }
+  const okIt = it => { for (let fy = 0.08; fy <= 0.92; fy += 0.12) for (let fx = 0.12; fx <= 0.88; fx += 0.12) { const x = it.x - it.w / 2 + it.w * fx, y = it.yb + it.h * fy, i = Math.floor((x - M0) / C), j = Math.floor((y - M0) / C); if (i < 0 || j < 0 || i >= PW || j >= PH) continue; if (D[j * PW + i] >= 2) return false; } return true; };
+  const good = items.filter(okIt); good.sort((a, b) => (b.yb - a.yb) || (a.lay - b.lay)); return good; }
 for (const it of ZC_PROP) { const f = /^zsm[pz]/.test(it[0]) ? 0.72 : it[1] >= 180 ? 0.66 : it[1] >= 100 ? 0.8 : 0.9; it[1] *= f; it[2] *= f; it[3] *= f; } /* houses are the biggest thing; vehicles and the rest smaller */
 function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32; let sd = 7654321; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   // how far each street cell is from a wall (sidewalks next to the buildings, the road in the middle)
-  const D = new Uint8Array(PW * PH).fill(255), Q = []; for (let k = 0; k < PW * PH; k++) if (W.pbase[k]) { D[k] = 0; Q.push(k); }
+  const reach = new Uint8Array(PW * PH); { const s0 = Math.floor((hz.y - M0) / C) * PW + Math.floor((hz.x - M0) / C), F = [s0]; reach[s0] = 1; for (let q = 0; q < F.length; q++) { const k = F[q], i = k % PW; for (const n of [k + 1, k - 1, k + PW, k - PW]) { if (n < 0 || n >= PW * PH || reach[n] || W.pbase[n]) continue; if ((n === k + 1 && i === PW - 1) || (n === k - 1 && i === 0)) continue; reach[n] = 1; F.push(n); } } }
+  A.cityLot = new Uint8Array(PW * PH); for (let k = 0; k < PW * PH; k++) if (!W.pbase[k] && !reach[k]) A.cityLot[k] = 1; /* closed pockets nobody walks into: bare ground */
+  const D = new Uint8Array(PW * PH).fill(255), Q = []; for (let k = 0; k < PW * PH; k++) if (W.pbase[k] || !reach[k]) { D[k] = 0; Q.push(k); }
   for (let q = 0; q < Q.length; q++) { const k = Q[q], d = D[k]; if (d >= 12) continue; const i = k % PW, j = (k / PW) | 0; for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= PW || b >= PH) continue; const n = b * PW + a; if (D[n] > d + 1) { D[n] = d + 1; Q.push(n); } } }
   A.cityD = D;
   { const RL = new Uint8Array(PW * PH); for (let j = 1; j < PH - 1; j++) for (let i = 1; i < PW - 1; i++) { const k = j * PW + i, d = D[k]; if (d < 5 || d === 255) continue; const v = d >= D[k - 1] && d >= D[k + 1] && (D[k - 1] < d || D[k + 1] < d) && Math.abs(D[k - PW] - d) <= 1 && Math.abs(D[k + PW] - d) <= 1 && D[k - 1] !== d && D[k + 1] !== d, hz = d >= D[k - PW] && d >= D[k + PW] && (D[k - PW] < d || D[k + PW] < d) && Math.abs(D[k - 1] - d) <= 1 && Math.abs(D[k + 1] - d) <= 1 && D[k - PW] !== d && D[k + PW] !== d; if (v && !hz) RL[k] = 1; else if (hz && !v) RL[k] = 2; } A.cityRL = RL; } /* 1: a road going up-down, 2: a road going left-right (its middle line) */
@@ -43231,7 +43240,7 @@ let _zcPat = null; function zCityPats(g) { if (_zcPat) return _zcPat; const mk =
   _zcPat = {
     road: mk(q => { q.fillStyle = '#3b3a39'; q.fillRect(0, 0, 128, 128); for (let i = 0; i < 70; i++) { q.fillStyle = i % 2 ? '#353433' : '#444240'; q.globalAlpha = 0.6; q.beginPath(); q.arc(r() * 128, r() * 128, 2 + r() * 7, 0, 7); q.fill(); } q.globalAlpha = 0.6; q.strokeStyle = '#242322'; q.lineWidth = 1.4; for (let i = 0; i < 4; i++) { let x = r() * 128, y = r() * 128; q.beginPath(); q.moveTo(x, y); for (let k = 0; k < 4; k++) { x += (r() - 0.5) * 40; y += (r() - 0.5) * 40; q.lineTo(x, y); } q.stroke(); } }),
     walk: mk(q => { q.fillStyle = '#7d7a75'; q.fillRect(0, 0, 128, 128); q.strokeStyle = '#5f5c58'; q.lineWidth = 2; for (let x = 0; x <= 128; x += 32) { q.beginPath(); q.moveTo(x, 0); q.lineTo(x, 128); q.stroke(); q.beginPath(); q.moveTo(0, x); q.lineTo(128, x); q.stroke(); } q.globalAlpha = 0.35; for (let i = 0; i < 30; i++) { q.fillStyle = i % 2 ? '#55524e' : '#96928c'; q.fillRect(r() * 128, r() * 128, 3 + r() * 6, 3 + r() * 5); } }),
-    block: mk(q => { q.fillStyle = '#2b2826'; q.fillRect(0, 0, 128, 128); for (let i = 0; i < 40; i++) { q.fillStyle = i % 2 ? '#3a3633' : '#232120'; q.globalAlpha = 0.8; q.fillRect(r() * 128, r() * 128, 4 + r() * 14, 3 + r() * 10); } }) };
+    block: mk(q => { q.fillStyle = '#4a3f33'; q.fillRect(0, 0, 128, 128); for (let i = 0; i < 60; i++) { q.fillStyle = ['#3e352b', '#57493b', '#5d5a40', '#352d25'][i % 4]; q.globalAlpha = 0.7; q.beginPath(); q.arc(r() * 128, r() * 128, 2 + r() * 9, 0, 7); q.fill(); } q.globalAlpha = 0.5; q.fillStyle = '#6b6b3a'; for (let i = 0; i < 14; i++) q.fillRect(r() * 128, r() * 128, 2, 5); }) /* bare dirt lots */ };
   return _zcPat; }
 /* the streets: road in the middle, sidewalks along the buildings, a curb between them */
 function zCityPaint(A, g, x0, y0, x1, y1) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32, D = A.cityD, RL = A.cityRL, P = zCityPats(g);
@@ -43248,7 +43257,7 @@ function zCityPaint(A, g, x0, y0, x1, y1) { const W = A.W, PW = W.PW, PH = W.PH 
 function zCityGround(A, g, R, vx0, vy0, vx1, vy1) { const CS = 1024, SC = 0.7; A._cc = A._cc || new Map(); const cc = A._cc; A._ccTick = (A._ccTick || 0) + 1; let built = 0;
   g.fillStyle = '#07030a'; const F = 20000, Bd = 6016; g.fillRect(-F, -F, 2 * F, F - Bd); g.fillRect(-F, Bd, 2 * F, F - Bd); g.fillRect(-F, -Bd, F - Bd, 2 * Bd); g.fillRect(Bd, -Bd, F - Bd, 2 * Bd);
   for (let cy = Math.floor(vy0 / CS); cy <= Math.floor(vy1 / CS); cy++) for (let cx = Math.floor(vx0 / CS); cx <= Math.floor(vx1 / CS); cx++) { const key = cx + ',' + cy; let e = cc.get(key);
-    if (!e || (e.miss && A._ccTick - e.at > 30)) { if (built >= 2 && e) { /* keep the old one this frame */ } else { built++; const cv = (e && e.cv) || document.createElement('canvas'); cv.width = cv.height = Math.round(CS * SC); const q = cv.getContext('2d'); q.setTransform(SC, 0, 0, -SC, -cx * CS * SC, (cy + 1) * CS * SC); A._cityMiss = false; zCityPaint(A, q, cx * CS, cy * CS, (cx + 1) * CS, (cy + 1) * CS); e = { cv, miss: A._cityMiss, at: A._ccTick }; cc.set(key, e); } }
+    if (!e || (e.miss && A._ccTick - e.at > 30)) { if (built >= 1 && e) { /* keep the old one this frame */ } else { built++; const cv = (e && e.cv) || document.createElement('canvas'); cv.width = cv.height = Math.round(CS * SC); const q = cv.getContext('2d'); q.setTransform(SC, 0, 0, -SC, -cx * CS * SC, (cy + 1) * CS * SC); A._cityMiss = false; zCityPaint(A, q, cx * CS, cy * CS, (cx + 1) * CS, (cy + 1) * CS); e = { cv, miss: A._cityMiss, at: A._ccTick }; cc.set(key, e); } }
     if (!e) continue; e.used = A._ccTick; g.save(); g.translate(cx * CS, (cy + 1) * CS); g.scale(1 / SC, -1 / SC); g.drawImage(e.cv, 0, 0); g.restore(); }
   if (cc.size > 24) { const L = [...cc.entries()].sort((a, b) => a[1].used - b[1].used); for (let k = 0; k < cc.size - 24; k++) cc.delete(L[k][0]); } }
 function zCityProps(A, g, R) { }
@@ -43363,7 +43372,9 @@ function zPanel(A, toggle) {
   const cost = (gg, hh) => (gg ? gg : '') + (hh ? (gg ? '+' : '') + hh + '🎖️' : '') || 'gratis';
   let note = '';
   if (!Z && _zTab === 0) { const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - me.x, q.y - me.y) < 260); if (f) add({ img: 'zi_smallfac' }, 'Capturar fábrica pequeña', '5 s quieto · +2 de oro por segundo', '5 s', 'cap');
-    for (const k of ZB_BUILD) { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1]; add(B, B.n, rq ? '🔒 Investiga ' + ZR[B.req[0]].n : B.d, cost(B.g, B.h), 'build:' + k, rq || g < B.g || h < (B.h || 0)); }
+    for (const k of ZB_BUILD) { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1], nopw = B.pw && zPowerFree(A, id) < B.pw, max4 = k === 'turret' && A.blds.filter(b => b.owner === id && ZB[b.k].pw).length >= 4;
+      const why = rq ? (k === 'core' ? 'Primero construye un Centro de investigación y ahí investiga ' : 'Primero investiga ') + ZR[B.req[0]].n + (B.req[0] === 'attach' || B.req[0] === 'power' ? ' (en el Centro de investigación)' : '') : nopw ? 'Necesitas energía: construye primero un Núcleo de energía' : max4 ? 'Máximo 4 torretas' : g < B.g ? 'Te falta oro (' + B.g + ')' : h < (B.h || 0) ? 'Te falta honor' : '';
+      const o = add(B, B.n, why ? '🔒 ' + why : B.d, cost(B.g, B.h), 'build:' + k, !!why); L[L.length - 1].why = why; }
   }
   if (!Z && _zTab === 1) { if (!near) note = 'Acércate a un edificio tuyo (o al Centro, Oficina o Almacén de un compañero).'; else { const B = ZB[near.k], own = near.owner === id;
     note = (own ? '' : 'De ' + zEsc(W.players[near.owner].name) + ' · ') + B.n + ' ❤️ ' + Math.ceil(near.hp) + '/' + near.max + (near.bt ? ' · 🔨 construyendo' : '');
@@ -43397,7 +43408,7 @@ function zPanel(A, toggle) {
     if (!e.dis && e.act === 'demomode') { pn.classList.add('hidden'); zDemoMode(A, true); return; }
     if (!e.dis && e.act && /^build:/.test(e.act)) { pn.classList.add('hidden'); zPlaceMode(A, e.act.split(':')[1]); return; } /* first a see-through building you place where you want */
     if (!e.dis && e.act && /^cap/.test(e.act)) { A.cmd(W.local, e.act); zBought(b, W); pn.classList.add('hidden'); return; } /* building or capturing: the menu closes so you can watch it */
-    if (!e.dis && e.act) { A.cmd(W.local, e.act); if (/^(build|buy|res|up|xg|xh|aura)/.test(e.act)) zBought(b, W); if (/^demolish/.test(e.act)) _zInfo = '💥 Demolido'; } else if (e.dis) _zInfo += '<br><span style="color:#ff9a7a">No puedes todavía</span>';
+    if (!e.dis && e.act) { A.cmd(W.local, e.act); if (/^(build|buy|res|up|xg|xh|aura)/.test(e.act)) zBought(b, W); if (/^demolish/.test(e.act)) _zInfo = '💥 Demolido'; } else if (e.dis) { _zInfo += '<br><span style="color:#ff5a5a;font-weight:900">❌ No puedes construir' + (e.why ? ': ' + zEsc(e.why) : ' todavía') + '</span>'; if (e.why) A.say('❌ ' + e.why, 'ffff5a5a'); }
     pn._k = null; setTimeout(() => zPanel(A, false), 80); }));
 }
 
