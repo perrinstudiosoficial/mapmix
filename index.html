@@ -516,6 +516,7 @@ body.tcine #hud > *:not(#sprayWrap):not(#emoteWrap), body.tcine #stickBase{opaci
 #online .mchat .mlog{height:84px!important;min-height:0}
 #online .row2{margin:6px 0}#online .lbl{margin:4px 0 2px}
 .icimg{width:100%;height:100%;max-width:56px;max-height:56px;object-fit:contain;border-radius:50%;vertical-align:middle;display:inline-block}span>.icimg{width:1.6em;height:1.6em}.aitem span>.icimg,.ashop span>.icimg,.asic>.icimg,.zpg span>.icimg{width:100%;height:100%;max-width:none;max-height:none}
+#tDlg{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:60;background:rgba(14,18,30,.95);border:2px solid #f4c542;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:220px;max-width:88vw;text-align:center;color:#fff;font:600 15px system-ui}#tDlg .tdq{margin-bottom:4px}#tDlg button{font:700 15px system-ui;padding:10px;border-radius:10px;border:0;background:#2d6cdf;color:#fff}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -38060,7 +38061,7 @@ function makeNatives(W) {
     GetTriggerUnit: () => C().unit || null, GetDyingUnit: () => C().unit || null, GetKillingUnit: () => C().killer || null,
     GetTriggerPlayer: () => C().player || (C().unit ? C().unit.owner : null),
     GetEventPlayerChatString: () => C().chat || '', GetEventPlayerChatStringMatched: () => C().chatMatched || '',
-    GetSpellAbilityId: () => C().spell || 0, GetSpellAbilityUnit: () => C().unit || null,
+    GetSpellAbilityId: () => C().spell || 0, GetSpellTargetUnit: () => C().target || null, GetSpellAbilityUnit: () => C().unit || null,
     GetManipulatedItem: () => C().item || null, GetItemTypeId: i => i ? i.typeId : 0,
     GetEnumUnit: () => enumTop('unit'), GetEnumPlayer: () => enumTop('player'), GetFilterUnit: () => W.filterStack[W.filterStack.length - 1] || null,
     GetFilterDestructable: () => W.filterStack[W.filterStack.length - 1] || null, GetEnumDestructable: () => enumTop('dest'),
@@ -38089,10 +38090,11 @@ function makeNatives(W) {
       if (b) { if (G[i]) { u._glideSaved = true; G[i] = false; } } // freeze the glide while paused (stage change / cannon)...
       else if (u._glideSaved) { u._glideSaved = false; if (u.alive) G[i] = true; } }, // ...and resume it afterwards
     ShowUnitHide: u => { if (u) u.hidden = true; }, ShowUnitShow: u => { if (u) u.hidden = false; },
-    SetUnitMoveSpeed: (u, s) => { if (u) u.speed = Math.max(0, Math.min(522, s)); },
+    SetUnitMoveSpeed: (u, s) => { if (u) u.speed = Math.max(W.profile.id === 'tonto4' ? 150 : 0, Math.min(522, s)); }, // map 4's windmills: Warcraft never goes under its minimum speed
+    OffsetLocation: (l, dx, dy) => loc((l ? l.x : 0) + dx, (l ? l.y : 0) + dy),
     GetUnitDefaultMoveSpeed: u => u ? u.defSpeed : 0, GetUnitMoveSpeed: u => u ? u.speed : 0,
     SetUnitTimeScalePercent: (u, p) => { if (u) u.timeScale = p / 100; },
-    SetUnitInvulnerable: (u, b) => { if (u) u.inv = b ? true : !!u.t.inv; },
+    SetUnitInvulnerable: (u, b) => { if (u) u.inv = !!b; },
     SelectUnitForPlayerSingle: (u, p) => { if (u && p === W.local) W.emit('select', u); },
     SuspendHeroXPBJ: () => {},
     // ---- groups & forces ----
@@ -38207,7 +38209,7 @@ function makeNatives(W) {
     ForceRemovePlayerSimple: (p, f) => { if (f) f.p = f.p.filter(q => q !== p); },
     IsPlayerInForce: (p, f) => !!(f && f.p.includes(p)),
     CountPlayersInForceBJ: f => f ? f.p.length : 0,
-    RectContainsUnit: (r, u) => !!(r && u && u.x >= r.x0 && u.x <= r.x1 && u.y >= r.y0 && u.y <= r.y1),
+    RectContainsUnit: (r, u) => !!(r && u && !u.removed && (u.alive || W.time - (u.deathTime || 0) < 30) && u.x >= r.x0 && u.x <= r.x1 && u.y >= r.y0 && u.y <= r.y1), // a corpse rots away after a while
     PauseAllUnitsBJ: b => { for (const u of W.units) if (!u.removed) u.paused = b; },
     ExplodeUnitBJ: u => { if (u) { W.killUnit(u); if (!u.hero) W.removeUnit(u); } },
     CreateItem: (id, x, y) => null,
@@ -43627,7 +43629,7 @@ function tontoUnitTypes(md) {
     const t = { code: id, base, speed: B.spd, r: B.r, hp: B.hp, dmg: B.dmg || 0, cd: B.cd || 1.5, rng: B.rng || 100, em: B.em, bld: !!B.bld, shop: !!B.shop, ranged: !!B.ranged, na: !!B.na, wander: !!B.wander, scale: 1, abil: '' };
     if (m) {
       if (m.umvs !== undefined) t.speed = m.umvs;
-      if (m.uhpm !== undefined) t.hp = m.uhpm;
+      if (m.uhpm !== undefined) t.hp = m.uhpm; if (m.udef !== undefined) t.armor = m.udef;
       if (m.ua1b !== undefined) t.dmg = m.ua1b + (m.ua1d || 0) * ((m.ua1s || 1) + 1) / 2;
       if (m.ua1c !== undefined) t.cd = m.ua1c;
       if (m.ua1r !== undefined) t.rng = Math.max(t.rng, m.ua1r);
@@ -43761,6 +43763,9 @@ function tontoNatives(W, N) {
     GetOwningPlayer: u => tontoOwner(u),
     GetUnitsOfPlayerAndTypeId: (p, id) => grp(W.units.filter(u => !u.removed && tontoOwner(u) === p && u.typeId === id)),
     GetUnitsInRectAll: r => { const g = grp(W.units.filter(u => !u.removed && !u.hidden && !u.t.aloc && u.x >= r.x0 && u.x <= r.x1 && u.y >= r.y0 && u.y <= r.y1)); g.srcRect = r; return g; },
+    String2OrderIdBJ: s => ({ unload: 852048, load: 852046, move: 851986, attack: 851983, stop: 851972, smart: 851971 })[s] || 0, GetIssuedOrderIdBJ: () => (W.cur || {}).orderId || 0, GetOrderedUnit: () => (W.cur || {}).unit || null,
+    UNIT_TYPE_HERO: 'hero', UNIT_TYPE_MECHANICAL: 'mech', UNIT_TYPE_STRUCTURE: 'bld', UNIT_TYPE_FLYING: 'fly', UNIT_TYPE_GROUND: 'ground',
+    IsUnitType: (u, ty) => { if (!u) return false; if (ty === 'hero') return !!u.hero; if (ty === 'mech') return /^(hmtt|hmtm|hctw|hrtt|ocat|ebal|umtw|nmrc)$/.test(u.t.base || ''); if (ty === 'bld') return !!u.t.bld; if (ty === 'fly') return !!u.fly; if (ty === 'ground') return !u.fly; return false; },
     SetUnitOwner: (u, p, col) => { if (!u || !p) return; if (u.hero) { u.ctl = p === u.owner ? null : p; if (u.ctl) { u.order = null; u.path = null; u.atk = null; } } else { u.owner = p; u.atk = null; } },
     SetUnitColor: (u, c) => { if (u) u.color = c; }, SetUnitVertexColorBJ: (u, r, g, b, tr) => { if (u) u.tint = [r, g, b, tr]; },
     SetUnitAnimation: (u, a) => { if (u) { u.anim = a; u.animT = W.time; } },
@@ -43771,11 +43776,13 @@ function tontoNatives(W, N) {
     IsUnitHidden: u => !!(u && u.hidden),
     IssueTargetOrderBJ: (u, ord, t) => tontoOrder(W, u, ord, t),
     IssueTargetOrder: (u, ord, t) => tontoOrder(W, u, ord, t),
-    IssueImmediateOrderBJ: (u, s) => { if (!u) return; if (s === 'stop' || s === 'holdposition') { W.issueImmediate(u, 851972); u.atk = null; u.sd = null; } },
-    IssuePointOrderLocBJ: (u, s, l) => { if (u) { u.atk = null; u.sd = null; } if (s === 'attack' && u && l) { u.amove = true; return W.issueOrder(u, 851986, l.x, l.y); } return N.IssuePointOrderLoc(u, s, l); },
+    IssueImmediateOrderBJ: (u, s) => { if (!u) return; if (s === 'stop' || s === 'holdposition') { W.issueImmediate(u, 851972); u.atk = null; u.sd = null; u.agT = null; } },
+    IssuePointOrderLocBJ: (u, s, l) => { if (u && s === 'breathoffire' && W.profile.id === 'tonto4' && ccstr(u.typeId) === 'n000') { /* "¡Esto es Esparta!": the shout kicks the messenger into the pit */ const hh = W.units.filter(v => v.hero && v.alive).sort((a, b) => Math.hypot(a.x - u.x, a.y - u.y) - Math.hypot(b.x - u.x, b.y - u.y))[0]; let dx = 0, dy = 1; if (hh) { const d = Math.hypot(u.x - hh.x, u.y - hh.y); if (d > 20 && u.y - hh.y > -10) { dx = (u.x - hh.x) / d; dy = (u.y - hh.y) / d; } } u.knock = { vx: dx * 1100, vy: dy * 1100, until: W.time + 0.75 }; u.order = null; u.path = null; u.atk = null; return true; }
+      if (u && l && s === 'attackground') { u.agT = { x: l.x, y: l.y, until: W.time + 12 }; return true; } /* a tower shooting at a spot (map 4's water tower puts the fires out) */ if (u) { u.atk = null; u.sd = null; u.agT = null; if (l && (s === 'attack' || s === 'move' || s === 'patrol')) u.goTo = { x: l.x, y: l.y }; } if (s === 'attack' && u && l) { u.amove = true; return W.issueOrder(u, 851986, l.x, l.y); } return N.IssuePointOrderLoc(u, s, l); },
     ExplodeUnitBJ: u => { if (!u || !u.alive) return; const e = W.addEffect(u.x, u.y, 'gib'); e.dur = 1; W.killUnit(u); if (!u.hero) W.removeUnit(u); },
     KillUnit: u => { if (u && u.alive) { W.killUnit(u); } },
     RemoveUnit: u => { if (u && u.hero) S.heroGone = true; W.removeUnit(u); },
+    SetUnitLifePercentBJ: (u, pc) => { if (!u || !u.alive) return; u.life = (u.maxLife || 100) * pc / 100; if (u.life <= 0.405) W.killUnit(u, null); },
     UnitAddAbilityBJ: (ab, u) => { if (u) (u.abilLv = u.abilLv || {})[typeof ab === 'number' ? ccstr(ab) : ab] = 1; }, UnitRemoveAbilityBJ: (ab, u) => { if (u && u.abilLv) delete u.abilLv[typeof ab === 'number' ? ccstr(ab) : ab]; },
     GetUnitAbilityLevelSwapped: (ab, u) => u && u.abilLv ? (u.abilLv[typeof ab === 'number' ? ccstr(ab) : ab] || 0) : 0,
     // groups
@@ -43837,8 +43844,21 @@ function tontoNatives(W, N) {
     CreateTextTagUnitBJ: (s, u, z, size, r, g, b, tr) => N.CreateTextTagLocBJ(s, loc(u ? u.x : 0, u ? u.y + 60 : 0), z, size, r, g, b, tr),
     SetTextTagVelocityBJ: (tg, sp, ang) => { if (tg) { tg.vy = sp * Math.sin(ang * Math.PI / 180); tg.vx = sp * Math.cos(ang * Math.PI / 180); } },
     SetTextTagLifespanBJ: (tg, t) => { if (tg) tg.life = t; }, SetTextTagFadepointBJ: () => {}, SetTextTagPermanentBJ: (tg, b) => { if (tg && b) tg.life = null; },
-    DialogCreate: () => ({ kind: 'dialog', btns: [] }), DialogAddButtonBJ: (d, txt) => { if (d) d.btns.push(tontoClean(txt)); return d; }, DialogDisplayBJ: (on, d, p) => { if (on && d && p === W.local && d.btns.length) { W.texts.push({ msg: d.btns.join(' · '), t: W.time }); W.emit('text', d.btns.join(' · ')); } },
+    DialogCreate: () => ({ kind: 'dialog', btns: [], msg: '', trigs: [] }), DialogSetMessageBJ: (d, m) => { if (d) d.msg = tontoClean(str(m)); }, DialogClear: d => { if (d) d.btns = []; },
+    DialogAddButtonBJ: (d, txt) => { if (!d) return null; const b = { kind: 'button', text: tontoClean(str(txt)), d }; d.btns.push(b); N.bj_lastCreatedButton = b; return b; }, GetLastCreatedButtonBJ: () => N.bj_lastCreatedButton || null,
+    /* a question with buttons: the player taps one (bots pick the first) and the map's dialog triggers run */
+    DialogDisplayBJ: (on, d, p) => { if (!d || !p) return; if (!on) { if (S.dialogs) S.dialogs = S.dialogs.filter(x => !(x.d === d && x.p === p)); W.emit('dialog', null); return; } if (!d.btns.length) return; (S.dialogs = S.dialogs || []).push({ d, p, t: W.time }); if (p === W.local) W.emit('dialog', { msg: d.msg, btns: d.btns.map(b => b.text) }); else if (p.ai) W.after ? W.after(1.5, () => tontoDialogClick(W, p, 0)) : (S.botDlg = S.botDlg || []).push({ p, at: W.time + 1.5 }); },
+    GetClickedButtonBJ: () => C().clicked || null, GetClickedDialogBJ: () => C().dialog || null,
     GroupTargetOrderBJ: (g, ord, t) => { if (g) for (const u of g.u) tontoOrder(W, u, ord, t); },
+    DistanceBetweenPoints: (a, b) => a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0, SinBJ: d => Math.sin(d * Math.PI / 180), CosBJ: d => Math.cos(d * Math.PI / 180),
+    GetLastReplacedUnitBJ: () => N.bj_lastReplacedUnit || null, QueueUnitAnimationBJ: () => {}, SetUnitPathing: () => {}, TerrainDeformationRippleBJ: () => null,
+    GetUnitsInRangeOfLocAll: (r, l) => grp(l ? W.units.filter(u => !u.removed && u.alive && Math.hypot(u.x - l.x, u.y - l.y) <= r) : []),
+    GroupAddUnitSimple: (u, g) => { if (u && g && !g.u.includes(u)) g.u.push(u); }, GroupRemoveUnitSimple: (u, g) => { if (g) g.u = g.u.filter(x => x !== u); }, IsUnitInGroup: (u, g) => !!(g && g.u.includes(u)),
+    EnumDestructablesInCircleBJ: (r, l, fn) => { if (!l) return; for (const d of S.dests.slice()) { if (d.removed || Math.hypot(d.x - l.x, d.y - l.y) > r) continue; W.enumStack.push({ kind: 'dest', x: d }); W.runSync(fn); W.enumStack.pop(); } },
+    UnitApplyTimedLifeBJ: (dur, buff, u) => { if (u) u.dieAt = W.time + dur; },
+    UnitDamageTargetBJ: (src, t, amt) => { if (t && t.kind === 'unit') tontoDamage(W, null, t, amt); else if (t) tontoHit(W, src, t, amt); return true; },
+    UnitDamagePointLoc: (src, delay, r, l, amt) => { if (!l) return; for (const v of W.units.slice()) if (v.alive && !v.removed && v !== src && Math.hypot(v.x - l.x, v.y - l.y) <= r) tontoDamage(W, null, v, amt); return true; },
+    UnitHasItemOfTypeBJ: (u, id) => !!(u && (u.inv6 || []).some(i => i && i.typeId === id)),
     ReplaceUnitBJ: (u, id, method) => tontoReplace(W, u, id),
     ResetUnitAnimation: u => { if (u) u.anim = null; }, SetCameraBoundsToRectForPlayerBJ: () => {},
     SetItemPositionLoc: (it, l) => { if (!it) return; if (it.holder) tontoDrop(W, it.holder, it, l.x, l.y); else { it.x = l.x; it.y = l.y; } },
@@ -43846,7 +43866,7 @@ function tontoNatives(W, N) {
     TransmissionFromUnitWithNameBJ: (f, u, name, snd, text, tt, dur, wait) => { if (f && f.p.includes(W.local)) { const m = tontoClean(str(name)) + ': ' + tontoClean(str(text)); W.texts.push({ msg: m, t: W.time }); W.emit('text', m); } },
     VolumeGroupSetVolumeBJ: () => {},
     GetUnitState: (u, st) => N.GetUnitStateSwap(st, u), SetHeroLevel: () => {}, SetDestructableLifePercentBJ: (d, pc) => { if (d) { if (pc <= 0) tontoKillDest(W, d, null); else d.life = (d.maxLife || d.life || 1) * pc / 100; } },
-    TriggerRegisterDialogEventBJ: () => {}, TriggerRegisterPlayerKeyEventBJ: (t, p, ty, key) => { (S.keyRegs || (S.keyRegs = [])).push({ trig: t, p, key }); },
+    TriggerRegisterDialogEventBJ: (t, d) => { if (t && d) d.trigs.push(t); }, TriggerRegisterPlayerKeyEventBJ: (t, p, ty, key) => { (S.keyRegs || (S.keyRegs = [])).push({ trig: t, p, key }); },
     TriggerRegisterUnitLifeEvent: () => {},
     bj_CINEFADETYPE_FADEOUTIN: 2, bj_KEYEVENTKEY_LEFT: 0, bj_KEYEVENTKEY_RIGHT: 1, bj_KEYEVENTKEY_DOWN: 2, bj_KEYEVENTKEY_UP: 3, bj_KEYEVENTTYPE_DEPRESS: 0, bj_TIMETYPE_ADD: 0, bj_TIMETYPE_SET: 1, bj_UNIT_STATE_METHOD_ABSOLUTE: 0, bj_UNIT_STATE_METHOD_RELATIVE: 1, bj_UNIT_STATE_METHOD_MAXIMUM: 3,
     CameraSetEQNoiseForPlayer: (p, mag) => { if (p === W.local) W.camera.shakeUntil = W.time + 1.5; }, CameraClearNoiseForPlayer: () => {},
@@ -43893,6 +43913,9 @@ function tontoOrder(W, u, ord, t) {
   if (!u || !u.alive || !t) return false;
   if (ord === 'attack' || ord === 'smart') { u.atk = t; u.order = null; u.path = null; u.forced = true; return true; }
   if (ord === 'selfdestruct') { u.sd = t; u.atk = null; return true; }
+  if (ord === 'devour') { if (t.kind !== 'unit' || t.inv) return false; u.devour = { t, until: W.time + 6 }; u.atk = null; return true; } /* map 4's kodos swallow whoever walks into their lane */
+  if (ord === 'load') { u.loadT = t; return true; } /* a car picks up a unit (it drives to it, then the unit gets in) */
+  if (ord === 'unload') { tontoUnload(W, u, t); W.fireUnitEvent('EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER', { unit: u, player: tontoOwner(u), target: t, orderId: W.N.String2OrderIdBJ ? W.N.String2OrderIdBJ('unload') : 852048 }); return true; }
   if (ord === 'impale') { if (!u.impale || u.castUntil > W.time || u.impCd > W.time) return false; u.castUntil = W.time + 0.5; u.impCd = W.time + 6; /* the cows need a moment to charge again */ u.facing = Math.atan2(t.y - u.y, t.x - u.x) * 180 / Math.PI;
     W.tonto.waves.push({ src: u, x0: u.x, y0: u.y, dx: Math.cos(u.facing * Math.PI / 180), dy: Math.sin(u.facing * Math.PI / 180), t0: W.time + 0.5, len: Math.min(u.impale.range, Math.hypot(t.x - u.x, t.y - u.y) + 150), w: u.impale.w, dmg: u.impale.dmg, hit: new Set() }); return true; }
   return false;
@@ -43920,14 +43943,31 @@ function tontoSetup(W, opts) {
     const k = u.killer; if (k && k.hero && !u.hero && tontoOwner(u) && tontoOwner(u).id === 12) { const m = W.md.units[u.t.code] || {}; const g = m.ubba != null ? (m.ubba + (m.ubdi || 0) * ((m.ubsi || 1) + 1) / 2) : Math.round(6 + u.maxLife / 60); if (g > 0) { tontoOwner(k).gold += Math.round(g); W.tonto.dmgTxt.push({ x: u.x, y: u.y + 40, v: '+' + Math.round(g) + '💰', t0: W.time, gold: true }); } } });
   // wrap the player commands: no control while the map holds your hero (sheep pen), and a joystick move cancels an attack
   const mv = W.cmdMove.bind(W); W.cmdMove = (p, x, y) => { const h = W.heroOf(p); if (!h || h.ctl || W.tonto.cine) return; h.atk = null; h.pick = null; mv(p, x, y); };
-  W.heroOf = p => W.units.find(u => u.hero && u.owner === p && !u.removed);
+  W.heroOf = p => { const h = W.units.find(u => u.hero && u.owner === p && !u.removed); return h && h.inCar && h.inCar.alive && !h.inCar.removed ? h.inCar : h; }; /* while driving, you move the car */
+  W.realHeroOf = p => W.units.find(u => u.hero && u.owner === p && !u.removed);
   if (typeof tontoBotsSetup === 'function') tontoBotsSetup(W, opts);
 }
 
+
+/* ---------- vehicles (map 4): get in, drive, get out ---------- */
+function tontoBoard(W, car, t) { car.loadT = null; if (!t || !t.alive || t.inCar) return; t.inCar = car; car.cargo = (car.cargo || []).concat([t]); t.hidden = true; t.order = null; t.path = null; t.atk = null; t.x = car.x; t.y = car.y; if (t.hero) { car.drv = t.owner; W.emit('sound', { name: 'pickup' }); } }
+function tontoUnload(W, car, t) { const L = car.cargo || []; const out = t ? L.filter(x => x === t) : L.slice(); for (const v of out) { v.inCar = null; v.hidden = false; let x = car.x, y = car.y; for (const [ox, oy] of [[-110, 0], [110, 0], [0, -110], [0, 110], [-90, -90], [90, 90]]) if (W.walkable(car.x + ox, car.y + oy)) { x = car.x + ox; y = car.y + oy; break; } v.x = x; v.y = y; v.order = null; v.path = null; } car.cargo = L.filter(x => !out.includes(x)); if (!car.cargo.some(x => x.hero)) car.drv = null; car.order = null; car.path = null; }
+function tontoCarsTick(W) { for (const car of W.units) { if (car.removed) continue;
+    if (car.loadT) { const t = car.loadT; if (!car.alive || !t.alive || t.removed) { car.loadT = null; continue; } const d = Math.hypot(t.x - car.x, t.y - car.y); if (d < 170) tontoBoard(W, car, t); else if (!car.order || (W.time - (car._lp || 0)) > 0.5) { car._lp = W.time; W.issueOrder(car, 851986, t.x, t.y); } }
+    if (car.cargo && car.cargo.length) { if (!car.alive) { tontoUnload(W, car); continue; } for (const v of car.cargo) { v.x = car.x; v.y = car.y; } } } }
 /* ---------- every tick ---------- */
 function tontoTick(W, dt) {
   { const pc = W.camera && W.camera.pan, lh = W.heroOf(W.local); if (pc && pc.cine && !W.tonto.cine && lh && lh.alive && Math.hypot(lh.x - pc.x, lh.y - pc.y) > 500) { W.camera.pan = null; W.tonto.camZoom = 1; } } /* a camera left by a trigger: back on your hero as soon as you walk away */
-  const S = W.tonto, now = W.time;
+  const S = W.tonto, now = W.time; tontoCarsTick(W);
+  if (S.botDlg && S.botDlg.length) { const due = S.botDlg.filter(x => now >= x.at); S.botDlg = S.botDlg.filter(x => now < x.at); for (const x of due) tontoDialogClick(W, x.p, 0); }
+  for (const u of W.units) if (u.dieAt && now >= u.dieAt && u.alive) { u.dieAt = 0; W.killUnit(u, null); }
+  for (const u of W.units) { const D = u.devour; if (!D) continue; const t = D.t; if (!u.alive || !t.alive || t.removed || t.inv || now > D.until) { u.devour = null; continue; }
+    if (Math.hypot(t.x - u.x, t.y - u.y) < 230 + (t.t.r || 0)) { u.devour = null; u.order = null; u.path = null; u.facing = Math.atan2(t.y - u.y, t.x - u.x) * 180 / Math.PI; u.swingT = now; t.hidden = true; W.killUnit(t, u); W.emit('sound', { name: 'roar' }); continue; }
+    if (!u.order || now - (u._dv || 0) > 0.4) { u._dv = now; W.issueOrder(u, 851986, t.x, t.y); } }
+  for (const u of W.units) { const K = u.knock; if (!K) continue; if (now > K.until || !u.alive) { u.knock = null; continue; } u.x += K.vx * dt; u.y += K.vy * dt; }
+  for (const u of W.units) { const C = u.castAt; if (!C) continue; if (!u.alive || now > C.until || !C.t.alive) { u.castAt = null; continue; } if (Math.hypot(C.t.x - u.x, C.t.y - u.y) <= C.rng) { u.castAt = null; u.order = null; u.path = null; tontoGenCast(W, tontoOwner(u), u, C.a); } else if (!u.order) W.issueOrder(u, 851986, C.t.x, C.t.y); }
+  for (const u of W.units) { const A = u.agT; if (!A || !u.alive || u.removed) continue; if (now > A.until) { u.agT = null; continue; } if (now < (u.agNext || 0)) continue; u.agNext = now + Math.max(0.8, u.t.cd || 1.5);
+    S.shots.push({ x0: u.x, y0: u.y, t: { x: A.x, y: A.y, alive: true, kind: 'pt' }, t0: now, dur: Math.max(0.2, Math.hypot(A.x - u.x, A.y - u.y) / 900), src: u, dmg: 0, splashAt: { x: A.x, y: A.y, r: 260, dmg: Math.max(60, u.t.dmg || 60) } }); }
   // heroes walking to an item they tapped
   for (const u of W.units) {
     if (!u.alive || u.removed) continue;
@@ -43946,16 +43986,17 @@ function tontoTick(W, dt) {
       if (!u.order || (now - (u._rp || 0)) > 0.4) { u._rp = now; W.issueOrder(u, 851986, t.x, t.y); } continue; }
     if (u.castUntil > now) continue;
     // auto attack: hostile players and creeps look for heroes around
-    if (!u.hero && !u.t.na && !u.t.noAcq && !u.atk && tontoHostile(u.owner) && !(S.sleepy && u.owner.id === 12)) { if ((u._acq = (u._acq || 0) - dt) <= 0) { u._acq = 0.3; const acq = u.t.bld ? u.t.rng + 70 : (u.t.acq || 520); let best = null, bd = acq;
+    if (!u.hero && !u.t.na && !u.t.noAcq && !u.atk && (tontoHostile(u.owner) || (u.owner.id === 8 && W.profile.id === 'tonto4')) && !(S.sleepy && u.owner.id === 12)) { if ((u._acq = (u._acq || 0) - dt) <= 0) { u._acq = 0.3; const acq = u.t.bld ? u.t.rng + 70 : (u.t.acq || 520); let best = null, bd = acq;
         for (const h of W.units) { if (!h.hero || !h.alive || h.removed || h.hidden || h.inv || h.invisUntil > now || tontoAllied(W, tontoOwner(h), u.owner)) continue; const d = Math.hypot(h.x - u.x, h.y - u.y) - h.t.r; if (d < bd) { bd = d; best = h; } }
+        if (!best && W.profile.id === 'tonto4' && (u.owner.id === 8 || u.owner.id === 11)) for (const v of W.units) { /* map 4: the Spartans and the Persians fight each other */ if (v.hero || !v.alive || v.removed || v.hidden || v.inv || v.t.bld || !(v.owner.id + u.owner.id === 19 || (u.owner.id === 8 && v.owner.id === 12))) continue; const d = Math.hypot(v.x - u.x, v.y - u.y) - v.t.r; if (d < bd) { bd = d; best = v; } }
         if (best) { if (u.selfd && u.t.acq) u.sd = best; else u.atk = best; } } }
     const t = u.atk; if (!t) continue;
     const dead = t.kind === 'dest' ? !t.alive || t.removed : !t.alive || t.removed || t.hidden;
     if (u.hero && u.invisUntil > now) u.invisUntil = 0; // attacking shows you again
     if (dead || (t.kind !== 'dest' && ((t.inv && !u.forced) || (t.invisUntil > now && !u.hero)))) { u.atk = null; u.forced = false; if (u.order && u.order.chase) { u.order = null; u.path = null; } continue; }
     const tr = t.kind === 'dest' ? t.r : t.t.r, d = Math.hypot(t.x - u.x, t.y - u.y) - tr - u.t.r * 0.5, rng = u.t.rng;
-    if (!u.hero && !u.forced && !u.t.bld && (d > 900 || (u.home && Math.hypot(u.x - u.home[0], u.y - u.home[1]) > 800))) { u.atk = null; if (u.home) { u.order = { type: 'move', x: u.home[0], y: u.home[1] }; u.path = null; } continue; } // creeps give up a long chase and walk back to their spot
-    if (d > rng) { if (u.t.bld || u.speed <= 0) { if (!u.forced) u.atk = null; continue; } if (!u.order || !u.order.chase || now - (u._rp || 0) > 0.35) { u._rp = now; u.order = { type: 'move', x: t.x, y: t.y, chase: true }; u.path = null; } continue; }
+    if (!u.hero && !u.forced && !u.t.bld && !(W.profile.id === 'tonto4' && (u.owner.id === 8 || u.owner.id === 11) && t.kind === 'unit' && !t.hero) && (d > 900 || (u.home && Math.hypot(u.x - u.home[0], u.y - u.home[1]) > 800))) { u.atk = null; const G = u.goTo || (u.home && { x: u.home[0], y: u.home[1] }); /* back to where the map sent it, or to its spot */ if (G) { u.order = { type: 'move', x: G.x, y: G.y }; u.path = null; } continue; } // creeps give up a long chase and walk back to their spot
+    if (d > rng) { if (u.t.bld || u.speed <= 0) { if (!u.forced) u.atk = null; continue; } if (!u.order || !u.order.chase || now - (u._rp || 0) > 0.35) { u._rp = now; let ax = t.x, ay = t.y; if (t.kind === 'dest' && W.profile.id === 'tonto4' && !W.walkable(ax, ay)) { /* walk to the free spot on our side of it, not to some pocket behind it */ const L = Math.hypot(u.x - t.x, u.y - t.y) || 1; for (let k = 16; k < L; k += 16) { const px = t.x + (u.x - t.x) * k / L, py = t.y + (u.y - t.y) * k / L; if (W.walkable(px, py)) { ax = px; ay = py; break; } } } u.order = { type: 'move', x: ax, y: ay, chase: true }; u.path = null; } continue; }
     if (u.order && u.order.chase) { u.order = null; u.path = null; }
     u.facing = Math.atan2(t.y - u.y, t.x - u.x) * 180 / Math.PI;
     if ((u._acd || 0) > now) continue;
@@ -43970,13 +44011,13 @@ function tontoTick(W, dt) {
     if (u.hero) W.emit('sound', { name: t.kind === 'dest' ? 'D' : 'slice' });
   }
   // shots in flight
-  for (const s of S.shots) if (!s.done && now >= s.t0 + s.dur) { s.done = true; if (s.bolt && s.t.kind === 'dest') { if (s.t.alive && !s.t.inv) { s.t.life -= s.dmg; if (s.t.life <= 0) tontoKillDest(W, s.t, s.src); } } else tontoHit(W, s.src, s.t, s.dmg); }
+  for (const s of S.shots) if (!s.done && now >= s.t0 + s.dur) { s.done = true; if (s.splashAt) { const P = s.splashAt; for (const v of W.units.slice()) if (v.alive && !v.removed && v !== s.src && Math.hypot(v.x - P.x, v.y - P.y) < P.r) tontoHit(W, s.src, v, P.dmg); continue; } if (s.bolt && s.t.kind === 'dest') { if (s.t.alive && !s.t.inv) { s.t.life -= s.dmg; if (s.t.life <= 0) tontoKillDest(W, s.t, s.src); } } else tontoHit(W, s.src, s.t, s.dmg); }
   S.shots = S.shots.filter(s => !s.done);
   // impale waves
   for (const w of S.waves) {
     if (now < w.t0) continue; const k = (now - w.t0) * 900; if (k > w.len + 60) { w.done = true; continue; }
     if (!w.fx || now - w.fx > 0.06) { w.fx = now; const e = W.addEffect(w.x0 + w.dx * k, w.y0 + w.dy * k, 'impale'); e.dur = 0.5; }
-    for (const v of W.units) { if (!v.alive || v.removed || v.inv || v === w.src || w.hit.has(v) || tontoAllied(W, tontoOwner(v), tontoOwner(w.src)) && !v.hero) continue; if (v.owner === w.src.owner) continue;
+    for (const v of W.units) { if (!v.alive || v.removed || v.inv || v === w.src || w.hit.has(v) || tontoAllied(W, tontoOwner(v), tontoOwner(w.src)) && !v.hero) continue; if (v.owner === w.src.owner) continue; if (v.hero && W.profile.id === 'tonto4' && tontoOwner(w.src).id === 8) continue; // the friend's kamehameha doesn't hit you
       const rx = v.x - w.x0, ry = v.y - w.y0, along = rx * w.dx + ry * w.dy, side = Math.abs(rx * w.dy - ry * w.dx); if (along < 0 || along > k || side > w.w + v.t.r * 0.5) continue; w.hit.add(v); tontoDamage(W, w.src, v, w.dmg); }
   }
   S.waves = S.waves.filter(w => !w.done);
@@ -44004,12 +44045,14 @@ function tontoHit(W, u, t, dmg) {
 }
 function tontoDamage(W, src, v, dmg) {
   if (!v || !v.alive || v.removed || v.inv) return;
+  if (src && src.kind === 'unit' && v.t.armor > 0 && dmg < 9999 && W.profile.id === 'tonto4') dmg /= 1 + 0.06 * v.t.armor; // armour, like the original (the Spartans barely get scratched)
   v.life -= dmg; v.hitT = W.time; if (dmg >= 1 && dmg < 99999) W.tonto.dmgTxt.push({ x: v.x, y: v.y, v: Math.round(dmg), t0: W.time });
   if (v.life <= 0.405) W.killUnit(v, src);
 }
 
 /* ---------- commands from the player (tap / buttons) ---------- */
 function tontoCmd(W, p, cmd) {
+  if (String(cmd).startsWith('dlg:')) return tontoDialogClick(W, p, +String(cmd).slice(4));
   const h = W.heroOf(p); if (!h || !h.alive || h.ctl || W.tonto.cine) return false; const S = W.tonto;
   const [verb, a, b] = String(cmd).split(':');
   const findUnit = hd => W.units.find(u => u.handle === +hd), findDest = hd => S.dests.find(d => d.handle === +hd), findItem = hd => S.items.find(i => i.handle === +hd);
@@ -44024,7 +44067,11 @@ function tontoCmd(W, p, cmd) {
   if (verb === 'use') { const it = (h.inv6 || [])[+a]; if (!it) return false; const ab = it.it.abil;
     const bb = tontoBoltAbil(W, ab); if (bb) { const t = tontoBoltTarget(W, h); if (!t) return false; if (h.boltReady > W.time) return false; h.boltReady = W.time + (bb.cd || 1); tontoBolt(W, h, t, bb); }
     W.fireUnitEvent('EVENT_PLAYER_UNIT_USE_ITEM', { unit: h, player: p, item: it }); if (it.it.consume) tontoRemoveItem(W, it); return true; }
+  if (verb === 'cast' && a === 'getout' && h.cargo) { const hero = h.cargo.find(x => x.hero && x.owner === p); W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_EFFECT', { unit: h, player: p, spell: fourcc('Adro') }); tontoUnload(W, h, hero); return true; }
+  if (verb === 'cast' && a === 'A000car' && h.abilLv && h.abilLv.A000) { let car = null, bd = 450; for (const u of W.units) { if (!u.alive || u.removed || u.hero || !/^(hmtt|hmtm|hctw|hrtt|ocat|ebal|umtw|nmrc)$/.test(u.t.base || '')) continue; const d = Math.hypot(u.x - h.x, u.y - h.y); if (d < bd) { bd = d; car = u; } }
+    if (!car) { W.emit('text', { text: 'Acércate al auto' }); return false; } W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_CAST', { unit: h, player: p, spell: fourcc('A000'), target: car }); W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_EFFECT', { unit: h, player: p, spell: fourcc('A000'), target: car }); return true; }
   if (verb === 'cast' && a === 'A000' && h.abilLv && h.abilLv.A000) { W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_CAST', { unit: h, player: p, spell: fourcc('A000') }); W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_EFFECT', { unit: h, player: p, spell: fourcc('A000') }); W.emit('sound', { name: 'roar' }); return true; }
+  if (verb === 'cast' && h.abilLv && h.abilLv[a] && tontoGenAbil(W, a)) return tontoGenCast(W, p, h, a);
   if (verb === 'cast') { if (a === 'AOwk' && h.abilLv && h.abilLv.AOwk && W.time >= (h.wwReady || 0)) { h.wwReady = W.time + 300; h.invisUntil = W.time + 5; W.emit('sound', { name: 'invis' }); for (const u of W.units) if (u.atk === h && !u.forced) u.atk = null; return true; } return false; }
   return false;
 }
@@ -44034,14 +44081,37 @@ function tontoBolt(W, h, t, bb) { bb = bb || { dmg: 1000, stun: 3 }; W.tonto.sho
 /* an item ability that throws a storm bolt: the hammer of map 2 (A002), the beer of map 3 (based on AHtb) */
 function tontoBoltAbil(W, ab) { if (!ab) return null; for (const a of ab.split(',')) { const k = Object.keys(W.md.abilObj || {}).find(x => x.startsWith(a + '<-')); const base = k ? k.split('<-')[1] : ''; if (base === 'AHtb') { const m = W.md.abilObj[k]; const beer = /beer/i.test(m['anam@0'] || ''); return { dmg: beer ? 0 : (m['Htb1@1'] || 100), stun: m['adur@1'] || 3, beer, cd: 2 }; } if (a === 'A002' && base !== 'Asdg') return { dmg: 1000, stun: 3, cd: 1 }; } return null; }
 function tontoCanHarvest(h) { return !!(h.abilLv && (h.abilLv.Ahar || h.abilLv.A001)) || (h.inv6 || []).some(i => i && /A001/.test(i.it.abil)); }
-function tontoSkills(W, h) { const L = []; if (h.abilLv && h.abilLv.A000 && W.md.abilObj && Object.keys(W.md.abilObj).some(k => k.startsWith('A000<-Aroa'))) L.push({ id: 'cast:A000', em: '📢', name: 'Gritar', left: 0, cd: 1 }); if (h.abilLv && h.abilLv.AOwk) L.push({ id: 'cast:AOwk', em: '👻', name: 'Invisible', left: Math.max(0, (h.wwReady || 0) - W.time), cd: 300 });
+/* the map's own active abilities (jump, talk, shout, net...): a button that fires the spell events the triggers listen to */
+const TONTO_GEN = { Aens: { t: 'unit', em: '🕸️' }, Adev: { t: 'unit', em: '😋' }, AUdc: { t: 'unit', em: '🚀' }, ACct: { t: 'unit', em: '🐺' }, ANbf: { t: 'point', em: '🦘', d: 420 }, ACsh: { t: 'point', em: '💥', d: 600 }, AOsh: { t: 'point', em: '💥', d: 600 }, Aroa: { t: 'none', em: '📢' }, ACro: { t: 'none', em: '💬' } };
+const TONTO_STD = { AHtc: { em: '⚡', name: 'Trueno' }, Awrs: { em: '🦶', name: 'Pisotón' } };
+function tontoGenAbil(W, a) { if (TONTO_STD[a]) return { base: a, t: 'none', em: TONTO_STD[a].em, d: 0, name: TONTO_STD[a].name, cd: 3, range: 0 }; if (a === 'A000' || !/^A0[0-9A-Z]{2}$/.test(a)) return null; const key = Object.keys(W.md.abilObj || {}).find(x => x.startsWith(a + '<-')); if (!key) return null; const base = key.split('<-')[1], g = TONTO_GEN[base]; if (!g) return null; const m = W.md.abilObj[key];
+  return { base, t: g.t, em: g.em, d: g.d || 0, name: m['atp1@1'] || m['anam@0'] || a, cd: Math.max(1, m['acdn@1'] || 1), range: m['aran@1'] || 0 }; }
+function tontoGenCast(W, p, h, a) { const g = tontoGenAbil(W, a); h.cdA = h.cdA || {}; if (W.time < (h.cdA[a] || 0)) return false;
+  const ev = { unit: h, player: p, spell: fourcc(a) };
+  if (g.t === 'unit') { const S = W.tonto; const ok = u => u && u.alive && !u.removed && !u.hero && !u.t.aloc && !u.hidden && u !== h && !(u.cargo && u.cargo.includes(h)); let t = ok(S.sel) && Math.hypot(S.sel.x - h.x, S.sel.y - h.y) < 700 ? S.sel : null;
+    if (!t) { let bd = 600; for (const u of W.units) { if (!ok(u) || u.t.bld) continue; const d = Math.hypot(u.x - h.x, u.y - h.y); if (d < bd) { bd = d; t = u; } } }
+    if (!t) { W.emit('text', { text: 'Acércate a tu objetivo' }); return false; }
+    const rng = Math.max(150, g.range + 60); if (Math.hypot(t.x - h.x, t.y - h.y) > rng) { h.castAt = { a, t, until: W.time + 8, rng }; W.issueOrder(h, 851986, t.x, t.y); return true; }
+    ev.target = t; ev.order = { x: t.x, y: t.y }; }
+  if (g.t === 'point') { const f = (h.facing || 0) * Math.PI / 180; let x = h.x + Math.cos(f) * g.d, y = h.y + Math.sin(f) * g.d; ev.order = { x, y }; }
+  h.cdA[a] = W.time + g.cd; h.facing = ev.target ? Math.atan2(ev.target.y - h.y, ev.target.x - h.x) * 180 / Math.PI : h.facing;
+  W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_CAST', ev); W.fireUnitEvent('EVENT_PLAYER_UNIT_SPELL_EFFECT', ev); W.emit('sound', { name: g.t === 'none' ? 'roar' : 'buy' }); return true; }
+function tontoDialogClick(W, p, i) { const S = W.tonto, k = (S.dialogs || []).findIndex(x => x.p === p); if (k < 0) return false; const { d } = S.dialogs[k]; const b = d.btns[i]; if (!b) return false; S.dialogs.splice(k, 1); if (p === W.local) W.emit('dialog', null);
+  for (const t of d.trigs) W.fire(t, { player: p, clicked: b, dialog: d }); return true; }
+if (typeof window !== 'undefined') window.tontoDialogClick = tontoDialogClick;
+function tontoSkills(W, h) { const L = []; const AB = k => { const key = Object.keys(W.md.abilObj || {}).find(x => x.startsWith(k + '<-')); return key ? key.split('<-')[1] : ''; };
+  if (h.cargo && h.cargo.some(x => x.hero)) L.push({ id: 'cast:getout', em: '🚪', name: 'Bajar del auto', left: 0, cd: 1 });
+  if (h.abilLv && h.abilLv.A000 && AB('A000') === 'Aprg' && !h.inCar) L.push({ id: 'cast:A000car', em: '🚗', name: 'Subir al auto', left: 0, cd: 1 }); if (h.abilLv && h.abilLv.A000 && W.md.abilObj && Object.keys(W.md.abilObj).some(k => k.startsWith('A000<-Aroa'))) L.push({ id: 'cast:A000', em: '📢', name: 'Gritar', left: 0, cd: 1 }); if (h.abilLv && h.abilLv.AOwk) L.push({ id: 'cast:AOwk', em: '👻', name: 'Invisible', left: Math.max(0, (h.wwReady || 0) - W.time), cd: 300 });
+  for (const a of Object.keys(h.abilLv || {})) { const g = tontoGenAbil(W, a); if (g) L.push({ id: 'cast:' + a, em: g.em, name: g.name, left: Math.max(0, ((h.cdA || {})[a] || 0) - W.time), cd: g.cd }); }
   (h.inv6 || []).forEach((it, k) => { const bb = it && tontoBoltAbil(W, it.it.abil); if (bb) L.push({ id: 'use:' + k, em: bb.beer ? '🍺' : '🔨', name: bb.beer ? 'Lanzar cerveza' : 'Martillo', left: Math.max(0, (h.boltReady || 0) - W.time), cd: bb.cd }); }); return L; }
 /* a unit turned into another one (the hero into Hulk, and back): same place, same player, same bag */
 function tontoReplace(W, u, id) {
   if (!u) return null; const nu = W.createUnit(u.owner, id, u.x, u.y, u.facing); tontoInitUnit(W, nu);
   nu.ctl = u.ctl; if (u.hero) { nu.hero = true; nu.morph = !nu.t.hero; nu.avoid = u.avoid; } if (u.inv6 && nu.inv6 !== undefined) { nu.inv6 = u.inv6; for (const it of nu.inv6) if (it) it.holder = nu; } else if (u.inv6) { nu.inv6 = u.inv6; for (const it of nu.inv6) if (it) it.holder = nu; }
   nu.abilLv = u.abilLv; if (!u.alive) nu.alive = false; W.removeUnit(u); u.replacedBy = nu; W.N.bj_lastReplacedUnit = nu;
-  if (W.tonto.sel === u) W.tonto.sel = null; return nu;
+  if (W.tonto.sel === u) W.tonto.sel = null;
+  if (nu.hero && nu.alive && W.profile.id === 'tonto4' && !(nu.t.speed > 0)) W.killUnit(nu, null); /* Medusa's stare: a stone hero is out of the game */
+  return nu;
 }
 function tontoSelect(W, p, u) {
   if (p === W.local) W.tonto.sel = u;
@@ -44625,6 +44695,68 @@ function tontoBotsTick(W, dt) {
     avoidUnits: ['e000', 'n003', 'Udre', 'Nplh'], avoidR: { e000: 135, n003: 215, Udre: 170, Nplh: 200 },
     talk: { 3: 'jaja la rata', 10: 'cuidado los come-cocos', 30: 'una pizza!' } };
 })();
+/* ======================= Laberinto de Trampas 4 ======================= */
+(function () {
+  const alive = (W, code, x, y) => { const d = W.tonto.dests.find(d => d.code === code && Math.abs(d.x - x) < 70 && Math.abs(d.y - y) < 70); return !!(d && d.alive); };
+  const DG = (code, x, y) => (W, b) => { const d = W.tonto.dests.find(d => d.code === code && Math.abs(d.x - x) < 40 && Math.abs(d.y - y) < 40); if (!d || !d.alive || d.removed || d.inv) return true; const h = TB.hero(W, b); if (h.atk !== d) TB.cmd(W, b, 'atk:' + d.handle); return false; };
+  const has = (h, code) => (h.inv6 || []).some(i => i && ccstr(i.typeId) === code);
+  const ground = (W, code) => W.tonto.items.find(i => !i.removed && !i.holder && ccstr(i.typeId) === code);
+  const first = (W, b) => W.ai.bots.find(o => { const q = W.heroOf(o.p); return q && q.alive && !q.removed && o.i === b.i; }) === b;
+  const unit1 = (W, code, x, y) => TB.unitsOf(W, code).sort((a, c) => Math.hypot(a.x - x, a.y - y) - Math.hypot(c.x - x, c.y - y))[0];
+  const inR = (u, x0, y0, x1, y1) => u && u.x >= x0 && u.x <= x1 && u.y >= y0 && u.y <= y1;
+  const sapperDead = W => !TB.unitsOf(W, 'ngsp').length;
+  // Medusa: cross her corridor only while she looks away (she is not on her spot)
+  const MED = (x, y) => (W, b) => { const h = TB.hero(W, b); if (Math.hypot(h.x - x, h.y - y) < 45) { h.order = null; h.path = null; return true; } const m = TB.unitsOf(W, 'H004')[0];
+    if (!m || b.st.go) { TB.walk(W, b, x, y); return false; } const on = inR(m, -3680, 2208, -3488, 2304); if (on) b.st.seen = 1; else if (b.st.seen) { b.st.go = 1; TB.walk(W, b, x, y); } return false; };
+  const steps = [
+    DG('DTg3', -7744, 8128), GO(-7232, 8272), UNTIL(W => { const c = TB.unitsOf(W, 'h00B')[0]; return !c || inR(c, -7100, 7100, -6800, 7350); }, 40), GO(-6960, 7216, 40),
+    // one of us drives the car over the sheep-bomb; the rest wait
+    FN((W, b) => { if (sapperDead(W)) return true; const h = W.heroOf(b.p), me = W.realHeroOf(b.p), driving = !!(me && me.inCar); if (!first(W, b) && !driving) { TB.walk(W, b, -7150 - (b.p.id % 3) * 40, 7500); return false; }
+      if (driving) { TB.walk(W, b, -5664, 7104); return false; } const car = TB.unitsOf(W, 'h00B')[0]; if (!car || car.cargo && car.cargo.length) { TB.walk(W, b, -7150, 7500); return false; }
+      if (Math.hypot(car.x - h.x, car.y - h.y) > 300) { TB.walk(W, b, car.x, car.y + 120); return false; } TB.cmd(W, b, 'cast:A000car'); return false; }),
+    WAIT(9),
+    FN((W, b) => { const h = W.heroOf(b.p), me = W.realHeroOf(b.p); if (!me || !me.inCar) return true; if (Math.hypot(h.x + 6400, h.y - 7160) > 80 && !b.st.w1) { TB.walk(W, b, -6400, 7160); return false; } b.st.w1 = 1;
+      if (Math.hypot(h.x + 7250, h.y - 7120) > 80) { TB.walk(W, b, -7250, 7120); return false; } TB.cmd(W, b, 'cast:getout'); return false; }),
+    GO(-7250, 7120), GO(-7250, 6650), GO(-7490, 6200), GO(-7490, 5700), GO(-7300, 5450), TELE(-7232, 4832, h => h.y < 3000),
+    // Sparta: shout at the Persian king (only the shout! the other two powers kill you)
+    GO(-7100, 4400), GO(-5248, 4600),
+    FN((W, b) => { if (!alive(W, 'LTg1', -7040, 1024)) return true; const h = TB.hero(W, b); if (W.tonto._sparta) { TB.walk(W, b, -5248 - (b.p.id % 3) * 50, 4300); return false; }
+      if (h.abilLv && h.abilLv.A007) { if (TB.cmd(W, b, 'cast:A007')) W.tonto._sparta = W.time; return false; } if (first(W, b)) TB.walk(W, b, -5248, 4650); else TB.walk(W, b, -5248 - (b.p.id % 3) * 50, 4300); return false; }),
+    UNTIL(W => !alive(W, 'LTg1', -7040, 1024), 40), WAIT(3),
+    UNTIL(W => !W.units.some(u => u.alive && !u.removed && u.owner.id === 11 && u.x < -6000 && u.y > -600 && u.y < 1600), 90),
+    GO(-7040, 1100), TELE(-6784, -384, h => h.x > -4500 && h.y > 3000),
+    // Medusa: from one hiding spot to the next while she looks away, then the lever
+    GO(-3584, 4050), MED(-3290, 3730), MED(-3290, 3220), MED(-3290, 2710), MED(-3330, 2112), UNTIL(W => !TB.unitsOf(W, 'H004').length, 20),
+    // the forest of the angry trees: around their spots
+    GO(-2600, 4400), GO(-1620, 5300), GO(-1650, 5560), GO(-1650, 5720), GO(-1250, 5720), TELE(-416, 5888, h => h.x > 500 && h.y < 3000),
+    // which one is your friend? the vitamins (from the barrels) for the one without the speech bubble
+    DG('LTbx', 2016, 1376), DG('LTbx', 2016, 1312), DG('LTbx', 2016, 1248), DG('LTbs', 1952, 1248), DG('LTbx', 2080, 1184),
+    FN((W, b) => { if (!alive(W, 'DTg5', 2496, 1024)) return true; const fr = TB.unitsOf(W, 'n001').find(u => Math.hypot(u.x - 2053, u.y - 2060) < 300); if (!fr) return true; const h = TB.hero(W, b);
+      const k = (h.inv6 || []).findIndex(i => i && ccstr(i.typeId) === 'I004'); if (k >= 0) { if (Math.hypot(fr.x - h.x, fr.y - h.y) > 300) TB.walk(W, b, fr.x - 150, fr.y); else TB.cmd(W, b, 'give:' + k + ':' + fr.handle); return false; }
+      const it = ground(W, 'I004'); if (it) { if (h.pick !== it) TB.cmd(W, b, 'pick:' + it.handle); return false; } TB.walk(W, b, 1700, 1950 + (b.p.id % 3) * 40); return false; }),
+    UNTIL(W => !alive(W, 'DTg5', 2496, 1024), 25), WAIT(2),
+    // out by the top of the windmills (their wind throws you to the kodos), then all the way to the troll
+    GO(2450, 840), GO(1060, 840), GO(960, 300), GO(930, -60), GO(900, -480), GO(1264, -2704), GO(3056, -4432), GO(3728, -5232), GO(4300, -5700),
+    // the password (the troll's riddle) opens the door to the fire lord
+    GO(4900, -6350), FN((W, b) => { if (!alive(W, 'DTg2', 5216, -6624)) return true; if (first(W, b) && (!W.tonto._pw4 || W.time - W.tonto._pw4 > 6)) { W.tonto._pw4 = W.time; TB.say(W, b, 'soy hermoso verdad'); } return false; }),
+    TELE(5392, -6784, h => h.x < -7000),
+    // the fire lord: the shamans go first, then buy his staff, let him walk down the lava (it cools) and give the staff to the salesman
+    FN((W, b) => { if (first(W, b) && !W.tonto._k4) { W.tonto._k4 = 1; TB.say(W, b, '-kill'); TB.say(W, b, '-kill2'); } return true; }), WAIT(1),
+    FN((W, b) => { const F = TB.unitsOf(W, 'Nfir')[0]; if (!F || F.owner.id !== 15) return true; const h = TB.hero(W, b); if (!first(W, b)) { TB.walk(W, b, -7300, -7700 + (b.p.id % 3) * 40); return false; }
+      const shop = TB.unitsOf(W, 'nmrc')[0]; if (!shop) return true; if (Math.hypot(shop.x - h.x, shop.y - h.y) > 400) { TB.walk(W, b, shop.x - 150, shop.y); return false; } TB.cmd(W, b, 'buy:' + shop.handle + ':I00D'); return false; }),
+    UNTIL(W => { const F = TB.unitsOf(W, 'Nfir')[0]; return !F || inR(F, -6950, -7550, -6800, -7400); }, 25),
+    FN((W, b) => { const sm = TB.unitsOf(W, 'nvl2').find(u => Math.hypot(u.x + 6580, u.y + 7761) < 300); if (!sm || (sm.inv6 || []).some(i => i && ccstr(i.typeId) === 'I00D')) return true; const h = TB.hero(W, b);
+      const k = (h.inv6 || []).findIndex(i => i && ccstr(i.typeId) === 'I00D'); if (k < 0) return !W.units.some(u => u.hero && u.alive && has(u, 'I00D')); if (Math.hypot(sm.x - h.x, sm.y - h.y) > 300) { TB.walk(W, b, sm.x + 100, sm.y + 60); return false; } TB.cmd(W, b, 'give:' + k + ':' + sm.handle); return false; }),
+    UNTIL(W => !TB.unitsOf(W, 'nvl2').some(u => Math.hypot(u.x + 6580, u.y + 7761) < 300), 30), WAIT(8),
+    GO(-6880, -7400), GO(-6880, -6000), DG('DTg3', -6272, -5888), TELE(-5984, -5808, h => h.y > 6000),
+    // the last room: the lever brings the lava, the lava burns the trees that close the way out
+    GO(930, 7380), DG('DTlv', 3040, 7392), GO(3300, 7850), UNTIL(W => !TB.unitsOf(W, 'h003').length, 40), WAIT(1), GO(496, 8000, 40), WAIT(30),
+  ];
+  TONTO_PLANS.tonto4 = { steps, win: /Ha Ganado/i,
+    avoid: ['Region_043', 'tr1', 'tr2', 'tr3', 'tr4', 'tr5', 'Region_092', 'k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'Windmills', 'Region_215', 'Region_215_Copy', 'Region_128', 'Region_128_Copy', 'Region_112'],
+    avoidUnits: ['ewsp', 'nban', 'o000'], avoidR: { ewsp: 140, nban: 140, o000: 300 },
+    talk: { 2: 'que hace ese auto', 12: 'ESTO ES ESPARTA', 20: 'no la mires!', 33: 'cual sera mi amigo?', 50: 'soy hermoso?', 60: 'que calor' } };
+})();
 if (typeof window !== 'undefined') Object.assign(window, { tontoBotsSetup, tontoBotsTick });
 
 // UI, input and main loop
@@ -45070,6 +45202,9 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     { const c = settings.myColor | 0; if (!online && c) { W.local.vcolor = c; const o = W.players[c]; if (o && o !== W.local) o.vcolor = W.local.id; } if (!online && settings.chaserMe && W.arena) { W.players[12].vcolor = W.local.vcolor ?? 0; W.local.vcolor = 14; } } /* the colour you picked in the lobby */
     if (!W.arena && (!online || online.host) && opts.botDiffList && W.ai && W.ai.bots) { const M = { facil: 0.88, normal: 1, dificil: 1, extremo: 1 }; /* extreme bots run all the time, at exactly your Correr speed */ W.ai.bots.forEach((b, i) => { b.diff = opts.botDiffList[i] || 'normal'; const h = W.heroOf(b.p); const k = M[opts.botDiffList[i]] || 1; if (h && k !== 1) { h.speed *= k; h.defSpeed = (h.defSpeed || h.speed / k) * k; } }); } /* bot level in the run / escape maps: how fast they are */
     W.on('text', showText);
+    W.on('dialog', d => { /* a map question with buttons (map 4's kid): tap an answer */ let el = $('#tDlg'); if (!d) { if (el) el.remove(); return; } if (!el) { el = document.createElement('div'); el.id = 'tDlg'; document.body.appendChild(el); }
+      el.innerHTML = ''; const q = document.createElement('div'); q.className = 'tdq'; q.textContent = d.msg || '¿?'; el.appendChild(q);
+      d.btns.forEach((t, i) => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => { if (W && W.tonto) { const ok = tontoCmd(W, W.local, 'dlg:' + i); if (ok && online) online.net.pushEvent('tcmd', 'dlg:' + i); } el.remove(); }; el.appendChild(b); }); });
     W.on('sound', s => sfx.play(s.name));
     W.on('death', u => { if (u.hero) { sfx.play(R ? 'dx_' + R.deathFxOf(u.owner) : 'death'); if (u.owner === W.local) { const dd = $('#dead'); dd.classList.remove('hidden'); clearTimeout(dd._tm); { const tb = $('#topbtns'); if (tb) { const r = tb.getBoundingClientRect(), pr = dd.offsetParent ? dd.offsetParent.getBoundingClientRect() : { top: 0 }; if (r.height) dd.style.top = (r.bottom - pr.top + 6) + 'px'; } } /* just under the row of 5 buttons */ dd._tm = setTimeout(() => dd.classList.add('hidden'), 5000); if (!dd._tap) { dd._tap = 1; dd.addEventListener('pointerdown', e => { e.stopPropagation(); dd.classList.add('hidden'); }); } } /* the banner leaves after 5 s */ } });
     W.on('death', u => { if (u.hero && u.owner !== W.local && W.ai && W.ai.bots.some(b => b.p === u.owner) && Math.random() < 0.45) setTimeout(() => { if (W && !u.alive) window.botChat(u, (W.arena ? ['noooo', 'me mataron', 'casi', 'nooo me mató'] : ['noooo', 'revivanme', 'ayudaaa', 'nooo me mató'])['0123'[Math.floor(Math.random() * 4)]]); }, 700); });
