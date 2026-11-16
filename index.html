@@ -87,7 +87,7 @@ body.onmenu #menu .mlog{height:auto!important;min-height:60px;flex:1}body.onmenu
 #bell{position:fixed;right:max(18px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));z-index:45;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:rgba(20,6,32,.85);border:1px solid rgba(255,255,255,.2);cursor:pointer}#bell.hidden{display:none}#bell.ig{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 300px)}#bell.shake{animation:bshake .9s ease 2}@keyframes bshake{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-18deg) scale(1.15)}30%{transform:rotate(16deg) scale(1.15)}45%{transform:rotate(-12deg)}60%{transform:rotate(9deg)}75%{transform:rotate(-4deg)}}.frav{width:34px;height:34px;border-radius:8px;flex:none;object-fit:cover}.frplus{margin-left:auto;font:inherit;font-weight:900;border:0;border-radius:10px;padding:6px 10px;background:#5fd12f;color:#13300a}
 #bell b{position:absolute;right:-3px;top:-3px;background:#ff3b6a;color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}#bell b:empty{display:none}#notifs{position:fixed;inset:0;z-index:61;background:rgba(5,0,12,.8);display:grid;place-items:center;padding:16px}#notifs.hidden{display:none}.nt{background:#2c1239;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px}.nt .row{display:flex;gap:6px}.nt .row button{flex:1;font:inherit;font-weight:900;border:0;border-radius:10px;padding:8px;background:#5fd12f;color:#13300a}.nt .row button.no{background:#4a2a62;color:#fff}
 #friends{position:fixed;inset:0;z-index:60;background:rgba(5,0,12,.8);display:grid;place-items:center;padding:16px}#friends.hidden{display:none}.frlist{max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:6px;text-align:left}.fr{display:flex;align-items:center;gap:8px;background:#2c1239;border-radius:12px;padding:8px 10px}.fr i{width:10px;height:10px;border-radius:50%;background:#777;flex:none}.fr.on i{background:#4dff6a;box-shadow:0 0 6px #4dff6a}.fr b{display:block}.fr small{display:block;opacity:.75;font-size:11px}.fr .x{margin-left:auto;background:none;border:0;color:#ff7b9c;font-size:16px}.fradd{display:flex;gap:6px}.fradd input{flex:1;min-width:0;font:inherit;font-weight:800;padding:8px;border-radius:10px;border:2px solid #8a4dff;background:#14061f;color:#fff}.fradd button{font:inherit;font-weight:900;border:0;border-radius:10px;padding:8px 12px;background:#8a4dff;color:#fff}
-#acctAsk .acbd,#bdAsk .acbd{display:block;margin:8px 0 2px;font-size:13px;font-weight:800;color:#ffd34d}#acctAsk .acbd small,#bdAsk .acbd small{color:#cbb;font-weight:600}.acbd input{display:block;width:100%;margin-top:4px;padding:8px;border-radius:10px;border:2px solid #8a4dff;background:#120720;color:#fff;font-size:15px}
+#acctAsk .acbd,#bdAsk .acbd{display:block;margin:8px 0 2px;font-size:13px;font-weight:800;color:#ffd34d}#acctAsk .acbd small,#bdAsk .acbd small{color:#cbb;font-weight:600}.bdsel{display:flex;gap:6px;margin-top:6px;position:relative;height:132px;background:#120720;border:2px solid #8a4dff;border-radius:12px;overflow:hidden}.bdsel:before{content:"";position:absolute;left:4px;right:4px;top:44px;height:40px;border-radius:8px;background:#8a4dff44;border:1px solid #ffd34d;pointer-events:none}.bdsel:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#120720,transparent 35%,transparent 65%,#120720)}.bdw{flex:1;min-width:0;height:128px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;text-align:center}.bdw::-webkit-scrollbar{display:none}.bdw div{height:40px;line-height:40px;scroll-snap-align:center;color:#fff;font-size:17px;font-weight:800}.bdw .pad{scroll-snap-align:none;height:44px}
 #bdAsk{position:fixed;inset:0;z-index:61;background:rgba(5,0,12,.8);display:grid;place-items:center;padding:16px}#bdAsk.hidden{display:none}
 #bCake{position:fixed;left:10px;top:64px;z-index:15;width:58px;height:58px;border-radius:50%;border:3px solid #ffd34d;background:radial-gradient(#ff8ad8,#b0208a);font-size:32px;box-shadow:0 0 18px #ff5ad8;animation:cakeB 1.2s ease-in-out infinite;cursor:pointer}#bCake.hidden{display:none}@keyframes cakeB{50%{transform:scale(1.12) rotate(-6deg)}}
 #bdChest{position:fixed;inset:0;z-index:70;background:radial-gradient(#3a1a5a,#05000c);display:grid;place-items:center;color:#fff;text-align:center;font-family:inherit}
@@ -319,8 +319,9 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .glbl{font-weight:800;font-size:13px;margin:8px 0 3px;color:#e9d8ff}.gd{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}.gi{display:flex;gap:6px;align-items:flex-start;text-align:left}.gi .icimg{width:30px;height:30px;flex:none}.gi b{display:block;font-size:12px;line-height:1.15}.gi small{display:block;font-size:10.5px;line-height:1.2;opacity:.85}
 #powers .card{padding:14px 16px!important}#bItem0,#bBlink{font-size:0!important;background-repeat:no-repeat;background-position:50% 42%;background-size:62%}#bItem0{background-image:url(assets/fx/it_p_tele.webp)}#bBlink{background-image:url(assets/fx/it_p_help.webp)}#bItem0 small,#bBlink small,#bItem0 kbd,#bItem0 em{font-size:10px}
 .bic{width:30px;height:30px;vertical-align:middle;border-radius:7px;margin:-6px 4px -4px 0}.wkic{width:20px;height:20px;vertical-align:middle;border-radius:5px;margin-right:3px}.mapc .mic{width:38px;height:38px;border-radius:9px}
+#create{padding:8px;place-items:stretch}#create .card{width:100%;max-width:none;height:100%;max-height:none;display:flex;flex-direction:column;overflow:hidden;padding:12px 12px 10px}#create .tbar,#create .opts,#create .lbl,#create .hint,#create .big-btn{flex:none}#create .opts{margin:6px 0}#create .hint{font-size:11px;margin:2px 0}#create #bCreate{margin:6px auto 0}#create #createMaps{flex:1 1 auto;min-height:150px;max-height:none!important;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;align-content:start;overflow-y:auto;-webkit-overflow-scrolling:touch}#create .mapc{min-height:92px}#create .mapc .mic{width:46px;height:46px}#create .mapc .nm{font-size:15px;padding-right:30px}
 #solo{padding:8px;place-items:stretch}#solo .card{width:100%;max-width:none;height:100%;max-height:none;display:flex;flex-direction:column;overflow:hidden;padding:12px 12px 10px}#solo .tbar{flex:none}#solo .lbl{flex:none;margin:6px 0 4px}#solo #soloMaps{flex:1 1 auto;min-height:0;max-height:none!important;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;align-content:start;overflow-y:auto;-webkit-overflow-scrolling:touch}#solo .opts,#solo #bPlay{flex:none}#solo .opts{margin:8px 0 6px}#solo #bPlay{margin:4px auto 0}#solo .mapc{min-height:92px}#solo .mapc .mic{width:46px;height:46px}#solo .mapc .nm{font-size:15px;padding-right:30px}
-#fpTry{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 190px);z-index:6;pointer-events:auto;font-size:16px;padding:10px 14px}#trainPanel{position:absolute;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 96px);max-height:none;z-index:7;background:rgba(20,8,34,.94);border:2px solid #8a4dff;border-radius:16px;padding:8px;pointer-events:auto;display:flex;flex-direction:column}#trainPanel.hidden{display:none}.trt{display:flex;gap:4px;flex-wrap:wrap}.trt button{border:0;border-radius:10px;padding:6px 8px;background:#3a2560;color:#fff;font-weight:800;font-size:12px}.trt button.on{background:#8a4dff}.trt button[data-x]{margin-left:auto}.trg{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;overflow-y:hidden;margin-top:6px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}.trg .tri{flex:0 0 74px}.tri{background:#2a1a48;border-radius:10px;padding:4px;text-align:center;cursor:pointer}.tri.on{outline:2px solid #b3ff5a}.tri img{width:46px;height:46px;object-fit:contain}.tri small{height:2.3em;overflow:hidden}.tri small{display:block;font-size:10px;line-height:1.1}.tri canvas.fxc{margin:2px auto 0!important}.trq{font-size:30px;height:54px;display:grid;place-items:center}
+#fpTry{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom) + 190px);z-index:6;pointer-events:auto;font-size:16px;padding:10px 14px}#trainPanel{position:absolute;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 96px);max-height:none;z-index:7;background:rgba(20,8,34,.94);border:2px solid #8a4dff;border-radius:16px;padding:8px;pointer-events:auto;display:flex;flex-direction:column}#trainPanel.hidden{display:none}.trt{display:flex;gap:4px;flex-wrap:wrap}.trt button{border:0;border-radius:10px;padding:6px 8px;background:#3a2560;color:#fff;font-weight:800;font-size:12px}.trt button.on{background:#8a4dff}.trt button[data-x]{margin-left:auto}.trg{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;overflow-y:hidden;margin-top:6px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}.trg .tri{flex:0 0 74px}.tri{background:#2a1a48;border-radius:10px;padding:4px;text-align:center;cursor:pointer}.tri.on{outline:2px solid #b3ff5a}.tri img{width:46px;height:46px;object-fit:contain}.tri small{height:2.3em;overflow:hidden}.tri small{display:block;font-size:10px;line-height:1.1}.tri canvas.fxc{margin:2px auto 0!important}.trh{flex:0 0 28px;writing-mode:vertical-rl;transform:rotate(180deg);font:900 10px system-ui;color:#ffd34d;text-align:center;background:#3a2560;border-radius:8px;padding:4px 2px}.tri.soon{opacity:.5;cursor:default}.trq{font-size:30px;height:54px;display:grid;place-items:center}
 #roundBanner{position:fixed;left:50%;top:52%;transform:translate(-50%,-50%);z-index:40;pointer-events:none;opacity:0;padding:10px 34px 14px;border-radius:22px;background:linear-gradient(180deg,rgba(60,20,110,.28),rgba(25,8,50,.28));border:2px solid rgba(255,210,63,.55);box-shadow:0 0 30px rgba(255,190,60,.25);text-align:center;white-space:nowrap}#roundBanner b{display:block;font:900 50px Nunito,system-ui,sans-serif;letter-spacing:2px;background:linear-gradient(180deg,#fff6b0,#ffd23f 45%,#ff8a1f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #6b2c00)}#roundBanner small{display:block;font:800 15px Nunito,system-ui,sans-serif;color:#e9d8ff;letter-spacing:3px}#bCam{position:relative}#bCam .nox{position:absolute;left:18%;right:18%;top:50%;height:4px;margin-top:-2px;background:#ff3b3b;border-radius:3px;transform:rotate(-40deg);box-shadow:0 0 0 1.5px #2a0a0a}#bCam.on .nox{display:none}#bCam.on{background:#8a4dff;outline:2px solid #b3ff5a}#roundBanner.go{animation:rbn 1.8s ease-out forwards}@keyframes rbn{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}28%{transform:translate(-50%,-50%) scale(1)}65%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
 body:not(.hudfull) #team,body:not(.hudfull) #stats .pcrow,body:not(.hudfull) #tox{display:none!important}body:not(.hudfull) #stats{padding:6px 10px!important;min-width:0!important}body:not(.hudfull) #chatLog{max-width:min(230px,55vw)}body:not(.hudfull) #chatLog > :nth-last-child(n+3){display:none}body:not(.hudfull) #mm{width:110px!important;height:110px!important}body:not(.hudfull) #chatLog > *{opacity:.85;font-size:12px}
 
@@ -422,13 +423,6 @@ body[data-fam=arena] #sprayWrap{bottom:calc(max(12px,env(safe-area-inset-bottom)
 /* create room: everything on one screen */
 #create .card{padding-top:10px;padding-bottom:10px}
 #create .tbar{margin-bottom:4px}
-#create #createMaps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:34vh;overflow-y:auto}
-#create #createMaps .mapc{min-height:0;padding:6px 6px 5px;border-radius:11px}
-#create #createMaps .mapc .mic{width:30px;height:30px;border-radius:7px}
-#create #createMaps .mapc .nm{font-size:11px;padding-right:0;margin-top:2px}
-#create #createMaps .mapc .ic{font-size:18px}
-#create #createMaps .mapc .tag,#create #createMaps .mapc .badge{transform:scale(.72);transform-origin:top right}
-#create #createMaps .mapc .info,#create #createMaps .mapc .mi{transform:scale(.75);transform-origin:bottom right}
 #create .opts label{padding:3px 0;font-size:14px}
 #create .hint{font-size:11px;margin:4px 0}
 #create #bCreate{margin-top:6px;padding:12px}
@@ -490,6 +484,7 @@ body.tcine #hud, body.tcine #stickBase{opacity:0;pointer-events:none!important}
 #tontoUI.hidden{display:none}
 #tInv{position:fixed;right:max(10px,env(safe-area-inset-right));bottom:calc(max(12px,env(safe-area-inset-bottom)) + 168px);display:grid;grid-template-columns:repeat(3,44px);gap:5px;z-index:6}
 #tInv button{width:44px;height:44px;border-radius:11px;border:2px solid #5a4a7a;background:rgba(20,12,34,.82);color:#fff;font-size:24px;display:grid;place-items:center;padding:0}
+#tInv .tico{width:100%;height:100%;object-fit:contain;pointer-events:none}#tSk .tico.big{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;pointer-events:none}#tSk button{position:relative;overflow:hidden}#tSk button small{position:relative;z-index:1}#tAtk .tico.atk{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;pointer-events:none}#tAtk{overflow:hidden}#tAtk small{position:relative;z-index:1}
 #tInv button.has{border-color:#ffd34d;background:rgba(60,40,10,.88)}
 #tAtk{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));width:76px;height:76px;border-radius:50%;border:3px solid #ff6a4a;background:radial-gradient(circle at 35% 30%,#7a2a20,#2e0e0a);color:#fff;font-size:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;z-index:6;padding:0}
 #tSk{position:fixed;right:calc(max(12px,env(safe-area-inset-right)) + 84px);bottom:calc(max(12px,env(safe-area-inset-bottom)) + 8px);display:flex;gap:6px;z-index:6}#tSk button{width:58px;height:58px;border-radius:50%;border:3px solid #9a7aff;background:radial-gradient(circle at 35% 30%,#4a2a7a,#1e1036);color:#fff;font-size:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;padding:0}#tSk button small{font:900 9px system-ui;margin-top:2px}#tSk button.cool{filter:grayscale(1);opacity:.55}
@@ -504,6 +499,8 @@ body.tcine #hud, body.tcine #stickBase{opacity:0;pointer-events:none!important}
 #tCard .tshop{display:flex;flex-direction:column;gap:5px;margin-top:6px}#tCard .trow{display:grid;grid-template-columns:30px 1fr auto;gap:6px;align-items:center;background:#1d163a;border-radius:10px;padding:5px}
 #tCard .trow>span{font-size:22px;text-align:center}#tCard .trow i{color:#ffe27a;font-style:normal;font-size:11px}#tCard .trow small{display:block;font-size:10.5px;opacity:.75}
 #tCard .trow button{border:0;border-radius:9px;background:linear-gradient(#ffe27a,#ffbf1f);color:#3a2600;font:900 12px system-ui;padding:7px 8px}#tCard .trow button:disabled{filter:grayscale(1);opacity:.5}
+#zBldPop{position:fixed;z-index:61;width:220px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;background:rgba(30,12,8,.94);border:2px solid #ff7a4a;border-radius:14px;padding:8px;color:#fff;font:800 13px system-ui}#zBldPop b{width:100%;text-align:center}#zBldPop .zdes{flex:1;padding:9px;border:0;border-radius:10px;background:#e0344f;color:#fff;font-weight:900;font-size:15px}#zBldPop .zx{width:42px;padding:9px;border:0;border-radius:10px;background:#555;color:#fff;font-weight:900;font-size:15px}
+#aimCancel{position:fixed;left:calc(50% - 37px);top:calc(env(safe-area-inset-top,0px) + 170px);z-index:70;width:74px;height:74px;border-radius:50%;background:#c81e3a;border:4px solid #fff;color:#fff;font:900 34px system-ui;display:grid;place-items:center;line-height:1;box-shadow:0 0 16px #ff4060;pointer-events:none}#aimCancel small{font-size:10px;margin-top:-14px}#aimCancel.on{transform:scale(1.25);background:#ff2448}
 #zDemoBar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 120px);transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:rgba(30,12,8,.92);border:2px solid #ffb04d;border-radius:14px;padding:10px 10px 10px 16px;color:#fff;font:800 15px system-ui;box-shadow:0 6px 20px rgba(0,0,0,.5);max-width:calc(100vw - 32px)}#zDemoBar button{background:#c0392b;color:#fff;border:0;border-radius:10px;width:36px;height:36px;font:900 18px system-ui}#zDemoBar.shake{animation:zshk .35s}@keyframes zshk{25%{transform:translateX(calc(-50% - 8px))}75%{transform:translateX(calc(-50% + 8px))}}
 .zcgrid button{position:relative}.zcgrid .zcn{position:absolute;left:2px;right:2px;top:2px;font:800 9px/1.05 system-ui;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;text-align:center;pointer-events:none;overflow:hidden;max-height:20px}
 </style>
@@ -542,8 +539,8 @@ window.addEventListener('unhandledrejection',function(e){if(!window.MM_BOOTED){c
 <div id="avPick" class="hidden"><div class="acbox"><b class="act">👤 Mi perfil</b><div id="prCard"></div><small>Toca un avatar para cambiarlo</small><div class="avgrid" id="avGrid"></div><button class="acgo" id="avClose">Listo</button></div></div>
 <div id="crAsk" class="hidden"><div class="acbox"><b class="act">💚 Apoya a un creador</b><div class="crbig">⬆️</div><b>Escribe el código de creador</b><input id="vipIn" maxlength="20" autocomplete="off" placeholder="Código"><div id="crErr" style="color:#ff7b9c;font-size:12px;min-height:14px"></div><button class="acgo" id="vipBtn">Vale</button><small>Dejarás de apoyar al creador automáticamente dentro de 7 días. Puedes dejar de apoyarlo cuando quieras.</small><button id="crStop" style="display:none;font:inherit;font-weight:900;border:0;border-radius:12px;padding:9px;background:#4a2a62;color:#fff">Dejar de apoyar</button><button class="crx" id="crClose">✕</button></div></div>
 <div id="friends" class="hidden"><div class="acbox"><b class="act">👥 Amigos</b><small id="frMine"></small><div class="fradd"><input id="frIn" inputmode="numeric" maxlength="9" placeholder="ID del jugador"><button id="frAdd">Agregar</button></div><div class="fradd"><input id="frName" maxlength="14" placeholder="Nombre del jugador"><button id="frFind">Buscar</button></div><div id="frErr" style="color:#ff7b9c;font-size:12px;min-height:14px"></div><div class="frlist" id="frRes" style="max-height:24vh"></div><div class="frlist" id="frList"></div><button class="acgo" id="frClose">Cerrar</button></div></div>
-<div id="bdAsk" class="hidden"><div class="acbox"><b class="act">🎂 ¿Cuándo es tu cumpleaños?</b><small>Ese día te llega un cofre sorpresa con un personaje. Se elige una sola vez y no se puede cambiar.</small><label class="acbd">Fecha<input id="bdIn" type="date" min="1920-01-01"></label><div id="bdErr" style="color:#ff6b6b;font-size:13px;min-height:16px"></div><button id="bdOk" class="acgo">Guardar</button></div></div><button id="bCake" class="hidden" title="Regalo de cumpleaños">🎂</button><div id="acctAsk" class="hidden"><div class="acbox"><b class="act">Crea tu cuenta</b><small>Elige tu nombre de jugador. Después solo se puede cambiar con el ítem <b>Cambio de nombre</b> de la tienda.</small>
-<input id="acName" maxlength="14" autocomplete="off" placeholder="Tu nombre"><label class="acbd">🎂 Tu cumpleaños <small>(no se puede cambiar)</small><input id="acBday" type="date" min="1920-01-01"></label><div id="acErr"></div><button id="acMake" class="acgo">Crear cuenta MapMix</button>
+<div id="bdAsk" class="hidden"><div class="acbox"><b class="act">🎂 ¿Cuándo es tu cumpleaños?</b><small>Ese día te llega un cofre sorpresa con un personaje. Se elige una sola vez y no se puede cambiar.</small><label class="acbd">Fecha<span class="bdsel" id="bdIn"></span></label><div id="bdErr" style="color:#ff6b6b;font-size:13px;min-height:16px"></div><button id="bdOk" class="acgo">Guardar</button></div></div><button id="bCake" class="hidden" title="Regalo de cumpleaños">🎂</button><div id="acctAsk" class="hidden"><div class="acbox"><b class="act">Crea tu cuenta</b><small>Elige tu nombre de jugador. Después solo se puede cambiar con el ítem <b>Cambio de nombre</b> de la tienda.</small>
+<input id="acName" maxlength="14" autocomplete="off" placeholder="Tu nombre"><label class="acbd">🎂 Tu cumpleaños <small>(no se puede cambiar)</small><span class="bdsel" id="acBday"></span></label><div id="acErr"></div><button id="acMake" class="acgo">Crear cuenta MapMix</button>
 <div class="acor">o entra con</div><div class="acsoc"><button disabled>Google</button><button disabled>TikTok</button><button disabled>Facebook</button></div><small class="acsoon">Google, TikTok y Facebook llegan con la app de Play Store.</small></div></div>
 <div id="hud" class="hidden">
   <div id="top">
@@ -37760,7 +37757,7 @@ class World {
       if (d <= step) { u.x = wp.x; u.y = wp.y; step -= d; u.pi++; }
       else {
         const nx = u.x + dx / d * step, ny = u.y + dy / d * step;
-        if (!u.fly && !this.walkable(nx, ny)) {
+        if (!u.fly && (!this.walkable(nx, ny) || (this.tonto && u.hero && !u.botGuard && !(this.walkable(nx, u.y) && this.walkable(u.x, ny))))) { /* mazes: no cutting through the corner of two walls */
           if (this.profile.id !== 'shroom25') { // slide along the wall instead of stopping dead
             const sx = u.x + Math.sign(dx) * step, sy = u.y + Math.sign(dy) * step;
             if (Math.abs(dx) > 0.5 && this.walkable(sx, u.y)) { u.x = sx; step = 0; u.walkPhase += dt * u.speed / 40; u.path = null; return; }
@@ -39774,6 +39771,20 @@ function makePattern(ctx, kind) {
   } else if (kind === 'snow') {
     g.fillStyle = '#eef4fb'; g.fillRect(0, 0, S, S);
     for (let i = 0; i < 70; i++) { g.fillStyle = i % 2 ? '#dbe6f2' : '#ffffff'; g.globalAlpha = 0.8; g.beginPath(); g.arc(R(i) * S, R(i + 1) * S, 4 + R(i + 2) * 12, 0, 7); g.fill(); }
+  } else if (kind === 'asphalt') { /* ruined city street: cracked asphalt, ash, dried blood */
+    g.fillStyle = '#4a4643'; g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 90; i++) { g.fillStyle = i % 3 ? '#3c3936' : '#57524d'; g.globalAlpha = 0.55; g.beginPath(); g.arc(R(i) * S, R(i + 1) * S, 3 + R(i + 2) * 14, 0, 7); g.fill(); }
+    g.globalAlpha = 0.7; g.strokeStyle = '#26231f'; g.lineWidth = 1.6; for (let i = 0; i < 9; i++) { let x = R(i + 400) * S, y = R(i + 401) * S; g.beginPath(); g.moveTo(x, y); for (let k = 0; k < 5; k++) { x += (R(i * 7 + k + 410) - 0.5) * 50; y += (R(i * 7 + k + 430) - 0.5) * 50; g.lineTo(x, y); } g.stroke(); }
+    g.globalAlpha = 0.35; for (let i = 0; i < 3; i++) { g.fillStyle = '#5a1410'; g.beginPath(); g.ellipse(R(i + 600) * S, R(i + 601) * S, 8 + R(i + 602) * 14, 5 + R(i + 603) * 8, R(i) * 3, 0, 7); g.fill(); }
+    g.globalAlpha = 0.45; for (let i = 0; i < 26; i++) { g.fillStyle = i % 2 ? '#6d665e' : '#2c2926'; g.fillRect(R(i + 700) * S, R(i + 701) * S, 3 + R(i + 702) * 6, 3 + R(i + 703) * 5); }
+    g.globalAlpha = 0.5; g.fillStyle = '#d9c96a'; for (let x = 0; x < S; x += 64) g.fillRect(x + 8, S / 2 - 3, 30, 5);
+  } else if (kind === 'ruin') { /* collapsed building roofs seen from above: concrete slabs, holes, rebar, soot */
+    g.fillStyle = '#6b6560'; g.fillRect(0, 0, S, S);
+    for (let y = 0; y < S; y += 64) for (let x = 0; x < S; x += 64) { const v = R(x * 3 + y); g.fillStyle = v < 0.3 ? '#5d5752' : v < 0.6 ? '#77706a' : '#696460'; g.fillRect(x + 2, y + 2, 60, 60); }
+    g.globalAlpha = 0.85; for (let i = 0; i < 7; i++) { const x = R(i + 900) * S, y = R(i + 901) * S, r = 10 + R(i + 902) * 18; g.fillStyle = '#1b1816'; g.beginPath(); for (let k = 0; k < 7; k++) { const a = k / 7 * 6.28, rr = r * (0.6 + R(i * 9 + k + 950) * 0.6); g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.fill(); }
+    g.globalAlpha = 0.4; for (let i = 0; i < 10; i++) { g.fillStyle = '#121010'; g.beginPath(); g.arc(R(i + 1000) * S, R(i + 1001) * S, 14 + R(i + 1002) * 26, 0, 7); g.fill(); }
+    g.globalAlpha = 0.8; g.strokeStyle = '#8a4a2a'; g.lineWidth = 2; for (let i = 0; i < 10; i++) { const x = R(i + 1100) * S, y = R(i + 1101) * S; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (R(i + 1102) - 0.5) * 40, y + (R(i + 1103) - 0.5) * 40); g.stroke(); }
+    g.globalAlpha = 0.6; for (let i = 0; i < 40; i++) { g.fillStyle = i % 2 ? '#9a938b' : '#4a4540'; g.fillRect(R(i + 1200) * S, R(i + 1201) * S, 4 + R(i + 1202) * 9, 3 + R(i + 1203) * 7); }
   } else if (kind === 'rock') {
     g.fillStyle = PAL.rock; g.fillRect(0, 0, S, S);
     for (let i = 0; i < 60; i++) { g.fillStyle = i % 2 ? PAL.rock2 : '#3d3036'; g.globalAlpha = 0.6; g.beginPath(); g.arc(R(i) * S, R(i + 1) * S, 4 + R(i + 2) * 10, 0, 7); g.fill(); }
@@ -39786,7 +39797,7 @@ class Renderer {
     this.cv = canvas; this.ctx = canvas.getContext('2d');
     this.W = W; this.zoom = 0.4; this.targetZoom = 0.4;
     this.pat = {};
-    for (const k of ['toxic', 'grass', 'stone', 'pink', 'rock', 'ice', 'snow']) this.pat[k] = makePattern(this.ctx, k);
+    for (const k of ['toxic', 'grass', 'stone', 'pink', 'rock', 'ice', 'snow', 'asphalt', 'ruin']) this.pat[k] = makePattern(this.ctx, k);
     this.cam = { x: W.camera.x, y: W.camera.y, rot: 0, roll: 0 };
     this.markers = []; this.floaters = [];
     this.resize();
@@ -39883,7 +39894,8 @@ class Renderer {
     const i0 = Math.max(0, Math.floor((vx0 - T.cx) / 128)), i1 = Math.min(w - 1, Math.ceil((vx1 - T.cx) / 128));
     const j0 = Math.max(0, Math.floor((vy0 - T.cy) / 128)), j1 = Math.min(h - 1, Math.ceil((vy1 - T.cy) / 128));
     // base toxic floor over whole view
-    g.fillStyle = this.pat.toxic; g.fillRect(vx0, vy0, vx1 - vx0, vy1 - vy0);
+    const ZC = W.profile && W.profile.id === 'zombie'; /* the zombie map is a ruined city */
+    g.fillStyle = ZC ? this.pat.asphalt : this.pat.toxic; g.fillRect(vx0, vy0, vx1 - vx0, vy1 - vy0);
     // animated toxic glow
     const t = W.time;
     // group fills by kind to minimize state changes
@@ -39894,7 +39906,7 @@ class Renderer {
     }
     for (const k of ['grass', 'stone', 'pink', 'ice', 'snow']) {
       if (!kinds[k].length) continue;
-      g.fillStyle = this.pat[k];
+      g.fillStyle = ZC ? this.pat.asphalt : this.pat[k];
       g.beginPath();
       for (const idx of kinds[k]) { const i = idx % w, j = (idx / w) | 0; g.rect(T.cx + i * 128 - 64, T.cy + j * 128 - 64, 128, 128); }
       g.fill();
@@ -39924,11 +39936,16 @@ class Renderer {
     // cliffs (unwalkable terrain from pathing map), drawn as rocks
     const PW = W.PW, M0 = W.MAPMIN; const ci0 = Math.max(0, Math.floor((vx0 - M0) / 32)), ci1 = Math.min(PW - 1, Math.ceil((vx1 - M0) / 32));
     const cj0 = Math.max(0, Math.floor((vy0 - M0) / 32)), cj1 = Math.min(PW - 1, Math.ceil((vy1 - M0) / 32));
-    g.fillStyle = W.profile && W.profile.id === 'bob' ? this.pat.snow : this.pat.rock; g.beginPath();
+    g.fillStyle = W.profile && W.profile.id === 'bob' ? this.pat.snow : ZC ? this.pat.ruin : this.pat.rock; g.beginPath();
     for (let j = cj0; j <= cj1; j++) for (let i = ci0; i <= ci1; i++) {
       const k = j * PW + i; if (W.pbase[k] && i >= 4 && j >= 4 && i < PW - 4 && j < PW - 4) g.rect(M0 + i * 32, M0 + j * 32, 32, 32);
     }
     g.fill();
+    if (ZC) { /* building walls: a dark shadow at the foot and a light broken rim on top, so the blocks read as ruined buildings */
+      const sh = [], rim = []; for (let j = cj0; j <= cj1; j++) for (let i = ci0; i <= ci1; i++) { const k = j * PW + i; if (!W.pbase[k]) continue; const x = M0 + i * 32, y = M0 + j * 32;
+        if (!W.pbase[k - PW]) sh.push(x, y - 22, 32, 22); if (!W.pbase[k + PW]) rim.push(x, y + 26, 32, 6); if (!W.pbase[k - 1]) rim.push(x, y, 5, 32); if (!W.pbase[k + 1]) rim.push(x + 27, y, 5, 32); }
+      g.fillStyle = 'rgba(0,0,0,0.45)'; g.beginPath(); for (let q = 0; q < sh.length; q += 4) g.rect(sh[q], sh[q + 1], sh[q + 2], sh[q + 3]); g.fill();
+      g.fillStyle = '#9d958c'; g.beginPath(); for (let q = 0; q < rim.length; q += 4) g.rect(rim[q], rim[q + 1], rim[q + 2], rim[q + 3]); g.fill(); }
     // outside the map: void
     g.fillStyle = '#07030a';
     const B = this.W.profile && this.W.profile.family === 'run' ? 3584 : 6016, F = 20000;
@@ -40023,6 +40040,7 @@ class Renderer {
           if (d.id[1] === 'T') { if (d.id[0] === 'Y') break; /* arena maps: trees (the pathing blockers stay invisible) */
             if (!top) { g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(14, -16, 62 * s, 34 * s, 0, 0, 7); g.fill(); break; }
             const pine = /^(ITtw|WTst|ATtr|NTtw|LTlt|JTtw)$/.test(d.id), sz = (50 + r * 16) * Math.min(1.3, s);
+            if (W.profile && W.profile.id === 'zombie') { /* dead burnt trees in the ruined city */ g.strokeStyle = '#1e1a17'; g.lineCap = 'round'; for (let k = 0; k < 6; k++) { const a = k * 1.05 + r * 3, L = sz * (0.6 + ((k * 37 + r * 100) % 10) / 25); g.lineWidth = 9 - k * 0.6; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a) * L, Math.sin(a) * L); g.stroke(); g.lineWidth = 4; g.beginPath(); g.moveTo(Math.cos(a) * L * 0.6, Math.sin(a) * L * 0.6); g.lineTo(Math.cos(a + 0.5) * L * 0.95, Math.sin(a + 0.5) * L * 0.95); g.stroke(); } g.fillStyle = '#2a2420'; g.beginPath(); g.arc(0, 0, 12, 0, 7); g.fill(); break; }
             const base = d.id[0] === 'I' || d.id[0] === 'W' || d.id[0] === 'N' ? [40, 90, 80] : d.id[0] === 'J' ? [50, 110, 60] : d.id[0] === 'O' ? [70, 100, 40] : [40, 105, 45];
             g.fillStyle = `rgb(${base[0] * 0.6},${base[1] * 0.6},${base[2] * 0.6})`; g.beginPath(); g.arc(0, 4, sz, 0, 7); g.fill();
             g.fillStyle = `rgb(${base[0]},${base[1]},${base[2]})`; g.beginPath(); g.arc(-sz * 0.15, sz * 0.2, sz * 0.82, 0, 7); g.fill();
@@ -42040,12 +42058,14 @@ function arenaHud(A, ui) {
 }
 function esc2(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 // a skill button: tap = cast where you look (with a little aim help); hold and drag = aim it yourself (blink: also how far)
+function arenaAimX(show) { let x = document.getElementById('aimCancel'); if (!show) { if (x) x.remove(); return null; } if (!x) { x = document.createElement('div'); x.id = 'aimCancel'; x.innerHTML = '✕<small>Cancelar</small>'; document.body.appendChild(x); } return x; }
 function arenaBtn(A, el, ui) {
-  let st = null;
+  let st = null; const inX = e => { const x = document.getElementById('aimCancel'); if (!x) return false; const r = x.getBoundingClientRect(); return e.clientX > r.left - 14 && e.clientX < r.right + 14 && e.clientY > r.top - 14 && e.clientY < r.bottom + 14; };
   el.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); try { el.setPointerCapture(e.pointerId); } catch (x) {} st = { x: e.clientX, y: e.clientY, id: e.pointerId, drag: false }; });
-  el.addEventListener('pointermove', e => { if (!st || st.id !== e.pointerId) return; const dx = e.clientX - st.x, dy = e.clientY - st.y, L = Math.hypot(dx, dy); if (L > 18) st.drag = true; if (st.drag) A.aimPrev = { k: el.dataset.k, dx: dx / (L || 1), dy: -dy / (L || 1), dist: 150 + Math.min(1, L / 120) * 550 }; });
-  const end = e => { if (!st || st.id !== e.pointerId) return; const a = st.drag ? A.aimPrev : null; st = null; A.aimPrev = null; ui.cast(el.dataset.k, a ? { dx: a.dx, dy: a.dy, dist: a.dist, exact: true } : null); };
-  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', e => { st = null; A.aimPrev = null; });
+  el.addEventListener('pointermove', e => { if (!st || st.id !== e.pointerId) return; const dx = e.clientX - st.x, dy = e.clientY - st.y, L = Math.hypot(dx, dy); if (L > 18) st.drag = true; if (st.drag) { const X = arenaAimX(true); const o = inX(e); X.classList.toggle('on', o); if (o) { A.aimPrev = null; return; } A.aimPrev = { k: el.dataset.k, dx: dx / (L || 1), dy: -dy / (L || 1), dist: 150 + Math.min(1, L / 120) * 550 }; } });
+  /* while aiming, a red ✕ appears: let go on it and the power is not used */
+  const end = e => { if (!st || st.id !== e.pointerId) return; const cancel = st.drag && inX(e); const a = st.drag ? A.aimPrev : null; st = null; A.aimPrev = null; arenaAimX(false); if (cancel) return; ui.cast(el.dataset.k, a ? { dx: a.dx, dy: a.dy, dist: a.dist, exact: true } : null); };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', e => { st = null; A.aimPrev = null; arenaAimX(false); });
 }
 if (typeof module !== 'undefined') module.exports = { setupArena, ARENA };
 
@@ -42232,7 +42252,24 @@ function arenaUseItem(A, u, k, a) {
   if (it.uses) { s.uses--; if (s.uses <= 0) A.inv[id].splice(A.inv[id].indexOf(s), 1); }
   u.invisUntil = 0; W.emit('sound', { name: 'coil' }); return true;
 }
-function arenaIllusion(A, u, n) { const W = A.W; for (let i = 0; i < n; i++) { const a = W.rand() * 6.28; A.illus.push({ src: u, x: u.x + Math.cos(a) * 80, y: u.y + Math.sin(a) * 80, until: W.time + 10, facing: u.facing, tx: null }); } A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.5, col: '200,160,255' }); }
+/* copies (illusions and summons) move like players: each has its own lane and pace, they keep apart from each other, sometimes take another way,
+   and when the enemy is across the river they keep running up and down their shore */
+function arenaWander(A, c, best, list, spd, dt, keepComp) { const W = A.W, t = W.time; c.ph = c.ph != null ? c.ph : W.rand() * 6.28;
+  if (!c.reT || t > c.reT) { c.reT = t + 1.2 + W.rand() * 2.3; c.lane = (W.rand() - 0.5) * 420; c.pace = 0.78 + W.rand() * 0.3; c.det = W.rand() < 0.22 ? { x: c.x + (W.rand() - 0.5) * 900, y: c.y + (W.rand() - 0.5) * 900, until: t + 1 + W.rand() * 1.2 } : null; }
+  let gx, gy; const home = c.o || c.src;
+  if (best) { const dx0 = best.x - c.x, dy0 = best.y - c.y, d0 = Math.hypot(dx0, dy0) || 1; const lf = Math.min(1, d0 / 500); gx = best.x - dy0 / d0 * c.lane * lf; gy = best.y + dx0 / d0 * c.lane * lf; }
+  else { gx = home.x + Math.cos(t * 0.7 + c.ph) * 260; gy = home.y + Math.sin(t * 0.7 + c.ph) * 260; }
+  if (c.det && t < c.det.until) { gx = c.det.x; gy = c.det.y; }
+  const comp = keepComp ? (c.comp != null ? c.comp : (c.comp = A.compAt(c.x, c.y))) : null;
+  if (keepComp && best && A.compAt(best.x, best.y) !== comp) { gx = best.x + Math.sin(t * 0.9 + c.ph) * 650; gy = c.y + (best.y - c.y) * 0.5; } /* enemy across the water: run along your shore */
+  for (const o of list) if (o !== c && !o.dead && (o.o || o.src) === home) { const ex = c.x - o.x, ey = c.y - o.y, ed = Math.hypot(ex, ey); if (ed < 190) { const k = (190 - ed) / 190; gx += (ex / (ed || 1)) * 320 * k; gy += (ey / (ed || 1)) * 320 * k; if (ed < 1) gx += c.ph > 3 ? 200 : -200; } }
+  const dx = gx - c.x, dy = gy - c.y, d = Math.hypot(dx, dy); c.moving = false; if (d < 30) return false;
+  const st = Math.min(d, spd * c.pace * dt); const ok = (nx, ny) => W.walkable(nx, ny) && (!keepComp || A.compAt(nx, ny) === comp);
+  const tryStep = (ux, uy) => { const nx = c.x + ux * st, ny = c.y + uy * st; if (ok(nx, ny)) { c.x = nx; c.y = ny; return true; } return false; };
+  const ux = dx / d, uy = dy / d; c.moving = tryStep(ux, uy) || tryStep(Math.sign(ux) || 0.001, 0) || tryStep(0, Math.sign(uy) || 0.001) || tryStep(-uy, ux) || tryStep(uy, -ux);
+  if (!c.moving) c.reT = 0; /* stuck: next tick it picks another lane */
+  c.facing = Math.atan2(dy, dx) * 180 / Math.PI; c.fx = dx > 0 ? 1 : -1; return c.moving; }
+function arenaIllusion(A, u, n) { const W = A.W; for (let i = 0; i < n; i++) { const a = W.rand() * 6.28 + i * 3.14; A.illus.push({ src: u, x: u.x + Math.cos(a) * 140, y: u.y + Math.sin(a) * 140, until: W.time + 10, facing: u.facing, tx: null }); } A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.5, col: '200,160,255' }); }
 
 // ---------------- damage changes: double damage, armour, dodge, shields, lifesteal, silence ----------------
 function arenaHitMod(A, by, u, dmg) {
@@ -42290,16 +42327,13 @@ function arenaItemsTick(A, dt) {
   for (const id in A.spec) if (A.spec[id] > 0 && A.spec[id] <= t) A.spec[id] = 0;
   // illusions walk at the closest enemy (they vanish when hit or when time is up)
   for (const il of A.illus) { if (il.dead || t > il.until || !il.src.alive) { il.dead = true; continue; } let best = null, bd = 1400; for (const e of A.alive()) { if (!A.enemy(il.src, e)) continue; const d = Math.hypot(e.x - il.x, e.y - il.y); if (d < bd) { bd = d; best = e; } }
-    const gx = best ? best.x + Math.cos(il.until * 3) * 260 : il.src.x + 200 * Math.cos(t + il.until), gy = best ? best.y + Math.sin(il.until * 3) * 260 : il.src.y + 200 * Math.sin(t + il.until);
-    const dx = gx - il.x, dy = gy - il.y, d = Math.hypot(dx, dy); if (d > 30) { const st = Math.min(d, (il.src.baseSpd || 360) * 0.9 * dt), nx = il.x + dx / d * st, ny = il.y + dy / d * st; if (W.walkable(nx, ny)) { il.x = nx; il.y = ny; } il.facing = Math.atan2(dy, dx) * 180 / Math.PI; il.moving = true; } else il.moving = false; }
+    arenaWander(A, il, best, A.illus, (il.src.baseSpd || 360) * 1.05, dt, A.id === 'pudge'); }
   A.illus = A.illus.filter(i => !i.dead);
   // wolves bite, archers shoot
   for (const s of A.summ) { if (t > s.until || !s.o.alive) { s.dead = true; continue; } let best = null, bd = s.k === 'archer' ? 750 : 1600; for (const e of A.alive()) { if (!A.enemy(s.o, e) || e.invisUntil > t) continue; const d = Math.hypot(e.x - s.x, e.y - s.y); if (d < bd) { bd = d; best = e; } }
-    if (s.k === 'wolf') { const gx = best ? best.x : s.o.x + 90, gy = best ? best.y : s.o.y; const dx = gx - s.x, dy = gy - s.y, d = Math.hypot(dx, dy); s.moving = false;
-      if (d > 70) { const st = Math.min(d - 60, 330 * dt), c = s.comp != null ? s.comp : (s.comp = A.compAt(s.x, s.y)); const tryStep = (ux, uy) => { const nx = s.x + ux * st, ny = s.y + uy * st; if (A.W.walkable(nx, ny) && A.compAt(nx, ny) === c) { s.x = nx; s.y = ny; return true; } return false; };
-        /* it walks: never through walls, trees, barricades or the river; it stays on its island */
-        const ux = dx / d, uy = dy / d; if (tryStep(ux, uy) || tryStep(Math.sign(ux) || 0.0001, 0) || tryStep(0, Math.sign(uy) || 0.0001)) s.moving = true; s.facing = Math.atan2(dy, dx) * 180 / Math.PI; s.fx = dx > 0 ? 1 : -1; }
-      else if (best) arenaHit(A, s.o, best, 3 * dt, 0, false, true); }
+    if (s.k === 'wolf') { const near = best && Math.hypot(best.x - s.x, best.y - s.y) < 75;
+      if (!near) arenaWander(A, s, best, A.summ, 340, dt, true); else s.moving = false;
+      if (near) arenaHit(A, s.o, best, 3 * dt, 0, false, true); }
     else { const dx = s.o.x - s.x, dy = s.o.y - s.y, d = Math.hypot(dx, dy); if (d > 160) { s.x += dx / d * Math.min(d, 380 * dt); s.y += dy / d * Math.min(d, 380 * dt); } if (best && t > s.sh) { s.sh = t + 2; A.addFx({ k: 'shot', x: s.x, y: s.y, tx: best.x, ty: best.y, t, dur: 0.3 }); arenaHit(A, s.o, best, 6); } } }
   A.summ = A.summ.filter(s => !s.dead);
   // mines and barricades
@@ -42323,7 +42357,7 @@ function arenaTakeRune(A, u, k) {
   if (k === 'invis') { b.invis = t + R.dur; u.invisUntil = t + R.dur; }
   if (k === 'shield') { b.shield = t + R.dur; b.absorb = 30; }
   if (k === 'illu') arenaIllusion(A, u, 2);
-  if (k === 'summon') for (let i = 0; i < 2; i++) A.summ.push({ k: 'wolf', o: u, x: u.x + (i ? 60 : -60), y: u.y, until: t + R.dur, fx: 1 });
+  if (k === 'summon') for (let i = 0; i < 2; i++) A.summ.push({ k: 'wolf', o: u, x: u.x + (i ? 150 : -150), y: u.y, until: t + R.dur, fx: 1 });
   A.addFx({ k: 'puff', x: u.x, y: u.y, t, dur: 0.7, col: '220,180,255' }); W.emit('sound', { name: 'revive' });
   A.say((u.owner === W.local ? 'Tomaste' : u.owner.name + ' tomó') + ' la runa de ' + R.n, u.owner.team === W.local.team ? 'ff7dff8a' : 'ffff9a7a');
 }
@@ -42539,6 +42573,7 @@ const ZB = {
   frost: { n: 'Torreta de hielo', ic: '❄️', s: 96, hp: 400, g: 300, pw: 1, dmg: [25, 35], cd: 1.0, rng: 800, slow: 1, hide: 1 },
   warehouse: { n: 'Almacén', ic: '📦', s: 128, hp: 400, g: 150, req: ['attach', 1], d: 'Vende armas y equipo para tu marine.' },
 };
+for (const k in ZB) ZB[k].img = 'ibc_' + k; /* the building icons Perrin drew */
 const ZB_BUILD = ['barricade', 'research', 'exchange', 'factory', 'flag', 'core', 'turret', 'warehouse'];
 // research (at the Research Center; income at the Factory): g = cost of level 1, gi = more per level, h = honor
 const ZR = {
@@ -42657,9 +42692,9 @@ function zSetup(A, opts) {
   const hz = W.nearestWalkable(HUMAN_ZONE[0], HUMAN_ZONE[1], 900) || A.spots[0], zz = W.nearestWalkable(ZOMBIE_ZONE[0], ZOMBIE_ZONE[1], 900) || A.spots[A.spots.length - 1];
   A.hzone = hz; A.zzone = zz;
   { /* an apocalyptic city: ruins, burnt cars, the dead (same layout for every player: a fixed seed) */ let sd = 1234567; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
-    const pics = []; for (let i = 0; i < 48; i++) if (i < 24 || i > 29) pics.push('zd1_' + String(i).padStart(2, '0')); for (let i = 0; i < 56; i++) pics.push('zd2_' + String(i).padStart(2, '0'));
-    A.decor = []; const sp = A.spots || []; for (let k = 0; k < 600 && A.decor.length < 90 && sp.length; k++) { const s = sp[Math.floor(rnd() * sp.length)]; const x = s.x + (rnd() - 0.5) * 300, y = s.y + (rnd() - 0.5) * 300;
-      if (!W.walkable(x, y) || Math.hypot(x - hz.x, y - hz.y) < 900 || Math.hypot(x - zz.x, y - zz.y) < 700 || A.decor.some(d => Math.hypot(d.x - x, d.y - y) < 330)) continue; A.decor.push({ x, y, im: pics[Math.floor(rnd() * pics.length)], sz: 150 + rnd() * 70 }); } }
+    const pics = []; for (let i = 0; i < 48; i++) if (i < 24 || i > 29) pics.push('zd1_' + String(i).padStart(2, '0')); for (let i = 0; i < 56; i++) pics.push('zd2_' + String(i).padStart(2, '0')); for (const n of ['cad1', 'cad2', 'cad3', 'cad4', 'cad5', 'edi1', 'edi2', 'edi4', 'edi5']) pics.push('zdp_' + n, 'zdp_' + n);
+    A.decor = []; const sp = A.spots || []; for (let k = 0; k < 4000 && A.decor.length < 320 && sp.length; k++) { const s = sp[Math.floor(rnd() * sp.length)]; const x = s.x + (rnd() - 0.5) * 1100, y = s.y + (rnd() - 0.5) * 1100;
+      if (!W.walkable(x, y) || Math.hypot(x - hz.x, y - hz.y) < 900 || Math.hypot(x - zz.x, y - zz.y) < 700 || A.decor.some(d => Math.hypot(d.x - x, d.y - y) < 175)) continue; A.decor.push({ x, y, im: pics[Math.floor(rnd() * pics.length)], sz: 170 + rnd() * 80 }); } }
   for (const pid of ids) { const p = W.players[pid], zb = A.heads.has(pid); const s = zSpawnPt(A, zb);
     const u = W.createUnit(p, fourcc('E000'), s.x, s.y, 0); A.heroes.push(u); A.kills[pid] = 0; A.deaths[pid] = 0; A.gold[pid] = zb ? 4000 : 1000; A.honor[pid] = 0; A.res[pid] = {}; A.inv[pid] = []; A.lvl[pid] = 1; A.buf[pid] = {};
     if (zb) zMakeZombie(A, u, true); else { zSetHuman(A, u); } arenaMove(A, u, s.x, s.y); }
@@ -42671,7 +42706,7 @@ function zSetup(A, opts) {
   A.say = (txt, col) => { W.emit('text', (col ? '|c' + col : '') + txt + (col ? '|r' : '')); if (!A.client) A.fxLog.push({ id: ++A.fxId, k: 'say', txt, col, t: W.time }); };
   A.addFx = f => { A.fx.push(f); if (!A.client) A.fxLog.push(Object.assign({ id: ++A.fxId }, f, { u: undefined })); };
   A.skillsOf = u => zSkillsOf(A, u); A.ready = (u, k) => Math.max(0, (A.cdz[u.owner.id + ':' + k] || 0) - W.time);
-  A.cmd = (p, s) => { if (A.client) { if (window.zcmdNet) zcmdNet(s); zLocalEcho(A, p, s); return; } zCmd(A, p, s); };
+  A.cmd = (p, s) => { if (A.client) { if (/^build:/.test(s)) { const a = String(s).split(':'), B = ZB[a[1]]; if (a[2] != null && B && !zFree(A, +a[2], +a[3], B.s)) { A.say('No hay espacio aquí', 'ffff9a7a'); return false; } } if (window.zcmdNet) zcmdNet(s); zLocalEcho(A, p, s); return true; } return zCmd(A, p, s); };
   W.arenaCast = (p, k, aim) => { const u = W.heroOf(p); if (!u) return false; A.cmd(p, 'cast:' + k + ':' + Math.round(((aim && aim.dx) || 0) * 100) + ':' + Math.round(((aim && aim.dy) || 0) * 100)); return true; };
   A.hud = ui => zHud(A, ui); A.cam = () => null; A.snapFn = () => zSnap(A); A.applyFn = s => { A.snap = s; };
   A.zGround = (g, R) => zGround(A, g, R); A.zDraw = (g, R) => zDraw(A, g, R); A.dark = (u, me) => zSees(A, W.local, u) ? undefined : false;
@@ -42711,7 +42746,7 @@ function zNearFlagFoe(A, u) { return A.blds.some(b => b.k === 'flag' && b.aura =
 function zAuraOf(A, u, k) { for (const f of A.alive()) if (!A.enemy(f, u) && Math.hypot(f.x - u.x, f.y - u.y) < 900) for (const it of zItemsOf(A, f.owner.id)) if (it.st && it.st[k]) return true; return false; }
 
 // ---------------- what a hero can do (buttons) ----------------
-function zSkillsOf(A, u) { const c = zClass(A, u); if (!c) return []; const Z = A.isHunter(u); const L = c.sk.filter(k => ZSK[k].t !== 'passive').concat(Z ? ['madness', 'recall'] : ['blink', 'ensnare', 'rapid']); return L.map(k => Object.assign({ id: k }, ZSK[k])); }
+function zSkillsOf(A, u) { const c = zClass(A, u); if (!c) return []; const Z = A.isHunter(u); const L = c.sk.filter(k => ZSK[k].t !== 'passive').concat(Z ? ['madness'] : ['blink', 'ensnare', 'rapid']); return L.map(k => Object.assign({ id: k }, ZSK[k])); }
 function zSkillCd(A, u, k) { let cd = ZSK[k].cd || 1; if (k === 'blink') cd = Math.max(6, cd - zStat(A, u, 'blinkCd')); return cd; }
 
 // ---------------- commands (host) ----------------
@@ -43098,12 +43133,10 @@ const _zImg = {}; function zImgDraw(g, n, x, y, S) { if (!n) return; let im = _z
 function zBldDraw(g, b, mine, A) {
   const B = ZB[b.k], h = b.s / 2, t = A.W.time; g.save(); g.translate(b.x, b.y);
   g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(-h + 6, -h - 8, b.s, b.s);
-  const wall = ['barricade', 'adv', 'stone', 'super', 'burrow'].includes(b.k);
-  if (wall) { const col = { barricade: ['#8a6a3a', '#5a4020'], adv: ['#9a7a45', '#5a4020'], stone: ['#8d8d8d', '#4d4d4d'], super: ['#a8a8b8', '#5d5d6d'], burrow: ['#7d7060', '#3d3020'] }[b.k]; g.fillStyle = col[0]; g.strokeStyle = col[1]; g.lineWidth = 4; g.fillRect(-h + 2, -h + 2, b.s - 4, b.s - 4); g.strokeRect(-h + 2, -h + 2, b.s - 4, b.s - 4); g.beginPath(); g.moveTo(-h + 2, 0); g.lineTo(h - 2, 0); g.moveTo(0, -h + 2); g.lineTo(0, 0); g.moveTo(-h / 2, 0); g.lineTo(-h / 2, h - 2); g.stroke();
-    if (b.k === 'burrow') { g.fillStyle = '#ddd'; for (let i = 0; i < 4; i++) { g.beginPath(); const a = i * 1.57; g.moveTo(Math.cos(a) * h, Math.sin(a) * h); g.lineTo(Math.cos(a + 0.2) * (h + 16), Math.sin(a + 0.2) * (h + 16)); g.lineTo(Math.cos(a + 0.4) * h, Math.sin(a + 0.4) * h); g.fill(); } } }
-  else { g.fillStyle = mine ? '#2c3e66' : '#3b2c52'; g.strokeStyle = mine ? '#7fb2ff' : '#b28cff'; if (A.zomb.has(b.owner)) { g.fillStyle = '#3a4a20'; g.strokeStyle = '#8cff6a'; } g.lineWidth = 5; g.beginPath(); g.roundRect ? g.roundRect(-h + 4, -h + 4, b.s - 8, b.s - 8, 12) : g.rect(-h + 4, -h + 4, b.s - 8, b.s - 8); g.fill(); g.stroke();
-    if (B.dmg || b.k === 'turret') { g.fillStyle = '#555c66'; g.beginPath(); g.arc(0, 6, h * 0.55, 0, 7); g.fill(); g.save(); g.rotate((b.aim || 0)); g.fillStyle = '#9aa3ad'; g.fillRect(0, 0, h * 0.9, 12); g.restore(); }
-    zImgDraw(g, b.k === 'flag' && b.aura ? FLAG_IMG[b.aura] : B.img, 0, B.dmg || b.k === 'turret' ? h * 0.55 : 0, B.dmg || b.k === 'turret' ? h * 0.9 : h * 1.45); }
+  { const im = zDecImg(B.img); g.save(); g.beginPath(); g.rect(-h + 2, -h + 2, b.s - 4, b.s - 4); g.clip(); g.fillStyle = '#2a2622'; g.fillRect(-h, -h, b.s, b.s);
+    if (im.complete && im.naturalWidth) { g.scale(1, -1); const S = b.s * 1.42; g.drawImage(im, -S / 2, -S / 2, S, S); } g.restore();
+    g.strokeStyle = A.zomb.has(b.owner) ? '#8cff6a' : mine ? '#7fb2ff' : '#b28cff'; g.lineWidth = 3; g.strokeRect(-h + 2, -h + 2, b.s - 4, b.s - 4);
+    if (b.k === 'flag' && b.aura) zImgDraw(g, FLAG_IMG[b.aura], 0, 0, h); }
   if (b.inv > t) { g.strokeStyle = 'rgba(120,255,160,0.8)'; g.lineWidth = 5; g.strokeRect(-h - 6, -h - 6, b.s + 12, b.s + 12); }
   if (b.bt) { const q = Math.min(1, (t - b.bt.t0) / b.bt.dur), w = Math.max(80, b.s), y = h + 26; g.fillStyle = 'rgba(0,0,0,0.65)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 13); g.fillStyle = '#ffd34d'; g.fillRect(-w / 2, y, w * q, 9); g.strokeStyle = 'rgba(255,211,77,0.8)'; g.lineWidth = 3; g.setLineDash([8, 6]); g.strokeRect(-h - 4, -h - 4, b.s + 8, b.s + 8); g.setLineDash([]);
     g.save(); g.scale(1, -1); g.font = '900 20px system-ui'; g.textAlign = 'center'; g.fillStyle = '#ffe27a'; g.strokeStyle = '#000'; g.lineWidth = 4; const tx = '🔨 ' + Math.ceil(b.bt.dur * (1 - q)) + ' s'; g.strokeText(tx, 0, -y - 22); g.fillText(tx, 0, -y - 22); g.restore(); }
@@ -43115,6 +43148,8 @@ function zGround(A, g, R) {
   const W = A.W, t = W.time, me = W.heroOf(W.local), myZ = me && A.isHunter(me);
   // the ruined city (props on the floor: you walk over them)
   if (A.decor && window.FX) { const V = R && R.view; for (const d of A.decor) { if (V && (d.x < V.vx0 - 200 || d.x > V.vx1 + 200 || d.y < V.vy0 - 200 || d.y > V.vy1 + 200)) continue; const im = zDecImg(d.im); if (!im.complete || !im.naturalWidth) continue; g.save(); g.translate(d.x, d.y); g.scale(1, -1); g.globalAlpha = 0.95; g.drawImage(im, -d.sz / 2, -d.sz / 2, d.sz, d.sz); g.restore(); } }
+  { /* a light drifting fog over the dead city */ const V = R && R.view; if (V) { const cx = (V.vx0 + V.vx1) / 2, cy = (V.vy0 + V.vy1) / 2, w = V.vx1 - V.vx0; if (!zGround._fog) { const c = document.createElement('canvas'); c.width = c.height = 256; const q = c.getContext('2d'); const gr = q.createRadialGradient(128, 128, 0, 128, 128, 128); gr.addColorStop(0, 'rgba(190,195,180,0.22)'); gr.addColorStop(1, 'rgba(190,195,180,0)'); q.fillStyle = gr; q.fillRect(0, 0, 256, 256); zGround._fog = c; }
+    for (let i = 0; i < 7; i++) { const fx = cx + Math.sin(t * 0.05 + i * 2.1) * w * 0.55, fy = cy + Math.cos(t * 0.04 + i * 1.3) * w * 0.45, fs = w * (0.5 + (i % 3) * 0.2); g.drawImage(zGround._fog, fx - fs / 2, fy - fs / 2, fs, fs); } } }
   // (no shop stalls on the map: the zombies buy from the menu)
   if (false) for (const s of A.shops) { g.save(); g.translate(s.x, s.y); g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(0, -6, 110, 34, 0, 0, 7); g.fill(); g.fillStyle = '#3a2a1a'; g.fillRect(-80, -10, 160, 70); for (let i = 0; i < 7; i++) { g.fillStyle = i % 2 ? '#2a3a20' : '#5a1a6a'; g.beginPath(); g.moveTo(-90 + i * 26, 60); g.lineTo(-90 + (i + 1) * 26, 60); g.lineTo(-90 + (i + 1) * 26 - 4, 100); g.lineTo(-90 + i * 26 + 4, 100); g.fill(); }
     g.scale(1, -1); g.font = '900 22px system-ui'; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = '#000'; g.strokeText(s.n, 0, -120); g.fillStyle = '#c8ff9a'; g.fillText(s.n, 0, -120); g.restore(); }
@@ -43156,7 +43191,8 @@ function zDraw(A, g, R) {
     if (b.harden) { g.strokeStyle = 'rgba(200,200,220,0.7)'; g.lineWidth = 6; g.beginPath(); g.arc(u.x, u.y + 50, 72, 0, 7); g.stroke(); }
     if (u.rootUntil > t) { g.strokeStyle = 'rgba(230,230,230,0.8)'; g.lineWidth = 3; g.beginPath(); g.ellipse(u.x, u.y, 50, 20, 0, 0, 7); g.stroke(); }
     if (u.chan && u.chan.k === 'cap' && u.chan.f && u.owner === W.local) { g.save(); g.setLineDash([18, 14]); g.strokeStyle = 'rgba(255,211,77,0.55)'; g.lineWidth = 5; g.beginPath(); g.arc(u.chan.f.x, u.chan.f.y, 320, 0, 6.29); g.stroke(); g.restore(); }
-    if (u.chan) { const q = 1 - (u.chan.t - t) / (u.chan.k === 'cap' ? 5 : u.chan.k === 'assas' ? 2.5 : 2.25); g.strokeStyle = '#ffd34d'; g.lineWidth = 8; g.beginPath(); g.arc(u.x, u.y + 50, 80, -Math.PI / 2, -Math.PI / 2 + q * 6.28); g.stroke(); }
+    if (u.chan && u.chan.k === 'cap' && u.chan.f && u.owner === W.local) { const f = u.chan.f, d = Math.hypot(f.x - u.x, f.y - u.y); g.save(); g.translate(f.x, f.y + 150); g.scale(1, -1); g.font = '900 26px system-ui'; g.textAlign = 'center'; g.lineWidth = 6; g.strokeStyle = '#000'; const tx = d > 250 ? '⚠️ ¡Mantente cerca!' : '🏭 Capturando… mantente cerca'; g.strokeText(tx, 0, 0); g.fillStyle = d > 250 ? '#ff9a4d' : '#ffd34d'; g.fillText(tx, 0, 0); g.restore(); }
+    if (u.chan && !(u.chan.k === 'cap' && u.chan.f && Math.hypot(u.chan.f.x - u.x, u.chan.f.y - u.y) >= 320)) { const q = 1 - (u.chan.t - t) / (u.chan.k === 'cap' ? 5 : u.chan.k === 'assas' ? 2.5 : 2.25); g.strokeStyle = '#ffd34d'; g.lineWidth = 8; g.beginPath(); g.arc(u.x, u.y + 50, 80, -Math.PI / 2, -Math.PI / 2 + q * 6.28); g.stroke(); }
     if ((A.lvl[u.owner.id] || 1) > 1) { g.save(); g.translate(u.x + 58, u.y - 30); g.scale(1, -1); g.font = '900 20px system-ui'; g.fillStyle = '#ffe27a'; g.fillText('Nv' + A.lvl[u.owner.id], 0, 0); g.restore(); } }
   // the night: everything is dark except what your side can see
   const cv = g.canvas, tr = g.getTransform(); if (!_zdark) _zdark = document.createElement('canvas'); if (_zdark.width !== cv.width || _zdark.height !== cv.height) { _zdark.width = cv.width; _zdark.height = cv.height; }
@@ -43209,7 +43245,7 @@ function zPanel(A, toggle) {
   if (toggle) { pn.classList.toggle('hidden'); pn._k = null; _zInfo = ''; } if (pn.classList.contains('hidden')) return;
   const g = Math.floor(A.gold[id] || 0), h = A.honor[id] || 0, res = A.res[id] || {};
   const near = A.blds.filter(b => !A.zomb.has(b.owner) && (b.owner === id || ['research', 'exchange', 'trade', 'warehouse'].includes(b.k)) && Math.hypot(b.x - me.x, b.y - me.y) < 520).sort((a, b) => Math.hypot(a.x - me.x, a.y - me.y) - Math.hypot(b.x - me.x, b.y - me.y))[0];
-  const mid = Z && (W.time < A.raiseAt || Math.hypot(me.x - A.zzone.x, me.y - A.zzone.y) < 900), shop = A.shops.filter(s => Math.hypot(s.x - me.x, s.y - me.y) < 520)[0];
+  const mid = Z, /* the zombie shops are always open, wherever you are */ shop = A.shops.filter(s => Math.hypot(s.x - me.x, s.y - me.y) < 520)[0];
   const SHOPIC = { 'Cripta': '⚰️', 'Vendedor de recetas': '📜', 'Tumba de reliquias': '🪦', 'Tienda embrujada': '👻', 'Tienda secreta': '🗝️' };
   const tabs = Z ? (mid ? Object.keys(ZSHOPS).map(n => ({ ic: SHOPIC[n], n })) : [{ ic: '🛒', n: 'Tienda' }]).concat([{ img: 'zi_bag', n: 'Bolso' }]) : [{ img: 'zi_build', n: 'Construir' }, { img: near ? (ZB[near.k].img || 'zi_build') : 'zi_research', n: near ? ZB[near.k].n : 'Cerca' }, { img: 'zi_bag', n: 'Bolso' }];
   if (_zTab >= tabs.length) _zTab = 0;
@@ -43219,7 +43255,7 @@ function zPanel(A, toggle) {
   let note = '';
   if (!Z && _zTab === 0) { const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - me.x, q.y - me.y) < 260); if (f) add({ img: 'zi_smallfac' }, 'Capturar fábrica pequeña', '5 s quieto · +2 de oro por segundo', '5 s', 'cap');
     for (const k of ZB_BUILD) { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1]; add(B, B.n, rq ? '🔒 Investiga ' + ZR[B.req[0]].n : B.d, cost(B.g, B.h), 'build:' + k, rq || g < B.g || h < (B.h || 0)); }
-    if (A.blds.some(b => b.owner === id && !b.dead)) add({ img: 'zi_demolish' }, 'Demoler', 'Toca el edificio que quieres derribar (te devuelve 25%)', 'elegir', 'demomode'); }
+  }
   if (!Z && _zTab === 1) { if (!near) note = 'Acércate a un edificio tuyo (o al Centro, Oficina o Almacén de un compañero).'; else { const B = ZB[near.k], own = near.owner === id;
     note = (own ? '' : 'De ' + zEsc(W.players[near.owner].name) + ' · ') + B.n + ' ❤️ ' + Math.ceil(near.hp) + '/' + near.max + (near.bt ? ' · 🔨 construyendo' : '');
     if (!near.bt) {
@@ -43231,7 +43267,7 @@ function zPanel(A, toggle) {
       if (near.k === 'flag' && own) for (const [k, [n, d]] of Object.entries(FLAG_AURA)) add({ img: FLAG_IMG[k] }, n + (near.aura === k ? ' ✅' : ''), d, near.aura === k ? 'activa' : 'elegir', 'aura:' + near.id + ':' + k, near.aura === k);
       if (near.k === 'burrow' && own && !near.rep) add({ ic: '🛠️' }, 'Reparación de emergencia', '+350 de vida (1 vez)', 'usar', 'erepair:' + near.id);
       if (near.k === 'factory' && own && !near.explo) add({ ic: '💣' }, 'Poner explosivo', 'Si la destruyen explota: 500 a los zombis cerca', 'poner', 'explo:' + near.id); }
-    if (own) add({ img: 'zi_demolish' }, 'Demoler', 'Toca el edificio que quieres derribar (te devuelve 25%)', 'elegir', 'demomode'); } }
+  } }
   if (Z && _zTab < tabs.length - 1) { const sh = mid ? { n: Object.keys(ZSHOPS)[_zTab] } : shop;
     if (!sh) note = 'Las tiendas zombi están en el centro del mapa.'; else { note = sh.n;
       if (sh.n === 'Vendedor de recetas') for (const [k, r] of Object.entries(ZREC)) { const have = r.parts.every(p => (A.inv[id] || []).some(q => q.k === p)); add(r, r.n, 'Junta: ' + r.parts.map(p => ZI[p].n).join(' + ') + ' · ' + r.d, cost(r.g, r.h), 'buy:' + k, !have || g < r.g || h < (r.h || 0)); }
@@ -43243,7 +43279,12 @@ function zPanel(A, toggle) {
     <div class="zcgrid">${L.map((e, i) => `<button data-i="${i}" class="${e.dis ? 'dis' : ''}">${icon(e.o)}<b class="zcn">${zEsc(String(e.n).replace(/ \(.*\)$/, ''))}</b><i>${zEsc(e.cost)}</i></button>`).join('')}</div>`;
   pn.querySelector('[data-x]').addEventListener('click', () => pn.classList.add('hidden'));
   pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _zTab = +b.dataset.tab; _zInfo = ''; pn._k = null; zPanel(A, false); }));
-  pn.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => { const e = L[+b.dataset.i]; _zInfo = '<b>' + zEsc(e.n) + '</b> · ' + zEsc(e.cost) + '<br>' + zEsc(e.d || '');
+  pn.querySelectorAll('[data-i]').forEach(b => { const e0 = L[+b.dataset.i]; if (e0.dis || !e0.act || !/^build:/.test(e0.act)) return; /* press a building and drag it out of the menu: the menu closes and it follows your finger; let go to build */
+    b.addEventListener('pointerdown', ev => { const sx = ev.clientX, sy = ev.clientY; let on = false;
+      const mv = m => { if (on || Math.hypot(m.clientX - sx, m.clientY - sy) < 18) return; on = true; b._drag = true; pn.classList.add('hidden'); zPlaceMode(A, e0.act.split(':')[1]); document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up0, true); zGhostFollow(A, W, sx, sy, false); };
+      const up0 = () => { document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up0, true); };
+      document.addEventListener('pointermove', mv, true); document.addEventListener('pointerup', up0, true); }); });
+  pn.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => { if (b._drag) { b._drag = false; return; } const e = L[+b.dataset.i]; _zInfo = '<b>' + zEsc(e.n) + '</b> · ' + zEsc(e.cost) + '<br>' + zEsc(e.d || '');
     if (!e.dis && e.act === 'demomode') { pn.classList.add('hidden'); zDemoMode(A, true); return; }
     if (!e.dis && e.act && /^build:/.test(e.act)) { pn.classList.add('hidden'); zPlaceMode(A, e.act.split(':')[1]); return; } /* first a see-through building you place where you want */
     if (!e.dis && e.act && /^cap/.test(e.act)) { A.cmd(W.local, e.act); zBought(b, W); pn.classList.add('hidden'); return; } /* building or capturing: the menu closes so you can watch it */
@@ -43255,18 +43296,32 @@ function zPanel(A, toggle) {
 function zPlaceMode(A, k) { const W = A.W, B = ZB[k], u = W.heroOf(W.local); if (!B || !u) return; zDemoMode(A, false);
   const sp = (['barricade', 'adv', 'stone', 'super'].includes(k) && zWallSpot(A, u, B.s)) || zBuildSpot(A, u, B.s, null) || { x: u.x, y: u.y + 200 };
   A.zPlace = { k, x: sp.x, y: sp.y, S: B.s }; let bar = document.getElementById('zDemoBar'); if (bar) bar.remove();
-  bar = document.createElement('div'); bar.id = 'zDemoBar'; bar.innerHTML = `<span>🏗️ ${B.n}: muévela con el dedo · tócala o suéltala para construir</span><button>✕</button>`; bar.addEventListener('pointerdown', e => e.stopPropagation()); bar.querySelector('button').addEventListener('click', () => zPlaceEnd(A)); document.body.appendChild(bar); }
+  bar = document.createElement('div'); bar.id = 'zDemoBar'; bar.innerHTML = `<span>🏗️ ${B.n} · arrástrala y suéltala</span><button>✕</button>`; bar.addEventListener('pointerdown', e => e.stopPropagation()); bar.querySelector('button').addEventListener('click', () => zPlaceEnd(A)); document.body.appendChild(bar); }
 function zPlaceEnd(A) { A.zPlace = null; const bar = document.getElementById('zDemoBar'); if (bar) bar.remove(); }
 const zGhSnap = v => Math.round(v / 32) * 32;
-window.zPlaceDown = (W, q, e) => { const A = W.arena, P = A && A.zPlace; if (!P) return false; const R = A.R; const lift = R ? 70 / (R.zoom || 1) * 1 : 70; /* the ghost floats above your finger */
-  const onGhost = Math.abs(q.x - P.x) < P.S / 2 + 40 && Math.abs(q.y - P.y) < P.S / 2 + 90; const sx = e.clientX, sy = e.clientY; let moved = false;
-  const mv = ev => { const p = R.screenToWorld(ev.clientX, ev.clientY); if (Math.hypot(ev.clientX - sx, ev.clientY - sy) > 10) moved = true; if (moved || !onGhost) { P.x = zGhSnap(p.x); P.y = zGhSnap(p.y + P.S / 2 + 60); } };
-  const up = ev => { document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); if (!A.zPlace) return;
-    if (onGhost || moved) { const u = W.heroOf(W.local); if (A.cmd(W.local, 'build:' + P.k + ':' + P.x + ':' + P.y)) { zPlaceEnd(A); try { W.emit('sound', { name: 'coin' }); } catch (er) {} } } };
-  if (!onGhost) { P.x = zGhSnap(q.x); P.y = zGhSnap(q.y + P.S / 2 + 60); }
-  document.addEventListener('pointermove', mv, true); document.addEventListener('pointerup', up, true); return true; };
-function zPlaceDraw(A, g) { const P = A.zPlace; if (!P) return; const ok = zFree(A, P.x, P.y, P.S), h = P.S / 2; g.save(); g.globalAlpha = 0.5; g.fillStyle = ok ? '#7dff8a' : '#ff5050'; g.fillRect(P.x - h, P.y - h, P.S, P.S); g.globalAlpha = 0.9; g.strokeStyle = ok ? '#c8ffc8' : '#ff9a9a'; g.lineWidth = 5; g.setLineDash([14, 10]); g.strokeRect(P.x - h, P.y - h, P.S, P.S);
-  const B = ZB[P.k]; if (B) { g.scale(1, -1); g.globalAlpha = 0.85; g.font = '900 22px system-ui'; g.textAlign = 'center'; g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 4; g.setLineDash([]); g.strokeText(B.n, P.x, -P.y - h - 14); g.fillText(B.n, P.x, -P.y - h - 14); } g.restore(); }
+function zLift(A, cx, cy, S) { const R = A.R; if (!R) return S / 2 + 100; const a = R.screenToWorld(cx, cy), b = R.screenToWorld(cx, cy - 140); return Math.abs(b.y - a.y) + S / 2; } /* the ghost sits well above your finger so you can see it */
+function zGhostFollow(A, W, sx, sy, onGhost) { const P = A.zPlace, R = A.R; let moved = false;
+  const at = (cx, cy) => { const p = R.screenToWorld(cx, cy); P.x = zGhSnap(p.x); P.y = zGhSnap(p.y + zLift(A, cx, cy, P.S)); };
+  const mv = ev => { if (!A.zPlace) return; if (Math.hypot(ev.clientX - sx, ev.clientY - sy) > 10) moved = true; if (moved || !onGhost) at(ev.clientX, ev.clientY); };
+  const up = ev => { document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', up, true); if (!A.zPlace) return;
+    if (onGhost || moved) { if (A.cmd(W.local, 'build:' + P.k + ':' + P.x + ':' + P.y)) { zPlaceEnd(A); try { W.emit('sound', { name: 'coin' }); } catch (er) {} } else { const bar = document.getElementById('zDemoBar'); if (bar) { bar.classList.remove('shake'); void bar.offsetWidth; bar.classList.add('shake'); } } } };
+  if (!onGhost) at(sx, sy);
+  document.addEventListener('pointermove', mv, true); document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', up, true); }
+window.zPlaceDown = (W, q, e) => { const A = W.arena, P = A && A.zPlace; if (!P) return false; zBldPopClose();
+  const onGhost = Math.abs(q.x - P.x) < P.S / 2 + 40 && Math.abs(q.y - P.y) < P.S / 2 + 40; zGhostFollow(A, W, e.clientX, e.clientY, onGhost); return true; };
+/* touch one of your buildings: a small sign to knock it down (or ✕) */
+function zBldPopClose() { const p = document.getElementById('zBldPop'); if (p) p.remove(); }
+window.zBldTap = (W, q, e) => { const A = W.arena; if (!A || !A.blds || A.zPlace) return false; zBldPopClose(); const id = W.local.id; if (A.zomb.has(id)) return false;
+  let best = null, bd = Infinity; for (const b of A.blds) { if (b.owner !== id || b.dead) continue; const d = Math.max(Math.abs(b.x - q.x), Math.abs(b.y - q.y)); if (d < b.s / 2 + 20 && d < bd) { bd = d; best = b; } } if (!best) return false;
+  const pop = document.createElement('div'); pop.id = 'zBldPop'; pop.innerHTML = `<b>${zEsc(ZB[best.k].n)}</b><button class="zdes">💥 Destruir</button><button class="zx">✕</button>`;
+  pop.style.left = Math.max(8, Math.min(innerWidth - 230, e.clientX - 110)) + 'px'; pop.style.top = Math.max(60, e.clientY - 120) + 'px';
+  pop.addEventListener('pointerdown', ev => ev.stopPropagation()); pop.querySelector('.zx').onclick = zBldPopClose;
+  pop.querySelector('.zdes').onclick = () => { A.cmd(W.local, 'demolish:' + best.id); zBldPopClose(); try { W.emit('sound', { name: 'dx_ko' }); } catch (er) {} };
+  document.body.appendChild(pop); setTimeout(zBldPopClose, 6000); return true; };
+function zPlaceDraw(A, g) { const P = A.zPlace; if (!P) return; const ok = zFree(A, P.x, P.y, P.S), h = P.S / 2, B = ZB[P.k]; g.save();
+  const im = B && zDecImg(B.img); g.globalAlpha = 0.6; g.save(); g.beginPath(); g.rect(-h + P.x, -h + P.y, P.S, P.S); g.clip(); if (im && im.complete && im.naturalWidth) { g.translate(P.x, P.y); g.scale(1, -1); const S = P.S * 1.42; g.drawImage(im, -S / 2, -S / 2, S, S); } g.restore();
+  g.globalAlpha = 0.28; g.fillStyle = ok ? '#7dff8a' : '#ff5050'; g.fillRect(P.x - h, P.y - h, P.S, P.S); g.globalAlpha = 0.95; g.strokeStyle = ok ? '#7dff8a' : '#ff5050'; g.lineWidth = 5; g.setLineDash([14, 10]); g.strokeRect(P.x - h, P.y - h, P.S, P.S);
+  if (B) { g.scale(1, -1); g.font = '900 22px system-ui'; g.textAlign = 'center'; g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 4; g.setLineDash([]); g.strokeText(B.n, P.x, -P.y - h - 14); g.fillText(B.n, P.x, -P.y - h - 14); } g.restore(); }
 
 /* demolish: the menu closes and a sign asks you to touch the building to knock down (✕ to cancel) */
 function zDemoMode(A, on) { A.zDemo = !!on; let bar = document.getElementById('zDemoBar');
@@ -43848,7 +43903,10 @@ function tontoEmoji(em, px) { // emoji drawn once into a small canvas, then reus
   c = document.createElement('canvas'); c.width = c.height = px; const g = c.getContext('2d'); g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = Math.round(px * 0.82) + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.fillText(em, px / 2, px * 0.54);
   TONTO_EMC.set(k, c); return c;
 }
-function tontoDrawEm(g, em, x, y, size, alpha = 1) { const px = size > 80 ? 128 : 64; const c = tontoEmoji(em, px); g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; g.drawImage(c, -size / 2, -size / 2, size, size); g.restore(); }
+const T_ICO = { '🔑': 'ibc_llave', '🗝️': 'ibc_llave', '💣': 'ibc_bomba', '💎': 'ibc_diamante', '🍺': 'ibc_cerveza', '🔥': 'ibc_antorcha', '🧪': 'ibc_pocion', '🔨': 'ibc_martillo', '🍕': 'ibc_pizza', '📢': 'pu_gritar', '⚔️': 'pu_atacar' };
+const _tIm = {}; function tIcoImg(em) { const n = T_ICO[em]; if (!n || !window.FX) return null; const im = _tIm[n] || (_tIm[n] = Object.assign(new Image(), { src: FX(n) })); return im.complete && im.naturalWidth ? im : null; }
+function tIco(em, cls) { const n = T_ICO[em]; return n && window.FX ? `<img class="${cls || 'tico'}" src="${FX(n)}" alt="">` : em; }
+function tontoDrawEm(g, em, x, y, size, alpha = 1) { { const im = tIcoImg(em); if (im) { g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; g.drawImage(im, -size * 0.6, -size * 0.6, size * 1.2, size * 1.2); g.restore(); return; } } const px = size > 80 ? 128 : 64; const c = tontoEmoji(em, px); g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; g.drawImage(c, -size / 2, -size / 2, size, size); g.restore(); }
 
 /* ---- the ground: tiles + walls baked into 1024x1024 chunks ---- */
 const TCH = 1024, TSC = 0.5;
@@ -44014,7 +44072,7 @@ function tontoHud(W, api) {
   const S = W.tonto; let ui = document.getElementById('tontoUI');
   if (!ui) {
     ui = document.createElement('div'); ui.id = 'tontoUI';
-    ui.innerHTML = '<div id="tInv"></div><div id="tSk"></div><button id="tAtk" class="ab">⚔️<small>Atacar</small></button><div id="tCard" class="hidden"></div><div id="tMenu" class="hidden"></div>';
+    ui.innerHTML = '<div id="tInv"></div><div id="tSk"></div><button id="tAtk" class="ab">' + tIco('⚔️', 'tico atk') + '<small>Atacar</small></button><div id="tCard" class="hidden"></div><div id="tMenu" class="hidden"></div>';
     document.body.appendChild(ui);
     const inv = ui.querySelector('#tInv'); for (let k = 0; k < 6; k++) { const b = document.createElement('button'); b.dataset.k = k; inv.appendChild(b); }
     inv.addEventListener('pointerdown', e => { const b = e.target.closest('button'); if (!b) return; e.preventDefault(); e.stopPropagation(); tontoItemMenu(W, +b.dataset.k, api); });
@@ -44027,9 +44085,9 @@ function tontoHud(W, api) {
   const h = W.heroOf(W.local), alive = h && h.alive;
   ui.querySelector('#tAtk').classList.toggle('cool', !alive);
   const inv = h && h.inv6 || [], btns = ui.querySelectorAll('#tInv button');
-  btns.forEach((b, k) => { const it = inv[k]; const key = it ? it.handle : 0; if (b._k !== key) { b._k = key; b.textContent = it ? it.it.em : ''; b.classList.toggle('has', !!it); } });
+  btns.forEach((b, k) => { const it = inv[k]; const key = it ? it.handle : 0; if (b._k !== key) { b._k = key; b.innerHTML = it ? tIco(it.it.em) : ''; b.classList.toggle('has', !!it); } });
   { const sk = alive ? tontoSkills(W, h) : [], box = ui.querySelector('#tSk'), key = sk.map(x => x.id + ':' + Math.ceil(x.left)).join(',');
-    if (box._k !== key) { box._k = key; box.innerHTML = sk.map(x => `<button data-a="${x.id}" class="${x.left > 0 ? 'cool' : ''}">${x.em}<small>${x.left > 0 ? Math.ceil(x.left) + 's' : x.name}</small></button>`).join(''); } }
+    if (box._k !== key) { box._k = key; box.innerHTML = sk.map(x => `<button data-a="${x.id}" class="${x.left > 0 ? 'cool' : ''}">${tIco(x.em, 'tico big')}<small>${x.left > 0 ? Math.ceil(x.left) + 's' : x.name}</small></button>`).join(''); } }
   // the card of the selected thing
   const card = ui.querySelector('#tCard'), sel = S.sel;
   const gone = !sel || sel.removed || (sel.kind === 'unit' && !sel.alive) || (sel.kind === 'dest' && !sel.alive) || (sel.kind === 'item' && (sel.holder || sel.removed));
@@ -44815,7 +44873,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   let online = null; // { net, game, mySlot, host, owned, lastSend, hostGoneT }
   function start(onl) {
     online = onl || null;
-    { const zb = document.getElementById('zDemoBar'); if (zb) zb.remove(); }
+    { const zb = document.getElementById('zDemoBar'); if (zb) zb.remove(); const zp = document.getElementById('zBldPop'); if (zp) zp.remove(); }
     $('#menu').classList.add('hidden'); $('#end').classList.add('hidden'); $('#hud').classList.remove('hidden');
     for (const s of document.querySelectorAll('.screen')) if (s.id !== 'pause' && s.id !== 'end' && s.id !== 'powers') s.classList.add('hidden');
     sfx.init(); sfx.muted = !settings.sound; startMusic(); try { if (window.SPR && W) for (const p of W.players) { const c = SPR.MAN.chars[SPR.charOf(p, W.profile.id, W)]; if (c && c.emoji) SPR.img(c.emoji.f); } } catch (e) {} /* faces ready before the first emote */ chatterAt = 0; setTimeout(() => { try { window.botOpen && window.botOpen(); } catch (e) {} }, 600); refreshSprayBtn(); $('#hudCoins').textContent = '🪙 ' + (settings.coins | 0); refreshLvl(); setTimeout(() => { try { $('#emoteIcon').innerHTML = emoteHTML(settings.emoteLast); } catch (e) {} }, 300);
@@ -44998,7 +45056,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     // while dead the camera stays on your tomb, so you can ping for help
     if (reviveLock && hero && hero.alive) { if (performance.now() - reviveLock < 1500) { if (hero.order && hero.order.type === 'move' && !W.isGliding(W.local)) W.cmdStop(W.local); } else reviveLock = 0; }
     if (settings.control === 'stick' && stick.active && !reviveLock && hero && hero.alive && !paused) {
-      if ((stick.t = (stick.t || 0) + dt) > 0.08) { stick.t = 0; W.cmdMove(W.local, hero.x + stick.dx * 140, hero.y + stick.dy * 140); }
+      if ((stick.t = (stick.t || 0) + dt) > 0.08) { stick.t = 0; const q = W.tonto ? stickTarget(hero, stick.dx, stick.dy) : { x: hero.x + stick.dx * 140, y: hero.y + stick.dy * 140 }; if (q) W.cmdMove(W.local, q.x, q.y); else W.cmdStop(W.local); }
     }
     if (holding && !paused && hero && hero.alive && (holdT += dt) > 0.12 && settings.control === 'tap') {
       holdT = 0; const p = R.screenToWorld(holdPos.x, holdPos.y); W.cmdMove(W.local, p.x, p.y);
@@ -45098,6 +45156,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (best) { camWatch = best; R.freeCam = false; $('#watchName').textContent = best.owner.name || 'Compañero'; return; } } }
     if (settings.control === 'stick' && e.pointerType === 'touch' && !targeting) { const r = $('#stickBase').getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2; if (Math.hypot(e.clientX - cx, e.clientY - cy) < r.width * 0.75) { startStick(e); return; } } /* only the joystick itself moves you */
     if (W.arena && W.arena.zPlace && window.zPlaceDown) { const q = R.screenToWorld(e.clientX, e.clientY); if (zPlaceDown(W, q, e)) { camDrag = null; return; } }
+    if (W.arena && W.arena.blds && window.zBldTap) { const q = R.screenToWorld(e.clientX, e.clientY); if (zBldTap(W, q, e)) { camDrag = null; return; } }
     if (W.arena && W.arena.zDemo && window.zDemoTap) { const q = R.screenToWorld(e.clientX, e.clientY); if (zDemoTap(W, q)) { camDrag = null; return; } }
     if (W.tonto && typeof tontoTap === 'function' && (e.pointerType !== 'mouse' || e.button === 0)) { const q = R.screenToWorld(e.clientX, e.clientY); if (tontoTap(W, q, e.pointerType === 'touch', tontoApi())) { camDrag = null; return; } }
     const p = R.screenToWorld(e.clientX, e.clientY);
@@ -45145,6 +45204,14 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   cv.addEventListener('wheel', e => { if (!R) return; e.preventDefault(); R.targetZoom = clampZoom(R.targetZoom * Math.exp(-e.deltaY * 0.0012)); zoomBack(); }, { passive: false });
   const ZOOM0 = 0.32; const zoom0 = () => ZOOM0 * ((W && W.arena && W.arena.C.zoom) || (W && W.tonto ? 1.45 : 1)); const clampZoom = z => Math.max(0.2, Math.min(zoom0(), z)); // only zooming OUT, never closer than everybody else
   let zoomTm = null; function zoomBack(ms) { clearTimeout(zoomTm); zoomTm = setTimeout(() => { if (window.camFree) return; if (R && !pinch) R.targetZoom = zoom0(); else zoomBack(); }, ms ?? 1500); } // and it springs back to the normal camera by itself
+  /* mazes: the stick walks only where you can really go. It looks along your thumb for free ground (with the hero's width);
+     against a wall it slides along it (down in a corridor goes down even if the thumb is a little to the side), never through corners */
+  function stickTarget(h, dx, dy) { const L = Math.hypot(dx, dy) || 1; const free = (x, y) => { const r = 14; return W.walkable(x, y) && W.walkable(x + r, y) && W.walkable(x - r, y) && W.walkable(x, y + r) && W.walkable(x, y - r); };
+    const ray = (ux, uy) => { let ok = 0; for (let d = 8; d <= 140; d += 8) { if (!free(h.x + ux * d, h.y + uy * d)) break; ok = d; } return ok; };
+    const ux = dx / L, uy = dy / L; const cand = [[ux, uy]]; if (Math.abs(ux) > 0.15 && Math.abs(uy) > 0.15) { /* a diagonal: also try the two straight ways, the stronger one first */ const a = [Math.sign(ux), 0], b = [0, Math.sign(uy)]; if (Math.abs(ux) > Math.abs(uy)) cand.push(a, b); else cand.push(b, a); }
+    else if (Math.abs(ux) >= Math.abs(uy)) cand.push([Math.sign(ux), 0]); else cand.push([0, Math.sign(uy)]);
+    for (const [cx, cy] of cand) { const d = ray(cx, cy); if (d >= 16) return { x: h.x + cx * d, y: h.y + cy * d }; } return null; }
+  window._stickTarget = (h, dx, dy) => stickTarget(h, dx, dy);
   function startStick(e) { const r = $('#stickBase').getBoundingClientRect(); stick.id = e.pointerId; stick.ox = r.left + r.width / 2; stick.oy = r.top + r.height / 2; stick.active = true; stick.dx = stick.dy = 0; moveStick(e); }
   function moveStick(e) {
     let dx = e.clientX - stick.ox, dy = e.clientY - stick.oy; const d = Math.hypot(dx, dy); const m = Math.min(50, d);
@@ -45676,11 +45743,20 @@ class Net {
   const NAME_PRICE = 800;
   const okName = v => { v = (v || '').trim(); if (v.length < 3) return 'Mínimo 3 letras'; if (v.length > 14) return 'Máximo 14 letras'; if (!/^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñÜü_. -]+$/.test(v)) return 'Solo letras, números, espacio, punto o guion bajo'; if (/^(jugador|admin|moderador|perrin ?studios)$/i.test(v) && !VIP()) return 'Ese nombre no está disponible'; return ''; };
   const setName = v => { S.nick = v.trim(); $('#nick').value = S.nick; SW.saveSettings(); };
-  function accountAsk() { if (S.account) return; const box = $('#acctAsk'); box.classList.remove('hidden'); $('#acName').value = S.nick || ''; $('#acMake').onclick = () => { const v = $('#acName').value, bd = $('#acBday').value; let e = okName(v) || bdErr(bd); $('#acErr').textContent = e; if (e) return; S.bday = bd; setName(v); S.sound = true; S.music = true; S.account = { id: Math.random().toString(36).slice(2, 10), uid: newUid(), at: Date.now(), via: 'mapmix' }; SW.saveSettings(); box.classList.add('hidden'); toast('¡Cuenta creada! Bienvenido, ' + S.nick); }; }
+  function accountAsk() { if (S.account) return; const box = $('#acctAsk'); box.classList.remove('hidden'); $('#acName').value = S.nick || ''; $('#acMake').onclick = () => { const v = $('#acName').value, bd = bdVal('#acBday'); let e = okName(v) || bdErr(bd); $('#acErr').textContent = e; if (e) return; S.bday = bd; setName(v); S.sound = true; S.music = true; S.account = { id: Math.random().toString(36).slice(2, 10), uid: newUid(), at: Date.now(), via: 'mapmix' }; SW.saveSettings(); box.classList.add('hidden'); toast('¡Cuenta creada! Bienvenido, ' + S.nick); }; }
   // ---------- birthday: chosen once with the account, never changed; on that day a cake opens a chest with a character ----------
-  function bdErr(v) { if (!/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return 'Elige tu fecha de cumpleaños'; const y = +v.slice(0, 4); if (y < 1920 || new Date(v) > new Date()) return 'Esa fecha no es válida'; return ''; }
+  function bdErr(v) { if (v === 'x') return 'Esa fecha no existe'; if (!/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return 'Elige tu fecha de cumpleaños'; const y = +v.slice(0, 4); if (y < 1920 || new Date(v) > new Date()) return 'Esa fecha no es válida'; return ''; }
   window.bdErr = bdErr;
-  function bdAsk() { if (!S.account || S.bday) return; const b = $('#bdAsk'); b.classList.remove('hidden'); $('#bdOk').onclick = () => { const v = $('#bdIn').value, e = bdErr(v); $('#bdErr').textContent = e; if (e) return; S.bday = v; SW.saveSettings(); b.classList.add('hidden'); toast('🎂 Cumpleaños guardado'); cakeCheck(); }; }
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  function bdFill(sel) { const el = $(sel); if (!el || el.children.length) return; const y = new Date().getFullYear();
+    const col = (cls, a) => '<div class="bdw ' + cls + '"><div class="pad"></div>' + a.map(([v, t]) => '<div data-v="' + v + '">' + t + '</div>').join('') + '<div class="pad"></div></div>';
+    el.innerHTML = col('bdD', Array.from({ length: 31 }, (_, i) => [String(i + 1).padStart(2, '0'), i + 1])) + col('bdM', MESES.map((m, i) => [String(i + 1).padStart(2, '0'), m])) + col('bdY', Array.from({ length: y - 1919 }, (_, i) => [y - i, y - i]));
+    setTimeout(() => { const yc = el.querySelector('.bdY'); yc.scrollTop = 20 * 40; }, 50); /* starts around 20 years ago */ }
+  const bdPick = c => { const i = Math.round(c.scrollTop / 40); const it = c.querySelectorAll('[data-v]')[i]; return it ? it.dataset.v : ''; };
+  function bdVal(sel) { const el = $(sel); if (!el) return ''; const d = bdPick(el.querySelector('.bdD')), m = bdPick(el.querySelector('.bdM')), y = bdPick(el.querySelector('.bdY')); if (!d || !m || !y) return ''; const v = y + '-' + m + '-' + d, t = new Date(+y, +m - 1, +d); return t.getMonth() === +m - 1 ? v : 'x'; }
+  window.bdSet = (sel, v) => { const el = $(sel); const [y, m, d] = v.split('-'); const go = (c, val) => { const L = [...el.querySelectorAll(c + ' [data-v]')]; el.querySelector(c).scrollTop = L.findIndex(x => x.dataset.v == val) * 40; }; go('.bdD', d); go('.bdM', m); go('.bdY', +y); };
+  bdFill('#acBday'); bdFill('#bdIn');
+  function bdAsk() { if (!S.account || S.bday) return; const b = $('#bdAsk'); b.classList.remove('hidden'); $('#bdOk').onclick = () => { const v = bdVal('#bdIn'), e = bdErr(v); $('#bdErr').textContent = e; if (e) return; S.bday = v; SW.saveSettings(); b.classList.add('hidden'); toast('🎂 Cumpleaños guardado'); cakeCheck(); }; }
   setTimeout(bdAsk, 1200);
   let bdOwner = false;
   (async () => { try { if (!(window.claude && window.claude.use)) return; const u = await window.claude.use('user'); if (u && u.isOwner && await u.isOwner()) { bdOwner = true; cakeCheck(); } } catch (e) {} })();
@@ -45838,7 +45914,7 @@ class Net {
     setTimeout(() => { fix('deathFx', 'dfx', DFX_ITEMS, 'clasico'); fix('spawnFx', 'spawn', SPAWN_ITEMS, 'estandar'); fix('aura', 'aura', AURA_ITEMS, 'anillo'); SW.saveSettings(); }, 1500); }
   /* training: everything the shop has, to try it on (what you do not own carries a lock and is only worn here) */
   window.trainLists = () => ({ aura: [['anillo', 'Anillo']].concat(AURA_ITEMS.filter(it => it[0] !== 'anillo').map(it => it.concat([owns('aura', it) ? 0 : 1]))), spawn: [['estandar', 'Estándar']].concat(SPAWN_ITEMS.map(it => it.concat([owns('spawn', it) ? 0 : 1]))), death: [['clasico', 'Clásica']].concat(DFX_ITEMS.map(it => it.concat([owns('dfx', it) ? 0 : 1]))),
-    chars: ['shroom25', 'kitty5', 'bob'].flatMap(cat => (window.SPR ? Object.keys(SPR.MAN.chars).filter(id => SPR.MAN.chars[id].game === cat && READY.includes(id)) : []).map(id => [cat, id, ownsChar(cat, id) ? 0 : 1])) });
+    chars: ['shroom25', 'kitty5', 'bob'].flatMap(cat => (window.SPR ? charList0(cat).filter(id => SPR.MAN.chars[id]) : []).map(id => [cat, id, ownsChar(cat, id) ? 0 : 1, READY.includes(id) ? 1 : 0])) }); /* every character of each game: yours, and the rest with a lock (to try them here) */
   window.fxThumbT = (id, n) => fxThumb(id, n); window.paintFxT = r => paintFx(r);
   const priceTag = (own, p, vip) => p === 'GRATIS' ? '<div class="price owned" style="text-decoration:none;opacity:1">GRATIS</div>' : vip && own ? '<div class="price owned" style="text-decoration:none;opacity:1;color:#ffd23a">TUYO 👑</div>' : `<div class="price${own ? ' owned' : ''}">${p}</div>`;
   const tagTxt = (eq, own) => eq || own ? `<div class="lockd${eq ? ' eq' : ''}">${eq ? 'EQUIPADO' : 'TOCA PARA EQUIPAR'}</div>` : '';
@@ -47319,7 +47395,7 @@ class Net {
     const T = [['char', '🧝 Personaje'], ['aura', '⭕ Aura'], ['spawn', '✨ Aparición'], ['death', '💥 Muerte']];
     const cur = { aura: trainTry.aura || S.aura || 'anillo', spawn: trainTry.spawn || S.spawnFx || 'estandar', death: trainTry.death || S.deathFx || 'clasico' };
     let body = '';
-    if (tab === 'char') body = L.chars.map(([cat, id, lk]) => { const C = SPR.MAN.chars[id]; const on = trainCat === cat && Object.assign({}, S.skins || {}, trainTry.skins || {})[cat] === id; return `<div class="tri${on ? ' on' : ''}" data-c="${cat}|${id}|${lk ? 1 : 0}"><img src="assets/spr/${C.thumb}" alt=""><small>${lk ? '🔒 ' : ''}${esc(C.name)}</small></div>`; }).join('');
+    if (tab === 'char') { const GN = { shroom25: 'Escape Fantasía', kitty5: 'Corre Amigo Corre', bob: 'Corre Polar' }; let lastCat = ''; body = L.chars.map(([cat, id, lk, rd]) => { const C = SPR.MAN.chars[id]; const hd = cat !== lastCat ? `<div class="trh">${GN[cat] || cat}</div>` : ''; lastCat = cat; if (!rd) return hd + `<div class="tri soon"><img src="assets/spr/${C.thumb}" alt=""><small>⏳ ${esc(C.name)}</small></div>`; const on = trainCat === cat && Object.assign({}, S.skins || {}, trainTry.skins || {})[cat] === id; return hd + `<div class="tri${on ? ' on' : ''}" data-c="${cat}|${id}|${lk ? 1 : 0}"><img src="assets/spr/${C.thumb}" alt=""><small>${lk ? '🔒 ' : ''}${esc(C.name)}</small></div>`; }).join(''); }
     else body = L[tab].map(([id, n, lk]) => `<div class="tri${cur[tab] === id ? ' on' : ''}" data-f="${id}|${lk ? 1 : 0}">${(id === 'anillo' || /^[apd][0-9]+$/.test(id)) && window.fxThumbT ? fxThumbT(id === 'anillo' ? 'a60' : id, 54) : `<div class="trq">${tab === 'aura' ? '⭕' : tab === 'spawn' ? '✨' : '💥'}</div>`}<small>${lk ? '🔒 ' : ''}${esc(String(n).replace(/^Aura /, ''))}</small></div>`).join('');
     const sl = (($('#trainPanel').querySelector('.trg') || {}).scrollLeft) || 0; const sameTab = trainPanel.last === tab; trainPanel.last = tab;
     $('#trainPanel').innerHTML = `<div class="trt">${T.map(([k, n]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}">${n}</button>`).join('')}<button data-x="1">✕</button></div><div class="trg">${body || '<div class="hint">Aún no tienes nada de esto. Consíguelo en la tienda.</div>'}</div>`;
