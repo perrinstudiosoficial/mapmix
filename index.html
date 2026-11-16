@@ -223,7 +223,7 @@ select,input[type=range]{font:inherit;background:#2a1438;color:var(--ink);border
 .lslots{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:6px 0}.lslots .lteam{grid-column:1/-1;margin:2px 0 0}.lslots .lrow.full{grid-column:1/-1}
 #wait .card,#pre .card{padding-top:10px;padding-bottom:10px}#wait .tbar h2,#pre .tbar h2{font-size:22px}#wait .winfo{margin:4px 0}
 #wait .wprev small,#pre .wprev small{display:none}.wprev{grid-template-columns:44px 1fr}.wprev .pvic{font-size:32px;grid-row:span 2}
-#wait .mchat .mlog{height:84px;min-height:0}#wait .big-btn,#pre .big-btn{margin-top:6px;padding:10px 24px;font-size:20px}#wait .opts,#pre .opts{margin:4px 0;gap:6px}#wait #wMsg{margin:2px 0;font-size:12px}.lteam{color:#ffd23a;font-weight:900;font-size:13px;margin-top:4px}
+#wait .mchat .mlog{height:58px;min-height:0}#wait .mchat{margin:2px 0}#wait .wprev{zoom:.78;margin:2px 0}#wait .lrow{padding-top:2px;padding-bottom:2px}#wait .mchat .mrow input{padding:6px 10px;font-size:14px}#wait .mchat .mrow button{padding:6px 12px;font-size:14px}#wait .card{padding-top:10px;padding-bottom:10px}#wait #wFill,#wait #wNoBots{padding:6px 12px!important}#wait .winfo{margin:2px 0}#wait .winfo span{padding:3px 8px;font-size:12px}#wait .lrow,#pre .lrow{min-height:0}.qdiff button.on{background:#ffd23a;color:#222!important}#wait .big-btn,#pre .big-btn{margin-top:6px;padding:10px 24px;font-size:20px}#wait .opts,#pre .opts{margin:4px 0;gap:6px}#wait #wMsg{margin:2px 0;font-size:12px}.lteam{color:#ffd23a;font-weight:900;font-size:13px;margin-top:4px}
 .lrow{text-align:left;display:grid;grid-template-columns:14px 1fr;grid-template-rows:auto auto;column-gap:6px;align-items:center;background:linear-gradient(#2a3a8a,#1a2560);border:1px solid #5a6ad0;border-radius:8px;padding:6px 8px;font-size:13px}.lrow.me{outline:2px solid #ffd23a}.lrow.bot{background:linear-gradient(#2c2f3a,#1c1e26);border-color:#555}.lrow.open{background:linear-gradient(#1e2a6a,#141c48);opacity:.85}.lrow.tap{cursor:pointer}
 .lrow{padding:4px 6px!important;font-size:12px!important}.lrow b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lrow .lc{width:12px;height:12px;border-radius:3px;border:1px solid #000;grid-row:span 2}.lrow small{opacity:.75;font-size:10px;grid-column:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lrow .lt{display:none}
 .wprev{display:grid;grid-template-columns:64px 1fr;gap:4px 10px;background:#1a2040;border:1px solid #5a6ad0;border-radius:12px;padding:8px;margin-top:8px}.wprev .pvic{grid-row:span 3;font-size:48px;text-align:center}.wprev b{color:#ffd23a}.wprev .pvd{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px}.wprev small{opacity:.8;font-size:11px;line-height:1.25}
@@ -407,8 +407,8 @@ body[data-fam=arena] #sprayWrap{bottom:calc(max(12px,env(safe-area-inset-bottom)
 .wopts{flex-direction:column;gap:6px!important}.wgrp{display:flex;align-items:center;gap:5px}.wgrp span{width:62px;font-size:11px;font-weight:800;opacity:.85;flex:none}
 .wgrp button{flex:1;padding:7px 0!important;border-radius:10px!important;border:0!important;background:#323a86!important;color:#fff;font-weight:900!important;font-size:14px!important;box-shadow:0 3px 0 #161a44}
 .wgrp button.on{background:linear-gradient(#ffe27a,#ffbf1f)!important;color:#3a2600!important;box-shadow:0 3px 0 #a86d00}
-#preFill,#preNone{border:0!important;border-radius:12px!important;padding:8px 14px!important;font-weight:900!important;font-size:13px!important;color:#fff!important;box-shadow:0 3px 0 rgba(0,0,0,.35)}
-#preFill{background:linear-gradient(#5be36b,#20a33a)!important}#preNone{background:linear-gradient(#ff6b7d,#c8203a)!important}
+#preFill,#preNone,#wFill,#wNoBots{border:0!important;border-radius:12px!important;padding:8px 14px!important;font-weight:900!important;font-size:13px!important;color:#fff!important;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+#preFill,#wFill{background:linear-gradient(#5be36b,#20a33a)!important}#preNone,#wNoBots{background:linear-gradient(#ff6b7d,#c8203a)!important}
 /* create room: everything on one screen */
 #create .card{padding-top:10px;padding-bottom:10px}
 #create .tbar{margin-bottom:4px}
@@ -433,7 +433,7 @@ body[data-fam=arena] #bBlink, body[data-fam=arena] #sosWrap{display:none!importa
 .lslots .lteam{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
 .qdiff{display:inline-flex;gap:3px}.qdiff button{font:800 10px system-ui;border-radius:7px;border:1px solid #6a74c0;background:#262a5a;color:#fff;padding:3px 6px;cursor:pointer}
 .qdiff .d-facil,.ldiff.d-facil{color:#8affa0}.qdiff .d-normal{color:#a8c4ff}.qdiff .d-dificil,.ldiff.d-dificil{color:#ffc46b}.qdiff .d-extremo{color:#ff6b9a;border-color:#ff6b9a}
-.wic{width:20px;height:20px;vertical-align:middle;margin-right:4px;border-radius:50%}#preFill .wic,#preNone .wic{width:22px;height:22px;margin:-4px 5px -4px -4px}
+.wic{width:20px;height:20px;vertical-align:middle;margin-right:4px;border-radius:50%}#preFill .wic,#preNone .wic,#wFill .wic,#wNoBots .wic{width:22px;height:22px;margin:-4px 5px -4px -4px}
 #preWin .wz{display:none}#preWin.zt .wz{display:flex}#preWin.zt .wt,#preWin.zt .wk{display:none}
 #pre .wprev{padding:6px 10px}#pre .lrow{min-height:34px}
 #watchBar .wplay{min-width:30px}#watchBar .wplay.on{background:#ffd34d!important;color:#222!important}
@@ -658,14 +658,14 @@ window.addEventListener('unhandledrejection',function(e){if(!window.MM_BOOTED){c
 </div>
 <div id="wait" class="screen hidden">
   <div class="card wide">
-    <div class="tbar"><button class="back" id="wLeave">‹</button><h2 id="wName">SALA</h2></div>
+    <div class="tbar"><button class="back" id="wLeave">‹</button><h2 id="wName">SALA</h2><span class="wallet wcoins" style="margin-left:auto">🪙 0</span></div>
     <div class="winfo"><span id="wMap"></span><span id="wCode"></span><span id="wMode"></span></div>
     <div id="wPrev" class="wprev"></div>
     <div id="wSlots" class="lslots"></div>
-    <div id="wWin" class="opts hidden"><label class="wlab"><img class="wic" src="assets/fx/ic_termina.webp" alt=""> La partida termina en</label><div class="wopts"><div class="wgrp wt"><span><img class="wic" src="assets/fx/ic_tiempo.webp" alt="">Tiempo</span><button data-w="t1">1′</button><button data-w="t2">2′</button><button data-w="t3">3′</button><button data-w="t4">4′</button><button data-w="t5">5′</button></div><div class="wgrp wk"><span><img class="wic" src="assets/fx/ic_bajas.webp" alt="">Bajas</span><button data-w="k5">5</button><button data-w="k10">10</button><button data-w="k15">15</button><button data-w="k20">20</button></div><div class="wgrp wz"><span><img class="wic" src="assets/fx/ic_tiempo.webp" alt="">Amanecer</span><button data-w="z15">15′</button><button data-w="z20">20′</button><button data-w="z25">25′</button><button data-w="z30">30′</button></div></div></div><div id="wDiff" class="opts"><label class="wlab">🤖 Dificultad de los bots</label><div class="wopts"><div class="wgrp"><button data-d="facil">Fácil</button><button data-d="normal">Normal</button><button data-d="dificil">Difícil</button><button data-d="extremo">Extremo</button></div></div></div><div id="wHost" class="opts"><label>Bots para completar <span class="stepper"><button id="wBotsMinus">−</button><b id="wBots">11</b><button id="wBotsPlus">+</button></span></label><div style="display:flex;gap:6px"><button class="buy" id="wFill" style="background:#2b8a3b;color:#fff">Llenar con bots</button><button class="buy" id="wNoBots" style="background:#7a2a3a;color:#fff">Sin bots</button></div></div>
+    <div id="wWin" class="opts hidden"><label class="wlab"><img class="wic" src="assets/fx/ic_termina.webp" alt=""> La partida termina en</label><div class="wopts"><div class="wgrp wt"><span><img class="wic" src="assets/fx/ic_tiempo.webp" alt="">Tiempo</span><button data-w="t1">1′</button><button data-w="t2">2′</button><button data-w="t3">3′</button><button data-w="t4">4′</button><button data-w="t5">5′</button></div><div class="wgrp wk"><span><img class="wic" src="assets/fx/ic_bajas.webp" alt="">Bajas</span><button data-w="k5">5</button><button data-w="k10">10</button><button data-w="k15">15</button><button data-w="k20">20</button></div><div class="wgrp wz"><span><img class="wic" src="assets/fx/ic_tiempo.webp" alt="">Amanecer</span><button data-w="z15">15′</button><button data-w="z20">20′</button><button data-w="z25">25′</button><button data-w="z30">30′</button></div></div></div><div id="wDiff" class="opts"><label class="wlab">🤖 Dificultad de los bots</label><div class="wopts"><div class="wgrp"><button data-d="facil">Fácil</button><button data-d="normal">Normal</button><button data-d="dificil">Difícil</button><button data-d="extremo">Extremo</button></div></div></div><div id="wHost" class="opts"><label>Bots para completar <span class="stepper"><button id="wBotsMinus">−</button><b id="wBots">11</b><button id="wBotsPlus">+</button></span></label><div style="display:flex;gap:6px"><button class="buy" id="wFill"><img class="wic" src="assets/fx/ic_llenar.webp" alt="">Llenar con bots</button><button class="buy" id="wNoBots"><img class="wic" src="assets/fx/ic_sinia.webp" alt="">Sin bots</button></div></div>
     <div id="wMsg" class="hint"></div>
     <div class="mchat"><div class="mlog" id="rLog"><div class="mnone">Chat de la sala</div></div><div class="mrow"><input id="rIn" maxlength="90" placeholder="Escribe a la sala…" autocomplete="off"><button id="rSend">ENVIAR</button></div></div>
-    <button class="big-btn" id="wStart">EMPEZAR</button>
+    <button class="big-btn" id="wStart">EMPEZAR PARTIDA</button>
   </div>
 </div>
 <div id="shop" class="screen hidden">
@@ -37623,7 +37623,14 @@ class World {
             else if ((pv > base * 1.05 || this.tileTypeAt(u.x, u.y) === 'Nice') && v < pv - A * dt && u._vdx != null) { const sp = pv - A * dt, nx = u.x + u._vdx * (sp - v) * dt, ny = u.y + u._vdy * (sp - v) * dt; if (this.walkable(nx, ny)) { u.x = nx; u.y = ny; } } // leaving the ice: glide out and slow down
             const ex = u.x - px, ey = u.y - py, e = Math.hypot(ex, ey); u._v = e / dt; if (e > 0.5) { u._vdx = ex / e; u._vdy = ey / e; } } }
                 u._px = u.x; u._py = u.y; } }
-  tick() { this._tick0(); this.iceSmooth(TICK); }
+  tick() { this._tick0(); this.iceSmooth(TICK); this.capBots(); }
+  // escape maps: no bot may ever go faster than you do with Correr (the fastest you can go)
+  capBots() { if (this.arena || this.tonto || !this.ai || !this.ai.bots || !this.ai.bots.length) return; const me = this.heroOf(this.local);
+    if (me && me._cpx != null && me.alive) { const v = Math.hypot(me.x - me._cpx, me.y - me._cpy) / TICK; if (v < 1500) this._hvm = Math.max(v, (this._hvm || 560) - 120 * TICK, 560); } if (me) { me._cpx = me.x; me._cpy = me.y; }
+    const cap = (this._hvm || 560) * TICK;
+    for (const b of this.ai.bots) { const h = this.heroOf(b.p); if (!h || !h.alive || h.removed || (this.remote && this.remote.has(b.p.id))) { if (h) h._cpx = null; continue; }
+      if (h._cpx != null) { const dx = h.x - h._cpx, dy = h.y - h._cpy, d = Math.hypot(dx, dy); if (d > cap && d < 220) { const k = cap / d, nx = h._cpx + dx * k, ny = h._cpy + dy * k; if (this.walkable(nx, ny)) { h.x = nx; h.y = ny; } } }
+      h._cpx = h.x; h._cpy = h.y; } }
   _tick0() {
     const dt = TICK; this.time += dt; this.loopCount = 0;
     // timers & periodic events
@@ -39334,8 +39341,8 @@ SONGS.pesadilla = { name: 'Pesadilla', bpm: 196, bass: 'drive', harm: false, wav
   intro: bars(['i1', 'i2'], ['Em', 'B']), introQuiet: 'i1', introFill: 'i2',
   loop: bars(['p1', 'p2', 'p3', 'p4', 'p1', 'p2', 'p3', 'p4', 'q1', 'q2', 'q3', 'q4', 'q1', 'q2', 'q3', 'q4'],
     ['Em', 'Em', 'C', 'B', 'Em', 'Em', 'C', 'B', 'Em', 'Dm', 'Cm', 'B', 'Em', 'Dm', 'Cm', 'B']) };
-SONGS.relampago = { name: 'Relámpago', bpm: 248, bass: 'drive', harm: true, wave: ['p25', 'p50'], // Guerra de Flechas: ultra fast
-  drums: { k: 'x.x.x.x.x.x.x.x.', s: '....x.......x...', h: 'xxxxxxxxxxxxxxxx' },
+SONGS.relampago = { name: 'Relámpago', bpm: 248, bass: 'none', noArp: true, harm: false, wave: ['p25', 'p50'], // Guerra de Flechas: ultra fast
+  drums: { k: '................', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' } /* no booming kick, like Infección Zombi */,
   lead: { i1: 'A5 - E5 - A5 - C6 - B5 - G#5 - E5 - G#5 -', i2: 'A5 - C6 - E6 - A6 - G#6 - E6 - B5 - G#5 -',
     r1: 'A5 C6 E6 C6 A5 C6 E6 C6 B5 D6 G6 D6 B5 D6 G6 D6', r2: 'C6 E6 A6 E6 C6 E6 A6 E6 B5 E6 G#6 E6 B5 E6 G#6 E6',
     r3: 'F5 A5 C6 A5 F5 A5 C6 A5 G5 B5 D6 B5 G5 B5 D6 B5', r4: 'E6 - D6 - C6 - B5 - A5 - G#5 - B5 - E6 -',
@@ -39365,8 +39372,8 @@ SONGS.sombras = { name: 'Réquiem de Sombras', bpm: 132, bass: 'oct', harm: fals
   loop: bars(['h1', 'h2', 'h3', 'h4', 'h1', 'h2', 'h3', 'h4', 'k1', 'k2', 'k3', 'k4', 'k1', 'k2', 'k3', 'k4'],
     ['Cm', 'C#m', 'Cm', 'G', 'Cm', 'C#m', 'Cm', 'G', 'Cm', 'Dbm', 'Cm', 'G', 'Cm', 'Dbm', 'Cm', 'G']) };
 
-SONGS.tormenta = { name: 'Tormenta de Sombras', bpm: 244, bass: 'drive', harm: true, wave: ['p25', 'p12'], // Guerra de Sombras: as fast as the arrows, darker
-  drums: { k: 'x.x.x.x.x.x.x.x.', s: '....x..x....x.x.', h: 'xxxxxxxxxxxxxxxx' },
+SONGS.tormenta = { name: 'Tormenta de Sombras', bpm: 244, bass: 'none', noArp: true, harm: false, wave: ['p25', 'p12'], // Guerra de Sombras: as fast as the arrows, darker
+  drums: { k: '................', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' } /* no booming kick, like Infección Zombi */,
   lead: { i1: 'D5 - A4 - D5 - F5 - E5 - C#5 - A4 - C#5 -', i2: 'D5 - F5 - A5 - D6 - C#6 - A5 - E5 - C#5 -',
     t1: 'D5 F5 A5 F5 D5 F5 A5 F5 C5 E5 G5 E5 C5 E5 G5 E5', t2: 'Bb4 D5 F5 D5 Bb4 D5 F5 D5 A4 C#5 E5 C#5 A4 C#5 E5 C#5',
     t3: 'G4 Bb4 D5 Bb4 G4 Bb4 D5 Bb4 A4 C#5 E5 G5 A5 G5 E5 C#5', t4: 'D6 - C6 - Bb5 - A5 - G5 - F5 - E5 - C#5 -',
@@ -39385,8 +39392,8 @@ SONGS.desesperacion = { name: 'Desesperación', bpm: 228, bass: 'none', noArp: t
   intro: bars(['i1', 'i2'], ['Bm', 'F#']), introQuiet: 'i1', introFill: 'i2',
   loop: bars(['d1', 'd2', 'd3', 'd4', 'd1', 'd2', 'd3', 'd4', 'e1', 'e2', 'e3', 'e4', 'e1', 'e2', 'e3', 'e4'],
     ['Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'G', 'F#', 'Bm', 'Bm', 'Em', 'F#']) };
-SONGS.versus = { name: 'Versus', bpm: 232, bass: 'drive', noArp: true, harm: false, wave: ['p25', 'tri'], // Guerra de Ganchos: a very fast battle, one against one
-  drums: { k: 'x...x...x...x...', s: '....x.......x.xx', h: 'xxxxxxxxxxxxxxxx' },
+SONGS.versus = { name: 'Versus', bpm: 232, bass: 'none', noArp: true, harm: false, wave: ['p25', 'tri'], // Guerra de Ganchos: a very fast battle, one against one
+  drums: { k: '................', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' } /* no booming kick, like Infección Zombi */,
   lead: { i1: 'E5 - E5 - E5 - G5 - E5 - D5 - B4 - D5 -', i2: 'E5 - E5 - E5 - G5 - A5 - B5 - D6 - B5 -',
     v1: 'E5 G5 B5 G5 E5 G5 B5 G5 D5 F#5 A5 F#5 D5 F#5 A5 F#5', v2: 'C5 E5 G5 E5 C5 E5 G5 E5 B4 D#5 F#5 D#5 B4 D#5 F#5 B5',
     v3: 'E5 G5 B5 E6 D6 B5 G5 B5 A5 C6 E6 C6 A5 G5 F#5 D#5', v4: 'E5 - B4 - E5 - G5 - F#5 - D#5 - B4 - D#5 -',
@@ -39831,7 +39838,7 @@ class Renderer {
       tontoDrawDests(this, g, vx0, vy0, vx1, vy1, true); this.drawEffects(g); tontoDrawTop(this, g);
       this.drawNames(g, hero); this.drawEmotes(g);
     } else {
-    this.drawTerrain(g, vx0, vy0, vx1, vy1);
+    if (!(W.arena && W.arena.id === 'pudge' && W.arena._pg)) this.drawTerrain(g, vx0, vy0, vx1, vy1); // the hooks map paints its own ground
     if (W.arena && typeof arenaGround === 'function') arenaGround(W.arena, g, this);
     this.drawGraffiti(g); this.drawLoot(g);
     this.drawDests(g, vx0, vy0, vx1, vy1);
@@ -40068,7 +40075,9 @@ class Renderer {
       const kind = u.t.kind;
       if (u.stunUntil > W.time && u.alive) { g.save(); g.translate(0, 70); for (let i = 0; i < 3; i++) { const a = W.time * 5 + i * 2.1; g.fillStyle = '#ffe34d'; g.save(); g.translate(Math.cos(a) * 22, Math.sin(a) * 7); g.scale(1, -1); g.font = '16px system-ui'; g.textAlign = 'center'; g.fillText('★', 0, 0); g.restore(); } g.restore(); } // stunned: stars over the head
       if (u.dashUntil > W.time && u.alive && Math.random() < 0.6) this.puff(u.x, u.y + 20, { r0: 6, r1: 18, life: 0.35, col: '120,220,255', a: 0.5, vx: 0, vy: 0 });
-      if (kind === 'arena' && this.drawSprHero && this.sprReady(u)) this.drawSprHero(g, u);
+      const tombMap = W.profile.id === 'bob' || W.profile.id === 'kitty5';
+      if (tombMap && ((u.hero && dead) || kind === 'circle')) { if (!(u.hero && dead && W.units.some(c => c.t.kind === 'circle' && c.alive && !c.removed && Math.hypot(c.x - u.x, c.y - u.y) < 120))) this.drawMarker(g, u); } /* the same tomb as Escape Fantasía */
+      else if (kind === 'arena' && this.drawSprHero && this.sprReady(u)) this.drawSprHero(g, u);
       else if (((kind === 'kitty' && W.profile.id === 'kitty5') || (kind === 'swimmer' && W.profile.id === 'bob') || (code === 'H003' && W.profile.id === 'shroom25')) && this.drawSprHero && this.sprReady(u)) this.drawSprHero(g, u); /* the owner's sprite characters */
       else if (kind === 'kitty' && W.profile.id === 'kitty5' && this.drawTiger3D && !(window.SW && window.SW.settings && window.SW.settings.tiger3d !== true)) { if (u.invisUntil > W.time) { const left = u.invisUntil - W.time; g.globalAlpha *= (u.owner === W.local ? 0.38 : 0.22) + 0.08 * Math.sin(W.time * 9) + (left < 1 ? (1 - left) * 0.5 : 0); } this.drawTiger3D(g, u); }
       else if (kind === 'kitty' && W.profile.id === 'kitty5' && this.drawCatSheet && this.catReady(u)) this.drawCatSheet(g, u); // the sheet big cats (white tiger by default)
@@ -41913,28 +41922,30 @@ function arenaAlpha(A, u) { const t = A.W.time; let a = 1; if (u.invisUntil > t)
 function arenaGround(A, g, R) {
   if (A.zGround) { A.R = R; return A.zGround(g, R); }
   const W = A.W; A.R = R; arenaClouds(A, g, false); if (A.extraGround) A.extraGround(g); if (A.id !== 'pudge') return; const [x0, y0, x1, y1] = A.bounds, t = W.time;
-  // cached shapes: the grass (every cell you can walk on, all green: no "water" you walk over), the water, the shore line
-  if (!A._pg) { const P = { grass: new Path2D(), water: new Path2D(), shore: new Path2D() }; const i0 = Math.max(0, Math.floor((x0 + 6144) / 32) - 2), i1 = Math.min(W.PW - 1, Math.ceil((x1 + 6144) / 32) + 2), j0 = Math.max(0, Math.floor((y0 + 6144) / 32) - 2), j1 = Math.min(W.PH - 1, Math.ceil((y1 + 6144) / 32) + 2);
-    const wet = (i, j) => { if (i < 0 || j < 0 || i >= W.PW || j >= W.PH) return true; const k = j * W.PW + i, x = -6144 + i * 32; return !!W.pbase[k] || (Math.abs(x + 16 - A.midX) < 270 && !W.walkableCell(i, j)); };
-    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const x = -6144 + i * 32, y = -6144 + j * 32; if (wet(i, j)) P.water.rect(x - 0.5, y - 0.5, 33, 33); else { P.grass.rect(x - 0.5, y - 0.5, 33, 33);
-      if (wet(i - 1, j)) { P.shore.moveTo(x, y); P.shore.lineTo(x, y + 32); } if (wet(i + 1, j)) { P.shore.moveTo(x + 32, y); P.shore.lineTo(x + 32, y + 32); } if (wet(i, j - 1)) { P.shore.moveTo(x, y); P.shore.lineTo(x + 32, y); } if (wet(i, j + 1)) { P.shore.moveTo(x, y + 32); P.shore.lineTo(x + 32, y + 32); } } }
-    A._pg = P; }
-  const P = A._pg, V = R && R.view, vx = V ? (V.vx0 + V.vx1) / 2 : (x0 + x1) / 2, vy = V ? (V.vy0 + V.vy1) / 2 : (y0 + y1) / 2, VW = V ? (V.vx1 - V.vx0) / 2 + 150 : 2600, VH = V ? (V.vy1 - V.vy0) / 2 + 150 : 3400;
-  g.fillStyle = '#5fbf4a'; g.fill(P.grass);
-  // the water: one sea, one river, same colours, everything moving
-  const gr = g.createLinearGradient(0, vy - VH, 0, vy + VH); gr.addColorStop(0, '#1a5fae'); gr.addColorStop(0.5, '#2378c4'); gr.addColorStop(1, '#1a5fae'); g.fillStyle = gr; g.fill(P.water);
-  g.save(); g.clip(P.water); g.lineCap = 'round';
-  const RX = A.river ? A.river.x : A.midX, inRiver = x => Math.abs(x - RX) < 300;
-  // soft light patches drifting
-  for (let k = 0; k < 18; k++) { const px = vx - VW + ((k * 577 + t * 22) % (VW * 2)), py = vy - VH + ((k * 911 + t * (inRiver(px) ? -120 : 14)) % (VH * 2) + VH * 2) % (VH * 2); g.fillStyle = 'rgba(120,200,255,0.10)'; g.beginPath(); g.ellipse(px, py, 220, 90, 0.3 * Math.sin(k), 0, 7); g.fill(); }
-  // waves: little arcs everywhere, slow in the sea, running down the river
-  g.lineWidth = 5; const step = 120;
+  // the still part (grass, water, foam) is painted once into a small picture; only the waves move each frame
+  if (!A._pg) { const i0 = Math.max(0, Math.floor((x0 + 6144) / 32) - 4), i1 = Math.min(W.PW - 1, Math.ceil((x1 + 6144) / 32) + 4), j0 = Math.max(0, Math.floor((y0 + 6144) / 32) - 4), j1 = Math.min(W.PH - 1, Math.ceil((y1 + 6144) / 32) + 4);
+    const NI = i1 - i0 + 1, NJ = j1 - j0 + 1, wetA = new Uint8Array(NI * NJ);
+    const wet0 = (i, j) => { if (i < 0 || j < 0 || i >= W.PW || j >= W.PH) return 1; const k = j * W.PW + i, x = -6144 + i * 32; return (W.pbase[k] || (Math.abs(x + 16 - A.midX) < 270 && !W.walkableCell(i, j))) ? 1 : 0; };
+    for (let j = 0; j < NJ; j++) for (let i = 0; i < NI; i++) wetA[j * NI + i] = wet0(i0 + i, j0 + j);
+    const PX = 4, cv = document.createElement('canvas'); cv.width = NI * PX; cv.height = NJ * PX; const c = cv.getContext('2d');
+    c.fillStyle = '#2073bd'; c.fillRect(0, 0, cv.width, cv.height); c.fillStyle = '#5fbf4a';
+    for (let j = 0; j < NJ; j++) for (let i = 0; i < NI; i++) if (!wetA[j * NI + i]) c.fillRect(i * PX, j * PX, PX, PX);
+    c.strokeStyle = 'rgba(235,250,255,0.75)'; c.lineWidth = 1.6; c.beginPath();
+    for (let j = 0; j < NJ; j++) for (let i = 0; i < NI; i++) { if (wetA[j * NI + i]) continue; const x = i * PX, y = j * PX, w = (a, b) => a < 0 || b < 0 || a >= NI || b >= NJ || wetA[b * NI + a];
+      if (w(i - 1, j)) { c.moveTo(x, y); c.lineTo(x, y + PX); } if (w(i + 1, j)) { c.moveTo(x + PX, y); c.lineTo(x + PX, y + PX); } if (w(i, j - 1)) { c.moveTo(x, y); c.lineTo(x + PX, y); } if (w(i, j + 1)) { c.moveTo(x, y + PX); c.lineTo(x + PX, y + PX); } }
+    c.stroke(); A._pg = { cv, X: -6144 + i0 * 32, Y: -6144 + j0 * 32, NI, NJ, i0, j0, wetA }; }
+  const P = A._pg, V = R && R.view, vx = V ? (V.vx0 + V.vx1) / 2 : (x0 + x1) / 2, vy = V ? (V.vy0 + V.vy1) / 2 : (y0 + y1) / 2, VW = V ? (V.vx1 - V.vx0) / 2 + 150 : 1400, VH = V ? (V.vy1 - V.vy0) / 2 + 150 : 2000;
+  { const PX = P.cv.width / P.NI, sx = Math.max(0, Math.floor((vx - VW - P.X) / 32)), sy = Math.max(0, Math.floor((vy - VH - P.Y) / 32)), ex = Math.min(P.NI, Math.ceil((vx + VW - P.X) / 32)), ey = Math.min(P.NJ, Math.ceil((vy + VH - P.Y) / 32));
+    if (ex > sx && ey > sy) { g.imageSmoothingEnabled = false; g.drawImage(P.cv, sx * PX, sy * PX, (ex - sx) * PX, (ey - sy) * PX, P.X + sx * 32, P.Y + sy * 32, (ex - sx) * 32, (ey - sy) * 32); g.imageSmoothingEnabled = true; } }
+  const isWet = (x, y) => { const i = Math.floor((x + 6144) / 32) - P.i0, j = Math.floor((y + 6144) / 32) - P.j0; return i >= 0 && j >= 0 && i < P.NI && j < P.NJ && P.wetA[j * P.NI + i]; };
+  // waves: little arcs on the sea, streaks running down the river (only those you can see)
+  const RX = A.river ? A.river.x : A.midX, step = 150, sea = new Path2D(), riv = new Path2D();
   for (let yy = Math.floor((vy - VH) / step) * step; yy < vy + VH; yy += step) for (let xx = Math.floor((vx - VW) / step) * step; xx < vx + VW; xx += step) {
-    const riv = inRiver(xx), h = Math.sin(xx * 12.9898 + yy * 78.233) * 43758.5, r = h - Math.floor(h); const ox = xx + r * 80 + (riv ? 30 * Math.sin(t * 2 + yy * 0.01) : 40 * Math.sin(t * 0.7 + r * 6)), oy = riv ? yy - ((t * 260 + r * step) % step) : yy + 18 * Math.sin(t * 0.9 + r * 6);
-    const a = riv ? 0.32 : 0.16 + 0.14 * Math.sin(t * 1.6 + r * 9); g.strokeStyle = `rgba(225,245,255,${a.toFixed(3)})`; g.beginPath(); if (riv) { g.moveTo(ox, oy); g.lineTo(ox + 6 * Math.sin(t * 3 + r), oy - 55); } else { g.moveTo(ox - 26, oy); g.quadraticCurveTo(ox, oy + 14, ox + 26, oy); } g.stroke(); }
-  g.restore();
-  // foam where the water meets the grass
-  g.strokeStyle = `rgba(235,250,255,${(0.55 + 0.2 * Math.sin(t * 2.2)).toFixed(3)})`; g.lineWidth = 10 + 3 * Math.sin(t * 2.2); g.lineCap = 'round'; g.stroke(P.shore); g.lineCap = 'butt';
+    const h = Math.sin(xx * 12.9898 + yy * 78.233) * 43758.5, r = h - Math.floor(h), inR = Math.abs(xx - RX) < 300;
+    const ox = xx + r * 90 + (inR ? 25 * Math.sin(t * 2 + yy * 0.01) : 40 * Math.sin(t * 0.7 + r * 6)), oy = inR ? yy - ((t * 260 + r * step) % step) : yy + 18 * Math.sin(t * 0.9 + r * 6);
+    if (!isWet(ox, oy) || !isWet(ox, oy - (inR ? 55 : 0))) continue;
+    if (inR) { riv.moveTo(ox, oy); riv.lineTo(ox + 6 * Math.sin(t * 3 + r), oy - 55); } else { sea.moveTo(ox - 26, oy); sea.quadraticCurveTo(ox, oy + 14, ox + 26, oy); } }
+  g.lineCap = 'round'; g.lineWidth = 5; g.strokeStyle = 'rgba(225,245,255,0.33)'; g.stroke(riv); g.strokeStyle = `rgba(225,245,255,${(0.2 + 0.1 * Math.sin(t * 1.6)).toFixed(3)})`; g.stroke(sea); g.lineCap = 'butt';
 }
 function arenaDraw(A, g, R) {
   if (A.zDraw) return A.zDraw(g, R);
@@ -43195,6 +43206,7 @@ function zPanel(A, toggle) {
   pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _zTab = +b.dataset.tab; _zInfo = ''; pn._k = null; zPanel(A, false); }));
   pn.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => { const e = L[+b.dataset.i]; _zInfo = '<b>' + zEsc(e.n) + '</b> · ' + zEsc(e.cost) + '<br>' + zEsc(e.d || '');
     if (!e.dis && e.act === 'demomode') { pn.classList.add('hidden'); zDemoMode(A, true); return; }
+    if (!e.dis && e.act && /^(build|cap)/.test(e.act)) { A.cmd(W.local, e.act); zBought(b, W); pn.classList.add('hidden'); return; } /* building or capturing: the menu closes so you can watch it */
     if (!e.dis && e.act) { A.cmd(W.local, e.act); if (/^(build|buy|res|up|xg|xh|aura)/.test(e.act)) zBought(b, W); if (/^demolish/.test(e.act)) _zInfo = '💥 Demolido'; } else if (e.dis) _zInfo += '<br><span style="color:#ff9a7a">No puedes todavía</span>';
     pn._k = null; setTimeout(() => zPanel(A, false), 80); }));
 }
@@ -43634,6 +43646,7 @@ function tontoSetup(W, opts) {
 
 /* ---------- every tick ---------- */
 function tontoTick(W, dt) {
+  { const pc = W.camera && W.camera.pan, lh = W.heroOf(W.local); if (pc && pc.cine && !W.tonto.cine && lh && lh.alive && Math.hypot(lh.x - pc.x, lh.y - pc.y) > 500) { W.camera.pan = null; W.tonto.camZoom = 1; } } /* a camera left by a trigger: back on your hero as soon as you walk away */
   const S = W.tonto, now = W.time;
   // heroes walking to an item they tapped
   for (const u of W.units) {
@@ -44675,6 +44688,9 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     pudge: ['buen gancho!', 'te pille jaja', 'cuidado con el veneno', 'muevanse que los enganchan', 'jajaja', 'casi te engancho', 'esquiva!', 'vamos equipo', 'xd', 'que punteria', 'traiganlo pa aca', 'no se queden quietos'],
     mirana: ['buena flecha!', 'que punteria', 'esquiva esquiva', 'jajaja', 'casi te doy', 'corre que te flecho', 'vamos equipo', 'xd', 'salta salta', 'desde lejos pega mas', 'te vi venir', 'uff por poco'],
     nevermore: ['las sombras te alcanzan', 'buena!', 'jajaja', 'ojo con el requiem', 'tengo cargas jeje', 'esquiva', 'vamos equipo', 'xd', 'casi', 'que miedo este mapa', 'uff por poco', 'acercate si te atreves'],
+    zombie: ['construyan muros!', 'ahi vienen los zombis', 'necesito oro', 'pongan torres', 'tengo poca vida', 'quien tiene madera?', 'investiguen armas', 'aguanten', 'xd', 'que miedo', 'capturen fabricas', 'reparen la pared', 'vamos que se hace de dia', 'jajaja', 'uff por poco'],
+    tonto: ['esperenme', 'que mapa mas raro', 'no toquen nada', 'jajaja', 'xd', 'eso es una trampa', 'lean lo que dice', 'quien tiene la llave?', 'cuidado', 'uff casi', 'que tonto este mapa', 'sigan sigan'],
+    generic: ['vamos!', 'jajaja', 'xd', 'buena!', 'uff por poco', 'sigan sigan', 'vamos equipo', 'esperenme'],
     kitty5: ['cuidado los perros', 'vamos gatitos', 'miau', 'esperenme', 'casi me pillan', 'voy a salvarlos', 'ya casi llegamos', 'corran!', 'jajaja', 'xd', 'buenaaa', 'que rapido son', 'miau miau', 'sigan sigan', 'uff por poco', 'vamos equipo'],
   };
   let chatterAt = 0;
@@ -44696,7 +44712,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     botBlinks();
     if (!W || !W.ai || !W.ai.bots || !W.ai.bots.length || (online && !online.host)) return; const now = performance.now();
     if (!chatterAt) { chatterAt = now + 3000 + Math.random() * 3000; return; } if (now < chatterAt) return; chatterAt = now + 4000 + Math.random() * 7000;
-    const list = CHATTER[W.profile.id] || CHATTER.shroom25; const alive = W.ai.bots.map(b => W.heroOf(b.p)).filter(u => u && !u.removed);
+    const list = (W.arena && CHATTER[W.arena.id]) || (W.tonto && CHATTER.tonto) || (!W.arena && CHATTER[W.profile.id]) || CHATTER.generic; /* each game talks about its own things */ const alive = W.ai.bots.map(b => W.heroOf(b.p)).filter(u => u && !u.removed);
     if (!alive.length) return; const u = alive[Math.floor(Math.random() * alive.length)];
     const dead = W.units.filter(h => h.hero && !h.removed && !h.alive);
     const txt = W.arena ? (!u.alive ? ['me pillaron jaja', 'nooo', 'la proxima', 'uff'][Math.floor(Math.random() * 4)] : list[Math.floor(Math.random() * list.length)]) : !u.alive ? ['revivanme porfa', 'ayudaaa', 'alguien me revive?', 'estoy muerto jaja'][Math.floor(Math.random() * 4)] : dead.length && Math.random() < 0.4 ? ['voy a revivir a alguien', 'aguanten, voy', 'hay gente muerta, cuidado'][Math.floor(Math.random() * 3)] : list[Math.floor(Math.random() * list.length)];
@@ -44769,7 +44785,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     $('#stats .t').textContent = W.tonto ? (W.profile.name || '¿ERES TONTO?').toUpperCase() : W.arena ? W.arena.C.name.toUpperCase() : W.profile.id === 'kitty5' ? 'CORRE AMIGO CORRE' : W.profile.id === 'bob' ? 'CORRE POLAR' : 'ESCAPE FANTASÍA'; $('#stats .ver').textContent = W.profile.family === 'run' ? 'Ronda 1/5' : 'Etapa 1/12'; hudCache['#stats .ver'] = null;
     window.W = W;
     { const c = settings.myColor | 0; if (!online && c) { W.local.vcolor = c; const o = W.players[c]; if (o && o !== W.local) o.vcolor = W.local.id; } if (!online && settings.chaserMe && W.arena) { W.players[12].vcolor = W.local.vcolor ?? 0; W.local.vcolor = 14; } } /* the colour you picked in the lobby */
-    if (!W.arena && (!online || online.host) && opts.botDiffList && W.ai && W.ai.bots) { const M = { facil: 0.88, normal: 1, dificil: 1.07, extremo: 1 }; /* extreme bots run all the time, at exactly your Correr speed */ W.ai.bots.forEach((b, i) => { b.diff = opts.botDiffList[i] || 'normal'; const h = W.heroOf(b.p); const k = M[opts.botDiffList[i]] || 1; if (h && k !== 1) { h.speed *= k; h.defSpeed = (h.defSpeed || h.speed / k) * k; } }); } /* bot level in the run / escape maps: how fast they are */
+    if (!W.arena && (!online || online.host) && opts.botDiffList && W.ai && W.ai.bots) { const M = { facil: 0.88, normal: 1, dificil: 1, extremo: 1 }; /* extreme bots run all the time, at exactly your Correr speed */ W.ai.bots.forEach((b, i) => { b.diff = opts.botDiffList[i] || 'normal'; const h = W.heroOf(b.p); const k = M[opts.botDiffList[i]] || 1; if (h && k !== 1) { h.speed *= k; h.defSpeed = (h.defSpeed || h.speed / k) * k; } }); } /* bot level in the run / escape maps: how fast they are */
     W.on('text', showText);
     W.on('sound', s => sfx.play(s.name));
     W.on('death', u => { if (u.hero) { sfx.play(R ? 'dx_' + R.deathFxOf(u.owner) : 'death'); if (u.owner === W.local) { const dd = $('#dead'); dd.classList.remove('hidden'); clearTimeout(dd._tm); { const tb = $('#topbtns'); if (tb) { const r = tb.getBoundingClientRect(), pr = dd.offsetParent ? dd.offsetParent.getBoundingClientRect() : { top: 0 }; if (r.height) dd.style.top = (r.bottom - pr.top + 6) + 'px'; } } /* just under the row of 5 buttons */ dd._tm = setTimeout(() => dd.classList.add('hidden'), 5000); if (!dd._tap) { dd._tap = 1; dd.addEventListener('pointerdown', e => { e.stopPropagation(); dd.classList.add('hidden'); }); } } /* the banner leaves after 5 s */ } });
@@ -46126,23 +46142,25 @@ class Net {
     const fakeN = (cfg.fake || []).length;
     const isHost = net.role === 'host'; const COLS = ['#ff2020', '#2f6bff', '#1ce6b9', '#8a2be2', '#fffc01', '#fe8a0e', '#20c000', '#e55bb0', '#959697', '#7ebff1', '#1a1a1a', '#17a36a'];
     const TEAM = { kitty5: ['Gatitos', 'Lobos del Rey Aullido'], bob: ['Focas', 'Cangrejos del puerto'], shroom25: ['Hongos', 'Payasos de feria'] }[cfg.map] || ['Jugadores', 'Enemigos'];
-    let html = `<div class="lteam">${TEAM[0]}</div>`;
+    const DV = cfg.diff || 'normal', DN = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil', extremo: 'Extremo' };
+    let html = `<div class="lteam">${TEAM[0]}${isHost ? `<span class="qdiff">${Object.entries(DN).map(([k, t]) => `<button data-qd="${k}" class="d-${k}${k === DV ? ' on' : ''}">${t}</button>`).join('')}</span>` : ''}</div>`; /* the same look as Jugar solo */
     const seat = net.seats(hs, nb); /* fixed colours: each player sits on the colour he chose, bots fill the free ones */
     for (let i = 0; i < 12; i++) { const hi = seat.col.indexOf(i), bi = seat.bots.indexOf(i), p = hs[hi]; let who, kind, cls = '';
       if (hi >= 0) { who = (hi === 0 ? '👑 ' : '👤 ') + esc(p.presence.nick || 'Jugador') + (p.sameTab ? ' (tú)' : ''); kind = (hi === 0 ? 'Anfitrión' : 'Jugador') + ' · 🪙 ' + ((p.presence.w | 0)); cls = p.sameTab ? ' me' : ''; }
       else if (bi >= 0 && bi < fakeN) { const nm = cfg.fake[bi]; who = '👤 ' + esc(nm); kind = 'Jugador · 🪙 0'; cls = ''; }
-      else if (bi >= 0) { who = '🤖 IA ' + (bi - fakeN + 1); kind = 'Bot (IA) · toca para ponerte aquí'; cls = ' bot'; }
+      else if (bi >= 0) { who = '🤖 IA ' + (bi - fakeN + 1); kind = 'Bot (IA)'; cls = ' bot'; }
       else { who = 'Abierto'; kind = 'toca para ponerte en este color'; cls = ' open'; }
-      html += `<div class="lrow${cls}${hi < 0 ? ' tap' : ''}" data-slot="${i}"><span class="lc" style="background:${COLS[i]}"></span><b>${who}</b><small>${kind}</small><span class="lt">Equipo 1</span></div>`; }
+      html += `<div class="lrow${cls}${hi < 0 ? ' tap' : ''}" data-slot="${i}"><span class="lc" style="background:${COLS[i]}"></span><b>${who}</b><small>${kind}</small>${bi >= fakeN ? `<span class="ldiff d-${DV}">${DN[DV]}</span>` : '<span class="lt">Equipo 1</span>'}</div>`; }
     { const AK = window.ARENA && ARENA[cfg.map]; if (!AK || AK.kind !== 'team') html += `<div class="lteam">${AK && AK.kind === 'tag' ? 'El Pillador' : AK && AK.kind === 'infect' ? 'Zombis' : TEAM[1]}</div><div class="lrow full bot"><span class="lc" style="background:#8b5a2b"></span><b>${AK && AK.kind === 'tag' ? '😈 IA Pillador' : AK && AK.kind === 'infect' ? '🧟 El virus' : '🤖 IA enemigos'}</b><small>${TEAM[1]}</small><span class="lt">Equipo 2</span></div>`; }
     $('#wSlots').innerHTML = html;
+    $('#wSlots').querySelectorAll('[data-qd]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); net.setCfg && net.setCfg({ diff: b.dataset.qd }); setTimeout(waitTick, 60); }));
     $('#wSlots').querySelectorAll('.lrow.tap').forEach(el => el.addEventListener('click', () => { const i = +el.dataset.slot; if (net.room) net.room.presence({ col: i }); setTimeout(waitTick, 60); })); /* tap a free colour (open or a bot): your box moves there and your old colour is free again */
     { const L = (typeof MAP_LORE !== 'undefined' && MAP_LORE[cfg.map]) || {}; const m = MAPS.find(x => x.id === cfg.map) || MAPS[0];
       $('#wPrev').innerHTML = `<div class="pvic">${mapIcon(m) || '🗺'}</div><b>${esc(mapName(cfg.map))}</b><div class="pvd"><span>Jugadores: ${hs.length + nb}/12</span><span>Creada por: ${esc((hs[0] && hs[0].presence.nick) || 'Anfitrión')}</span><span>Mapa: Perrin Studios</span></div><small>${esc(L.lore || '')}</small>`; }
     $('#wHost').classList.toggle('hidden', !isHost); $('#wBots').textContent = cfg.bots | 0;
     { /* the same options as Jugar solo: how the game ends and how good the bots are */ const AK = window.ARENA && ARENA[cfg.map], team = AK && AK.kind === 'team', zt = cfg.map === 'zombie', wo = $('#wWin'), wd = $('#wDiff');
       if (wo) { wo.classList.toggle('hidden', !isHost || (!team && !zt)); wo.classList.toggle('zt', zt); const v = zt ? (cfg.zombieTime || S.zombieTime || 'z20') : (cfg.arenaWin || S.arenaWin || 'k15'); wo.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('on', x.dataset.w === v)); }
-      if (wd) { wd.classList.toggle('hidden', !isHost); const dv = cfg.diff || 'normal'; wd.querySelectorAll('[data-d]').forEach(x => x.classList.toggle('on', x.dataset.d === dv)); } }
+      if (wd) { wd.classList.toggle('hidden', true); const dv = cfg.diff || 'normal'; wd.querySelectorAll('[data-d]').forEach(x => x.classList.toggle('on', x.dataset.d === dv)); } }
     $('#wStart').classList.toggle('hidden', !isHost);
     if (isHost) {
       if (cfg.auto && hs.length >= 1) {
