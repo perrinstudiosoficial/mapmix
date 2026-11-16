@@ -468,7 +468,7 @@ body[data-akind=zsurv] #dead, body[data-akind=zsurv] #watchBar, body[data-akind=
 #zbPanel{position:fixed;left:max(8px,env(safe-area-inset-left));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 188px);width:226px;background:rgba(10,18,8,.86);border:2px solid #6aaa5a;border-radius:12px;z-index:30;color:#fff;padding:5px;box-shadow:0 4px 16px #0008}#zbPanel.hidden{display:none}
 #zbPanel .zch{display:flex;align-items:center;gap:4px}#zbPanel .zct{display:flex;gap:3px;flex-wrap:wrap}#zbPanel .zct button{width:30px;height:30px;padding:0;border-radius:8px;border:1px solid #5a8a4a;background:#203a18;display:grid;place-items:center;font-size:16px;overflow:hidden}#zbPanel .zct button.on{border-color:#ffd34d;box-shadow:0 0 0 2px #ffd34d}#zbPanel .zct img{width:26px;height:26px;border-radius:50%}
 #zbPanel .zcg{margin-left:auto;font:900 11px system-ui;color:#ffe27a;white-space:nowrap}#zbPanel .zcx{border:0;background:#3a5a2a;color:#fff;border-radius:7px;width:24px;height:24px;font-size:13px;padding:0}
-#zbPanel .zci{font-size:10.5px;line-height:1.25;margin:4px 0;min-height:26px;max-height:40px;overflow:hidden;color:#e4ffd8;text-align:left}
+#zbPanel .zci{font-size:10px;line-height:1.2;margin:3px 0;min-height:24px;max-height:none;overflow:visible;color:#e4ffd8;text-align:left}
 #zbPanel .zcgrid{display:grid;grid-template-columns:repeat(4,50px);gap:4px;max-height:166px;overflow-y:auto;justify-content:center}#zbPanel .zcgrid button{position:relative;width:50px;height:50px;padding:0;border-radius:10px;border:2px solid #ffd34d;background:#1b2a14;display:grid;place-items:center;font-size:24px;overflow:hidden}
 #zbPanel .zcgrid img{width:44px;height:44px;border-radius:50%}#zbPanel .zcgrid i{position:absolute;left:0;right:0;bottom:0;font:900 9px system-ui;font-style:normal;background:rgba(0,0,0,.7);color:#ffe27a;line-height:12px}#zbPanel .zcgrid button.dis{filter:grayscale(1) brightness(.6);border-color:#555}
 #zbPick{position:fixed;inset:0;z-index:41;background:rgba(5,8,4,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;color:#fff}#zbPick.hidden{display:none}
@@ -42455,7 +42455,7 @@ function arenaItemsHud(A, ui) {
 let _shopTab = 0;
 function arenaShopOpen(A, ui) {
   let sp = document.getElementById('arenaShop'); if (!sp) { sp = document.createElement('div'); sp.id = 'arenaShop'; sp.className = 'hidden'; document.body.appendChild(sp); sp.addEventListener('pointerdown', e => e.stopPropagation()); }
-  sp.classList.toggle('hidden'); sp._k = null; arenaShopFill(A, ui);
+  sp.classList.toggle('hidden'); if (!sp.classList.contains('hidden')) _shopTab = 0; /* always opens on the first tab (upgrades) */ sp._k = null; arenaShopFill(A, ui);
 }
 function arenaShopFill(A, ui) {
   const W = A.W, sp = document.getElementById('arenaShop'), id = W.local.id, me = W.heroOf(W.local); if (!sp || sp.classList.contains('hidden')) return;
@@ -42593,7 +42593,7 @@ const ZB = {
   frost: { n: 'Torreta de hielo', ic: '❄️', s: 96, hp: 400, g: 300, pw: 1, dmg: [25, 35], cd: 1.0, rng: 800, slow: 1, hide: 1 },
   warehouse: { n: 'Almacén', ic: '📦', s: 128, hp: 400, g: 150, req: ['attach', 1], d: 'Vende armas y equipo para tu marine.' },
 };
-for (const k in ZB) ZB[k].img = 'ibc_' + k; /* the building icons Perrin drew */
+for (const k in ZB) ZB[k].img = 'ibc_' + k; /* the building icons Perrin drew */ for (const k of ['barricade', 'adv']) ZB[k].img = 'zw09';
 const ZB_BUILD = ['barricade', 'research', 'exchange', 'factory', 'flag', 'core', 'turret', 'warehouse'];
 // research (at the Research Center; income at the Factory): g = cost of level 1, gi = more per level, h = honor
 const ZR = {
@@ -43080,12 +43080,12 @@ function zSees(A, p, e) {
   if (A.buf[e.owner.id] && A.buf[e.owner.id].marked > t && !myZ) return true;
   for (const v of zVisionSrc(A, myZ)) if (Math.hypot(v.x - e.x, v.y - e.y) < v.r) return true; return false;
 }
-function zVisionSrc(A, Z) { const t = A.W.time; if (A._vsT === t && A._vsZ === Z) return A._vs; const L = [];
+function zVisionSrc(A, Z) { const t = A.W.time; if (A._vsT !== t) { A._vsT = t; A._vsC = {}; } if (A._vsC[Z]) return A._vsC[Z]; const L = []; /* cached for both sides each tick */
   for (const u of A.heroes) if (u.alive && A.isHunter(u) === Z) L.push({ x: u.x, y: u.y, r: Z ? 1000 : 850 });
   if (!Z) { for (const b of A.blds) if (!A.zomb.has(b.owner)) L.push({ x: b.x, y: b.y, r: ZB[b.k].dmg ? 850 : 450 }); for (const m of A.mins) if (!A.isHunter(m.o)) L.push({ x: m.x, y: m.y, r: 500 }); }
   else for (const m of A.mins) if (A.isHunter(m.o)) L.push({ x: m.x, y: m.y, r: m.k === 'eye' ? 900 : m.k === 'ghost' ? 900 : 500 });
   for (const v of A.vis) if ((v.team === 1) === Z) L.push(v);
-  A._vs = L; A._vsT = t; A._vsZ = Z; return L; }
+  A._vsC[Z] = L; return L; }
 
 // ---------------- bots ----------------
 const ZBOT_PLAN = ['research', 'b', 'b', 'b', 'factory', 'b', 'ub', 'r:hp', 'exchange', 'xg', 'xg', 'ub', 'r:power', 'core', 'turret', 'u:rocket', 'b', 'r:dmg', 'r:walls', 'ub', 'turret', 'u:electric', 'r:attach', 'warehouse', 'i:suit', 'r:dmg', 'r:hp', 'ub', 'xg', 'r:walls', 'ub', 'r:range', 'r:income', 'r:dmg', 'gen', 'turret', 'u:frost', 'r:hp', 'r:dmg', 'r:walls', 'ub', 'ub', 'r:dmg'];
@@ -43160,9 +43160,9 @@ const _zImg = {}; function zImgDraw(g, n, x, y, S) { if (!n) return; let im = _z
 function zBldDraw(g, b, mine, A) {
   const B = ZB[b.k], h = b.s / 2, t = A.W.time; g.save(); g.translate(b.x, b.y);
   g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(-h + 6, -h - 8, b.s, b.s);
-  { const im = zCI('zsuB_' + b.k); g.strokeStyle = A.zomb.has(b.owner) ? 'rgba(140,255,106,0.7)' : mine ? 'rgba(127,178,255,0.7)' : 'rgba(178,140,255,0.6)'; g.lineWidth = 3; g.beginPath(); g.ellipse(0, -h * 0.35, h * 0.95, h * 0.4, 0, 0, 7); g.stroke();
+  { const ZWI = { barricade: 'zw00', adv: 'zw01', stone: 'zw04', super: 'zw05', burrow: 'zw08' }; const im = zCI(ZWI[b.k] || 'zsuB_' + b.k); if (ZWI[b.k]) { if (im) { const w = b.s * 1.04, hh = w * im.naturalHeight / im.naturalWidth; g.save(); g.scale(1, -1); g.drawImage(im, -w / 2, h - hh, w, hh); g.restore(); } } else { g.strokeStyle = A.zomb.has(b.owner) ? 'rgba(140,255,106,0.7)' : mine ? 'rgba(127,178,255,0.7)' : 'rgba(178,140,255,0.6)'; g.lineWidth = 3; g.beginPath(); g.ellipse(0, -h * 0.35, h * 0.95, h * 0.4, 0, 0, 7); g.stroke();
     if (im) { const w = b.s * 1.55, hh = w * im.naturalHeight / im.naturalWidth; g.save(); g.scale(1, -1); g.drawImage(im, -w / 2, -hh / 2 - h * 0.15, w, hh); g.restore(); } else { g.fillStyle = '#2a2622'; g.fillRect(-h + 2, -h + 2, b.s - 4, b.s - 4); }
-    if (b.k === 'flag' && b.aura) zImgDraw(g, FLAG_IMG[b.aura], 0, 0, h); }
+    } if (b.k === 'flag' && b.aura) zImgDraw(g, FLAG_IMG[b.aura], 0, 0, h); }
   if (b.inv > t) { g.strokeStyle = 'rgba(120,255,160,0.8)'; g.lineWidth = 5; g.strokeRect(-h - 6, -h - 6, b.s + 12, b.s + 12); }
   if (b.bt && !b.bt.up && mine) { const oh = A.W.heroOf(A.W.local), d = oh ? Math.hypot(oh.x - b.x, oh.y - b.y) : 0; g.save(); g.setLineDash([18, 14]); g.strokeStyle = 'rgba(255,211,77,0.55)'; g.lineWidth = 5; g.beginPath(); g.arc(0, 0, 320, 0, 6.29); g.stroke(); g.restore();
     g.save(); g.scale(1, -1); g.font = '900 22px system-ui'; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = '#000'; const tx = d > 250 ? '⚠️ ¡Mantente cerca!' : 'Mantente cerca'; g.strokeText(tx, 0, -h - 70); g.fillStyle = d > 250 ? '#ff9a4d' : '#ffd34d'; g.fillText(tx, 0, -h - 70); g.restore(); }
@@ -43181,7 +43181,7 @@ const ZC_PROP = [].concat(
   Array.from({ length: 4 }, (_, i) => ['zsma' + String(i).padStart(2, '0'), 92, 52, 26]), Array.from({ length: 12 }, (_, i) => ['zsma' + String(i + 4).padStart(2, '0'), 64, 36, 20]),
   [['zspa04', 190, 130, 60], ['zspa05', 180, 120, 60], ['zspa06', 230, 170, 70], ['zspb00', 230, 150, 70], ['zspb01', 190, 130, 64], ['zspb02', 110, 70, 36], ['zspb03', 230, 160, 70], ['zspc02', 230, 150, 70], ['zspc05', 200, 140, 66], ['zspc14', 220, 150, 64], ['zspc03', 250, 180, 70],
    ['zspa07', 140, 110, 40], ['zspa08', 130, 70, 30], ['zspa12', 80, 50, 20], ['zspa13', 70, 46, 30], ['zspa14', 100, 70, 40], ['zspa15', 130, 100, 30], ['zspb04', 140, 90, 60], ['zspb05', 150, 110, 60], ['zspb06', 160, 120, 80], ['zspb07', 150, 100, 60], ['zspb08', 130, 70, 30], ['zspb09', 70, 44, 34], ['zspb10', 120, 90, 46], ['zspb11', 90, 60, 34], ['zspb12', 160, 120, 70], ['zspb13', 90, 64, 40], ['zspb14', 90, 66, 40], ['zspb15', 110, 80, 30], ['zspc04', 150, 100, 70], ['zspc06', 160, 120, 70], ['zspc08', 160, 120, 40], ['zspc09', 120, 90, 50], ['zspc10', 200, 150, 60], ['zspc11', 160, 120, 50], ['zspc12', 150, 120, 40], ['zspc13', 160, 120, 70], ['zspc15', 160, 120, 60]]);
-const ZC_AR = {"zcF100":0.677,"zcF101":0.843,"zcF102":0.93,"zcF103":0.643,"zcF104":0.687,"zcF105":0.743,"zcF106":0.687,"zcF107":0.63,"zcF108":0.77,"zcF109":0.89,"zcF110":0.7,"zcF111":0.78,"zcF200":0.81,"zcF201":0.857,"zcF202":0.737,"zcF203":0.797,"zcF204":0.77,"zcF205":0.867,"zcF206":0.643,"zcF207":0.617,"zcF208":0.757,"zcF209":0.793,"zcF210":0.683,"zcF211":0.67,"zcL00":1.382,"zcL01":1.648,"zcL02":1.604,"zcL03":1.44,"zcL04":1.565,"zcL05":1.487,"zcL06":1.503,"zcL07":1.442,"zcL08":1.241,"zcL09":1.363,"zcL10":1.252,"zcL11":1.294,"zcL12":1.325,"zcL13":1.302,"zcL14":1.333,"zcL15":1.22,"zcL16":1.224,"zcL17":1.364,"zcL18":1.387,"zcL19":1.307,"zcL20":1.327,"zcL21":1.319,"zcL22":1.233,"zcL23":1.207,"zcL24":1.393,"zcL25":1.389,"zcL26":1.444,"zcL27":1.439,"zcL28":1.369,"zcL29":1.384,"zcL30":1.387,"zcL31":1.36,"zcR00":1.442,"zcR01":1.409,"zcR02":1.464,"zcR03":1.389,"zcR04":1.518,"zcR05":1.377,"zcR06":1.457,"zcR07":1.451,"zcR08":1.327,"zcR09":1.317,"zcR10":1.228,"zcR11":1.261,"zcR12":1.384,"zcR13":1.329,"zcR14":1.327,"zcR15":1.296,"zcR16":1.236,"zcR17":1.319,"zcR18":1.323,"zcR19":1.317,"zcR20":1.296,"zcR21":1.3,"zcR22":1.227,"zcR23":1.278,"zcR24":1.333,"zcR25":1.528,"zcR26":1.596,"zcR27":1.58,"zcR28":1.729,"zcR29":1.479,"zcR30":1.51,"zcR31":1.566,"zcR32":1.369,"zcT00":2.62,"zcT01":2.54,"zcT02":2.35,"zcT03":2.375,"zcT04":2.645,"zcT05":2.491,"zcT06":2.579,"zcT07":2.44,"zcT08":2.455,"zcT09":2.131,"zcT10":2.046,"zcT11":2.202,"zcT12":2.574,"zcT13":2.83,"zcT14":2.791,"zcT15":2.49,"zcT16":2.237,"zcT17":2.691,"zcT18":2.731,"zcT19":2.955,"zcT20":2.484,"zcT21":2.842,"zcT22":2.521,"zcT23":2.525,"zcT24":2.957,"zcT25":2.945,"zcT26":2.957,"zcT27":2.765,"zcT28":3.0,"zcT29":2.435,"zcT30":2.444,"zcT31":2.618,"zcT32":2.241,"zcT33":2.567,"zcT34":2.067,"zcT35":2.135,"zcRS00":1.818,"zcRS01":2.326,"zcRS02":2.362,"zcRS03":2.439,"zcRS04":2.098,"zcRS05":1.531,"zcRS06":1.911,"zcRS07":1.765,"zcRS08":2.174,"zcRS09":1.923,"zcRS10":1.829,"zcRS11":1.875,"zcK00":1.281,"zcK01":1.359,"zcK02":1.44,"zcK03":1.181,"zcK04":1.5,"zcK05":1.318,"zcK06":1.369,"zcK07":1.249,"zcK08":1.143,"zcK09":1.199,"zcK10":1.177,"zcK11":1.178,"zcK12":1.241,"zcK13":1.219,"zcK14":1.226,"zcK15":1.075,"zcK16":1.11,"zcK17":1.269,"zcK18":1.204,"zcK19":1.339,"zcK20":1.25,"zcK21":1.327,"zcK22":1.204,"zcK23":1.076,"zcK24":1.331,"zcK25":1.352,"zcK26":1.442,"zcK27":1.341,"zcK28":1.347,"zcK29":1.32,"zcK30":1.292,"zcK31":1.204}; /* height / width of each building drawing */
+const ZC_AR = Object.assign({"zgA00":0.759,"zgA01":0.666,"zgA02":0.838,"zgA03":0.566,"zgA04":0.622,"zgA05":0.572,"zgA06":0.694,"zgA07":0.616,"zgA08":0.634,"zgA09":0.575,"zgA10":0.641,"zgA11":0.541,"zgB00":0.741,"zgB01":0.669,"zgB02":0.847,"zgB03":0.519,"zgB04":0.597,"zgB05":0.7,"zgB06":0.575,"zgB07":0.659,"zgB08":0.647,"zgB09":0.603,"zgB10":0.625,"zgB11":0.534,"zgC00":0.506,"zgC01":0.509,"zgC02":0.494,"zgC03":0.394,"zgC04":0.425,"zgC05":0.441,"zgC06":0.419,"zgC07":0.456,"zgC08":0.441,"zgC09":0.494,"zgC10":0.487,"zgC11":0.463}, {"zcF100":0.677,"zcF101":0.843,"zcF102":0.93,"zcF103":0.643,"zcF104":0.687,"zcF105":0.743,"zcF106":0.687,"zcF107":0.63,"zcF108":0.77,"zcF109":0.89,"zcF110":0.7,"zcF111":0.78,"zcF200":0.81,"zcF201":0.857,"zcF202":0.737,"zcF203":0.797,"zcF204":0.77,"zcF205":0.867,"zcF206":0.643,"zcF207":0.617,"zcF208":0.757,"zcF209":0.793,"zcF210":0.683,"zcF211":0.67,"zcL00":1.382,"zcL01":1.648,"zcL02":1.604,"zcL03":1.44,"zcL04":1.565,"zcL05":1.487,"zcL06":1.503,"zcL07":1.442,"zcL08":1.241,"zcL09":1.363,"zcL10":1.252,"zcL11":1.294,"zcL12":1.325,"zcL13":1.302,"zcL14":1.333,"zcL15":1.22,"zcL16":1.224,"zcL17":1.364,"zcL18":1.387,"zcL19":1.307,"zcL20":1.327,"zcL21":1.319,"zcL22":1.233,"zcL23":1.207,"zcL24":1.393,"zcL25":1.389,"zcL26":1.444,"zcL27":1.439,"zcL28":1.369,"zcL29":1.384,"zcL30":1.387,"zcL31":1.36,"zcR00":1.442,"zcR01":1.409,"zcR02":1.464,"zcR03":1.389,"zcR04":1.518,"zcR05":1.377,"zcR06":1.457,"zcR07":1.451,"zcR08":1.327,"zcR09":1.317,"zcR10":1.228,"zcR11":1.261,"zcR12":1.384,"zcR13":1.329,"zcR14":1.327,"zcR15":1.296,"zcR16":1.236,"zcR17":1.319,"zcR18":1.323,"zcR19":1.317,"zcR20":1.296,"zcR21":1.3,"zcR22":1.227,"zcR23":1.278,"zcR24":1.333,"zcR25":1.528,"zcR26":1.596,"zcR27":1.58,"zcR28":1.729,"zcR29":1.479,"zcR30":1.51,"zcR31":1.566,"zcR32":1.369,"zcT00":2.62,"zcT01":2.54,"zcT02":2.35,"zcT03":2.375,"zcT04":2.645,"zcT05":2.491,"zcT06":2.579,"zcT07":2.44,"zcT08":2.455,"zcT09":2.131,"zcT10":2.046,"zcT11":2.202,"zcT12":2.574,"zcT13":2.83,"zcT14":2.791,"zcT15":2.49,"zcT16":2.237,"zcT17":2.691,"zcT18":2.731,"zcT19":2.955,"zcT20":2.484,"zcT21":2.842,"zcT22":2.521,"zcT23":2.525,"zcT24":2.957,"zcT25":2.945,"zcT26":2.957,"zcT27":2.765,"zcT28":3.0,"zcT29":2.435,"zcT30":2.444,"zcT31":2.618,"zcT32":2.241,"zcT33":2.567,"zcT34":2.067,"zcT35":2.135,"zcRS00":1.818,"zcRS01":2.326,"zcRS02":2.362,"zcRS03":2.439,"zcRS04":2.098,"zcRS05":1.531,"zcRS06":1.911,"zcRS07":1.765,"zcRS08":2.174,"zcRS09":1.923,"zcRS10":1.829,"zcRS11":1.875,"zcK00":1.281,"zcK01":1.359,"zcK02":1.44,"zcK03":1.181,"zcK04":1.5,"zcK05":1.318,"zcK06":1.369,"zcK07":1.249,"zcK08":1.143,"zcK09":1.199,"zcK10":1.177,"zcK11":1.178,"zcK12":1.241,"zcK13":1.219,"zcK14":1.226,"zcK15":1.075,"zcK16":1.11,"zcK17":1.269,"zcK18":1.204,"zcK19":1.339,"zcK20":1.25,"zcK21":1.327,"zcK22":1.204,"zcK23":1.076,"zcK24":1.331,"zcK25":1.352,"zcK26":1.442,"zcK27":1.341,"zcK28":1.347,"zcK29":1.32,"zcK30":1.292,"zcK31":1.204}); /* height / width of each building drawing */
 const ZC_SET = k => Object.keys(ZC_AR).filter(n => n.startsWith('zc' + k) && /\d\d$/.test(n) && !(k === 'R' && n.startsWith('zcRS')));
 /* buildings on every wall, like a city seen from the front:
    - the side of a wall that looks DOWN onto a street: building fronts (one next to the other)
@@ -43190,7 +43190,7 @@ const ZC_SET = k => Object.keys(ZC_AR).filter(n => n.startsWith('zc' + k) && /\d
    thin walls get one row; thick walls get a row on each side */
 function zCityBlocks(A, D, rnd) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32, items = [];
   const F = ZC_SET('F'), R = ZC_SET('R').concat(ZC_SET('RS'), ZC_SET('RS')), L = ZC_SET('L'), T = ZC_SET('T'), K = ZC_SET('K'), RS = ZC_SET('RS');
-  const pick = a => a[Math.floor(rnd() * a.length)];
+  const pick = a => a[Math.floor(rnd() * a.length)], G = Object.keys(ZC_AR).filter(n => /^zg[ABC]\d\d$/.test(n));
   const wall = (i, j) => i < 0 || j < 0 || i >= PW || j >= PH || D[j * PW + i] === 0, st = (i, j) => !wall(i, j);
   const thU = (i, j) => { let n = 0; while (n < 30 && wall(i, j + n)) n++; return n; }, thD = (i, j) => { let n = 0; while (n < 30 && wall(i, j - n)) n++; return n; };
   const thL = (i, j) => { let n = 0; while (n < 30 && wall(i - n, j)) n++; return n; }, thR = (i, j) => { let n = 0; while (n < 30 && wall(i + n, j)) n++; return n; };
@@ -43199,8 +43199,10 @@ function zCityBlocks(A, D, rnd) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 
   // 1) fronts along walls that have a street below them
   for (let j = 1; j < PH - 1; j++) { let i = 1; while (i < PW - 1) { if (!(wall(i, j) && st(i, j - 1))) { i++; continue; } let e = i; while (e < PW - 1 && wall(e, j) && st(e, j - 1)) e++;
       let pos = i; while (pos < e) { const rem = e - pos; let n = rem <= 8 ? rem : 5 + Math.floor(rnd() * 3); if (rem - n > 0 && rem - n < 3) n = rem - 3 > 3 ? rem - 3 : rem;
-        let t = 30; for (let q = pos; q < pos + n; q++) t = Math.min(t, thU(q, j)); const im = pick(F); let w = n * C + 6, h = w * ZC_AR[im]; const mh = t * C + 26; if (h > mh) { h = mh; w = h / ZC_AR[im]; }
-        add(im, M0 + (pos + n / 2) * C, M0 + j * C - 4, w, 1, 2); pos += n; } i = e; } }
+        let t = 30; for (let q = pos; q < pos + n; q++) t = Math.min(t, thU(q, j));
+        if (t >= 7 && rem >= 9 && rnd() < 0.45) { n = Math.min(rem, 9 + Math.floor(rnd() * 3)); if (rem - n > 0 && rem - n < 3) n = rem; t = 30; for (let q = pos; q < pos + n; q++) t = Math.min(t, thU(q, j)); const im = pick(G); const w = n * C + 6, h = Math.min(w * ZC_AR[im], t * C + 26); add(im, M0 + (pos + n / 2) * C, M0 + j * C - 4, w, 1, 2); items[items.length - 1].h = h; pos += n; continue; } /* wide blocks: a mansion, a factory, a field… */
+        const im = pick(F); const w = n * C + 6; let h = w * ZC_AR[im]; const mh = t * C + 26; if (h > mh) h = mh; /* squeezed a little rather than leaving a gap */
+        add(im, M0 + (pos + n / 2) * C, M0 + j * C - 4, w, 1, 2); items[items.length - 1].h = h; pos += n; } i = e; } }
   // 2) sides: street to the right -> buildings looking right; street to the left -> looking left
   for (const dir of [1, -1]) for (let i = 1; i < PW - 1; i++) { let j = 1; while (j < PH - 1) { const ok = jj => wall(i, jj) && st(i + dir, jj) && !st(i, jj - 1); if (!ok(j)) { j++; continue; } let e = j; while (e < PH - 1 && ok(e)) e++;
       const tx = dir > 0 ? thL(i, j) : thR(i, j), other = dir > 0 ? st(i - tx, j) : st(i + tx, j);
@@ -43236,21 +43238,21 @@ function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MA
     P.push({ x, y, im: it[0], w: it[1], fw, fh, fx: rnd() < 0.5 ? -1 : 1 }); W.blockRect(x - fw, y - fh, x + fw, y + fh, 1); }
   P.sort((a, b) => b.y - a.y); A.cityP = P; }
 const _zci = {}; function zCI(n) { let im = _zci[n]; if (!im) { im = _zci[n] = new Image(); im.src = FX(n); } return im.complete && im.naturalWidth ? im : null; }
-let _zcPat = null; function zCityPats(g) { if (_zcPat) return _zcPat; const mk = f => { const c = document.createElement('canvas'); c.width = c.height = 128; const q = c.getContext('2d'); f(q); return g.createPattern(c, 'repeat'); }; let sd = 99; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+let _zcPat = null; function zCityPats(g) { if (_zcPat && _zcPat.real) return _zcPat; { const ia = zCI('zrd_asph'), iw = zCI('zrd_walk'); if (ia && iw && _zcPat) { _zcPat.road = g.createPattern(ia, 'repeat'); _zcPat.walk = g.createPattern(iw, 'repeat'); _zcPat.real = true; return _zcPat; } } if (_zcPat) return _zcPat; /* Perrin's road texture once it is loaded */ const mk = f => { const c = document.createElement('canvas'); c.width = c.height = 128; const q = c.getContext('2d'); f(q); return g.createPattern(c, 'repeat'); }; let sd = 99; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   _zcPat = {
     road: mk(q => { q.fillStyle = '#3b3a39'; q.fillRect(0, 0, 128, 128); for (let i = 0; i < 70; i++) { q.fillStyle = i % 2 ? '#353433' : '#444240'; q.globalAlpha = 0.6; q.beginPath(); q.arc(r() * 128, r() * 128, 2 + r() * 7, 0, 7); q.fill(); } q.globalAlpha = 0.6; q.strokeStyle = '#242322'; q.lineWidth = 1.4; for (let i = 0; i < 4; i++) { let x = r() * 128, y = r() * 128; q.beginPath(); q.moveTo(x, y); for (let k = 0; k < 4; k++) { x += (r() - 0.5) * 40; y += (r() - 0.5) * 40; q.lineTo(x, y); } q.stroke(); } }),
     walk: mk(q => { q.fillStyle = '#7d7a75'; q.fillRect(0, 0, 128, 128); q.strokeStyle = '#5f5c58'; q.lineWidth = 2; for (let x = 0; x <= 128; x += 32) { q.beginPath(); q.moveTo(x, 0); q.lineTo(x, 128); q.stroke(); q.beginPath(); q.moveTo(0, x); q.lineTo(128, x); q.stroke(); } q.globalAlpha = 0.35; for (let i = 0; i < 30; i++) { q.fillStyle = i % 2 ? '#55524e' : '#96928c'; q.fillRect(r() * 128, r() * 128, 3 + r() * 6, 3 + r() * 5); } }),
     block: mk(q => { q.fillStyle = '#4a3f33'; q.fillRect(0, 0, 128, 128); for (let i = 0; i < 60; i++) { q.fillStyle = ['#3e352b', '#57493b', '#5d5a40', '#352d25'][i % 4]; q.globalAlpha = 0.7; q.beginPath(); q.arc(r() * 128, r() * 128, 2 + r() * 9, 0, 7); q.fill(); } q.globalAlpha = 0.5; q.fillStyle = '#6b6b3a'; for (let i = 0; i < 14; i++) q.fillRect(r() * 128, r() * 128, 2, 5); }) /* bare dirt lots */ };
   return _zcPat; }
 /* the streets: road in the middle, sidewalks along the buildings, a curb between them */
-function zCityPaint(A, g, x0, y0, x1, y1) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32, D = A.cityD, RL = A.cityRL, P = zCityPats(g);
+function zCityPaint(A, g, x0, y0, x1, y1) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32, D = A.cityD, RL = A.cityRL, P = zCityPats(g); if (!P.real) A._cityMiss = true;
   const i0 = Math.max(0, Math.floor((x0 - M0) / C) - 1), i1 = Math.min(PW - 1, Math.ceil((x1 - M0) / C) + 1), j0 = Math.max(0, Math.floor((y0 - M0) / C) - 1), j1 = Math.min(PH - 1, Math.ceil((y1 - M0) / C) + 1);
   g.fillStyle = P.road; g.fillRect(x0 - 64, y0 - 64, x1 - x0 + 128, y1 - y0 + 128);
   const walk = new Path2D(), blk = new Path2D(), curb = new Path2D(), line = new Path2D();
   for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const k = j * PW + i, d = D[k], x = M0 + i * C, y = M0 + j * C; if (d === 0) blk.rect(x, y, C, C); else if (d <= 2) { walk.rect(x, y, C, C); if (i + 1 < PW && D[k + 1] === 3) curb.rect(x + C - 3, y, 6, C); if (i > 0 && D[k - 1] === 3) curb.rect(x - 3, y, 6, C); if (j + 1 < PH && D[k + PW] === 3) curb.rect(x, y + C - 3, C, 6); if (j > 0 && D[k - PW] === 3) curb.rect(x, y - 3, C, 6); }
     else if (d === 4) { if (i + 1 < PW && D[k + 1] === 3) line.rect(x + C - 2, y, 4, C); if (i > 0 && D[k - 1] === 3) line.rect(x - 2, y, 4, C); if (j + 1 < PH && D[k + PW] === 3) line.rect(x, y + C - 2, C, 4); if (j > 0 && D[k - PW] === 3) line.rect(x, y - 2, C, 4); } /* the white edge line of the road */
     if (d >= 5 && RL && RL[k]) { if ((RL[k] & 1) && j % 3 !== 0) line.rect(x + C / 2 - 3, y, 6, C); if ((RL[k] & 2) && i % 3 !== 0) line.rect(x, y + C / 2 - 3, C, 6); } }
-  g.fillStyle = P.walk; g.fill(walk); g.fillStyle = '#a7a39c'; g.fill(curb); g.fillStyle = P.block; g.fill(blk); g.fillStyle = 'rgba(235,235,230,0.8)'; g.fill(line);
+  g.fillStyle = P.walk; g.fill(walk); g.fillStyle = '#8f8a84'; g.fill(curb); g.fillStyle = P.block; g.fill(blk); g.fillStyle = '#f2f2ee'; g.fill(line);
   for (const b of A.cityB || []) { if (b.x + b.w < x0 || b.x - b.w > x1 || b.yb + b.h < y0 || b.yb > y1) continue; const im = zCI(b.im); if (!im) { A._cityMiss = true; continue; } g.save(); g.translate(b.x, b.yb); g.scale(b.fx, -1); g.drawImage(im, -b.w / 2, -b.h, b.w, b.h); g.restore(); }
   for (const p of A.cityP || []) { if (p.x + p.w < x0 || p.x - p.w > x1 || p.y + p.w < y0 || p.y - p.w > y1) continue; const im = zCI(p.im); if (!im) { A._cityMiss = true; continue; } const w = p.w, h = w * im.naturalHeight / im.naturalWidth; g.save(); g.translate(p.x, p.y); g.scale(p.fx, -1); g.drawImage(im, -w / 2, -h / 2 - 6, w, h); g.restore(); } }
 /* the city is drawn once in big pieces and then only copied: smooth on phones */
@@ -43362,7 +43364,8 @@ function zPanel(A, toggle) {
   let pn = document.getElementById('zbPanel'); if (!pn) { pn = document.createElement('div'); pn.id = 'zbPanel'; pn.className = 'hidden'; document.body.appendChild(pn); pn.addEventListener('pointerdown', e => e.stopPropagation()); }
   if (toggle) { pn.classList.toggle('hidden'); pn._k = null; _zInfo = ''; } if (pn.classList.contains('hidden')) return;
   const g = Math.floor(A.gold[id] || 0), h = A.honor[id] || 0, res = A.res[id] || {};
-  const near = A.blds.filter(b => !A.zomb.has(b.owner) && (b.owner === id || ['research', 'exchange', 'trade', 'warehouse'].includes(b.k)) && Math.hypot(b.x - me.x, b.y - me.y) < 520).sort((a, b) => Math.hypot(a.x - me.x, a.y - me.y) - Math.hypot(b.x - me.x, b.y - me.y))[0];
+  if (A._selB && (A._selB.dead || Math.hypot(A._selB.x - me.x, A._selB.y - me.y) > 1400)) A._selB = null;
+  const near = A._selB && !A._selB.dead ? A._selB : A.blds.filter(b => !A.zomb.has(b.owner) && (b.owner === id || ['research', 'exchange', 'trade', 'warehouse'].includes(b.k)) && Math.hypot(b.x - me.x, b.y - me.y) < 520).sort((a, b) => Math.hypot(a.x - me.x, a.y - me.y) - Math.hypot(b.x - me.x, b.y - me.y))[0];
   const mid = Z, /* the zombie shops are always open, wherever you are */ shop = A.shops.filter(s => Math.hypot(s.x - me.x, s.y - me.y) < 520)[0];
   const SHOPIC = { 'Cripta': '⚰️', 'Vendedor de recetas': '📜', 'Tumba de reliquias': '🪦', 'Tienda embrujada': '👻', 'Tienda secreta': '🗝️' };
   const tabs = Z ? (mid ? Object.keys(ZSHOPS).map(n => ({ ic: SHOPIC[n], n })) : [{ ic: '🛒', n: 'Tienda' }]).concat([{ img: 'zi_bag', n: 'Bolso' }]) : [{ img: 'zi_build', n: 'Construir' }, { img: near ? (ZB[near.k].img || 'zi_build') : 'zi_research', n: near ? ZB[near.k].n : 'Cerca' }, { img: 'zi_bag', n: 'Bolso' }];
@@ -43373,7 +43376,7 @@ function zPanel(A, toggle) {
   let note = '';
   if (!Z && _zTab === 0) { const f = A.facs.find(q => q.own !== id && Math.hypot(q.x - me.x, q.y - me.y) < 260); if (f) add({ img: 'zi_smallfac' }, 'Capturar fábrica pequeña', '5 s quieto · +2 de oro por segundo', '5 s', 'cap');
     for (const k of ZB_BUILD) { const B = ZB[k], rq = B.req && (res[B.req[0]] || 0) < B.req[1], nopw = B.pw && zPowerFree(A, id) < B.pw, max4 = k === 'turret' && A.blds.filter(b => b.owner === id && ZB[b.k].pw).length >= 4;
-      const why = rq ? (k === 'core' ? 'Primero construye un Centro de investigación y ahí investiga ' : 'Primero investiga ') + ZR[B.req[0]].n + (B.req[0] === 'attach' || B.req[0] === 'power' ? ' (en el Centro de investigación)' : '') : nopw ? 'Necesitas energía: construye primero un Núcleo de energía' : max4 ? 'Máximo 4 torretas' : g < B.g ? 'Te falta oro (' + B.g + ')' : h < (B.h || 0) ? 'Te falta honor' : '';
+      const why = rq ? (k === 'core' ? 'Investiga ' : 'Primero investiga ') + ZR[B.req[0]].n + ' en el Centro de investigación' : nopw ? 'Necesitas un Núcleo de energía' : max4 ? 'Máximo 4 torretas' : g < B.g ? 'Te falta oro (' + B.g + ')' : h < (B.h || 0) ? 'Te falta honor' : '';
       const o = add(B, B.n, why ? '🔒 ' + why : B.d, cost(B.g, B.h), 'build:' + k, !!why); L[L.length - 1].why = why; }
   }
   if (!Z && _zTab === 1) { if (!near) note = 'Acércate a un edificio tuyo (o al Centro, Oficina o Almacén de un compañero).'; else { const B = ZB[near.k], own = near.owner === id;
@@ -43386,7 +43389,8 @@ function zPanel(A, toggle) {
       if (near.k === 'warehouse') for (const [k, it] of Object.entries(ZI)) if (it.shop === 'Almacén') add(it, it.n, it.d, cost(it.g), 'buy:' + k, g < it.g);
       if (near.k === 'flag' && own) for (const [k, [n, d]] of Object.entries(FLAG_AURA)) add({ img: FLAG_IMG[k] }, n + (near.aura === k ? ' ✅' : ''), d, near.aura === k ? 'activa' : 'elegir', 'aura:' + near.id + ':' + k, near.aura === k);
       if (near.k === 'burrow' && own && !near.rep) add({ ic: '🛠️' }, 'Reparación de emergencia', '+350 de vida (1 vez)', 'usar', 'erepair:' + near.id);
-      if (near.k === 'factory' && own && !near.explo) add({ ic: '💣' }, 'Poner explosivo', 'Si la destruyen explota: 500 a los zombis cerca', 'poner', 'explo:' + near.id); }
+      if (near.k === 'factory' && own && !near.explo) add({ ic: '💣' }, 'Poner explosivo', 'Si la destruyen explota: 500 a los zombis cerca', 'poner', 'explo:' + near.id);}
+    if (own) add({ ic: '💥' }, 'Destruir', 'Derriba este edificio (te devuelve 25%)', 'destruir', 'demolish:' + near.id);
   } }
   if (Z && _zTab < tabs.length - 1) { const sh = mid ? { n: Object.keys(ZSHOPS)[_zTab] } : shop;
     if (!sh) note = 'Las tiendas zombi están en el centro del mapa.'; else { note = sh.n;
@@ -43398,7 +43402,7 @@ function zPanel(A, toggle) {
     <div class="zci">${_zInfo || (note ? zEsc(note) : '<b>' + zEsc(tabs[_zTab].n) + '</b> · toca un icono')}</div>
     <div class="zcgrid">${L.map((e, i) => `<button data-i="${i}" class="${e.dis ? 'dis' : ''}">${icon(e.o)}<b class="zcn">${zEsc(String(e.n).replace(/ \(.*\)$/, ''))}</b><i>${zEsc(e.cost)}</i></button>`).join('')}</div>`;
   pn.querySelector('[data-x]').addEventListener('click', () => pn.classList.add('hidden'));
-  pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { _zTab = +b.dataset.tab; _zInfo = ''; pn._k = null; zPanel(A, false); }));
+  pn.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { if (+b.dataset.tab !== 1) A._selB = null; _zTab = +b.dataset.tab; _zInfo = ''; pn._k = null; zPanel(A, false); }));
   pn.querySelectorAll('[data-i]').forEach(b => { const e0 = L[+b.dataset.i]; if (e0.dis || !e0.act || !/^build:/.test(e0.act)) return; /* press a building and drag it out of the menu: the menu closes and it follows your finger; let go to build */
     b.addEventListener('pointerdown', ev => { const sx = ev.clientX, sy = ev.clientY; let on = false;
       const mv = m => { if (on || Math.hypot(m.clientX - sx, m.clientY - sy) < 18) return; on = true; b._drag = true; pn.classList.add('hidden'); zPlaceMode(A, e0.act.split(':')[1]); document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up0, true); zGhostFollow(A, W, sx, sy, false); };
@@ -43408,7 +43412,7 @@ function zPanel(A, toggle) {
     if (!e.dis && e.act === 'demomode') { pn.classList.add('hidden'); zDemoMode(A, true); return; }
     if (!e.dis && e.act && /^build:/.test(e.act)) { pn.classList.add('hidden'); zPlaceMode(A, e.act.split(':')[1]); return; } /* first a see-through building you place where you want */
     if (!e.dis && e.act && /^cap/.test(e.act)) { A.cmd(W.local, e.act); zBought(b, W); pn.classList.add('hidden'); return; } /* building or capturing: the menu closes so you can watch it */
-    if (!e.dis && e.act) { A.cmd(W.local, e.act); if (/^(build|buy|res|up|xg|xh|aura)/.test(e.act)) zBought(b, W); if (/^demolish/.test(e.act)) _zInfo = '💥 Demolido'; } else if (e.dis) { _zInfo += '<br><span style="color:#ff5a5a;font-weight:900">❌ No puedes construir' + (e.why ? ': ' + zEsc(e.why) : ' todavía') + '</span>'; if (e.why) A.say('❌ ' + e.why, 'ffff5a5a'); }
+    if (!e.dis && e.act) { A.cmd(W.local, e.act); if (/^(build|buy|res|up|xg|xh|aura)/.test(e.act)) zBought(b, W); if (/^demolish/.test(e.act)) _zInfo = '💥 Demolido'; } else if (e.dis) { _zInfo = '<b>' + zEsc(e.n) + '</b> · ' + zEsc(e.cost) + '<br><span style="color:#ff6a6a;font-weight:900">❌ ' + zEsc(e.why || (e.d && /^🔒/.test(e.d) ? e.d.replace(/^🔒 /, '') : 'No puedes todavía')) + '</span>'; }
     pn._k = null; setTimeout(() => zPanel(A, false), 80); }));
 }
 
@@ -43432,14 +43436,11 @@ window.zPlaceDown = (W, q, e) => { const A = W.arena, P = A && A.zPlace; if (!P)
 /* touch one of your buildings: a small sign to knock it down (or ✕) */
 function zBldPopClose() { const p = document.getElementById('zBldPop'); if (p) p.remove(); }
 window.zBldTap = (W, q, e) => { const A = W.arena; if (!A || !A.blds || A.zPlace) return false; zBldPopClose(); const id = W.local.id; if (A.zomb.has(id)) return false;
-  let best = null, bd = Infinity; for (const b of A.blds) { if (b.owner !== id || b.dead) continue; const d = Math.max(Math.abs(b.x - q.x), Math.abs(b.y - q.y)); if (d < b.s / 2 + 20 && d < bd) { bd = d; best = b; } } if (!best) return false;
-  const pop = document.createElement('div'); pop.id = 'zBldPop'; pop.innerHTML = `<b>${zEsc(ZB[best.k].n)}</b><button class="zdes">💥 Destruir</button><button class="zx">✕</button>`;
-  pop.style.left = Math.max(8, Math.min(innerWidth - 230, e.clientX - 110)) + 'px'; pop.style.top = Math.max(60, e.clientY - 120) + 'px';
-  pop.addEventListener('pointerdown', ev => ev.stopPropagation()); pop.querySelector('.zx').onclick = zBldPopClose;
-  pop.querySelector('.zdes').onclick = () => { A.cmd(W.local, 'demolish:' + best.id); zBldPopClose(); try { W.emit('sound', { name: 'dx_ko' }); } catch (er) {} };
-  document.body.appendChild(pop); setTimeout(zBldPopClose, 6000); return true; };
+  let best = null, bd = Infinity; for (const b of A.blds) { if (b.dead || A.zomb.has(b.owner) || !(b.owner === id || ['research', 'exchange', 'trade', 'warehouse'].includes(b.k))) continue; const d = Math.max(Math.abs(b.x - q.x), Math.abs(b.y - q.y)); if (d < b.s / 2 + 20 && d < bd) { bd = d; best = b; } } if (!best) return false;
+  /* touching a building opens its menu (research, upgrades, shop, destroy) */ A._selB = best; _zTab = 1; _zInfo = ''; const pn = document.getElementById('zbPanel'); if (pn) { pn.classList.remove('hidden'); pn._k = null; } zPanel(A, !pn); return true; };
+
 function zPlaceDraw(A, g) { const P = A.zPlace; if (!P) return; const ok = zFree(A, P.x, P.y, P.S), h = P.S / 2, B = ZB[P.k]; g.save();
-  const im = zCI('zsuB_' + P.k); g.globalAlpha = 0.6; g.save(); if (im) { g.translate(P.x, P.y); g.scale(1, -1); const w = P.S * 1.55, hh = w * im.naturalHeight / im.naturalWidth; g.drawImage(im, -w / 2, -hh / 2 - h * 0.15, w, hh); } g.restore();
+  const im = zCI(({ barricade: 'zw00', adv: 'zw01', stone: 'zw04', super: 'zw05', burrow: 'zw08' })[P.k] || 'zsuB_' + P.k); g.globalAlpha = 0.6; g.save(); if (im) { g.translate(P.x, P.y); g.scale(1, -1); const w = P.S * 1.55, hh = w * im.naturalHeight / im.naturalWidth; g.drawImage(im, -w / 2, -hh / 2 - h * 0.15, w, hh); } g.restore();
   g.globalAlpha = 0.28; g.fillStyle = ok ? '#7dff8a' : '#ff5050'; g.fillRect(P.x - h, P.y - h, P.S, P.S); g.globalAlpha = 0.95; g.strokeStyle = ok ? '#7dff8a' : '#ff5050'; g.lineWidth = 5; g.setLineDash([14, 10]); g.strokeRect(P.x - h, P.y - h, P.S, P.S);
   if (B) { g.scale(1, -1); g.font = '900 22px system-ui'; g.textAlign = 'center'; g.fillStyle = '#fff'; g.strokeStyle = '#000'; g.lineWidth = 4; g.setLineDash([]); g.strokeText(B.n, P.x, -P.y - h - 14); g.fillText(B.n, P.x, -P.y - h - 14); } g.restore(); }
 
@@ -45462,7 +45463,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
   if (!settings.kSongV2) { settings.kittySong = 'sinfreno'; settings.kSongV2 = 1; saveSettings(); } // the owner picked Sin Freno as the theme
   { const ks = $('#optKSong');  }
   btn('#bRoar', doRoar); btn('#bInvis', doInvis); btn('#bStun', doStun); btn('#bDash', doDash);
-  btn('#bKShop', () => { renderKShop(); $('#kShop').classList.remove('hidden'); }); btn('#kShopX', () => $('#kShop').classList.add('hidden'));
+  btn('#bKShop', () => { kTab = 'items'; renderKShop(); $('#kShop').classList.remove('hidden'); }); btn('#kShopX', () => $('#kShop').classList.add('hidden'));
   btn('#bJump', doJump);
   btn('#bBlink', blinkTomb);
   btn('#bGive', giveItem);
