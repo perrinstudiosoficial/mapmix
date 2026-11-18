@@ -43218,12 +43218,14 @@ const ZC_FILL = ['zspa03', 'zspc12', 'zspa07', 'zspc08', 'zspc10', 'zspc09', 'zs
 const ZC_BLD = ['zsbd00', 'zsbd01', 'zsbd02', 'zsbd03', 'zsbd04', 'zsbd05', 'zsbd06', 'zsbd07', 'zsbd08', 'zsbd09', 'zsbd10', 'zsbd11', 'zsbd13', 'zsbd14', 'zsbd15', 'zspa00', 'zspa01', 'zspa02', 'zspa03', 'zspc00', 'zspc07'];
 /* [image, width in the world, footprint width, footprint height, needs open space] */
 const ZC_PROP = [].concat(
+  [["zspd00", 90, 60, 110], ["zspd01", 90, 60, 110], ["zspd02", 150, 130, 60], ["zspd03", 150, 130, 60], ["zsx00", 150, 130, 50], ["zsx01", 130, 110, 60], ["zsx02", 120, 110, 50], ["zsx03", 90, 70, 50], ["zsx04", 120, 100, 40], ["zsx05", 120, 110, 30], ["zsx06", 110, 95, 55], ["zsx07", 60, 40, 35], ["zsx08", 100, 80, 50], ["zsx09", 100, 60, 25], ["zsx10", 100, 70, 25], ["zsx11", 110, 8, 8], ["zsx12", 110, 8, 8], ["zsx13", 80, 60, 40], ["zsx14", 80, 60, 40], ["zsx15", 110, 90, 50], ["zsx16", 110, 100, 30], ["zsx17", 120, 110, 80], ["zsx18", 70, 8, 8], ["zsma16", 100, 60, 30], ["zsma17", 70, 40, 20], ["zsma18", 90, 55, 26], ["zsma19", 90, 60, 35], ["zsma20", 90, 8, 8]], /* Perrin's sheet of the ruined city */
   Array.from({ length: 16 }, (_, i) => ['zsmp' + String(i).padStart(2, '0'), 118, 70, 30]),
   Array.from({ length: 16 }, (_, i) => ['zsmz' + String(i).padStart(2, '0'), 118, 70, 30]),
   Array.from({ length: 4 }, (_, i) => ['zsma' + String(i).padStart(2, '0'), 92, 52, 26]), Array.from({ length: 12 }, (_, i) => ['zsma' + String(i + 4).padStart(2, '0'), 64, 36, 20]),
   [['zspa04', 190, 130, 60], ['zspa05', 180, 120, 60], ['zspa06', 230, 170, 70], ['zspb00', 230, 150, 70], ['zspb01', 190, 130, 64], ['zspb02', 110, 70, 36], ['zspb03', 230, 160, 70], ['zspc02', 230, 150, 70], ['zspc05', 200, 140, 66], ['zspc14', 220, 150, 64], ['zspc03', 250, 180, 70],
    ['zspa07', 140, 110, 40], ['zspa08', 130, 70, 30], ['zspa12', 80, 50, 20], ['zspa13', 70, 46, 30], ['zspa14', 100, 70, 40], ['zspa15', 130, 100, 30], ['zspb04', 140, 90, 60], ['zspb05', 150, 110, 60], ['zspb06', 160, 120, 80], ['zspb07', 150, 100, 60], ['zspb08', 130, 70, 30], ['zspb09', 70, 44, 34], ['zspb10', 120, 90, 46], ['zspb11', 90, 60, 34], ['zspb12', 160, 120, 70], ['zspb13', 90, 64, 40], ['zspb14', 90, 66, 40], ['zspb15', 110, 80, 30], ['zspc04', 150, 100, 70], ['zspc06', 160, 120, 70], ['zspc08', 160, 120, 40], ['zspc09', 120, 90, 50], ['zspc10', 200, 150, 60], ['zspc11', 160, 120, 50], ['zspc12', 150, 120, 40], ['zspc13', 160, 120, 70], ['zspc15', 160, 120, 60]]);
 const ZC_AR = Object.assign({"zh100":1.76,"zh101":1.294,"zh102":1.358,"zh103":1.571,"zh104":1.302,"zh105":1.467,"zh106":1.583,"zh107":1.35,"zh108":1.366,"zh109":1.111,"zh110":1.146,"zh111":1.243,"zh200":1.56,"zh201":1.358,"zh202":1.229,"zh203":1.667,"zh204":1.31,"zh205":1.583,"zh206":1.429,"zh207":1.236,"zh208":1.264,"zh209":1.229,"zh210":1.048,"zh211":1.264,"zh300":0.909,"zh301":1.467,"zh302":1.089,"zh303":1.128,"zh304":0.968,"zh305":1.111,"zh306":1.023,"zh307":0.977,"zh308":1.09,"zh309":1.095,"zh310":1.215,"zh311":1.128,"zh400":1.528,"zh401":1.395,"zh402":1.583,"zh403":1.477,"zh404":1.215,"zh405":1.073,"zh406":1.366,"zh407":1.279,"zh408":1.41,"zh409":1.244,"zh410":1.053,"zh411":1.1}, {"zgA00":0.759,"zgA01":0.666,"zgA02":0.838,"zgA03":0.566,"zgA04":0.622,"zgA05":0.572,"zgA06":0.694,"zgA07":0.616,"zgA08":0.634,"zgA09":0.575,"zgA10":0.641,"zgA11":0.541,"zgB00":0.741,"zgB01":0.669,"zgB02":0.847,"zgB03":0.519,"zgB04":0.597,"zgB05":0.7,"zgB06":0.575,"zgB07":0.659,"zgB08":0.647,"zgB09":0.603,"zgB10":0.625,"zgB11":0.534,"zgC00":0.506,"zgC01":0.509,"zgC02":0.494,"zgC03":0.394,"zgC04":0.425,"zgC05":0.441,"zgC06":0.419,"zgC07":0.456,"zgC08":0.441,"zgC09":0.494,"zgC10":0.487,"zgC11":0.463}, {"zcF100":0.677,"zcF101":0.843,"zcF102":0.93,"zcF103":0.643,"zcF104":0.687,"zcF105":0.743,"zcF106":0.687,"zcF107":0.63,"zcF108":0.77,"zcF109":0.89,"zcF110":0.7,"zcF111":0.78,"zcF200":0.81,"zcF201":0.857,"zcF202":0.737,"zcF203":0.797,"zcF204":0.77,"zcF205":0.867,"zcF206":0.643,"zcF207":0.617,"zcF208":0.757,"zcF209":0.793,"zcF210":0.683,"zcF211":0.67,"zcL00":1.382,"zcL01":1.648,"zcL02":1.604,"zcL03":1.44,"zcL04":1.565,"zcL05":1.487,"zcL06":1.503,"zcL07":1.442,"zcL08":1.241,"zcL09":1.363,"zcL10":1.252,"zcL11":1.294,"zcL12":1.325,"zcL13":1.302,"zcL14":1.333,"zcL15":1.22,"zcL16":1.224,"zcL17":1.364,"zcL18":1.387,"zcL19":1.307,"zcL20":1.327,"zcL21":1.319,"zcL22":1.233,"zcL23":1.207,"zcL24":1.393,"zcL25":1.389,"zcL26":1.444,"zcL27":1.439,"zcL28":1.369,"zcL29":1.384,"zcL30":1.387,"zcL31":1.36,"zcR00":1.442,"zcR01":1.409,"zcR02":1.464,"zcR03":1.389,"zcR04":1.518,"zcR05":1.377,"zcR06":1.457,"zcR07":1.451,"zcR08":1.327,"zcR09":1.317,"zcR10":1.228,"zcR11":1.261,"zcR12":1.384,"zcR13":1.329,"zcR14":1.327,"zcR15":1.296,"zcR16":1.236,"zcR17":1.319,"zcR18":1.323,"zcR19":1.317,"zcR20":1.296,"zcR21":1.3,"zcR22":1.227,"zcR23":1.278,"zcR24":1.333,"zcR25":1.528,"zcR26":1.596,"zcR27":1.58,"zcR28":1.729,"zcR29":1.479,"zcR30":1.51,"zcR31":1.566,"zcR32":1.369,"zcT00":2.62,"zcT01":2.54,"zcT02":2.35,"zcT03":2.375,"zcT04":2.645,"zcT05":2.491,"zcT06":2.579,"zcT07":2.44,"zcT08":2.455,"zcT09":2.131,"zcT10":2.046,"zcT11":2.202,"zcT12":2.574,"zcT13":2.83,"zcT14":2.791,"zcT15":2.49,"zcT16":2.237,"zcT17":2.691,"zcT18":2.731,"zcT19":2.955,"zcT20":2.484,"zcT21":2.842,"zcT22":2.521,"zcT23":2.525,"zcT24":2.957,"zcT25":2.945,"zcT26":2.957,"zcT27":2.765,"zcT28":3.0,"zcT29":2.435,"zcT30":2.444,"zcT31":2.618,"zcT32":2.241,"zcT33":2.567,"zcT34":2.067,"zcT35":2.135,"zcRS00":1.818,"zcRS01":2.326,"zcRS02":2.362,"zcRS03":2.439,"zcRS04":2.098,"zcRS05":1.531,"zcRS06":1.911,"zcRS07":1.765,"zcRS08":2.174,"zcRS09":1.923,"zcRS10":1.829,"zcRS11":1.875,"zcK00":1.281,"zcK01":1.359,"zcK02":1.44,"zcK03":1.181,"zcK04":1.5,"zcK05":1.318,"zcK06":1.369,"zcK07":1.249,"zcK08":1.143,"zcK09":1.199,"zcK10":1.177,"zcK11":1.178,"zcK12":1.241,"zcK13":1.219,"zcK14":1.226,"zcK15":1.075,"zcK16":1.11,"zcK17":1.269,"zcK18":1.204,"zcK19":1.339,"zcK20":1.25,"zcK21":1.327,"zcK22":1.204,"zcK23":1.076,"zcK24":1.331,"zcK25":1.352,"zcK26":1.442,"zcK27":1.341,"zcK28":1.347,"zcK29":1.32,"zcK30":1.292,"zcK31":1.204}); /* height / width of each building drawing */
+Object.assign(ZC_AR, {"zh112":1.311,"zcK32":1.111,"zh113":1.306,"zcK33":1.164,"zh114":1.333,"zcK34":1.139,"zh115":1.416,"zcK35":1.208,"zh116":0.916,"zcK36":0.943,"zh117":1.26,"zcK37":1.107,"zh118":1.111,"zcK38":1.007,"zh119":1.096,"zcK39":1.078,"zh120":1.24,"zcK40":1.085,"zh121":1.255,"zcK41":1.09,"zh122":1.356,"zcK42":1.236,"zh123":1.667,"zcK43":1.301,"zspd00":1.512,"zspd01":1.236,"zspd02":0.918,"zspd03":0.758,"zsx00":0.842,"zsx01":1.071,"zsx02":0.598,"zsx03":0.781,"zsx04":0.779,"zsx05":0.759,"zsx06":0.841,"zsx07":1.175,"zsx08":0.802,"zsx09":0.815,"zsx10":0.794,"zsx11":0.764,"zsx12":0.732,"zsx13":0.912,"zsx14":0.904,"zsx15":0.878,"zsx16":0.659,"zsx17":0.871,"zsx18":0.886,"zsma16":0.596,"zsma17":0.661,"zsma18":0.579,"zsma19":0.762,"zsma20":0.812}); /* Perrin's new houses (side and back) and city things */
 const ZC_SET = k => Object.keys(ZC_AR).filter(n => (n.startsWith('zc' + k) || (k[0] === 'h' && n.startsWith('z' + k))) && /\d\d$/.test(n) && !(k === 'R' && n.startsWith('zcRS')));
 /* buildings on every wall, like a city seen from the front:
    - the side of a wall that looks DOWN onto a street: building fronts (one next to the other)
@@ -43414,7 +43416,7 @@ function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MA
     P.push({ x, y, im: it[0], w: it[1], fw, fh, fx: rnd() < 0.5 ? -1 : 1 }); W.blockRect(x - fw, y - fh, x + fw, y + fh, 1); }
   for (const o of A._outDead || []) P.push(o); A._outDead = null; P.sort((a, b) => b.y - a.y); A.cityP = P;
   /* decode every picture of the city in the background before painting it (no freeze at the start) */
-  const names = new Set(['zrd_asph', 'zrd_walk']); for (let k = 0; k < 12; k++) names.add('zrt' + String(k).padStart(2, '0')); for (const b of A.cityB) names.add(b.im); for (const p of P) names.add(p.im); let left = names.size; A._cityReady = false;
+  const names = new Set(['zrd_asph', 'zrd_walk', 'zcx_manhole', ...Object.values(ZC_CT)]); for (let k = 0; k < 12; k++) names.add('zrt' + String(k).padStart(2, '0')); for (const b of A.cityB) names.add(b.im); for (const p of P) names.add(p.im); let left = names.size; A._cityReady = false;
   const done = () => { if (--left <= 0) A._cityReady = true; };
   for (const n of names) { const im = _zci[n] || (_zci[n] = Object.assign(new Image(), { src: FX(n) })); (im.decode ? im.decode() : Promise.resolve()).then(done, done); }
   setTimeout(() => { A._cityReady = true; }, 20000); }
@@ -43429,11 +43431,14 @@ let _zcPat = null; function zCityPats(g) { if (_zcPat && _zcPat.real) return _zc
 /* the open squares drawn by code (until Perrin's pictures): world coords, y goes up */
 /* courts and pools always have their real size (2-3 houses): a space too small for one stays bare ground, like a base */
 const ZC_REAL = { soccer: [900, 560], baseball: [760, 760], pool: [520, 300], tennis: [560, 300], basket: [480, 280], futsal: [560, 340] }; /* 2-3 houses */
+const ZC_CT = { soccer: 'zcx_ct_soccer', tennis: 'zcx_ct_tennis', basket: 'zcx_ct_basket', pool: 'zcx_ct_poolw', futsal: 'zcx_ct_futsal', park: 'zcx_ct_park', fountain: 'zcx_ct_fountain' };
+function zCourtImg(g, n, X, Y, w, h) { const im = zCI(n); if (!im) return false; const iw = im.naturalWidth, ih = im.naturalHeight, rot = (w > h) !== (iw > ih); g.save(); g.translate(X + w / 2, Y + h / 2); g.scale(1, -1); if (rot) g.rotate(Math.PI / 2); const dw = rot ? h : w, dh = rot ? w : h; g.drawImage(im, -dw / 2, -dh / 2, dw, dh); g.restore(); return true; }
 function zPlazaPaint(g, z) {
-  const R = ZC_REAL[z.k]; if (!R) return zPlazaPaint0(g, z);
+  const R = ZC_REAL[z.k]; if (!R) { if (ZC_CT[z.k] && zCourtImg(g, ZC_CT[z.k], z.x + 8, z.y + 8, z.w - 16, z.h - 16)) return; return zPlazaPaint0(g, z); }
   let [w, h] = R; if ((w > z.w || h > z.h) && h <= z.w && w <= z.h) [w, h] = [h, w];
   if (w > z.w + 2 || h > z.h + 2) return zPlazaPaint0(g, Object.assign({}, z, { k: 'grass' })); /* no room for it: a patch of grass (brown is only for bases) */
   w = Math.min(w, z.w); h = Math.min(h, z.h);
+  if (ZC_CT[z.k] && zCourtImg(g, ZC_CT[z.k], z.x + (z.w - w) / 2, z.y + (z.h - h) / 2, w, h)) return; /* Perrin's worn courts */
   zPlazaPaint0(g, Object.assign({}, z, { x: z.x + (z.w - w) / 2, y: z.y + (z.h - h) / 2, w, h }));
 }
 function zPlazaPaint0(g, z) { const m = 8, X = z.x + m, Y = z.y + m, Wd = z.w - 2 * m, H = z.h - 2 * m, h = k => { const v = Math.sin(z.s * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
@@ -43491,7 +43496,7 @@ function zCityPaint(A, g, x0, y0, x1, y1, BM) { const SM = BM ? BM[0] : 1, EX = 
     for (const e of A.cityRE || []) { if (e.x < x0 - 80 || e.x > x1 + 80 || e.y < y0 - 80 || e.y > y1 + 80) continue; const L = 110, w = 16; /* the end of the road: a striped barrier */ for (let q = 0; q < 6; q++) { g.fillStyle = q % 2 ? '#f2f2ee' : '#d12b2b'; if (e.v) g.fillRect(e.x - w / 2, e.y - L / 2 + q * L / 6, w, L / 6); else g.fillRect(e.x - L / 2 + q * L / 6, e.y - w / 2, L / 6, w); } g.fillStyle = '#2a2a2a'; if (e.v) { g.fillRect(e.x - 3, e.y - L / 2 - 6, 6, 8); g.fillRect(e.x - 3, e.y + L / 2 - 2, 6, 8); } else { g.fillRect(e.x - L / 2 - 6, e.y - 3, 8, 6); g.fillRect(e.x + L / 2 - 2, e.y - 3, 8, 6); } }
     if (A.cityBase) { const bp = new Path2D(); for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (A.cityBase[j * PW + i]) bp.rect(M0 + i * C, M0 + j * C, C, C); g.fillStyle = P.block; g.fill(bp); g.fillStyle = 'rgba(150,120,80,.22)'; g.fill(bp); } /* bases: only bare ground inside */
     for (const z of A.cityPZ || []) { if (z.x > x1 || z.x + z.w < x0 || z.y > y1 || z.y + z.h < y0) continue; zPlazaPaint(g, z); }
-    g.fillStyle = '#3d3f44'; g.strokeStyle = '#26272b'; g.lineWidth = 3; for (const m of A.cityMH || []) { if (m.x < x0 - 30 || m.x > x1 + 30 || m.y < y0 - 30 || m.y > y1 + 30) continue; g.beginPath(); g.arc(m.x, m.y, 15, 0, 7); g.fill(); g.stroke(); g.beginPath(); g.moveTo(m.x - 10, m.y); g.lineTo(m.x + 10, m.y); g.moveTo(m.x, m.y - 10); g.lineTo(m.x, m.y + 10); g.stroke(); } }
+    g.fillStyle = '#3d3f44'; g.strokeStyle = '#26272b'; g.lineWidth = 3; const mhI = zCI('zcx_manhole'); for (const m of A.cityMH || []) { if (m.x < x0 - 30 || m.x > x1 + 30 || m.y < y0 - 30 || m.y > y1 + 30) continue; if (mhI) { g.save(); g.translate(m.x, m.y); g.scale(1, -1); g.drawImage(mhI, -20, -20, 40, 40); g.restore(); continue; } g.beginPath(); g.arc(m.x, m.y, 15, 0, 7); g.fill(); g.stroke(); g.beginPath(); g.moveTo(m.x - 10, m.y); g.lineTo(m.x + 10, m.y); g.moveTo(m.x, m.y - 10); g.lineTo(m.x, m.y + 10); g.stroke(); } }
   else { g.fillStyle = P.walk; g.fill(walk); g.fillStyle = '#8f8a84'; g.fill(curb); g.fillStyle = P.block; g.fill(blk); g.fillStyle = '#f2f2ee'; g.fill(line); }
   for (const b of A.cityB || []) { if (b.x + b.w < x0 || b.x - b.w > x1 || b.yb + b.h < y0 || b.yb > y1) continue; const im = zCI(b.im); if (!im) { A._cityMiss = true; continue; } g.setTransform(SM * b.fx, 0, 0, SM, SM * b.x + EX, -SM * b.yb + EY); g.drawImage(im, -b.w / 2, -b.h, b.w, b.h); }
   g.setTransform(SM, 0, 0, -SM, EX, EY);
@@ -44136,6 +44141,8 @@ function gridOf(mi) { return gridCache[mi] || (gridCache[mi] = makeGrid(mi)); }
 function paintMaze(mi) { /* the maze picture, made once per map */
   const g = gridOf(mi), T = THEME[g.id], cv = document.createElement('canvas'); cv.width = g.w * CS; cv.height = g.h * CS; const x = cv.getContext('2d');
   x.fillStyle = T[0]; x.fillRect(0, 0, cv.width, cv.height);
+  const fI = img('au_' + g.id + '_floor'), wI = img('au_' + g.id + '_wall'), texOk = fI._ok && wI._ok; if (!texOk && !fI._bad) cv._miss = true; /* Perrin's floor and wall of each maze */
+  if (texOk) for (let cy = 0; cy < g.h; cy++) for (let cx = 0; cx < g.w; cx++) if (!isWall(g, cx, cy)) x.drawImage(fI, cx * CS, cy * CS, CS + 0.5, CS + 0.5);
   // the floor: lane lines in the middle of each corridor
   /* no lane lines: you drive freely */
   if (g.id === 'bloques') { for (let cy = 0; cy < g.h; cy++) for (let cx = 0; cx < g.w; cx++) if (!isWall(g, cx, cy) && (cx + cy) % 2) { x.fillStyle = 'rgba(0,0,0,.07)'; x.fillRect(cx * CS, cy * CS, CS, CS); } }
@@ -44144,6 +44151,7 @@ function paintMaze(mi) { /* the maze picture, made once per map */
   const neon = g.id === 'comelon' || g.id === 'fantasma';
   for (let cy = 0; cy < g.h; cy++) for (let cx = 0; cx < g.w; cx++) { if (!isWall(g, cx, cy)) continue; const X = cx * CS, Y = cy * CS;
     if (neon) { x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(X, Y, CS, CS); continue; }
+    if (texOk) { x.drawImage(wI, X, Y, CS + 0.5, CS + 0.5); continue; }
     x.fillStyle = T[1]; x.fillRect(X, Y, CS, CS); x.fillStyle = T[2]; x.fillRect(X + 3, Y + 3, CS - 6, CS - 14); x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(X, Y + CS - 6, CS, 6);
     if (g.id === 'ciudad') { x.fillStyle = 'rgba(80,110,160,.55)'; for (let k = 0; k < 4; k++) x.fillRect(X + 9 + (k % 2) * 26, Y + 10 + (k >> 1) * 20, 16, 11); }
     if (g.id === 'mazmorra') { x.strokeStyle = 'rgba(0,0,0,.25)'; x.lineWidth = 2; x.strokeRect(X + 4, Y + 4, CS / 2 - 4, CS / 2 - 6); x.strokeRect(X + CS / 2, Y + CS / 2 - 2, CS / 2 - 4, CS / 2 - 6); }
@@ -44405,7 +44413,7 @@ function render(V, now) {
   if (rot) x.setTransform(0, s * dpr, -s * dpr, 0, (ox + Hd * s) * dpr, oy * dpr); else x.setTransform(s * dpr, 0, 0, s * dpr, ox * dpr, oy * dpr);
   const w2s = (wx, wy) => rot ? [ox + (Hd - wy) * s, oy + wx * s] : [ox + wx * s, oy + wy * s]; S.w2s = w2s; S.sc = s;
   if (V.ph === 'vote') { x.globalAlpha = 0.25; x.drawImage(paintMaze(mi), 0, 0); x.globalAlpha = 1; return; }
-  if (!S.maze || S.maze.mi !== mi) S.maze = { mi, cv: paintMaze(mi) };
+  if (!S.maze || S.maze.mi !== mi || (S.maze.cv._miss && Math.random() < 0.05)) S.maze = { mi, cv: paintMaze(mi) };
   x.drawImage(S.maze.cv, 0, 0);
   // interpolate cars between the last two pictures the host sent
   let cars = V.c; if (!S.host && S.prevV && S.prevV.c && S.prevV.mi === V.mi) { const k = clamp((performance.now() - S.vAt) / 70, 0, 1); cars = V.c.map(c => { const p = S.prevV.c.find(q => q[0] === c[0]); if (!p || Math.hypot(p[1] - c[1], p[2] - c[2]) > 120) return c; const d = ang(c[3] - p[3]); return [c[0], p[1] + (c[1] - p[1]) * k, p[2] + (c[2] - p[2]) * k, p[3] + d * k, c[4], c[5], c[6], c[7], c[8]]; }); }
@@ -44471,12 +44479,18 @@ const MP = window.ORC_MAP, M0 = MP.m0, GWd = MP.w, GHd = MP.h, CELL = 32;
 const DMK = new Uint8Array(GWd * GHd); /* cells blocked by things you can break (rocks, boxes, barrels) */
 const BREAK = { LTrc: [10, 'Rocas'], LTbx: [6, 'Caja'], LTcr: [6, 'Caja'], LTbr: [6, 'Barril'], LTbs: [6, 'Barril'], LTba: [6, 'Barril'], LTex: [6, 'Barril explosivo'] }; /* hits to break, like the original */
 const DEST = []; /* [doo index, hits, cells] */
+/* the rock corner (top right of the arena): one rock wall with a single 3-cell lane that winds to a dead end; there only you and one monster fit, one against one */
+const RKI0 = 196, RKJ0 = 246, RKW = 49, RKH = 51, RKMZ = new Uint8Array(GWd * GHd);
+const inRock = (x, y) => { const i = Math.floor((x - M0) / CELL) - RKI0, j = Math.floor((y - M0) / CELL) - RKJ0; return i >= 0 && j >= 0 && i < RKW && j < RKH; };
+const RKPATH = [[-3, 4], [24, 4], [24, 22], [8, 22], [8, 40], [41, 40]];
 const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })();
 { /* the stones, columns, trees and boxes of the map block the way too (that is how the corners where monsters come one by one are made) */
   const RAD = { LOic: 48, LOsc: 48, AOsr: 60, LTrc: 52, YObs: 64, YSco: 48, YObw: 64, YTft: 40, LTbx: 40, LTcr: 40, LTba: 48, YOwb: 48, YObb: 48, YSaw: 48, LSst: 48, YOfs: 32, YOks: 32, LTbr: 32, LTbs: 32, LTex: 40 };
   const SQ = { LTrc: 64 }; /* rock chunks block a 4x4 square like in the editor: side by side they make the walls of the corner pockets */
-  for (let di0 = 0; di0 < MP.doo.length; di0++) { const d = MP.doo[di0]; const brk = BREAK[d[0]], cl = brk ? [] : null; const blockC = k => { if (cl) { if (!cl.includes(k)) { cl.push(k); DMK[k]++; } } else WALK[k >> 3] &= ~(1 << (k & 7)); };
+  for (let di0 = 0; di0 < MP.doo.length; di0++) { const d = MP.doo[di0]; if (d[0] === 'LTrc' && inRock(d[1], d[2])) continue; const brk = BREAK[d[0]], cl = brk ? [] : null; const blockC = k => { if (cl) { if (!cl.includes(k)) { cl.push(k); DMK[k]++; } } else WALK[k >> 3] &= ~(1 << (k & 7)); };
     if (SQ[d[0]]) { const h = SQ[d[0]]; for (let j = Math.floor((d[2] - h - M0) / CELL); j <= Math.floor((d[2] + h - M0) / CELL); j++) for (let i = Math.floor((d[1] - h - M0) / CELL); i <= Math.floor((d[1] + h - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if (Math.abs(cx - d[1]) >= h || Math.abs(cy - d[2]) >= h || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl) DEST.push([di0, brk[0], cl]); continue; } let r = RAD[d[0]]; if (!r) continue; r *= d[4] || 1; for (let j = Math.floor((d[2] - r - M0) / CELL); j <= Math.floor((d[2] + r - M0) / CELL); j++) for (let i = Math.floor((d[1] - r - M0) / CELL); i <= Math.floor((d[1] + r - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if ((cx - d[1]) ** 2 + (cy - d[2]) ** 2 > r * r || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl && cl.length) DEST.push([di0, brk[0], cl]); } }
+{ const lane = new Set(); for (let q = 0; q + 1 < RKPATH.length; q++) { const [a0, b0] = RKPATH[q], [a1, b1] = RKPATH[q + 1]; for (let u = Math.min(a0, a1); u <= Math.max(a0, a1) + 1; u++) for (let v = Math.min(b0, b1); v <= Math.max(b0, b1) + 1; v++) lane.add(u + ',' + v); }
+  for (let v = 0; v < RKH; v++) for (let u = 0; u < RKW; u++) { if (lane.has(u + ',' + v)) continue; const i = RKI0 + u, j = RKJ0 + v, k = j * GWd + i; if (!(WALK[k >> 3] & (1 << (k & 7)))) continue; WALK[k >> 3] &= ~(1 << (k & 7)); RKMZ[k] = 1; } }
 const FOUNT = MP.fount, SHOPS = MP.shops, ARENA = MP.arena, GATEB = MP.gate;
 function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false; const k = j * GWd + i; return !DMK[k] && !!(WALK[k >> 3] & (1 << (k & 7))); }
 // the cell doors: each cell has its iron gate shut until its gladiator picks a weapon (1 s later it opens for good)
@@ -44732,12 +44746,12 @@ function sell(G, h, slot) { const k = h.inv[slot]; if (!k || G.ph !== 'break' ||
 
 // ---------- moving ----------
 function spotNear(x, y) { if (walkable(x, y)) return [x, y]; for (let r = 32; r < 600; r += 32) for (let a = 0; a < 6.28; a += 0.5) { const qx = x + Math.cos(a) * r, qy = y + Math.sin(a) * r; if (walkable(qx, qy)) return [qx, qy]; } return [x, y]; }
-const free = (x, y, r, cr) => { const q = cr ? Math.min(22, r * 0.85) : Math.min(14, r * 0.5); /* monsters are wide: through a narrow pocket entrance only one fits */ return walkable(x, y) && walkable(x + q, y) && walkable(x - q, y) && walkable(x, y + q) && walkable(x, y - q); };
+const free = (x, y, r, cr) => { const q = inRock(x, y) ? 10 : cr ? Math.min(22, r * 0.85) : Math.min(14, r * 0.5); /* the rock lane is 2 cells: one at a time */ /* monsters are wide: through a narrow pocket entrance only one fits */ return walkable(x, y) && walkable(x + q, y) && walkable(x - q, y) && walkable(x, y + q) && walkable(x, y - q); };
 function slide(u, nx, ny, r) { const cr = !!u.creep && !u.thin; if (!cr || free(u.x, u.y, r, 1)) { if (free(nx, ny, r, cr)) { u.x = nx; u.y = ny; return true; } if (free(nx, u.y, r, cr)) { u.x = nx; return true; } if (free(u.x, ny, r, cr)) { u.y = ny; return true; } return false; }
   if (free(nx, ny, r)) { u.x = nx; u.y = ny; return true; } if (free(nx, u.y, r)) { u.x = nx; return true; } if (free(u.x, ny, r)) { u.y = ny; return true; } return false; } /* (a monster already squeezed somewhere tight can still move out) */
 function clampArena(x, y) { return spotNear(x, y); }
 // distance fields over the walk grid (from the heroes for the monsters, from the monsters for the bots, to the shops/fountain for the bots)
-let WIDE = null; function wideOk(k) { if (!WIDE) { WIDE = new Uint8Array(GWd * GHd); for (let j = 0; j < GHd; j++) for (let i = 0; i < GWd; i++) { const x = M0 + i * CELL + 16, y = M0 + j * CELL + 16, q = 22; WIDE[j * GWd + i] = walkable(x, y, 1) && walkable(x + q, y, 1) && walkable(x - q, y, 1) && walkable(x, y + q, 1) && walkable(x, y - q, 1) ? 1 : 0; } } return WIDE[k]; }
+let WIDE = null; function wideOk(k) { if (!WIDE) { WIDE = new Uint8Array(GWd * GHd); for (let j = 0; j < GHd; j++) for (let i = 0; i < GWd; i++) { const x = M0 + i * CELL + 16, y = M0 + j * CELL + 16, q = inRock(x, y) ? 10 : 22; WIDE[j * GWd + i] = walkable(x, y, 1) && walkable(x + q, y, 1) && walkable(x - q, y, 1) && walkable(x, y + q, 1) && walkable(x, y - q, 1) ? 1 : 0; } } return WIDE[k]; }
 function field(srcs, wide) { const N = GWd * GHd, D = new Int16Array(N).fill(-1), Q = new Int32Array(N); let h = 0, t = 0;
   for (const [x, y] of srcs) { const i = Math.floor((x - M0) / CELL), j = Math.floor((y - M0) / CELL); if (!walkC(i, j)) continue; const k = j * GWd + i; if (D[k] < 0) { D[k] = 0; Q[t++] = k; } }
   while (h < t) { const k = Q[h++], i = k % GWd, d = D[k] + 1; for (const nb of [k + 1, k - 1, k + GWd, k - GWd]) { if (nb < 0 || nb >= N || D[nb] >= 0) continue; const ni = nb % GWd; if (Math.abs(ni - i) > 1) continue; const nx = M0 + ni * CELL + 16, ny = M0 + Math.floor(nb / GWd) * CELL + 16; if (!walkable(nx, ny, 1) || (wide && !wideOk(nb))) continue; D[nb] = d; Q[t++] = nb; } }
@@ -44745,6 +44759,7 @@ function field(srcs, wide) { const N = GWd * GHd, D = new Int16Array(N).fill(-1)
 function downhill(D, u) { /* the next step toward the sources (8 neighbours, the lowest number) */ const i = Math.floor((u.x - M0) / CELL), j = Math.floor((u.y - M0) / CELL), k = j * GWd + i; let best = null, bv = D[k] >= 0 ? D[k] : 1e9;
   for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { if (!di && !dj) continue; const nk = (j + dj) * GWd + i + di; if (nk < 0 || nk >= D.length) continue; const v = D[nk]; if (v < 0) continue; if (di && dj && (D[k + di] < 0 || D[k + dj * GWd] < 0)) continue; const vv = v + (di && dj ? 0.4 : 0); if (vv < bv) { bv = vv; best = [M0 + (i + di) * CELL + 16, M0 + (j + dj) * CELL + 16]; } }
   return best; }
+function behind(G, c, tg, d) { /* melee: another monster stands between you and it, so it waits its turn */ const ux = (tg.x - c.x) / d, uy = (tg.y - c.y) / d; return G.units.some(o => o !== c && o.creep && !o.dead && hyp(o.x - tg.x, o.y - tg.y) < d - 8 && (() => { const px = o.x - c.x, py = o.y - c.y, along = px * ux + py * uy; return along > 0 && Math.abs(px * uy - py * ux) < (o.sz || 24) * 0.9; })()); }
 function los(ax, ay, bx, by) { for (let k = 1; k < 6; k++) { const q = k / 6; if (!walkable(ax + (bx - ax) * q, ay + (by - ay) * q, 1)) return false; } return true; }
 function nearField(D, u) { /* the closest cell on the way with a smaller number than here */ const i0 = Math.floor((u.x - M0) / CELL), j0 = Math.floor((u.y - M0) / CELL), k0 = j0 * GWd + i0, here = D[k0] >= 0 ? D[k0] : 1e9; let best = null, bv = 1e9;
   for (let dj = -4; dj <= 4; dj++) for (let di = -4; di <= 4; di++) { const i = i0 + di, j = j0 + dj; if (i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const v = D[j * GWd + i]; if (v < 0 || v >= here) continue; const sc = v + (di * di + dj * dj) * 0.6; if (sc < bv) { bv = sc; best = [M0 + i * CELL + 16, M0 + j * CELL + 16]; } } return best; }
@@ -44793,14 +44808,14 @@ function step(G, dt) {
     let tg = null, bd = 1e9; for (const o of G.units) { if (o.creep || o.dead) continue; const d = hyp(o.x - c.x, o.y - c.y) - (o.hero ? 0 : 80); if (d < bd) { bd = d; tg = o; } } if (!tg) continue;
     const d = hyp(tg.x - c.x, tg.y - c.y), sp = C.sp * ((c.e.slow || 0) > t ? 0.5 : 1);
     if (!c.lp || t > c.lpT) { if (c.lp && hyp(c.x - c.lp[0], c.y - c.lp[1]) < 20 && d > C.r + 120) { const p = spotNear(clamp(c.x, ARENA[0] + 120, ARENA[2] - 120), clamp(c.y, ARENA[1] + 120, ARENA[3] - 120)); c.x = p[0]; c.y = p[1]; } c.lp = [c.x, c.y]; c.lpT = t + 5; } /* stuck for 5 s: into the arena */
-    if (!c.np || t > c.npT) { if (c.np && hyp(c.x - c.np[0], c.y - c.np[1]) < 6 && d > C.r + 40) { let n = G.fH && downhill(G.fH, c); if (!n || !free(n[0], n[1], c.sz, 1)) n = G.fH && nearField(G.fH, c); if (n) { c.x = n[0]; c.y = n[1]; } } c.np = [c.x, c.y]; c.npT = t + 0.7; } /* caught on a rock corner: one step along its way */
+    if (!c.np || t > c.npT) { if (c.np && hyp(c.x - c.np[0], c.y - c.np[1]) < 6 && d > C.r + 40) { let n = G.fH && downhill(G.fH, c); if (!n || !free(n[0], n[1], c.sz, 1)) n = G.fH && nearField(G.fH, c); if (n && !G.units.some(o => o !== c && o.creep && !o.dead && hyp(o.x - n[0], o.y - n[1]) < (o.sz + c.sz) * 1.2)) { c.x = n[0]; c.y = n[1]; } /* never jump past the monster in front */ } c.np = [c.x, c.y]; c.npT = t + 0.7; } /* caught on a rock corner: one step along its way */
     { const k = Math.floor((c.y - M0) / CELL) * GWd + Math.floor((c.x - M0) / CELL); if (!c.thin && G.fH && G.fH[k] < 0) { c.thinT = (c.thinT || 0) + dt; if (c.thinT > 8) c.thin = 1; } } /* no way for a wide monster (you hid in a tight corridor): after 8 s it squeezes in anyway */
-    if (d > C.r + (tg.sz || 24) * 0.6 || (!C.shot && !los(c.x, c.y, tg.x, tg.y))) moveTo(c, tg.x, tg.y, sp, dt, c.thin ? (G.fN || G.fH) : G.fH); /* melee needs a clear line: no hitting through the rocks */
+    if (d > (C.shot ? C.r + (tg.sz || 24) * 0.6 : Math.min(C.r, c.sz + (tg.sz || 24) + 10)) || (!C.shot && (!los(c.x, c.y, tg.x, tg.y) || behind(G, c, tg, d)))) { if (!(inRock(c.x, c.y) && G.units.some(o => o !== c && o.creep && !o.dead && hyp(o.x - c.x, o.y - c.y) < (o.sz + c.sz) * 1.5 && hyp(o.x - tg.x, o.y - tg.y) < d - 4))) moveTo(c, tg.x, tg.y, sp, dt, c.thin ? (G.fN || G.fH) : G.fH); } /* in the rock lane the ones behind wait their turn */ /* melee needs a clear line: no hitting through the rocks */
     else if (c.atkT + C.as * ((c.e.slow || 0) > t ? 1.4 : 1) <= t) { c.atkT = t; c.a = Math.atan2(tg.y - c.y, tg.x - c.x); const dm = C.d * (window.OG_DM || 1.25) * (c.small ? 0.4 : 1) * ((c.e.howl || 0) > t ? 0.7 : 1) * (1 + G.round * 0.05); /* like the original: two or three at once nearly kill you */
       if (C.shot) shoot(G, c, C.shot, c.a, dm, C.r + 120, false); else { hurt(G, c, tg, dm, false); ev(G, 'hit', tg.x | 0, tg.y | 0); }
       if (C.spl === 'spider' && !c.small && rnd() < 0.25) { tg.e.stun = t + 1.2; ev(G, 'web', tg.id); } } }
   // keep everybody from standing in one pile
-  const U = G.units.filter(u => !u.dead); for (let i = 0; i < U.length; i++) for (let j = i + 1; j < U.length; j++) { const a = U[i], b = U[j], ra = a.sz || 24, rb = b.sz || 24, dx = b.x - a.x, dy = b.y - a.y, d = hyp(dx, dy), m = (a.creep && b.creep) ? (ra + rb) * 1.45 : (ra + rb) * 0.75; if (d > 0 && d < m) { const k = (m - d) / d * 0.5; slide(a, a.x - dx * k, a.y - dy * k, ra); slide(b, b.x + dx * k, b.y + dy * k, rb); } }
+  const U = G.units.filter(u => !u.dead); for (let i = 0; i < U.length; i++) for (let j = i + 1; j < U.length; j++) { const a = U[i], b = U[j], ra = a.sz || 24, rb = b.sz || 24, dx = b.x - a.x, dy = b.y - a.y, d = hyp(dx, dy), m = (a.creep && b.creep) ? (ra + rb) * 1.45 : (a.creep || b.creep) && inRock(a.x, a.y) ? (ra + rb) * 1.05 : (ra + rb) * 0.75; /* in the rock lane nobody slips past you */ if (d > 0 && d < m) { const k = (m - d) / d * 0.5; slide(a, a.x - dx * k, a.y - dy * k, ra); slide(b, b.x + dx * k, b.y + dy * k, rb); } }
   // shots
   for (const p of G.pr.slice()) { if (p.tgt) { const T = G.units.find(u => u.id === p.tgt); if (T) p.a = Math.atan2(T.y - p.y, T.x - p.x); }
     const s = p.sp * dt; p.x += Math.cos(p.a) * s; p.y += Math.sin(p.a) * s; p.left -= s; let hit = null;
@@ -44816,7 +44831,7 @@ function step(G, dt) {
     if (!left) { if (G.round >= ROUNDS) { G.ph = 'end'; G.won = true; ev(G, 'end', 1); return; } ev(G, 'clear', G.round); startBreak(G, false); } }
 }
 function resetDest() { DMK.fill(0); for (const [, , cl] of DEST) for (const k of cl) DMK[k]++; WIDE = null; }
-function breakDest(G, di, by) { const D0 = DEST.find(q => q[0] === di); if (!D0 || G.dd.includes(di)) return; G.dd.push(di); for (const k of D0[2]) DMK[k] = Math.max(0, DMK[k] - 1); WIDE = null; const d = MP.doo[di]; ev(G, 'boom', d[1] | 0, d[2] | 0, 40);
+function breakDest(G, di, by) { const D0 = DEST.find(q => q[0] === di); if (!D0 || G.dd.includes(di)) return; G.dd.push(di); for (const k of D0[2]) DMK[k] = Math.max(0, DMK[k] - 1); WIDE = null; CHUNK.clear(); const d = MP.doo[di]; ev(G, 'boom', d[1] | 0, d[2] | 0, 40);
   if (d[0] === 'LTex') { for (const o of near(G, d[1], d[2], 280, o => o.creep)) hurt(G, by, o, 300 + G.round * 20, true); ev(G, 'boom', d[1] | 0, d[2] | 0, 160); } } /* the explosive barrel only hurts the monsters */
 function hitDest(G, h, st) { /* walking into a rock, box or barrel (and no monster to hit): you hit it */
   const t = G.t; if (h.atkT + st.as > t || h.in.m < 0.3) return; if (nearestFoe(G, h, st.r + 60)) return; let best = null, bd = 1e9;
@@ -45058,10 +45073,17 @@ function paintChunk(ci, cj) {
       if (z !== 'sand' && (Math.floor((x - M0) / CELL) + Math.floor((y - M0) / CELL)) % 2) { g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(px, py, cs, cs); } /* stone slabs */
       if (z === 'sand' && r < 0.04) { g.fillStyle = 'rgba(120,20,10,.22)'; g.beginPath(); g.ellipse(px + cs / 2, py + cs / 2, cs * 0.9, cs * 0.5, r * 9, 0, 7); g.fill(); } }
     else if (((x > 1500 && y < -4500) || (x > 4400 && y < 0)) && (walkable(x + 48, y + 16) || walkable(x - 16, y + 16) || walkable(x + 16, y + 48) || walkable(x + 16, y - 16))) { /* the prisoners' cells: iron bars */ g.fillStyle = '#2a2624'; g.fillRect(px, py, cs, cs); g.fillStyle = '#9a9aa2'; for (let b = 3; b < cs; b += cs / 3) g.fillRect(px + b, py, Math.max(1.5, cs * 0.12), cs); g.fillStyle = '#6a6a72'; g.fillRect(px, py + cs * 0.15, cs, cs * 0.1); }
+    else if (RKMZ[Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL)]) { /* the rock wall of the rock corner: piled boulders, a darker face where the lane is in front */
+      g.fillStyle = r < 0.5 ? '#6d655c' : '#675f57'; g.fillRect(px, py, cs, cs); }
     else { /* walls: stone blocks, with a darker front face where the floor is in front (below) so they look tall */
       const front = walkable(x + 16, y - 16); g.fillStyle = r < 0.5 ? '#4a3f45' : '#463c42'; g.fillRect(px, py, cs, cs);
       g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1);
       if (front) { g.fillStyle = '#2b2328'; g.fillRect(px, py + cs * 0.45, cs, cs * 0.55); g.fillStyle = '#6a5c62'; g.fillRect(px, py + cs * 0.4, cs, cs * 0.1); } } }
+  for (let y = y0 - CELL * 2; y < y1 + CELL * 2; y += CELL) for (let x = x0 - CELL * 2; x < x0 + CHW + CELL * 2; x += CELL) { const i = Math.floor((x + 16 - M0) / CELL), j = Math.floor((y + 16 - M0) / CELL); if (i < 0 || j < 0 || i >= GWd || j >= GHd || !RKMZ[j * GWd + i] || (i + j * 3) % 2) continue; /* boulders on every other cell of the rock wall */
+    const r = hsh(x * 1.7, y * 0.9), [px, py] = P(x + 16 + (r - 0.5) * 14, y + 16 + (hsh(y, x) - 0.5) * 14), R = CELL * CK * (0.95 + r * 0.4), front = !RKMZ[(j - 1) * GWd + i] && walkable(x + 16, y - 16);
+    g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px + R * 0.25, py + R * 0.35, R, R * 0.6, 0, 0, 7); g.fill();
+    g.fillStyle = r < 0.33 ? '#8f877c' : r < 0.66 ? '#857d73' : '#9a9185'; g.strokeStyle = '#3b3530'; g.lineWidth = 1.2; g.beginPath(); for (let q = 0; q < 7; q++) { const an = q / 7 * 6.283 + r * 4, rr = R * (0.78 + 0.22 * hsh(q, r)); g.lineTo(px + Math.cos(an) * rr, py - (front ? R * 0.3 : 0) + Math.sin(an) * rr * 0.85); } g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.2)'; g.beginPath(); g.ellipse(px - R * 0.3, py - R * 0.45, R * 0.35, R * 0.2, 0, 0, 7); g.fill(); }
   // the gate between the yard and the arena (always shut)
   { const [gx, gy] = P(GATEB[0], GATEB[3]); g.fillStyle = '#2a2420'; g.fillRect(gx, gy, (GATEB[2] - GATEB[0]) * CK, (GATEB[3] - GATEB[1]) * CK); g.strokeStyle = '#8a8a90'; g.lineWidth = 3; for (let x = GATEB[0] + 16; x < GATEB[2]; x += 40) { const [lx, ly] = P(x, GATEB[3]); g.beginPath(); g.moveTo(lx, ly); g.lineTo(lx, ly + (GATEB[3] - GATEB[1]) * CK); g.stroke(); } }
   return { cv: c, miss };
@@ -45075,7 +45097,7 @@ function drawGround(g, cam, z, cw, ch) {
 }
 const ROCKY = /^(AOsr|LTrc|LOs[^c]|YOb.|YOfs|YOks|YOwb|YSaw|LSst)$/;
 function drawProp(g, d, sx, sy, z, now) { /* stones, columns, trees and boxes of the original map */
-  const [id, , , a, sc] = d, s = (sc || 1) * z, r = hsh(d[1], d[2]);
+  const [id, , , a, sc] = d, s = (sc || 1) * z, r = hsh(d[1], d[2]); if (id === 'LTrc' && inRock(d[1], d[2])) return;
   if (id === 'YSco') { const q = im('og_column'); if (q) { const w = 120 * s, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); return; } }
   if (ROCKY.test(id) || id === 'YSco') { const R = (id[0] === 'Y' ? 46 : id === 'LTrc' ? 62 : 34) * s * (0.8 + r * 0.5); g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx + R * 0.2, sy + R * 0.3, R, R * 0.55, 0, 0, 7); g.fill();
     g.fillStyle = id === 'AOsr' ? '#7a7280' : '#8c8478'; g.strokeStyle = '#3b3530'; g.lineWidth = Math.max(1.5, 3 * z); g.beginPath(); for (let k = 0; k < 8; k++) { const an = k / 8 * 6.283 + r * 3, rr = R * (0.75 + 0.25 * hsh(k, r)); g.lineTo(sx + Math.cos(an) * rr, sy - R * 0.35 + Math.sin(an) * rr * 0.8); } g.closePath(); g.fill(); g.stroke();
@@ -45787,10 +45809,12 @@ function tontoEmoji(em, px) { // emoji drawn once into a small canvas, then reus
   c = document.createElement('canvas'); c.width = c.height = px; const g = c.getContext('2d'); g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = Math.round(px * 0.82) + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.fillText(em, px / 2, px * 0.54);
   TONTO_EMC.set(k, c); return c;
 }
+const T_CH = { '🦂': 'scorpion', '🧟‍♂️': 'ghoul', '🧌': 'abomination', '👹': 'demonlord', '🧟': 'zombie', '🐂': 'bull', '👨‍🌾': 'farmer', '👻': 'ghost', '👷': 'engineer', '🧑‍🌾': 'peasant', '🐑': 'sheep', '🗿': 'giant', '👺': 'troll', '🐄': 'cow', '🐔': 'chicken', '🐉': 'hydra', '🐢': 'turtle', '🥷': 'bandit', '🐻': 'bear', '🚜': 'tank', '💂': 'spartan', '🧒': 'kid', '👩': 'woman', '👨': 'man', '💀': 'skeleton', '😈': 'firelord', '🧙': 'wizard', '🪨': 'golem', '🐰': 'rabbit', '🧛': 'bloodmage', '🐸': 'frog', '🛍️': 'merchant', '🛒': 'merchant', '🧔': 'persian', '🐓': 'chicken' }; /* Perrin's drawings instead of the emojis */
 const T_ICO = { '🔑': 'ibc_llave', '🗝️': 'ibc_llave', '💣': 'ibc_bomba', '💎': 'ibc_diamante', '🍺': 'ibc_cerveza', '🔥': 'ibc_antorcha', '🧪': 'ibc_pocion', '🔨': 'ibc_martillo', '🍕': 'ibc_pizza', '📢': 'pu_gritar', '⚔️': 'pu_atacar' };
-const _tIm = {}; function tIcoImg(em) { const n = T_ICO[em]; if (!n || !window.FX) return null; const im = _tIm[n] || (_tIm[n] = Object.assign(new Image(), { src: FX(n) })); return im.complete && im.naturalWidth ? im : null; }
+const _tIm = {}; function tIcoImg(em) { const n = T_ICO[em] || (T_CH[em] && 'tt_ch_' + T_CH[em]); if (!n || !window.FX) return null; const im = _tIm[n] || (_tIm[n] = Object.assign(new Image(), { src: FX(n) })); return im.complete && im.naturalWidth ? im : null; }
+const _tI2 = {}; function tImg(n) { if (!window.FX) return null; const im = _tI2[n] || (_tI2[n] = Object.assign(new Image(), { src: FX(n) })); return im.complete && im.naturalWidth ? im : null; }
 function tIco(em, cls) { const n = T_ICO[em]; return n && window.FX ? `<img class="${cls || 'tico'}" src="${FX(n)}" alt="">` : em; }
-function tontoDrawEm(g, em, x, y, size, alpha = 1) { { const im = tIcoImg(em); if (im) { g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; g.drawImage(im, -size * 0.6, -size * 0.6, size * 1.2, size * 1.2); g.restore(); return; } } const px = size > 80 ? 128 : 64; const c = tontoEmoji(em, px); g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; g.drawImage(c, -size / 2, -size / 2, size, size); g.restore(); }
+function tontoDrawEm(g, em, x, y, size, alpha = 1) { { const im = tIcoImg(em); if (im) { g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; const ch = !T_ICO[em], w = size * (ch ? 1.35 : 1.2), h = ch ? w * im.naturalHeight / im.naturalWidth : w; g.drawImage(im, -w / 2, ch ? w * 0.5 - h : -h / 2, w, h); g.restore(); return; } } const px = size > 80 ? 128 : 64; const c = tontoEmoji(em, px); g.save(); g.translate(x, y); g.scale(1, -1); if (alpha < 1) g.globalAlpha *= alpha; g.drawImage(c, -size / 2, -size / 2, size, size); g.restore(); }
 
 /* ---- the ground: tiles + walls baked into 1024x1024 chunks ---- */
 const TCH = 1024, TSC = 0.5;
@@ -45799,11 +45823,12 @@ function tontoChunk(W, ci, cj) {
   if (S.chunks.size > 70) { const old = [...S.chunks.entries()].sort((a, b) => a[1].used - b[1].used).slice(0, 20); for (const [k] of old) S.chunks.delete(k); }
   const cv = document.createElement('canvas'); cv.width = cv.height = TCH * TSC; const g = cv.getContext('2d');
   const x0 = ci * TCH, y0 = cj * TCH, T = W.T, X = x => (x - x0) * TSC, Y = y => (y0 + TCH - y) * TSC;
-  g.fillStyle = '#17121c'; g.fillRect(0, 0, cv.width, cv.height);
+  g.fillStyle = '#17121c'; g.fillRect(0, 0, cv.width, cv.height); let miss = false;
   const i0 = Math.floor((x0 - T.cx - 64) / 128), i1 = Math.ceil((x0 + TCH - T.cx + 64) / 128), j0 = Math.floor((y0 - T.cy - 64) / 128), j1 = Math.ceil((y0 + TCH - T.cy + 64) / 128);
   for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
     if (i < 0 || j < 0 || i >= T.w || j >= T.h) continue; const idx = j * T.w + i; const id = W.tileIds[W.tex[idx]]; let col = TONTO_TILE[id] || '#7a7a70';
     if (T.flags[idx] & 4) col = '#2f6fd8';
+    if (id === 'Dlav' || (T.flags[idx] & 4)) { const im = tImg(id === 'Dlav' ? 'tt_lava' : 'tt_water'); if (im) { g.drawImage(im, X(T.cx + i * 128 - 64), Y(T.cy + j * 128 + 64), 128 * TSC + 1, 128 * TSC + 1); continue; } miss = true; } /* Perrin's lava and water */
     if (id === 'Dlav') { g.fillStyle = col; g.fillRect(X(T.cx + i * 128 - 64), Y(T.cy + j * 128 + 64), 128 * TSC + 1, 128 * TSC + 1); g.fillStyle = 'rgba(255,200,60,0.35)'; for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(X(T.cx + i * 128 - 64 + tontoHash(i + k, j) * 128), Y(T.cy + j * 128 - 64 + tontoHash(i, j + k) * 128), 4 + 6 * tontoHash(k, j), 0, 7); g.fill(); } continue; }
     const x = T.cx + i * 128, y = T.cy + j * 128, n = tontoHash(i, j);
     g.fillStyle = col; g.fillRect(X(x - 64), Y(y + 64), 128 * TSC + 1, 128 * TSC + 1);
@@ -45824,7 +45849,7 @@ function tontoChunk(W, ci, cj) {
   for (let j = cj0; j < cj0 + n; j++) for (let i = ci0; i < ci0 + n; i++) { if (wall(i, j)) continue; if (wall(i, j + 1)) g.fillRect(X(M0 + i * 32), Y(M0 + j * 32 + 32), 32 * TSC + 0.6, 5); if (wall(i - 1, j)) g.fillRect(X(M0 + i * 32), Y(M0 + j * 32 + 32), 4, 32 * TSC + 0.6); }
   // small props (doodads that never change)
   for (const d of S.props) { const [id, v, x, y, a, s] = d; if (x < x0 - 80 || x > x0 + TCH + 80 || y < y0 - 80 || y > y0 + TCH + 80) continue; tontoProp(g, id, X(x), Y(y), s, v); }
-  c = { cv, used: performance.now() }; S.chunks.set(key, c); return c;
+  c = { cv, used: performance.now() }; if (!miss) S.chunks.set(key, c); return c;
 }
 function tontoProp(g, id, px, py, s, v) {
   const k = id.slice(1, 2), r = 9 * Math.max(0.6, Math.min(2, s || 1));
@@ -45852,6 +45877,9 @@ function tontoDrawDests(R, g, vx0, vy0, vx1, vy1, top) {
     const isTop = d.dk === 'tree'; if (isTop !== !!top) continue;
     g.save(); g.translate(d.x, d.y);
     const k = d.dk;
+    { const n = d.alive ? ({ crate: 'tt_crate', barrel: 'tt_barrel', tnt: 'tt_tnt', lever: 'tt_lever_off', switch: 'tt_switch', spikes: 'tt_spikes', rock: 'tt_rock', tree: 'tt_tree', fence: 'tt_fence' })[k] : k === 'lever' ? 'tt_lever_on' : null, im = n && tImg(n);
+      if (im) { const s = Math.max(0.8, Math.min(2.2, d.scale || 1)), sz = ({ rock: 150, tree: 130, fence: 128 })[k] || 64 * s, sh = d.hitT && t - d.hitT < 0.25 ? Math.sin(t * 60) * 4 : 0; g.save(); if (k === 'fence') g.rotate((d.face || 0) * Math.PI / 180); g.scale(1, -1); const w = sz, h = w * im.naturalHeight / im.naturalWidth; g.drawImage(im, -w / 2 + sh, -h / 2, w, h); g.restore();
+        if (d.alive && !d.inv && d.life < d.maxLife) tontoBar(g, 0, h / 2 + 8, d.life / d.maxLife); if (S.sel === d) { g.strokeStyle = 'rgba(120,255,120,0.9)'; g.lineWidth = 4; g.beginPath(); g.ellipse(0, 0, d.r + 14, (d.r + 14) * 0.7, 0, 0, 7); g.stroke(); } g.restore(); continue; } } /* Perrin's drawings */
     if (k === 'gate') {
       const col = d.base === 'ATg3' ? ['#6d4a2a', '#9a7040'] : d.base === 'DTg1' ? ['#4a2626', '#a04040'] : ['#3a3c46', '#8a90a0'];
       const a = d.blk || (d._lastBlk || null); if (d.blk) d._lastBlk = d.blk;
