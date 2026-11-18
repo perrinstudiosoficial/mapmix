@@ -43260,7 +43260,22 @@ function zCityBlocks(A, D, rnd) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 
 for (const it of ZC_PROP) { const f = /^zsm[pz]/.test(it[0]) ? 0.72 : it[1] >= 180 ? 0.66 : it[1] >= 100 ? 0.8 : 0.9; it[1] *= f; it[2] *= f; it[3] *= f; } /* houses are the biggest thing; vehicles and the rest smaller */
 function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32; let sd = 7654321; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   // how far each street cell is from a wall (sidewalks next to the buildings, the road in the middle)
-  const reach = new Uint8Array(PW * PH); { const s0 = Math.floor((hz.y - M0) / C) * PW + Math.floor((hz.x - M0) / C), F = [s0]; reach[s0] = 1; for (let q = 0; q < F.length; q++) { const k = F[q], i = k % PW; for (const n of [k + 1, k - 1, k + PW, k - PW]) { if (n < 0 || n >= PW * PH || reach[n] || W.pbase[n]) continue; if ((n === k + 1 && i === PW - 1) || (n === k - 1 && i === 0)) continue; reach[n] = 1; F.push(n); } } }
+  let reach = new Uint8Array(PW * PH); const fillReach = () => { reach = new Uint8Array(PW * PH); const s0 = Math.floor((hz.y - M0) / C) * PW + Math.floor((hz.x - M0) / C), F = [s0]; reach[s0] = 1; for (let q = 0; q < F.length; q++) { const k = F[q], i = k % PW; for (const n of [k + 1, k - 1, k + PW, k - PW]) { if (n < 0 || n >= PW * PH || reach[n] || W.pbase[n] || W.pdyn[n]) continue; if ((n === k + 1 && i === PW - 1) || (n === k - 1 && i === 0)) continue; reach[n] = 1; F.push(n); } } }; fillReach(); /* trees and spikes block too */
+  const cellK = (x, y) => Math.floor((y - M0) / C) * PW + Math.floor((x - M0) / C);
+  { /* a factory nobody can walk to (it is in the original map data, but behind walls) is taken out */ const ok = f => { const k = cellK(f.x, f.y); for (let dj = -3; dj <= 3; dj++) for (let di = -3; di <= 3; di++) if (reach[k + dj * PW + di]) return true; return false; };
+    A.facsOff = A.facs.filter(f => !ok(f)).length; A.facs = A.facs.filter(ok); A.facs.forEach((f, i) => { f.i = i; }); }
+  { /* factories in the open get a ring of ruined walls with 4-cell openings where the streets cross it: a base you close with 2 barricades on each side */
+    const R = 9; let built = 0;
+    for (const f of A.facs) { const fi = Math.floor((f.x - M0) / C), fj = Math.floor((f.y - M0) / C); if (Math.hypot(f.x - hz.x, f.y - hz.y) < (R + 6) * C * 1.5 || Math.hypot(f.x - zz.x, f.y - zz.y) < (R + 6) * C * 1.5) continue;
+      if (fi - R - 2 < 2 || fj - R - 2 < 2 || fi + R + 2 >= PW - 2 || fj + R + 2 >= PH - 2) continue;
+      let open = 0, tot = 0; for (let dj = -R + 1; dj < R; dj++) for (let di = -R + 1; di < R; di++) { tot++; if (reach[(fj + dj) * PW + fi + di]) open++; } if (open / tot < 0.6) continue; /* already closed in by buildings */
+      for (const d of [R, R + 1]) { const per = []; for (let i = -d; i < d; i++) per.push([fi + i, fj - d]); for (let j = -d; j < d; j++) per.push([fi + d, fj + j]); for (let i = d; i > -d; i--) per.push([fi + i, fj + d]); for (let j = d; j > -d; j--) per.push([fi - d, fj + j]);
+        const n = per.length, wk = per.map(([i, j]) => !!reach[j * PW + i]); if (wk.every(Boolean)) { /* all open: four doors, one per side */ }
+        let st = wk.findIndex(v => !v); if (st < 0) st = 0; const runs = []; let cur = null; for (let q = 0; q < n; q++) { const k2 = (st + q) % n; if (wk[k2]) { if (!cur) { cur = [k2, 0]; runs.push(cur); } cur[1]++; } else cur = null; }
+        if (wk.every(Boolean)) { runs.length = 0; for (let sd2 = 0; sd2 < 4; sd2++) runs.push([sd2 * 2 * d, 2 * d]); }
+        for (const [a0, len] of runs) { if (len <= 4) continue; const g0 = Math.floor((len - 4) / 2); for (let q = 0; q < len; q++) { if (q >= g0 && q < g0 + 4) continue; const [i, j] = per[(a0 + q) % n]; W.pbase[j * PW + i] = 1; } } }
+      built++; }
+    if (built) fillReach(); A.ringBases = built; }
   A.cityLot = new Uint8Array(PW * PH); for (let k = 0; k < PW * PH; k++) if (!W.pbase[k] && !reach[k]) A.cityLot[k] = 1; /* closed pockets nobody walks into: bare ground */
   const D = new Uint8Array(PW * PH).fill(255), Q = []; for (let k = 0; k < PW * PH; k++) if (W.pbase[k] || !reach[k]) { D[k] = 0; Q.push(k); }
   for (let q = 0; q < Q.length; q++) { const k = Q[q], d = D[k]; if (d >= 12) continue; const i = k % PW, j = (k / PW) | 0; for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= PW || b >= PH) continue; const n = b * PW + a; if (D[n] > d + 1) { D[n] = d + 1; Q.push(n); } } }
@@ -43275,6 +43290,8 @@ function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MA
       let need = 0; for (const g2 of gs) need += Math.ceil(gmin[g2] / 2); /* barricades it takes to close every way in */
       const hasFac = q.some(c => FAC.has(c));
       if ((q.length >= 24 && q.length <= 2600 && gs.size >= 1 && gs.size <= 4 && need <= 5) || (hasFac && q.length <= 5000 && gs.size <= 8)) { for (const c of q) base[c] = 1; A.cityBases.push({ n: q.length, need }); } }
+    for (const f of A.facs) { const k0 = cellK(f.x, f.y); if (base[k0]) continue; const q = [k0], dist = new Map([[k0, 0]]); base[k0] = 1; /* in the open: brown ground around the factory too */
+      for (let h = 0; h < q.length; h++) { const c = q[h], d0 = dist.get(c), i = c % PW; if (d0 >= 8) continue; for (const nb of [c + 1, c - 1, c + PW, c - PW]) { if (nb < 0 || nb >= N || dist.has(nb) || !st(nb)) continue; if ((nb === c + 1 && i === PW - 1) || (nb === c - 1 && i === 0)) continue; dist.set(nb, d0 + 1); base[nb] = 1; q.push(nb); } } }
     A.cityBase = base; A.cityGate = gate; }
   { const RL = new Uint8Array(PW * PH); for (let j = 1; j < PH - 1; j++) for (let i = 1; i < PW - 1; i++) { const k = j * PW + i, d = D[k]; if (d < 5 || d === 255) continue; const v = d >= D[k - 1] && d >= D[k + 1] && (D[k - 1] < d || D[k + 1] < d) && Math.abs(D[k - PW] - d) <= 1 && Math.abs(D[k + PW] - d) <= 1 && D[k - 1] !== d && D[k + 1] !== d, hz = d >= D[k - PW] && d >= D[k + PW] && (D[k - PW] < d || D[k + PW] < d) && Math.abs(D[k - 1] - d) <= 1 && Math.abs(D[k + 1] - d) <= 1 && D[k - PW] !== d && D[k + PW] !== d; if (v && !hz) RL[k] = 1; else if (hz && !v) RL[k] = 2; } A.cityRL = RL; } /* 1: a road going up-down, 2: a road going left-right (its middle line) */
   A.cityB = zCityBlocks(A, D, rnd); const lo = 4;
@@ -43302,6 +43319,15 @@ function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MA
         let kk = K[Math.floor(rnd() * K.length)]; const zx = M0 + (I * n + best.ox) * C, zy = M0 + (J * n + best.oy) * C; const COURT = ['soccer', 'baseball', 'pool', 'tennis', 'basket'];
         if (COURT.includes(kk) && PZ.some(o => o.k === kk && Math.hypot(o.x - zx, o.y - zy) < 2600)) kk = rnd() < 0.5 ? 'grass' : 'dirt'; /* the same court never twice close together */
         PZ.push({ x: zx, y: zy, w: w * T, h: h * T, k: kk, s: Math.floor(rnd() * 1000) }); }
+      { const N = PW * PH, fr = new Uint8Array(N); for (let k = 0; k < N; k++) fr[k] = reach[k] && !W.pbase[k] && !A.cityBase[k] && !A.cityGate[k] && D[k] >= 2 ? 1 : 0;
+        const SAT = new Int32Array((PW + 1) * (PH + 1)); for (let j = 0; j < PH; j++) for (let i = 0; i < PW; i++) SAT[(j + 1) * (PW + 1) + i + 1] = (fr[j * PW + i] ? 0 : 1) + SAT[j * (PW + 1) + i + 1] + SAT[(j + 1) * (PW + 1) + i] - SAT[j * (PW + 1) + i];
+        const bad2 = (i, j, w, h) => SAT[(j + h) * (PW + 1) + i + w] - SAT[j * (PW + 1) + i + w] - SAT[(j + h) * (PW + 1) + i] + SAT[j * (PW + 1) + i] > 0; A.cityCourt = new Uint8Array(N); let nC = 0;
+        for (const kd of ['soccer', 'pool', 'tennis', 'basket', 'futsal', 'soccer', 'pool', 'baseball', 'tennis', 'basket']) { const [rw, rh] = ZC_REAL[kd]; for (let tr = 0; tr < 3000; tr++) { const sw = rnd() < 0.5, w = Math.ceil((sw ? rh : rw) / C) + 2, h = Math.ceil((sw ? rw : rh) / C) + 2, i = 2 + Math.floor(rnd() * (PW - w - 4)), j = 2 + Math.floor(rnd() * (PH - h - 4));
+            if (bad2(i, j, w, h)) continue; const x = M0 + i * C, y = M0 + j * C; if (Math.hypot(x - hz.x, y - hz.y) < 700 || Math.hypot(x - zz.x, y - zz.y) < 700) continue; if (PZ.some(o => o.court && Math.hypot(o.x - x, o.y - y) < (o.k === kd ? 3000 : 1200))) continue;
+            for (let b = 0; b < h; b++) for (let a = 0; a < w; a++) { fr[(j + b) * PW + i + a] = 0; A.cityCourt[(j + b) * PW + i + a] = 1; } for (let jj = j; jj <= PH; jj++) for (let ii = 0; ii <= PW; ii++) if (jj > 0 && ii > 0) SAT[jj * (PW + 1) + ii] = (fr[(jj - 1) * PW + ii - 1] ? 0 : 1) + SAT[(jj - 1) * (PW + 1) + ii] + SAT[jj * (PW + 1) + ii - 1] - SAT[(jj - 1) * (PW + 1) + ii - 1];
+            for (let q = PZ.length - 1; q >= 0; q--) { const o = PZ[q]; if (o.x < x + w * C && o.x + o.w > x && o.y < y + h * C && o.y + o.h > y) PZ.splice(q, 1); } /* the court replaces small squares under it */
+            PZ.push({ x: x + C, y: y + C, w: (w - 2) * C, h: (h - 2) * C, k: kd, s: Math.floor(rnd() * 1000), court: 1 }); nC++; break; } }
+        A.cityCourts = nC; }
       A.cityPZ = PZ; A.cityMH = tiles.filter(() => rnd() < 0.16).map(t2 => ({ x: t2.x + (rnd() - 0.5) * 50, y: t2.y + (rnd() - 0.5) * 50 })); } }
   { /* the empty lots (where nobody walks): fields, pools, parks, factories, mansions */ const DW = new Uint8Array(PW * PH).fill(255), Q = []; for (let k = 0; k < PW * PH; k++) if (D[k] >= 1) { DW[k] = 0; Q.push(k); }
     for (let q = 0; q < Q.length; q++) { const k = Q[q], d = DW[k]; if (d >= 30) continue; const i = k % PW; for (const nb of [k + 1, k - 1, k + PW, k - PW]) { if (nb < 0 || nb >= PW * PH) continue; if ((nb === k + 1 && i === PW - 1) || (nb === k - 1 && i === 0)) continue; if (DW[nb] > d + 1) { DW[nb] = d + 1; Q.push(nb); } } }
@@ -43321,7 +43347,7 @@ function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MA
     const fw = it[2] / 2, fh = it[3] / 2; if (!far(x, y)) continue; let ok = true; for (let yy = y - fh - 40; yy <= y + fh + 40 && ok; yy += 20) for (let xx = x - fw - 40; xx <= x + fw + 40; xx += 20) if (!W.walkable(xx, yy)) { ok = false; break; } if (!ok) continue;
     if (P.some(p => Math.abs(p.x - x) < (p.fw + fw + 90) && Math.abs(p.y - y) < (p.fh + fh + 90))) continue; P.push({ x, y, im: it[0], w: it[1], fw, fh, fx: rnd() < 0.5 ? -1 : 1 }); W.blockRect(x - fw, y - fh, x + fw, y + fh, 1); }
   for (let k = 0; k < 9000 && P.length < 420; k++) { const it = ZC_PROP[Math.floor(rnd() * ZC_PROP.length)]; const x = M0 + (lo + rnd() * (PW - 2 * lo)) * C, y = M0 + (lo + rnd() * (PH - 2 * lo)) * C;
-    const fw = it[2] / 2, fh = it[3] / 2, mg = 110; { const ci = Math.floor((x - M0) / C), cj = Math.floor((y - M0) / C); if (D[cj * PW + ci] < Math.ceil((Math.max(fw, fh) + mg) / C)) continue; if (A.cityBase[cj * PW + ci]) continue; } /* quick reject: not enough room around */ if (!far(x, y)) continue; let ok = true;
+    const fw = it[2] / 2, fh = it[3] / 2, mg = 110; { const ci = Math.floor((x - M0) / C), cj = Math.floor((y - M0) / C); if (D[cj * PW + ci] < Math.ceil((Math.max(fw, fh) + mg) / C)) continue; if (A.cityBase[cj * PW + ci] || (A.cityCourt && A.cityCourt[cj * PW + ci])) continue; } /* quick reject: not enough room around */ if (!far(x, y)) continue; let ok = true;
     for (let yy = y - fh - mg; yy <= y + fh + mg && ok; yy += 32) for (let xx = x - fw - mg; xx <= x + fw + mg; xx += 32) if (!W.walkable(xx, yy)) { ok = false; break; } if (!ok) continue;
     if (P.some(p => Math.abs(p.x - x) < (p.fw + fw + 70) && Math.abs(p.y - y) < (p.fh + fh + 70))) continue;
     P.push({ x, y, im: it[0], w: it[1], fw, fh, fx: rnd() < 0.5 ? -1 : 1 }); W.blockRect(x - fw, y - fh, x + fw, y + fh, 1); }
@@ -43341,12 +43367,12 @@ let _zcPat = null; function zCityPats(g) { if (_zcPat && _zcPat.real) return _zc
 /* the streets: road in the middle, sidewalks along the buildings, a curb between them */
 /* the open squares drawn by code (until Perrin's pictures): world coords, y goes up */
 /* courts and pools always have their real size (2-3 houses): a space too small for one stays bare ground, like a base */
-const ZC_REAL = { soccer: [1100, 700], baseball: [900, 900], pool: [600, 340], tennis: [640, 340], basket: [560, 320], futsal: [640, 400] };
+const ZC_REAL = { soccer: [900, 560], baseball: [760, 760], pool: [520, 300], tennis: [560, 300], basket: [480, 280], futsal: [560, 340] }; /* 2-3 houses */
 function zPlazaPaint(g, z) {
   const R = ZC_REAL[z.k]; if (!R) return zPlazaPaint0(g, z);
   let [w, h] = R; if ((w > z.w || h > z.h) && h <= z.w && w <= z.h) [w, h] = [h, w];
-  const P = zCityPats(g); g.fillStyle = P.block; g.fillRect(z.x, z.y, z.w, z.h); g.fillStyle = 'rgba(150,120,80,.22)'; g.fillRect(z.x, z.y, z.w, z.h);
-  if (w > z.w || h > z.h) return; /* no room: just bare ground */
+  if (w > z.w + 2 || h > z.h + 2) return zPlazaPaint0(g, Object.assign({}, z, { k: 'grass' })); /* no room for it: a patch of grass (brown is only for bases) */
+  w = Math.min(w, z.w); h = Math.min(h, z.h);
   zPlazaPaint0(g, Object.assign({}, z, { x: z.x + (z.w - w) / 2, y: z.y + (z.h - h) / 2, w, h }));
 }
 function zPlazaPaint0(g, z) { const m = 8, X = z.x + m, Y = z.y + m, Wd = z.w - 2 * m, H = z.h - 2 * m, h = k => { const v = Math.sin(z.s * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
@@ -43824,20 +43850,20 @@ function unstick(G, c) {
 }
 /* corner help: you drive as always, but if you point to a side road before you reach it, the car keeps straight (no scraping the wall)
    and starts its normal curve just in time to come out in the middle of the new road */
-const AUTO_TURN = true;
+const AUTO_TURN = true, R_TURN = 58; /* radius of the helped curve: a real curve (like a drift), not a 90° snap */
 function cornerAim(G, c) {
   const I = c.in, g = G.g, t = G.t, v = Math.abs(c.v);
   const ix = Math.abs(I.dx) > 0.38 ? Math.sign(I.dx) : 0, iy = Math.abs(I.dy) > 0.38 ? Math.sign(I.dy) : 0; if (!ix && !iy) return null;
-  if (c.turnTo && c.turnTo.until > t && (Math.sign(Math.cos(c.turnTo.a)) === ix && ix || Math.sign(Math.sin(c.turnTo.a)) === iy && iy)) return c.turnTo.a; /* finishing a curve */
-  c.turnTo = null; if (v < 60) return null;
-  const ca = Math.cos(c.a), sa = Math.sin(c.a); let hx = 0, hy = 0; if (Math.abs(ca) > 0.88) hx = Math.sign(ca); else if (Math.abs(sa) > 0.88) hy = Math.sign(sa); else return null;
+  if (c.turnTo && c.turnTo.until > t && (Math.sign(Math.round(Math.cos(c.turnTo.a))) === ix && ix || Math.sign(Math.round(Math.sin(c.turnTo.a))) === iy && iy)) return c.turnTo.a; /* finishing a curve */
+  c.turnTo = null;
+  const ca = Math.cos(c.a), sa = Math.sin(c.a); let hx = 0, hy = 0; if (Math.abs(ca) > 0.8) hx = Math.sign(ca); else if (Math.abs(sa) > 0.8) hy = Math.sign(sa); else return null;
   if ((hx && ix === -hx) || (hy && iy === -hy)) return null; /* going back: normal steering */
   const px = hx ? 0 : ix, py = hy ? 0 : iy; if (!px && !py) return null; /* only straight on: normal */
-  const cx = cellOf(c.x), cy = cellOf(c.y), along = hx ? (mid(cx) - c.x) * hx : (mid(cy) - c.y) * hy, R = Math.min(CS * 0.6, v / 6.5);
-  const straight = Math.atan2(hy, hx);
-  if (!isWall(g, cx + px, cy + py) && along <= R && along > -CS * 0.3) { c.turnTo = { a: Math.atan2(py, px), until: t + 0.7 }; return c.turnTo.a; }
-  if (isWall(g, cx + hx, cy + hy) && along <= R) return null; /* nothing ahead and no side road here: normal steering */
-  return straight; /* the side road is still ahead: keep straight */
+  const cx = cellOf(c.x), cy = cellOf(c.y), along0 = hx ? (mid(cx) - c.x) * hx : (mid(cy) - c.y) * hy, straight = Math.atan2(hy, hx);
+  for (let k = 0; k <= 1; k++) { const qx = cx + hx * k, qy = cy + hy * k; if (k && isWall(g, qx, qy)) break; const along = along0 + k * CS;
+    if (!isWall(g, qx + px, qy + py) && along <= (v > 60 ? R_TURN : 10) && along > -CS * 0.3) { c.turnTo = { a: Math.atan2(py, px), until: t + 0.9 }; return c.turnTo.a; } }
+  if (isWall(g, cx + hx, cy + hy) && along0 <= 6) return null; /* nothing ahead and no side road here: normal steering */
+  return straight; /* the side road is still ahead (or there is none here): keep straight, never into the wall */
 }
 function driveCar(G, c, dt) {
   const t = G.t, E = c.e; if (E.jump) { const k = (t - E.jump.t0) / E.jump.d; if (k >= 1) { c.x = E.jump.x1; c.y = E.jump.y1; E.jump = null; c.v = 120; } else { c.x = E.jump.x0 + (E.jump.x1 - E.jump.x0) * k; c.y = E.jump.y0 + (E.jump.y1 - E.jump.y0) * k; } return; }
@@ -43846,8 +43872,8 @@ function driveCar(G, c, dt) {
   let maxV = BASEV * (c.bot ? c.diff.sp : 1) * ((E.turbo || 0) > t ? 1.8 : (E.boost || 0) > t ? 1.55 : 1) * ((E.slow || 0) > t ? 0.45 : 1) * ((E.foot || 0) > t ? 0.33 : 1) * (c.hurt > t ? 0.9 : 1);
   const I = c.in;
   if ((E.spin || 0) > t) { c.a += 13 * dt; c.v *= Math.pow(0.25, dt); }
-  else if (I.m > 0.15) { const ca0 = AUTO_TURN ? cornerAim(G, c) : null, ta = ca0 != null ? ca0 : Math.atan2(I.dy, I.dx), d = ang(ta - c.a), tr = (Math.abs(c.v) < 70 ? 10 : 6.5) * dt; c.a = ang(c.a + clamp(d, -tr, tr));
-    const want = maxV * Math.min(1, I.m) * (Math.abs(d) > 1.7 ? 0.12 : Math.abs(d) > 0.75 ? 0.5 : 1); c.v += clamp(want - c.v, -700 * dt, 420 * dt); }
+  else if (I.m > 0.15) { const ca0 = AUTO_TURN ? cornerAim(G, c) : null, ta = ca0 != null ? ca0 : Math.atan2(I.dy, I.dx), d = ang(ta - c.a), helped = !!(c.turnTo && ca0 != null), tr = (helped ? Math.max(Math.abs(c.v), 90) / R_TURN : Math.abs(c.v) < 70 ? 10 : 6.5) * dt; c.a = ang(c.a + clamp(d, -tr, tr));
+    const want = maxV * Math.min(1, I.m) * (helped ? 0.92 : Math.abs(d) > 1.7 ? 0.12 : Math.abs(d) > 0.75 ? 0.5 : 1); c.v += clamp(want - c.v, -700 * dt, 420 * dt); }
   else c.v += clamp(-c.v, -600 * dt, 600 * dt);
   c.x += Math.cos(c.a) * c.v * dt; c.y += Math.sin(c.a) * c.v * dt;
   // corridors: keep the car in the middle of its lane and help it into the side road you point at
@@ -44353,6 +44379,9 @@ const COLS = ['#ff3b3b', '#3b7bff', '#1ce6b9', '#9b4dff', '#ffe23b', '#ff9a1e', 
 // the closed gate, the arena with its stones, the stands with the public and the 3 doors the monsters come in by
 const MP = window.ORC_MAP, M0 = MP.m0, GWd = MP.w, GHd = MP.h, CELL = 32;
 const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })();
+{ /* the stones, columns, trees and boxes of the map block the way too (that is how the corners where monsters come one by one are made) */
+  const RAD = { AOsr: 60, LTrc: 52, YObs: 64, YSco: 48, YObw: 64, YTft: 40, LTbx: 40, LTcr: 40, LTba: 48, YOwb: 48, YObb: 48, YSaw: 48, LSst: 48, YOfs: 32, YOks: 32, LTbr: 32, LTbs: 32, LTex: 40, LTg1: 32, LTg3: 32, DTg1: 32, DTg3: 32 };
+  for (const d of MP.doo) { let r = RAD[d[0]]; if (!r) continue; r *= d[4] || 1; for (let j = Math.floor((d[2] - r - M0) / CELL); j <= Math.floor((d[2] + r - M0) / CELL); j++) for (let i = Math.floor((d[1] - r - M0) / CELL); i <= Math.floor((d[1] + r - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if ((cx - d[1]) ** 2 + (cy - d[2]) ** 2 > r * r || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; WALK[k >> 3] &= ~(1 << (k & 7)); } } }
 const FOUNT = MP.fount, SHOPS = MP.shops, ARENA = MP.arena, GATEB = MP.gate;
 function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false; const k = j * GWd + i; return !!(WALK[k >> 3] & (1 << (k & 7))); }
 function walkable(x, y) { if (x > GATEB[0] && x < GATEB[2] && y > GATEB[1] && y < GATEB[3]) return false; /* the gate to the arena is always shut: you go in when the round starts */ return walkC(Math.floor((x - M0) / CELL), Math.floor((y - M0) / CELL)); }
@@ -44362,25 +44391,25 @@ const inArena = (x, y) => x > ARENA[0] && x < ARENA[2] && y > ARENA[1] && y < AR
 // r: reach, d: damage, as: seconds between hits, hp, ar: armor, sp: speed; q/w: the two skills
 const WEAP = {
   samurai: { n: 'Espada Samurái', ic: '🗡️', r: 70, d: 26, as: 0.85, hp: 520, ar: 3, sp: 300, crit: [0.2, 2], txt: 'Golpes críticos. Torbellino y paso del viento.',
-    q: { id: 'storm', n: 'Torbellino', ic: '🌪️', cd: 14 }, w: { id: 'wind', n: 'Paso del viento', ic: '💨', cd: 12 } },
+    q: { id: 'storm', n: 'Torbellino', ic: '🌪️', cd: 120 }, w: { id: 'wind', n: 'Paso del viento', ic: '💨', cd: 20 } },
   axe: { n: 'Hacha de Batalla', ic: '🪓', r: 70, d: 30, as: 1.0, hp: 560, ar: 3, sp: 290, cleave: 0.4, txt: 'Golpea a todos los de al lado. Rugido y furia.',
-    q: { id: 'howl', n: 'Rugido', ic: '😱', cd: 15 }, w: { id: 'berserk', n: 'Furia', ic: '😤', cd: 18 } },
+    q: { id: 'howl', n: 'Rugido', ic: '😱', cd: 90 }, w: { id: 'berserk', n: 'Furia', ic: '😤', cd: 30 } },
   spear: { n: 'Lanza Doble', ic: '🔱', r: 110, d: 24, as: 0.8, hp: 500, ar: 2, sp: 310, txt: 'Llega lejos. Estocada y copias falsas.',
-    q: { id: 'thrust', n: 'Estocada', ic: '➶', cd: 8 }, w: { id: 'mirror', n: 'Espejismo', ic: '👥', cd: 22 } },
+    q: { id: 'thrust', n: 'Estocada', ic: '➶', cd: 12 }, w: { id: 'mirror', n: 'Espejismo', ic: '👥', cd: 60 } },
   hammer: { n: 'Martillo de Guerra', ic: '🔨', r: 75, d: 32, as: 1.1, hp: 600, ar: 4, sp: 280, bash: 0.15, txt: 'Aturde a veces. Temblor y avatar.',
-    q: { id: 'quake', n: 'Temblor', ic: '💥', cd: 10 }, w: { id: 'avatar', n: 'Avatar', ic: '🗿', cd: 30 } },
+    q: { id: 'quake', n: 'Temblor', ic: '💥', cd: 12 }, w: { id: 'avatar', n: 'Avatar', ic: '🗿', cd: 120 } },
   great: { n: 'Gran Hacha', ic: '⚒️', r: 80, d: 42, as: 1.35, hp: 620, ar: 3, sp: 280, leech: 0.2, txt: 'Golpe enorme y roba vida. Tajo brutal y grito.',
-    q: { id: 'smash', n: 'Tajo brutal', ic: '🩸', cd: 9 }, w: { id: 'shout', n: 'Grito de guerra', ic: '📣', cd: 20 } },
+    q: { id: 'smash', n: 'Tajo brutal', ic: '🩸', cd: 15 }, w: { id: 'shout', n: 'Grito de guerra', ic: '📣', cd: 90 } },
   wizard: { n: 'Bastón de Mago', ic: '🪄', r: 420, d: 20, as: 1.0, hp: 400, ar: 1, sp: 300, ranged: 'orb', txt: 'De lejos. Lluvia de fuego y curación.',
-    q: { id: 'rain', n: 'Lluvia de fuego', ic: '☄️', cd: 12 }, w: { id: 'heal', n: 'Curar', ic: '💚', cd: 10 } },
+    q: { id: 'rain', n: 'Lluvia de fuego', ic: '☄️', cd: 15 }, w: { id: 'heal', n: 'Curar', ic: '💚', cd: 20 } },
   bow: { n: 'Arco Élfico', ic: '🏹', r: 480, d: 22, as: 0.75, hp: 400, ar: 1, sp: 320, ranged: 'arrow', noMerc: true, txt: 'De lejos y rápido. Flechas múltiples y trampa. (Sin mercenarios)',
-    q: { id: 'multi', n: 'Flecha múltiple', ic: '🎯', cd: 8 }, w: { id: 'trap', n: 'Trampa', ic: '🪤', cd: 14 } },
+    q: { id: 'multi', n: 'Flecha múltiple', ic: '🎯', cd: 12 }, w: { id: 'trap', n: 'Trampa', ic: '🪤', cd: 10 } },
   storm: { n: 'Martillo de Tormenta', ic: '⚡', r: 90, d: 28, as: 1.0, hp: 560, ar: 3, sp: 290, txt: 'Martillo que aturde y avalancha.',
-    q: { id: 'bolt', n: 'Martillo de rayo', ic: '🌩️', cd: 9 }, w: { id: 'aval', n: 'Avalancha', ic: '🪨', cd: 16 } },
+    q: { id: 'bolt', n: 'Martillo de rayo', ic: '🌩️', cd: 12 }, w: { id: 'aval', n: 'Avalancha', ic: '🪨', cd: 20 } },
   druid: { n: 'Bastón Druida', ic: '🌿', r: 380, d: 18, as: 1.0, hp: 440, ar: 2, sp: 300, ranged: 'leaf', txt: 'Raíces que atrapan y aura que regenera.',
-    q: { id: 'roots', n: 'Raíces', ic: '🌱', cd: 11 }, w: { id: 'regen', n: 'Aura de vida', ic: '🍀', cd: 20 } },
+    q: { id: 'roots', n: 'Raíces', ic: '🌱', cd: 20 }, w: { id: 'regen', n: 'Aura de vida', ic: '🍀', cd: 60 } },
   frost: { n: 'Espada de Escarcha', ic: '❄️', r: 75, d: 27, as: 0.95, hp: 540, ar: 3, sp: 295, chill: true, txt: 'Cada golpe congela un poco. Nova helada y aura de frío.',
-    q: { id: 'nova', n: 'Nova helada', ic: '🧊', cd: 11 }, w: { id: 'frostaura', n: 'Aura de frío', ic: '🌨️', cd: 20 } },
+    q: { id: 'nova', n: 'Nova helada', ic: '🧊', cd: 15 }, w: { id: 'frostaura', n: 'Aura de frío', ic: '🌨️', cd: 60 } },
 };
 const WL = Object.keys(WEAP);
 
@@ -44564,9 +44593,9 @@ function useItem(G, h, slot) {
   ev(G, 'item', h.id, k.id); k.ch--; if (k.ch <= 0) h.inv.splice(slot, 1); return true;
 }
 // shopping (only in the break and only next to the shops)
-const atShop = h => Object.values(SHOPS).some(p => hyp(h.x - p[0], h.y - p[1]) < 380);
+const SHOP_R = 300, atShop = (h, sec) => (sec ? [SHOPS[sec]] : Object.values(SHOPS)).some(p => p && hyp(h.x - p[0], h.y - p[1]) < SHOP_R); /* each shop sells only its own things: walk to it */
 function canBuy(G, h, id) {
-  const I = ITEMS[id]; if (!I) return 'No existe'; if (G.ph !== 'break') return 'Las tiendas abren al terminar la ronda'; if (h.dead) return 'Estás muerto'; if (!atShop(h)) return 'Acércate a las tiendas';
+  const I = ITEMS[id]; if (!I) return 'No existe'; if (G.ph !== 'break') return 'Las tiendas abren al terminar la ronda'; if (h.dead) return 'Estás muerto'; if (!atShop(h, I.s)) return 'Acércate a esa tienda';
   if (h.gold < I.c) return 'Te falta oro'; if (I.merc && WEAP[h.wp] && WEAP[h.wp].noMerc) return 'Los arqueros no pueden tener mercenarios';
   if (I.rec) { for (const r of I.rec) if (!h.inv.some(k => k.id === r)) return 'Te falta: ' + ITEMS[r].n; return ''; }
   if (!I.merc && h.inv.length >= 6 && !(I.ch && h.inv.some(k => k.id === id && I.ch > 0))) return 'No tienes espacio (6 casillas)'; return '';
@@ -44595,7 +44624,7 @@ function downhill(D, u) { /* the next step toward the sources (8 neighbours, the
   return best; }
 function moveTo(u, x, y, sp, dt, D) { let tx = x, ty = y; if (D) { const d = hyp(x - u.x, y - u.y); if (d > 140) { const nx = downhill(D, u); if (nx) { tx = nx[0]; ty = nx[1]; } } }
   const dx = tx - u.x, dy = ty - u.y, L = hyp(dx, dy); if (L < 2) return; const s2 = Math.min(L, sp * dt); u.a = Math.atan2(dy, dx); slide(u, u.x + dx / L * s2, u.y + dy / L * s2, u.sz || 24); }
-let FIELDS = null; function staticFields() { if (FIELDS) return FIELDS; FIELDS = { shop: field(Object.values(SHOPS).map(p => spotNear(p[0], p[1] - 100))), fount: field([spotNear(FOUNT[0], FOUNT[1] + 150)]), arena: field([spotNear((ARENA[0] + ARENA[2]) / 2, (ARENA[1] + ARENA[3]) / 2)]) }; return FIELDS; }
+let FIELDS = null; function staticFields() { if (FIELDS) return FIELDS; FIELDS = { shop: field(Object.values(SHOPS).map(p => spotNear(p[0], p[1] - 100))), per: Object.fromEntries(Object.entries(SHOPS).map(([k, p]) => [k, field([spotNear(p[0], p[1] - 100)])])), fount: field([spotNear(FOUNT[0], FOUNT[1] + 150)]), arena: field([spotNear((ARENA[0] + ARENA[2]) / 2, (ARENA[1] + ARENA[3]) / 2)]) }; return FIELDS; }
 function spawnSpot(Sr) { const A = staticFields().arena; for (let k = 0; k < 60; k++) { const x = Sr[0] + rnd() * (Sr[2] - Sr[0]), y = Sr[1] + rnd() * (Sr[3] - Sr[1]); const i = Math.floor((x - M0) / CELL), j = Math.floor((y - M0) / CELL); if (A[j * GWd + i] >= 0) return [x, y]; }
   const cx = (Sr[0] + Sr[2]) / 2, cy = (Sr[1] + Sr[3]) / 2; return spotNear(clamp(cx, ARENA[0] + 80, ARENA[2] - 80), clamp(cy, ARENA[1] + 80, ARENA[3] - 80)); } /* only where the monsters can walk into the arena */
 
@@ -44630,7 +44659,7 @@ function step(G, dt) {
     const d = hyp(tg.x - c.x, tg.y - c.y), sp = C.sp * ((c.e.slow || 0) > t ? 0.5 : 1);
     if (!c.lp || t > c.lpT) { if (c.lp && hyp(c.x - c.lp[0], c.y - c.lp[1]) < 20 && d > C.r + 120) { const p = spotNear(clamp(c.x, ARENA[0] + 120, ARENA[2] - 120), clamp(c.y, ARENA[1] + 120, ARENA[3] - 120)); c.x = p[0]; c.y = p[1]; } c.lp = [c.x, c.y]; c.lpT = t + 5; } /* stuck for 5 s: into the arena */
     if (d > C.r + (tg.sz || 24) * 0.6) moveTo(c, tg.x, tg.y, sp, dt, G.fH);
-    else if (c.atkT + C.as * ((c.e.slow || 0) > t ? 1.4 : 1) <= t) { c.atkT = t; c.a = Math.atan2(tg.y - c.y, tg.x - c.x); const dm = C.d * (c.small ? 0.4 : 1) * ((c.e.howl || 0) > t ? 0.75 : 1) * (1 + G.round * 0.05);
+    else if (c.atkT + C.as * ((c.e.slow || 0) > t ? 1.4 : 1) <= t) { c.atkT = t; c.a = Math.atan2(tg.y - c.y, tg.x - c.x); const dm = C.d * 1.8 * (c.small ? 0.4 : 1) * ((c.e.howl || 0) > t ? 0.75 : 1) * (1 + G.round * 0.05); /* like the original: two or three at once nearly kill you */
       if (C.shot) shoot(G, c, C.shot, c.a, dm, C.r + 120, false); else { hurt(G, c, tg, dm, false); ev(G, 'hit', tg.x | 0, tg.y | 0); }
       if (C.spl === 'spider' && !c.small && rnd() < 0.25) { tg.e.stun = t + 1.2; ev(G, 'web', tg.id); } } }
   // keep everybody from standing in one pile
@@ -44665,7 +44694,7 @@ function botThink(G, h, dt) {
   const go = (x, y, D) => { let tx = x, ty = y; if (D && hyp(x - h.x, y - h.y) > 160) { const n = downhill(D, h); if (n) { tx = n[0]; ty = n[1]; } } const dx = tx - h.x, dy = ty - h.y, L = hyp(dx, dy); h.in = L > 20 ? { dx: dx / L, dy: dy / L, m: 1 } : { dx: 0, dy: 0, m: 0 }; };
   if (G.ph === 'break') { // shop with the plan, then wait by the fountain
     const want = BOT_PLAN.slice(ai.plan).find(id => !ITEMS[id].rec || ITEMS[id].rec.every(r => h.inv.some(k => k.id === r)));
-    const F = staticFields(); if (want && h.gold >= ITEMS[want].c) { if (!atShop(h)) { const sp0 = Object.values(SHOPS)[0]; return go(sp0[0], sp0[1], F.shop); } const why = buy(G, h, want); if (!why || /espacio|No existe|arqueros/.test(why)) ai.plan = BOT_PLAN.indexOf(want) + 1; return; }
+    const F = staticFields(); if (want && h.gold >= ITEMS[want].c) { const sec = ITEMS[want].s; if (!atShop(h, sec)) { const sp0 = SHOPS[sec]; return go(sp0[0], sp0[1] - 100, F.per[sec]); } const why = buy(G, h, want); if (!why || /espacio|No existe|arqueros/.test(why)) ai.plan = BOT_PLAN.indexOf(want) + 1; return; }
     return go(FOUNT[0] + (h.pid % 5 - 2) * 70, FOUNT[1] + 200, F.fount); }
   if (G.ph === 'pick') { const F = staticFields(); return go(FOUNT[0], FOUNT[1] + 200, F.fount); }
   if (G.ph !== 'wave') return;
@@ -44714,8 +44743,8 @@ const CSS = `#og{position:fixed;inset:0;z-index:50;background:#07070d;touch-acti
 .ogb.cd{filter:grayscale(.8) brightness(.6)}.ogb b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 22px system-ui;text-shadow:0 2px 3px #000}
 #ogInv{position:absolute;right:12px;bottom:200px;display:flex;flex-direction:column;gap:6px}
 #ogInv button{width:44px;height:44px;border-radius:11px;border:2px solid #ffffff44;background:#000a;font-size:22px;position:relative;padding:0}#ogInv button i{position:absolute;right:1px;bottom:0;font:800 10px system-ui;font-style:normal}
-#ogShopB{position:absolute;left:50%;bottom:170px;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:#fff;font:900 13px system-ui;text-shadow:0 2px 3px #000}
-#ogShopB.on{display:flex}#ogShopB span{width:78px;height:78px;border-radius:22px;background:radial-gradient(#ffe36a,#d38b00);border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 4px 18px #ffb30088;animation:ogP 1s infinite}
+#ogShopB{position:absolute;left:50%;bottom:150px;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:1px;border:0;background:none;color:#fff;font:900 11px system-ui;text-shadow:0 2px 3px #000}
+#ogShopB.on{display:flex}#ogShopB span{width:48px;height:48px;border-radius:14px;background:radial-gradient(#ffe36a,#d38b00);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 18px #ffb30088;animation:ogP 1s infinite}
 #ogShopB.lock span{background:radial-gradient(#777,#333);animation:none;box-shadow:none}@keyframes ogP{50%{transform:scale(1.08)}}
 #ogMsg{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);font:900 26px Nunito,system-ui;text-align:center;text-shadow:0 3px 0 #000,0 0 18px #000;pointer-events:none;opacity:0;transition:opacity .3s;width:92vw}#ogMsg.on{opacity:1}#ogMsg small{display:block;font:700 14px system-ui;color:#ffe9a8;margin-top:6px}
 #ogOv{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#000a;z-index:5}#ogOv.on{display:flex}
@@ -44759,7 +44788,7 @@ function bindInput() {
   addEventListener('pointermove', e => { if (S && e.pointerId === sid) setStick(e.clientX - ox, e.clientY - oy); });
   const up = e => { if (!S || e.pointerId !== sid) return; sid = null; st.classList.remove('on'); kn.style.transform = ''; S.input = { dx: 0, dy: 0, m: 0 }; }; addEventListener('pointerup', up); addEventListener('pointercancel', up);
   $('#ogQ').addEventListener('pointerdown', e => { e.stopPropagation(); act('q'); }); $('#ogW').addEventListener('pointerdown', e => { e.stopPropagation(); act('w'); });
-  $('#ogShopB').addEventListener('click', () => { if (S.V && S.V.ph === 'break') shopOverlay(); else flash('🔒 Las tiendas abren al terminar la ronda'); });
+  $('#ogShopB').addEventListener('click', () => { if (!S.nearShop) return; if (S.V && S.V.ph === 'break') { S.tab = S.nearShop; shopOverlay(); } else flash('🔒 Las tiendas abren al terminar la ronda'); });
   $('#ogMenu').addEventListener('click', pauseMenu);
   const K = {}; const upd = () => { const dx = (K.ArrowRight || K.d ? 1 : 0) - (K.ArrowLeft || K.a ? 1 : 0), dy = (K.ArrowDown || K.s ? 1 : 0) - (K.ArrowUp || K.w ? 1 : 0); if (sid == null) { const L = hyp(dx, dy); S.input = L ? { dx: dx / L, dy: dy / L, m: 1 } : { dx: 0, dy: 0, m: 0 }; } };
   const kd = e => { if (!S || e.repeat) return; K[e.key] = 1; if (e.key === 'q') act('q'); if (e.key === 'e') act('w'); upd(); }, ku = e => { if (!S) return; K[e.key] = 0; upd(); };
@@ -44780,7 +44809,8 @@ function invHtml(inv, cls) { return (inv || []).map((s, i) => { const [id, ch] =
 function shopOverlay() {
   const ov = $('#ogOv'); ov.classList.add('on'); S.shopOpen = true; const h = myHero(); if (!h) return; const gold = h[8], inv = h[11] ? h[11].split(',') : [];
   const L = IL.filter(k => ITEMS[k].s === S.tab);
-  ov.innerHTML = `<div class="card"><b>🛒 Tiendas de la arena · 💰 ${gold}</b><div class="ogtabs">${SECTIONS.map(([k, ic, n]) => `<button data-t="${k}" class="${S.tab === k ? 'on' : ''}" type="button">${ic} ${n}</button>`).join('')}</div>
+  const SEC = SECTIONS.find(x => x[0] === S.tab) || SECTIONS[0];
+  ov.innerHTML = `<div class="card"><b>${SEC[1]} ${SEC[2]} · 💰 ${gold}</b>
     <div class="ogit">${L.map(k => { const I = ITEMS[k], no = gold < I.c; return `<div><em>${icon('og_i_' + k, I.ic)}</em><span>${I.n}<small>${I.d}</small></span><button data-b="${k}" class="${no ? 'no' : ''}" type="button">💰 ${I.c}</button></div>`; }).join('')}</div>
     <div class="ogwhy" id="ogWhy">${S.why || ''}</div><small style="font:700 11px system-ui;opacity:.8">Tus cosas (toca una para venderla a mitad de precio):</small><div class="oginv">${invHtml(inv)}</div><button class="go" id="ogClose" type="button">Listo</button></div>`;
   ov.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.tab = b.dataset.t; S.why = ''; shopOverlay(); });
@@ -44817,7 +44847,7 @@ function readClients(G) {
       if (k === 'q' || k === 'w') useSkill(G, h, k); else if (k === 'i') useItem(G, h, a | 0); else if (k === 'b' && ITEMS[a]) buy(G, h, a); else if (k === 's') sell(G, h, a | 0); else if (k === 'p' && G.ph === 'pick' && WEAP[a]) { h.wp = a; setWeapon(G, h); } } }
 }
 function onPhase(V, was) {
-  if (V.ph === 'break') { if (S.pickShown) closeOv(); if (V.r === 0) flash('¡A pelear, gladiadores!', 'Tienen ' + Math.round(V.pe) + ' s para comprar en las tiendas (abajo, toca 🛒)', 4200); }
+  if (V.ph === 'break') { if (S.pickShown) closeOv(); if (V.r === 0) flash('¡A pelear, gladiadores!', 'Sal de tu celda: en el patio están la fuente y las tiendas (' + Math.round(V.pe) + ' s). Acércate a cada tienda para ver lo que vende.', 4600); }
   if (V.ph === 'wave') { if (S.shopOpen) { closeOv(); flash('🔒 Tiendas cerradas', 'Abren al terminar la ronda'); } }
   if (V.ph === 'end') { snd(V.won ? 'win' : 'lose'); setTimeout(() => showEnd(false), 1200); }
 }
@@ -44851,9 +44881,9 @@ function hud(V) {
   btn(q, W && W.q, h[12]); btn(w, W && W.w, h[13]);
   const inv = h[11] ? h[11].split(',') : [], ik = h[11]; const iv = $('#ogInv'); if (iv._k !== ik) { iv._k = ik; iv.innerHTML = inv.map((s, i) => { const [id, ch] = s.split(':'), I = ITEMS[id]; return I && I.use ? `<button data-i="${i}" type="button">${icon('og_i_' + id, I.ic)}${+ch > 1 ? `<i>${ch}</i>` : ''}</button>` : ''; }).join(''); iv.querySelectorAll('[data-i]').forEach(b => b.addEventListener('pointerdown', e => { e.stopPropagation(); act('i', +b.dataset.i); snd('skill'); })); }
   // the shop button: shows up when you walk to the shops; open only in the break
-  const sb = $('#ogShopB'), nearS = Object.values(SHOPS).some(p => hyp(h[2] - p[0], h[3] - p[1]) < 380) && !h[10], open = V.ph === 'break';
-  sb.classList.toggle('on', nearS && V.ph !== 'pick' && V.ph !== 'end'); sb.classList.toggle('lock', !open); sb.querySelector('em').textContent = open ? 'Tienda' : '🔒 Cerrada'; sb.querySelector('span').textContent = open ? '🛒' : '🔒';
-  if (S.shopOpen && (!nearS || !open)) { closeOv(); if (!open) flash('🔒 Tiendas cerradas', 'Abren al terminar la ronda'); }
+  const sb = $('#ogShopB'); let near1 = null; if (!h[10]) for (const [k, p] of Object.entries(SHOPS)) if (hyp(h[2] - p[0], h[3] - p[1]) < SHOP_R) near1 = k; const open = V.ph === 'break', sec = SECTIONS.find(x => x[0] === near1);
+  sb.classList.toggle('on', !!near1 && V.ph !== 'pick' && V.ph !== 'end'); sb.classList.toggle('lock', !open); S.nearShop = near1; if (sec) { sb.querySelector('em').textContent = open ? sec[2] : '🔒 Cerrada'; sb.querySelector('span').textContent = open ? sec[1] : '🔒'; }
+  if (S.shopOpen && (!near1 || near1 !== S.tab || !open)) { closeOv(); if (!open) flash('🔒 Tiendas cerradas', 'Abren al terminar la ronda'); }
   const pk = V.h.map(q2 => q2[0] + ':' + q2[5] + ':' + q2[10]).join('|'); const pa = $('#ogParty'); if (pa._k !== pk) { pa._k = pk; pa.innerHTML = V.h.map(q2 => `<div class="${q2[10] ? 'dead' : ''}"><b style="color:${COLS[q2[16] % COLS.length]}">●</b><span>${esc(q2[15])}</span><i style="background:linear-gradient(90deg,#3c3 ${Math.round(q2[5] / q2[6] * 100)}%,#600 0)"></i>${q2[10] ? '💀' : WEAP[q2[9]] ? WEAP[q2[9]].ic : ''}</div>`).join(''); }
 }
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -44883,6 +44913,7 @@ function paintChunk(ci, cj) {
       g.fillRect(px, py, cs, cs); if (z === 'sand') { g.fillStyle = 'rgba(205,168,108,.55)'; g.fillRect(px, py, cs, cs); }
       if (z !== 'sand' && (Math.floor((x - M0) / CELL) + Math.floor((y - M0) / CELL)) % 2) { g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(px, py, cs, cs); } /* stone slabs */
       if (z === 'sand' && r < 0.04) { g.fillStyle = 'rgba(120,20,10,.22)'; g.beginPath(); g.ellipse(px + cs / 2, py + cs / 2, cs * 0.9, cs * 0.5, r * 9, 0, 7); g.fill(); } }
+    else if (((x > 1500 && y < -4500) || (x > 4400 && y < 0)) && (walkable(x + 48, y + 16) || walkable(x - 16, y + 16) || walkable(x + 16, y + 48) || walkable(x + 16, y - 16))) { /* the prisoners' cells: iron bars */ g.fillStyle = '#2a2624'; g.fillRect(px, py, cs, cs); g.fillStyle = '#9a9aa2'; for (let b = 3; b < cs; b += cs / 3) g.fillRect(px + b, py, Math.max(1.5, cs * 0.12), cs); g.fillStyle = '#6a6a72'; g.fillRect(px, py + cs * 0.15, cs, cs * 0.1); }
     else { /* walls: stone blocks, with a darker front face where the floor is in front (below) so they look tall */
       const front = walkable(x + 16, y - 16); g.fillStyle = r < 0.5 ? '#4a3f45' : '#463c42'; g.fillRect(px, py, cs, cs);
       g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1);
@@ -46651,7 +46682,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     online = null; W = null;
     window.AUTOS.start({ players, dur, lives, me: onl ? onl.mySlot : 0, online: onl ? { net: onl.net, game: onl.game, host: onl.host } : null });
   }
-  function loadUI(txt, p) { if (window.MM_LOADUI) return MM_LOADUI(txt, p); let o = document.getElementById('mmLoad'); if (txt === null) { if (o) o.remove(); return null; } if (!o) { o = document.createElement('div'); o.id = 'mmLoad'; o.style.cssText = 'position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;background:#14102a;color:#fff;font:800 17px system-ui;text-align:center;padding:20px'; document.body.appendChild(o); } o.textContent = txt; return o; }
+  function loadUI(txt, p, map) { if (window.MM_LOADUI) return MM_LOADUI(txt, p, map); let o = document.getElementById('mmLoad'); if (txt === null) { if (o) o.remove(); return null; } if (!o) { o = document.createElement('div'); o.id = 'mmLoad'; o.style.cssText = 'position:fixed;inset:0;z-index:99998;display:flex;align-items:flex-end;justify-content:center;padding-bottom:18vh;background:#14102a center/cover;color:#fff;font:800 17px system-ui;text-align:center;text-shadow:0 2px 3px #000'; if (map) o.style.backgroundImage = `url(assets/fx/load_${map.replace(/^estupido\d$/, 'estupido')}.webp), url(assets/fx/load_bg.webp)`; document.body.appendChild(o); } o.textContent = txt + (p != null ? ` ${Math.round(p * 100)}%` : ''); return o; }
   function waitPlayers(onl, cb) { /* everybody says "I have the map"; the host gives the go when all are ready (or after 30 s, so nobody waits forever) */
     const g = onl.game, seed = g.seed, net = onl.net, t0 = Date.now(); let done = false; try { net.room.presence({ mmReady: seed }); } catch (e) {}
     const fin = () => { if (done) return; done = true; clearInterval(iv); loadUI(null); cb(); };
@@ -46660,8 +46691,11 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
       if (onl.host) { if (ready >= total || Date.now() - t0 > 30000) { try { net.room.presence({ mmGo: seed }); } catch (e) {} fin(); } }
       else { const hp = net.hostPeer && net.hostPeer(); if ((hp && hp.presence && hp.presence.mmGo === seed) || Date.now() - t0 > 35000) fin(); } }, 250); }
   function start(onl) {
-    { const m1 = onl ? (onl.game && onl.game.map) || 'shroom25' : settings.map || 'shroom25'; if (window.MM_NEED && !MM_NEED(m1, () => start(onl))) return; }
-    if (onl && onl.game && onl._sync !== onl.game.seed) { waitPlayers(onl, () => { onl._sync = onl.game.seed; start(onl); }); return; } /* online: nobody starts until everybody has the map */ /* the published game loads each map's own files the first time you play it */
+    { const m1 = onl ? (onl.game && onl.game.map) || 'shroom25' : settings.map || 'shroom25';
+      if (!start._shown) { start._shown = true; const t0 = performance.now(); const tick = () => { const k = Math.min(1, (performance.now() - t0) / 700); loadUI('Cargando el mapa…', k * 0.9, m1); if (k < 1) requestAnimationFrame(tick); else start(onl); }; tick(); return; } /* every map opens with its loading screen (its wallpaper and the bar) */
+      if (window.MM_NEED && !MM_NEED(m1, () => start(onl))) return; }
+    if (onl && onl.game && onl._sync !== onl.game.seed) { waitPlayers(onl, () => { onl._sync = onl.game.seed; start(onl); }); return; } /* online: nobody starts until everybody has the map */
+    start._shown = false; loadUI(null); /* the published game loads each map's own files the first time you play it */
     { const m0 = onl ? onl.game && onl.game.map : settings.map; if (m0 === 'autos' && window.AUTOS) return startAutos(onl); if (m0 === 'orc' && window.ORC) return startOrc(onl); }
     online = onl || null;
     { const zb = document.getElementById('zDemoBar'); if (zb) zb.remove(); const zp = document.getElementById('zBldPop'); if (zp) zp.remove(); const zw = document.getElementById('zWait'); if (zw) zw.remove(); }
@@ -49196,7 +49230,7 @@ class Net {
     const cur = { aura: trainTry.aura || S.aura || 'anillo', spawn: trainTry.spawn || S.spawnFx || 'estandar', death: trainTry.death || S.deathFx || 'clasico' };
     let body = '';
     if (tab === 'char') { const GN = { shroom25: 'Escape Fantasía', kitty5: 'Corre Amigo Corre', bob: 'Corre Polar' }; const gm = trainPanel.game || (GN[trainCat] ? trainCat : 'shroom25'); trainPanel.game = gm; /* first a drop-down with the games; then the characters of that game */
-      body = `<div class="trdd"><button class="trddb" data-dd="1">🎮 ${GN[gm]} ▾</button>${trainPanel.ddOpen ? `<div class="trddl">${Object.entries(GN).map(([k, n]) => `<button data-gm="${k}" class="${k === gm ? 'on' : ''}">${n}</button>`).join('')}</div>` : ''}</div>` + L.chars.filter(c => c[0] === gm).map(([cat, id, lk, rd]) => { const C = SPR.MAN.chars[id]; const hd = ''; if (!rd) return hd + `<div class="tri soon"><img src="assets/spr/${C.thumb}" alt=""><small>⏳ ${esc(C.name)}</small></div>`; const on = trainCat === cat && Object.assign({}, S.skins || {}, trainTry.skins || {})[cat] === id; return hd + `<div class="tri${on ? ' on' : ''}" data-c="${cat}|${id}|${lk ? 1 : 0}"><img src="assets/spr/${C.thumb}" alt=""><small>${lk ? '🔒 ' : ''}${esc(C.name)}</small></div>`; }).join(''); }
+      body = `<div class="trdd"><button class="trddb" data-dd="1">🎮 ${GN[gm]} ▾</button>${trainPanel.ddOpen ? `<div class="trddl">${Object.entries(GN).map(([k, n]) => `<button data-gm="${k}" class="${k === gm ? 'on' : ''}">${n}</button>`).join('')}</div>` : ''}</div>` + L.chars.filter(c => c[0] === gm).map(([cat, id, lk, rd]) => { const C = SPR.MAN.chars[id]; const hd = ''; if (!rd) return hd + `<div class="tri soon" data-c="${cat}|${id}|1"><img src="assets/spr/${C.thumb}" alt=""><small>⏳ ${esc(C.name)}</small></div>`; /* not finished yet (missing sheets), but you can still try it here */ const on = trainCat === cat && Object.assign({}, S.skins || {}, trainTry.skins || {})[cat] === id; return hd + `<div class="tri${on ? ' on' : ''}" data-c="${cat}|${id}|${lk ? 1 : 0}"><img src="assets/spr/${C.thumb}" alt=""><small>${lk ? '🔒 ' : ''}${esc(C.name)}</small></div>`; }).join(''); }
     else body = L[tab].map(([id, n, lk]) => `<div class="tri${cur[tab] === id ? ' on' : ''}" data-f="${id}|${lk ? 1 : 0}">${(id === 'anillo' || /^[apd][0-9]+$/.test(id)) && window.fxThumbT ? fxThumbT(id === 'anillo' ? 'a60' : id, 54) : `<div class="trq">${tab === 'aura' ? '⭕' : tab === 'spawn' ? '✨' : '💥'}</div>`}<small>${lk ? '🔒 ' : ''}${esc(String(n).replace(/^Aura /, ''))}</small></div>`).join('');
     const sl = (($('#trainPanel').querySelector('.trg') || {}).scrollLeft) || 0; const sameTab = trainPanel.last === tab; trainPanel.last = tab;
     $('#trainPanel').innerHTML = `<div class="trt">${T.map(([k, n]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}">${n}</button>`).join('')}<button data-x="1">✕</button></div><div class="trg">${body || '<div class="hint">Aún no tienes nada de esto. Consíguelo en la tienda.</div>'}</div>`;
