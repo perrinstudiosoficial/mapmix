@@ -539,6 +539,7 @@ body.tcine #hud > *:not(#sprayWrap):not(#emoteWrap), body.tcine #stickBase{opaci
 #auOv .card{background:#141a2e;border:2px solid #ffe23b;border-radius:16px;padding:14px;color:#fff;display:flex;flex-direction:column;gap:8px;align-items:stretch;max-width:94vw;max-height:92vh;overflow:auto;text-align:center}
 #auOv .card>b{font:900 20px Nunito,system-ui}#auOv button{font:800 15px system-ui;padding:10px 14px;border-radius:11px;border:0;background:#2b3350;color:#fff}#auOv button.go{background:#2fa84f}
 #auOv .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;width:min(560px,90vw)}
+#auOv .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:min(560px,90vw)}#auOv .cm{background:#0006;border:2px solid #fff3;border-radius:10px;padding:4px;height:46px}#auOv .cm img{width:100%;height:100%;object-fit:contain}#auOv .cm.on{border-color:#ffe23b;background:#ffe23b33}
 #auOv .vm{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px!important;background:#1f2742!important;border:2px solid transparent!important}#auOv .vm.on{border-color:#ffe23b!important}
 #auOv .vm canvas{width:100px;height:60px;border-radius:6px}#auOv .vm span{font:800 11px system-ui}#auOv .vm em{font:800 10px system-ui;color:#ffe23b;font-style:normal;min-height:18px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;max-width:104px}#auOv .vm em svg{margin:0 -1px}
 #auOv .vbar{height:6px;background:#ffffff22;border-radius:3px;overflow:hidden}#auOv .vbar i{display:block;height:100%;background:#ffe23b}
@@ -41659,13 +41660,19 @@ function setupArena(W, opts) {
     else { const P = W.players[15]; P.name = 'El Pillador'; P.team = 1; P.slot = 1; P.ai = true; P.allies = new Set([15]); P.forceChar = (window.SPR && SPR.MAN && SPR.MAN.chars.orco) ? 'orco' : null; A.chaserP = P; A.ids.push(15); W.ai.bots.push({ p: P, t: 0, diff: ARENA_DIFF[opts.chaserDiff] ? opts.chaserDiff : 'normal' }); }
   }
   for (const a of A.ids) for (const c of A.ids) if (W.players[a].team === W.players[c].team) W.players[a].allies.add(c);
-  A.spawnOf = p => { let L = A.spots;
-    if (C.kind === 'team') { const side = p.team === 0 ? -1 : 1; const S = A.spots.filter(s => (s.x - A.midX) * side > (id === 'pudge' ? 0 : 900)); if (S.length) L = S; }
+  A.flip = W.rand() < 0.5; /* Perrin: the teams start on a different side each match */
+  A.spawnOf = (p, start) => { let L = A.spots;
+    if (C.kind === 'team' && id === 'pudge') { const side = (p.team === 0 ? -1 : 1) * (A.flip ? -1 : 1); const S = A.spots.filter(s => (s.x - A.midX) * side > 0); if (S.length) L = S; /* the river: each team on its bank, the bank changes */
+      if (start) { A.anc = A.anc || {}; const an = A.anc[p.team] || (A.anc[p.team] = L[Math.floor(W.rand() * L.length)]); const nr = L.filter(s => Math.hypot(s.x - an.x, s.y - an.y) < 900); if (nr.length) L = nr; } }
+    else if (C.kind === 'team') { const foes = A.heroes.filter(u => u.alive && u.owner.team !== p.team), mates = A.heroes.filter(u => u.alive && u.owner.team === p.team && u.owner !== p);
+      if (start || !foes.length) { A.anc = A.anc || {}; if (!A.anc[p.team]) { const o = A.anc[1 - p.team]; if (!o) A.anc[p.team] = A.spots[Math.floor(W.rand() * A.spots.length)]; else { const far = A.spots.slice().sort((a, b) => Math.hypot(b.x - o.x, b.y - o.y) - Math.hypot(a.x - o.x, a.y - o.y)); A.anc[p.team] = far[Math.floor(W.rand() * Math.max(1, Math.floor(far.length / 6)))]; } }
+        const an = A.anc[p.team], nr = A.spots.filter(s => Math.hypot(s.x - an.x, s.y - an.y) < 800); if (nr.length) L = nr; } /* the team starts together at a random place, the other team far away */
+      else { const sc = s => Math.min(...foes.map(u => Math.hypot(s.x - u.x, s.y - u.y))) + (mates.length ? Math.min(600, Math.min(...mates.map(u => Math.hypot(s.x - u.x, s.y - u.y)))) * 0.5 : 0); const R = A.spots.slice().sort((a, b) => sc(b) - sc(a)); L = R.slice(0, Math.max(1, Math.ceil(R.length / 5))); } } /* back from death: a safe place far from the enemies (and not on top of your mates) */
     const hunters = A.heroes.filter(u => A.isHunter(u) && u.owner !== p);
     if (isChase(C) && hunters.length && !A.isHunter(W.heroOf(p) || {})) { const far = A.spots.filter(s => hunters.every(h => Math.hypot(s.x - h.x, s.y - h.y) > 1400)); if (far.length) L = far; }
     return L[Math.floor(W.rand() * L.length)] || { x: 0, y: 0 }; };
   A.isHunter = u => !!u && (C.kind === 'tag' ? A.chaser === u : C.kind === 'infect' ? A.zomb.has(u.owner && u.owner.id) : false);
-  for (const pid of A.ids) { const p = W.players[pid], s = A.spawnOf(p); const u = W.createUnit(p, fourcc('E000'), s.x, s.y, p.team === 1 ? 180 : 0); u.amax = C.hp || 100; u.ahp = u.amax; u.baseSpd = C.speed || 360; u.speed = u.defSpeed = u.baseSpd; A.heroes.push(u); A.kills[pid] = 0; A.deaths[pid] = 0; A.charges[pid] = 0; if (A.chaserP === p) A.chaser = u; arenaMove(A, u, s.x, s.y); }
+  for (const pid of A.ids) { const p = W.players[pid], s = A.spawnOf(p, true); const u = W.createUnit(p, fourcc('E000'), s.x, s.y, p.team === 1 ? 180 : 0); u.amax = C.hp || 100; u.ahp = u.amax; u.baseSpd = C.speed || 360; u.speed = u.defSpeed = u.baseSpd; A.heroes.push(u); A.kills[pid] = 0; A.deaths[pid] = 0; A.charges[pid] = 0; if (A.chaserP === p) A.chaser = u; arenaMove(A, u, s.x, s.y); }
   A.skillsOf = u => (A.isHunter(u) ? C.chaser : C.skills);
   A.ready = (u, k) => Math.max(0, (A.cd.get(u.handle + ':' + k) || 0) - W.time);
   A.say = (txt, col) => { W.emit('text', (col ? '|c' + col : '') + txt + (col ? '|r' : '')); if (!A.client) A.fxLog.push({ id: ++A.fxId, k: 'say', txt, col, t: W.time }); };
@@ -41725,7 +41732,7 @@ function arenaTagEnd(A) {
 // ---------------- zombies: one infected at the start, every bite makes a new zombie ----------------
 function arenaInfStart(A) {
   const W = A.W; A.round++; A.roundEnd = W.time + A.C.roundT + 8; A.zomb.clear();
-  for (const u of A.heroes) { u.owner.forceChar = null; u.baseSpd = 360; const s = A.spawnOf(u.owner); if (!u.alive) arenaRevive(A, u, s.x, s.y); else arenaMove(A, u, s.x, s.y); }
+  A.anc = null; A.flip = W.rand() < 0.5; for (const u of A.heroes) { u.owner.forceChar = null; u.baseSpd = 360; const s = A.spawnOf(u.owner, true); if (!u.alive) arenaRevive(A, u, s.x, s.y); else arenaMove(A, u, s.x, s.y); }
   A.cd.clear(); A.infAt = W.time + 8;
   A.say('Ronda ' + A.round + '/' + A.C.rounds + ' · ¡En 8 segundos alguien se convierte en zombi! Escóndete', 'ff8cff6a');
 }
@@ -41973,7 +41980,7 @@ function arenaBots(A, dt) {
     const d = td || 1, nx = (u.x - tgt.x) / d, ny = (u.y - tgt.y) / d, side = Math.random() < 0.5 ? 1 : -1;
     const k2 = d > want + 150 ? -1 : d < want - 150 ? 1 : 0, r = 240 * (0.5 + D.keep);
     botGo(W, u, u.x + nx * r * k2 + -ny * 170 * side, u.y + ny * r * k2 + nx * 170 * side);
-    if (A.id === 'pudge') { const keep = (u.owner.team === 0 ? -1 : 1); if ((u.order && (u.order.x - A.midX) * keep < 40)) u.order.x = A.midX + keep * 80; }
+    if (A.id === 'pudge') { const keep = (u.owner.team === 0 ? -1 : 1) * (A.flip ? -1 : 1); if ((u.order && (u.order.x - A.midX) * keep < 40)) u.order.x = A.midX + keep * 80; }
   }
 }
 function botTag(A, b, u, D) {
@@ -42230,8 +42237,8 @@ function arenaItemsSetup(A, opts) {
   A.gold = {}; A.inv = {}; A.buff = {}; A.icd = {}; A.illus = []; A.summ = []; A.mines = []; A.walls = []; A.runes = []; A.runeT = RUNE_FIRST; A.spec = {};
   for (const id of A.ids) { A.gold[id] = GOLD_START; A.inv[id] = []; A.buff[id] = {}; }
   // a shop stall at each team's side, near where it comes back to life
-  const side = t => { const L = A.spots.filter(s => (s.x - A.midX) * (t === 0 ? -1 : 1) > (A.id === 'pudge' ? 250 : 1200)); const ax = L.reduce((a, s) => a + s.x, 0) / Math.max(1, L.length), ay = L.reduce((a, s) => a + s.y, 0) / Math.max(1, L.length); let best = L[0] || { x: 0, y: 0 }, bd = Infinity; for (const s of L) { const d = Math.hypot(s.x - ax, s.y - ay); if (d < bd) { bd = d; best = s; } } return { x: best.x, y: best.y }; };
-  A.shopAt = [side(0), side(1)];
+  const side = t => { const L = A.spots.filter(s => (s.x - A.midX) * (t === 0 ? -1 : 1) * (A.id === 'pudge' && A.flip ? -1 : 1) > (A.id === 'pudge' ? 250 : 1200)); const ax = L.reduce((a, s) => a + s.x, 0) / Math.max(1, L.length), ay = L.reduce((a, s) => a + s.y, 0) / Math.max(1, L.length); let best = L[0] || { x: 0, y: 0 }, bd = Infinity; for (const s of L) { const d = Math.hypot(s.x - ax, s.y - ay); if (d < bd) { bd = d; best = s; } } return { x: best.x, y: best.y }; };
+  A.shopAt = [side(0), side(1)]; if (A.id !== 'pudge' && A.anc) A.shopAt = [A.anc[0] || A.shopAt[0], A.anc[1] || A.shopAt[1]]; /* the shop is where your team started */
   if (A.id === 'pudge') { let ya = Infinity, yb = -Infinity; for (let j = 0; j < W.PW; j++) { const y = -6144 + j * 32 + 16; if (y < A.bounds[1] || y > A.bounds[3]) continue; const i = Math.floor((A.midX + 6144) / 32); if (!W.walkableCell(i, j)) { ya = Math.min(ya, y); yb = Math.max(yb, y); } } A.river = { x: A.midX, y0: isFinite(ya) ? ya : A.bounds[1], y1: isFinite(yb) ? yb : A.bounds[3] }; }
   // where runes appear: one place for each side of the river (hooks), else the top and the bottom of the middle
   { const ys = A.spots.map(s => s.y), y0 = Math.min(...ys), y1 = Math.max(...ys), my = (y0 + y1) / 2; const pick = (x, y, f) => { let best = null, bd = Infinity; for (const s of A.spots) { if (f && !f(s)) continue; const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; best = s; } } return best; };
@@ -42728,7 +42735,7 @@ useIcons(ZH, 'zh_', 'zi_'); useIcons(ZZ, 'zz_'); useIcons(ZI, 'zt_');
 for (const k in ZSK) if (FX_HAVE.has('zk_' + k)) ZSK[k].img = 'zk_' + k;
 const ZSHOPS = { // zombie shops in the middle of the map (original positions)
   'Cripta': [-896, 192], 'Vendedor de recetas': [115, 142], 'Tumba de reliquias': [-896, -960], 'Tienda embrujada': [128, -896], 'Tienda secreta': [-622, -2824] };
-const NEUTRAL_FACTORIES = [[-2816, 832], [-896, -5184], [4672, 448], [4608, -2432], [-4096, -4544], [576, 3776], [-2496, 4736], [3712, -3328], [-4608, 1280], [1280, -2944], [-3200, -3648], [768, -1408], [4928, 1792], [3328, -2816], [-256, 3520], [-3648, 4160], [5248, 448], [2816, 4160], [2432, 3648], [1344, -4288]];
+const NEUTRAL_FACTORIES = [[-2816, 832], [-896, -5184], [4672, 448], [4608, -2432], [-4096, -4544], [576, 3776], [-2496, 4736], [3712, -3328], [-4608, 1280], [1280, -2944], [-3200, -3648], [768, -1408], [4928, 1792], [3328, -2816], [-256, 3520], [-3648, 4160], [5248, 448], [2816, 4160], [2432, 3648], [1344, -4288], [-5264, 4992], [-5792, 4544], [5136, 3616], [-3472, 2304]]; /* the last 4: yellow houses of the original map that were missing */
 const HUMAN_ZONE = [-400, -448], ZOMBIE_ZONE = [-400, -448]; /* in the original everybody appears in the middle (Create_Zone); the zombies wait there, next to their shops */
 const RAISE_T = 15, PICK_T = 15; /* the zombies wake up 30 s after the start */
 Object.entries({"barricade": "zi_barricade", "adv": "zi_barricade", "stone": "zi_stone", "super": "zi_stone", "burrow": "zi_stone", "research": "zi_research", "exchange": "zi_exchange", "trade": "zi_exchange", "factory": "zi_factory", "flag": "zi_flag", "core": "zi_core", "gen": "zi_core", "turret": "zi_turret", "rocket": "zi_turret", "electric": "zi_turret", "frost": "zi_turret", "warehouse": "zi_warehouse"}).forEach(([k, v]) => { ZB[k].img = v; }); Object.entries({"walls": "zi_stone", "dmg": "zi_dmg", "range": "zi_range", "hp": "zi_hp", "attach": "zi_attach", "power": "zi_power", "ensnare": "zi_ensnare", "rapid": "zi_rapid", "income": "zi_factory"}).forEach(([k, v]) => { ZR[k].img = v; }); Object.entries({"droid": "zi_droid", "plasma": "zi_storm", "heavy": "zi_heavy", "ranger": "zi_ranger", "pyro": "zi_pyro", "engineer": "zi_engineer", "medic": "zi_medic", "sheep": "zi_sheep", "sniper": "zi_range", "commando": "zi_scan"}).forEach(([k, v]) => { ZH[k].img = v; }); Object.entries({"ensnare": "zi_ensnare", "rapid": "zi_rapid", "barrel": "zi_barrel", "pgren": "zi_pgren", "storm": "zi_storm", "firewall": "zi_pyro", "adren": "zi_medic", "antidote": "zi_shield", "repairbot": "zi_engineer", "sentry": "zi_turret", "missiles": "zi_heavy", "ksheep": "zi_sheep", "smoke": "zi_ranger", "gren": "zi_barrel", "mark": "zi_range", "orbital": "zi_scan", "blink": "zi_blink"}).forEach(([k, v]) => { ZSK[k].img = v; }); /* the picture set made for this map */
@@ -43266,6 +43273,7 @@ function zCity(A, hz, zz) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MA
   let reach = new Uint8Array(PW * PH); const fillReach = () => { reach = new Uint8Array(PW * PH); const s0 = Math.floor((hz.y - M0) / C) * PW + Math.floor((hz.x - M0) / C), F = [s0]; reach[s0] = 1; for (let q = 0; q < F.length; q++) { const k = F[q], i = k % PW; for (const n of [k + 1, k - 1, k + PW, k - PW]) { if (n < 0 || n >= PW * PH || reach[n] || W.pbase[n] || W.pdyn[n]) continue; if ((n === k + 1 && i === PW - 1) || (n === k - 1 && i === 0)) continue; reach[n] = 1; F.push(n); } } }; fillReach(); /* trees and spikes block too */
   const cellK = (x, y) => Math.floor((y - M0) / C) * PW + Math.floor((x - M0) / C);
   { /* a factory nobody can walk to (it is in the original map data, but behind walls) is taken out */ const ok = f => { const k = cellK(f.x, f.y); for (let dj = -3; dj <= 3; dj++) for (let di = -3; di <= 3; di++) if (reach[k + dj * PW + di]) return true; return false; };
+    for (const f of A.facs) if (!ok(f)) { const k0 = cellK(f.x, f.y), i0 = k0 % PW, j0 = (k0 / PW) | 0; let best = null; for (let r = 1; r <= 40 && !best; r++) for (let dj = -r; dj <= r && !best; dj++) for (let di = -r; di <= r; di++) { const k = (j0 + dj) * PW + i0 + di; if (reach[k] && !W.pbase[k]) { best = [M0 + (i0 + di) * C + 16, M0 + (j0 + dj) * C + 16]; break; } } if (best) { f.x = best[0]; f.y = best[1]; } } /* a factory behind walls moves to the nearest street instead of vanishing (all the original yellow houses count) */
     A.facsOff = A.facs.filter(f => !ok(f)).length; A.facs = A.facs.filter(ok); A.facs.forEach((f, i) => { f.i = i; }); }
   { /* the bases: around each factory a big closed yard (bare brown ground, nothing inside: no houses, no spikes) with ONE way in
        (4 cells: 2 barricades close it). Factories close together share one yard. Very big yards may get a second way in, only if
@@ -43476,8 +43484,8 @@ function zBaseVis(A) { const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN,
     for (const r of A.cityR || []) { const m = r.m || 0, box = (x0, y0, x1, y1) => { for (let j = Math.ceil((y0 - M0) / C - 0.5); (M0 + (j + 0.5) * C) <= y1; j++) for (let i = Math.ceil((x0 - M0) / C - 0.5); (M0 + (i + 0.5) * C) <= x1; i++) if (i >= 0 && j >= 0 && i < PW && j < PH) rd[j * PW + i] = 1; };
       box(r.x - hh, r.y - hh, r.x + hh, r.y + hh); if (m & 1) box(r.x - hh, r.y, r.x + hh, r.y + HH); if (m & 2) box(r.x, r.y - hh, r.x + HH, r.y + hh); if (m & 4) box(r.x - hh, r.y - HH, r.x + hh, r.y); if (m & 8) box(r.x - HH, r.y - hh, r.x, r.y + hh); }
     const vis = new Uint8Array(N), dist = new Int16Array(N).fill(-1), Q = []; for (let k = 0; k < N; k++) if (A.cityBase[k]) { vis[k] = 1; dist[k] = 0; Q.push(k); }
-    for (let q = 0; q < Q.length; q++) { const k = Q[q], i = k % PW; if (dist[k] >= 70) continue; for (const nb of [k + 1, k - 1, k + PW, k - PW]) { if (nb < 0 || nb >= N || dist[nb] >= 0) continue; if ((nb === k + 1 && i === PW - 1) || (nb === k - 1 && i === 0)) continue; if (rd[nb] || (A.cityCourt && A.cityCourt[nb]) || !W.walkable(M0 + (nb % PW) * C + 16, M0 + ((nb / PW) | 0) * C + 16)) continue; dist[nb] = dist[k] + 1; vis[nb] = 1; Q.push(nb); } }
-    for (let k = 0; k < N; k++) if (!vis[k] && !rd[k] && W.walkable(M0 + (k % PW) * C + 16, M0 + ((k / PW) | 0) * C + 16)) { const i = k % PW; let n = 0; for (const nb of [k + 1, k - 1, k + PW, k - PW]) if (nb >= 0 && nb < N && vis[nb]) n++; if (n >= 3) vis[k] = 1; } /* no grey specks left between brown */
+    for (let q = 0; q < Q.length; q++) { const k = Q[q], i = k % PW; if (dist[k] >= 70) continue; for (const nb of [k + 1, k - 1, k + PW, k - PW]) { if (nb < 0 || nb >= N || dist[nb] >= 0) continue; if ((nb === k + 1 && i === PW - 1) || (nb === k - 1 && i === 0)) continue; if (rd[nb] || (A.cityCourt && A.cityCourt[nb]) || (!W.walkable(M0 + (nb % PW) * C + 16, M0 + ((nb / PW) | 0) * C + 16) && !(A.cityD && A.cityD[nb] >= 1))) continue; /* under trucks and junk too: the ground there is the same ground */ dist[nb] = dist[k] + 1; vis[nb] = 1; Q.push(nb); } }
+    for (let k = 0; k < N; k++) if (!vis[k] && !rd[k] && (W.walkable(M0 + (k % PW) * C + 16, M0 + ((k / PW) | 0) * C + 16) || (A.cityD && A.cityD[k] >= 1))) { const i = k % PW; let n = 0; for (const nb of [k + 1, k - 1, k + PW, k - PW]) if (nb >= 0 && nb < N && vis[nb]) n++; if (n >= 3) vis[k] = 1; } /* no grey specks left between brown */
     A.cityBaseVis = vis; A._rd = rd; A._bd = dist; }
 function zCityPaint(A, g, x0, y0, x1, y1, BM) { const SM = BM ? BM[0] : 1, EX = BM ? BM[1] : 0, EY = BM ? BM[2] : 0; /* draw with setTransform (no save/restore: much faster) */ const W = A.W, PW = W.PW, PH = W.PH || PW, M0 = W.MAPMIN, C = 32, D = A.cityD, RL = A.cityRL, P = zCityPats(g); if (!P.real) A._cityMiss = true;
   const i0 = Math.max(0, Math.floor((x0 - M0) / C) - 1), i1 = Math.min(PW - 1, Math.ceil((x1 - M0) / C) + 1), j0 = Math.max(0, Math.floor((y0 - M0) / C) - 1), j1 = Math.min(PH - 1, Math.ceil((y1 - M0) / C) + 1);
@@ -43827,7 +43835,7 @@ function bfs(g, from, block) {
 function newMatch(o) {
   const G = { t: 0, ph: 'vote', voteEnd: 5.4, votes: {}, mi: -1, g: null, cars: [], dur: o.dur, lives: o.lives, tl: o.dur, stars: [], boxes: [], hz: [], pr: [], tn: [], ev: [], evSeq: 0,
     stop: null, boxT: 0, rank: null, players: o.players, seq: 0, uid: 1 };
-  for (const p of o.players) G.cars.push({ id: p.id, name: p.name, col: p.col, bot: !!p.bot, diff: DIFF[p.diff] || DIFF.normal, x: 0, y: 0, a: 0, v: 0, lives: o.lives || 0, out: false, hurt: 0, pw: null, starT: 0,
+  for (const p of o.players) G.cars.push({ id: p.id, name: p.name, col: p.col, mdl: p.bot ? (rnd() * 8) | 0 : 0, bot: !!p.bot, diff: DIFF[p.diff] || DIFF.normal, x: 0, y: 0, a: 0, v: 0, lives: o.lives || 0, out: false, hurt: 0, pw: null, starT: 0,
     e: {}, in: { dx: 0, dy: 0, m: 0 }, ai: { t: 0, tx: 0, ty: 0, hold: 0 }, stuck: 0, hornT: 6 + rnd() * 10, votes: -1 });
   for (const c of G.cars) if (c.bot) G.votes[c.id] = (rnd() * AU_MAPS.length) | 0;
   return G;
@@ -43867,7 +43875,7 @@ function passStar(G, from) {
 }
 // a power (or a bomb, a missile...) hit this car
 function hurt(G, c, by) {
-  if (!c || c.out || c.hurt > G.t || (c.e.invul || 0) > G.t || c.e.jump) return false;
+  if (!c || c.out || c.hurt > G.t || (c.e.invul || 0) > G.t || c.e.jump || (by != null && by === c.id)) return false; /* your own power never hurts you */
   if (c.e.shield) { c.e.shield = 0; ev(G, 'pop', c.id); return false; }
   c.hurt = G.t + 3; c.e.spin = 0; c.e.frozen = 0; c.e.foot = 0; c.e.tor = null; c.v *= 0.3;
   ev(G, 'hit', c.id, by == null ? -1 : by);
@@ -44055,7 +44063,7 @@ function flyStep(G, p, dt) {
       const ck = cellOf(p.y) * g.w + cellOf(p.x); if (!p.trail.includes(ck)) { p.trail.push(ck); G.hz.push({ id: G.uid++, k: 'fire', x: mid(cellOf(p.x)), y: mid(cellOf(p.y)), r: 20, until: t + 3, by: p.by, arm: t + 0.4 }); }
       if (Math.hypot(T.x - p.x, T.y - p.y) < 26) { G.pr.splice(G.pr.indexOf(p), 1); fireBlast(G, p.x, p.y, p.by); } return; } }
   if (p.k === 'fire') { const nx = p.x + Math.cos(p.a) * p.sp * dt, ny = p.y + Math.sin(p.a) * p.sp * dt; const ck = cellOf(ny) * g.w + cellOf(nx);
-    if (!p.trail.includes(ck) && !isWall(g, cellOf(nx), cellOf(ny))) { p.trail.push(ck); G.hz.push({ id: G.uid++, k: 'fire', x: mid(cellOf(nx)), y: mid(cellOf(ny)), r: 20, until: t + 3, by: p.by, arm: t + 0.25 }); }
+    if (p.x0 == null) { p.x0 = p.x; p.y0 = p.y; } if (!p.trail.includes(ck) && !isWall(g, cellOf(nx), cellOf(ny)) && Math.hypot(nx - p.x0, ny - p.y0) > CS * 1.6) { p.trail.push(ck); /* the fire starts burning a bit ahead of you, not under your car */ G.hz.push({ id: G.uid++, k: 'fire', x: mid(cellOf(nx)), y: mid(cellOf(ny)), r: 20, until: t + 3, by: p.by, arm: t + 0.25 }); }
     let hitCar = G.cars.find(c => c.id !== p.by && !c.out && c.hurt <= t && !c.e.jump && Math.hypot(c.x - nx, c.y - ny) < 26);
     if (isWall(g, cellOf(nx), cellOf(ny)) || hitCar) { G.pr.splice(G.pr.indexOf(p), 1); fireBlast(G, isWall(g, cellOf(nx), cellOf(ny)) ? p.x : nx, isWall(g, cellOf(nx), cellOf(ny)) ? p.y : ny, p.by); return; }
     p.x = nx; p.y = ny; return; }
@@ -44137,7 +44145,7 @@ function snap(G) {
     if ((e.frozen || 0) > t) f |= 64; if ((e.spin || 0) > t) f |= 128; if ((e.slow || 0) > t) f |= 256; if ((e.foot || 0) > t) f |= 512; if ((e.turbo || 0) > t || (e.boost || 0) > t) f |= 1024; if (e.jump) f |= 2048; if (e.tor) f |= 4096; if (c.out) f |= 8192; if ((e.ink || 0) > t) f |= 16384; return f; };
   const vc = AU_MAPS.map(() => 0); for (const k in G.votes) vc[G.votes[k]]++;
   return { ph: G.ph, t: Math.round(t * 100) / 100, tl: Math.round(G.tl * 10) / 10, dur: G.dur, lv: G.lives, mi: G.mi, vl: G.ph === 'vote' ? Math.max(0, G.voteEnd - t) : 0, vc, cl: G.ph === 'count' ? Math.max(0, G.cntEnd - t) : 0,
-    pl: G.cars.map(c => [c.id, c.name, c.col]),
+    pl: G.cars.map(c => [c.id, c.name, c.col, c.mdl || 0]),
     c: G.cars.map(c => [c.id, Math.round(c.x), Math.round(c.y), Math.round(c.a * 100) / 100, F(c), c.lives, Math.round(c.starT * 10) / 10, c.pw ? PWL.indexOf(c.pw) : -1, c.e.jump ? Math.round(Math.sin(clamp((t - c.e.jump.t0) / c.e.jump.d, 0, 1) * Math.PI) * 100) / 100 : 0]),
     st: G.stars.map(S1 => [S1.h, Math.round(S1.x), Math.round(S1.y)]), bx: G.boxes.map(b => [Math.round(b.x), Math.round(b.y), b.trap ? 1 : 0]),
     hz: G.hz.map(h => [HZK.indexOf(h.k), Math.round(h.x), Math.round(h.y), Math.round((h.until - t) * 10) / 10, h.d4 || 0]),
@@ -44177,7 +44185,7 @@ function rr(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w
 /* the cars are Perrin's white pictures (top view, nose to the right), painted with each player's color only where the body is white */
 const CAR_IM = {}, CAR_TINT = {};
 function carBase(n) { let o = CAR_IM[n]; if (!o) { o = CAR_IM[n] = { b: new Image(), m: new Image() }; o.b.src = window.FX ? FX(n) : 'assets/fx/' + n + '.webp'; o.m.src = window.FX ? FX(n + 'm') : 'assets/fx/' + n + 'm.webp'; } return o.b.complete && o.b.naturalWidth && o.m.complete && o.m.naturalWidth ? o : null; }
-function carSprite(id, col) { let n = 'au_car' + (1 + (Math.abs(id | 0) % 8)); if (!carBase(n)) n = 'au_car' + (1 + (Math.abs(id | 0) % 2)); /* 8 models: Perrin's 2 + his 6 new ones */ const k = n + col; if (CAR_TINT[k]) return CAR_TINT[k]; const o = carBase(n); if (!o) return null;
+function carSprite(id, col, mdl) { let n = 'au_car' + (1 + ((mdl == null ? Math.abs(id | 0) : mdl) % 8)); if (!carBase(n)) n = 'au_car1'; /* the car each player chose (8 models: Perrin's 2 + his 6 new ones) */ const k = n + col; if (CAR_TINT[k]) return CAR_TINT[k]; const o = carBase(n); if (!o) return null;
   const W = o.b.naturalWidth, H = o.b.naturalHeight, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
   const p = document.createElement('canvas'); p.width = W; p.height = H; const q = p.getContext('2d'); q.drawImage(o.m, 0, 0); q.globalCompositeOperation = 'source-in'; q.fillStyle = col; q.fillRect(0, 0, W, H);
   g.drawImage(o.b, 0, 0); g.globalCompositeOperation = 'multiply'; g.drawImage(p, 0, 0); g.globalCompositeOperation = 'destination-in'; g.drawImage(o.b, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 0.18; g.drawImage(o.m, 0, 0); /* a little shine back */
@@ -44200,7 +44208,7 @@ function drawCar(x, c, col, now, me) {
     x.fillStyle = col; x.beginPath(); x.arc(0, -13.5, 6, Math.PI * 0.95, Math.PI * 2.15); x.fill(); x.fillStyle = '#1d2a3a'; x.fillRect(2.5, -14.5, 4, 2.6); /* helmet + visor */
     x.restore(); return; }
   if (f & 1024) { const k = 0.6 + Math.random() * 0.6; x.fillStyle = '#ffb300'; x.beginPath(); x.moveTo(-16, -6); x.lineTo(-16 - 22 * k, 0); x.lineTo(-16, 6); x.fill(); x.fillStyle = '#ff3d00'; x.beginPath(); x.moveTo(-16, -3); x.lineTo(-16 - 13 * k, 0); x.lineTo(-16, 3); x.fill(); }
-  const cim = carSprite(id, col); if (cim) { const w = 38, h = w * cim.height / cim.width; x.fillStyle = 'rgba(0,0,0,.28)'; x.beginPath(); x.ellipse(2, 3, w * 0.48, h * 0.42, 0, 0, 7); x.fill(); x.drawImage(cim, -w / 2, -h / 2, w, h); } else {
+  const cim = carSprite(id, col, mdlOf(S.V, id)); if (cim) { const w = 38, h = w * cim.height / cim.width; x.fillStyle = 'rgba(0,0,0,.28)'; x.beginPath(); x.ellipse(2, 3, w * 0.48, h * 0.42, 0, 0, 7); x.fill(); x.drawImage(cim, -w / 2, -h / 2, w, h); } else {
   // (fallback while the picture loads) wheels, body, windows, lights
   x.fillStyle = '#111'; for (const [wx, wy] of [[-11, -12], [7, -12], [-11, 9], [7, 9]]) x.fillRect(wx, wy, 8, 4);
   x.fillStyle = col; rr(x, -17, -10, 34, 20, 7); x.fill(); x.strokeStyle = 'rgba(0,0,0,.45)'; x.lineWidth = 2; x.stroke();
@@ -44234,7 +44242,7 @@ function drawBox(x, X, Y, now, trap) {
   x.fillStyle = '#fff'; x.font = '900 17px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineWidth = 3; x.strokeStyle = '#7a4a12'; x.strokeText('?', 0, 1); x.fillText('?', 0, 1); x.restore();
 }
 /* the giant stone head looks where you threw it: 0 right, 1 down, 2 left, 3 up (Perrin's side and back pictures when they come; until then the same head turned) */
-const STV = {}; function statueView(im, d) { const k = d; if (STV[k]) return STV[k]; const own = auIm(['au_statue_side', 'au_statue_statue', 'au_statue_side', 'au_statue_back'][d]); if (own && own !== im) return STV[k] = own;
+const STV = {}, OILG = {}; function statueView(im, d) { const k = d; if (STV[k]) return STV[k]; const own = auIm(['au_statue_side', 'au_statue_statue', 'au_statue_side', 'au_statue_back'][d]); if (own && own !== im) return STV[k] = own;
   if (d === 1) return im; const W = im.width, H = im.height, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.drawImage(im, 0, 0);
   g.globalCompositeOperation = 'source-atop'; if (d === 3) { g.fillStyle = '#7f7b74'; g.fillRect(0, H * 0.2, W, H * 0.8); g.fillStyle = 'rgba(0,0,0,.18)'; for (let q = 1; q < 5; q++) g.fillRect(W * q / 5, H * 0.25, 2, H * 0.6); g.fillStyle = 'rgba(90,140,60,.5)'; g.fillRect(W * 0.2, H * 0.7, W * 0.25, H * 0.08); } /* the back: plain stone, no face */
   else { g.fillStyle = '#7f7b74'; g.fillRect(0, H * 0.25, W * 0.62, H * 0.75); g.globalCompositeOperation = 'source-over'; g.fillStyle = '#6a665f'; g.beginPath(); g.moveTo(W * 0.62, H * 0.3); g.lineTo(W * 0.96, H * 0.5); g.lineTo(W * 0.66, H * 0.62); g.closePath(); g.fill(); g.fillStyle = '#3c3a36'; g.fillRect(W * 0.5, H * 0.38, W * 0.12, H * 0.05); g.fillRect(W * 0.55, H * 0.78, W * 0.3, H * 0.04); } /* in profile: nose and mouth toward where it looks */
@@ -44243,7 +44251,8 @@ function drawStatue(x, im, d) { const v = statueView(im, d), w = 58, hh = w * v.
 function drawHazard(x, h, now) {
   const [k, X, Y, left] = h, K = HZK[k]; x.save(); x.translate(X, Y); x.globalAlpha = left < 1 ? Math.max(0.15, left) : 1;
   { const nm = { oil: 'au_oil_puddle', slow: 'au_slow_goo', statue: 'au_statue_statue', fire: 'au_fire_floor' }[K], im = nm && auIm(nm); /* Perrin's pictures when they're loaded */
-    if (im && K === 'statue') { drawStatue(x, im, h[4] || 0); x.restore(); return; }
+    if (im && K === 'statue') { drawStatue(x, im, 1); /* always looking at the camera (Perrin) */ x.restore(); return; }
+    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 60, hh = w * v.height / v.width; x.drawImage(v, -w / 2, -hh / 2, w, hh); x.restore(); return; } /* green slippery oil */
     if (im) { const w = K === 'fire' ? 50 + Math.sin(now * 12 + X) * 3 : 56, hh = w * im.height / im.width; x.drawImage(im, -w / 2, -hh / 2, w, hh); x.restore(); return; } }
   if (K === 'oil') { x.fillStyle = '#0c0c0c'; x.beginPath(); for (let i = 0; i < 9; i++) { const t2 = i / 9 * 6.28, r = 24 + Math.sin(i * 2.7) * 5; x.lineTo(Math.cos(t2) * r, Math.sin(t2) * r * 0.8); } x.closePath(); x.fill(); x.fillStyle = 'rgba(120,160,255,.35)'; x.beginPath(); x.ellipse(-6, -5, 8, 3, -0.4, 0, 7); x.fill(); }
   else if (K === 'slow') { x.fillStyle = 'rgba(150,70,230,.7)'; x.beginPath(); x.arc(0, 0, 20, 0, 7); x.fill(); x.font = '18px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('🐌', 0, 1); }
@@ -44292,12 +44301,13 @@ function buildDom() {
   document.body.appendChild(el); return el;
 }
 function fmt(s) { s = Math.max(0, Math.ceil(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+const mdlOf = (V, id) => { const p = V && V.pl && V.pl.find(q => q[0] === id); return p && p[3] != null ? p[3] : null; };
 const colOf = (V, id) => { const p = V.pl && V.pl.find(q => q[0] === id); return COLS[(p ? p[2] : id) % COLS.length]; };
 const nameOf = (V, id) => { const p = V.pl && V.pl.find(q => q[0] === id); return p ? p[1] : '?'; };
 
 function start(o) {
   stop(); const st = window.SW && SW.settings || {};
-  S = { online: o.online || null, me: o.me, host: !o.online || o.online.host, t0: performance.now(), last: performance.now(), acc: 0, input: { dx: 0, dy: 0, m: 0 }, pwSeq: 0, hornSeq: 0, vote: -1, evSeen: 0, fxs: [], seen: {}, prevV: null, V: null, vAt: 0, opts: o, paused: false };
+  S = { online: o.online || null, me: o.me, host: !o.online || o.online.host, t0: performance.now(), last: performance.now(), acc: 0, input: { dx: 0, dy: 0, m: 0 }, pwSeq: 0, hornSeq: 0, vote: -1, mdl: (() => { try { return +localStorage.au_mdl || 0; } catch (e) { return 0; } })(), evSeen: 0, fxs: [], seen: {}, prevV: null, V: null, vAt: 0, opts: o, paused: false };
   if (S.host) { S.G = newMatch(o); S.V = snap(S.G); }
   buildDom(); bindInput(); S.raf = requestAnimationFrame(loop);
   const s = sfxObj(); if (s) { s.tempo = 1; s.setSong && s.setSong('autos'); }
@@ -44342,7 +44352,7 @@ function loop(now) {
     S.V = snap(G); S.vAt = now;
     if (O && now - (S.sent || 0) > 66) { S.sent = now; try { O.net.room.presence({ ag: S.V }); } catch (e) {} }
   } else { const net = O.net;
-    if (now - (S.sent || 0) > 66) { S.sent = now; const I = S.input; try { net.room.presence({ au: { x: Math.round(I.dx * 100) / 100, y: Math.round(I.dy * 100) / 100, m: Math.round(I.m * 100) / 100, p: S.pwSeq, pa: S.pwAim ? S.pwAim.map(v => Math.round(v * 100) / 100) : null, h: S.hornSeq, v: S.vote } }); } catch (e) {} }
+    if (now - (S.sent || 0) > 66) { S.sent = now; const I = S.input; try { net.room.presence({ au: { x: Math.round(I.dx * 100) / 100, y: Math.round(I.dy * 100) / 100, m: Math.round(I.m * 100) / 100, p: S.pwSeq, pa: S.pwAim ? S.pwAim.map(v => Math.round(v * 100) / 100) : null, h: S.hornSeq, v: S.vote, cm: S.mdl || 0 } }); } catch (e) {} }
     const h = net.hostPeer && net.hostPeer(); const ag = h && h.presence && h.presence.ag;
     if (ag && (!S.V || ag.t !== S.V.t)) { S.prevV = S.V; S.V = ag; S.vAt = now; }
     if (!h) { S.hostGone = (S.hostGone || 0) + dt; if (S.hostGone > 6 && !S.goneShown) { S.goneShown = true; showEnd({ gone: true }); } } else S.hostGone = 0; }
@@ -44359,7 +44369,7 @@ function readClients(G) {
     c.in = { dx: +I.x || 0, dy: +I.y || 0, m: clamp(+I.m || 0, 0, 1) }; const seen = S.cin[slot] || (S.cin[slot] = { p: I.p | 0, h: I.h | 0 });
     if ((I.p | 0) > seen.p) { seen.p = I.p | 0; usePower(G, c, Array.isArray(I.pa) ? I.pa : null); }
     if ((I.h | 0) > seen.h) { seen.h = I.h | 0; ev(G, 'horn', slot); }
-    if (G.ph === 'vote' && Number.isInteger(I.v) && I.v >= 0 && I.v < AU_MAPS.length) G.votes[slot] = I.v; }
+    if (G.ph === 'vote' && Number.isInteger(I.v) && I.v >= 0 && I.v < AU_MAPS.length) G.votes[slot] = I.v; if (Number.isInteger(I.cm) && I.cm >= 0 && I.cm < 8) c.mdl = I.cm; }
 }
 function onEvent(V, e, now) {
   const [, k, a, b, c] = e, car = id => V.c.find(q => q[0] === id);
@@ -44386,13 +44396,15 @@ function onPhase(V) {
 }
 function voteOverlay() {
   const ov = $('#auOv'); ov.classList.add('on');
-  ov.innerHTML = `<div class="card vote"><b>Vota el laberinto</b><div class="vbar"><i></i></div><div class="vgrid">${AU_MAPS.map((m, i) => `<button class="vm" data-i="${i}"><canvas width="100" height="60"></canvas><span>${m.n}</span><em>0</em></button>`).join('')}</div></div>`;
+  ov.innerHTML = `<div class="card vote"><b>Vota el laberinto</b><div class="vbar"><i></i></div><div class="vgrid">${AU_MAPS.map((m, i) => `<button class="vm" data-i="${i}"><canvas width="100" height="60"></canvas><span>${m.n}</span><em>0</em></button>`).join('')}</div><b style="font-size:14px">Elige tu auto</b><div class="cgrid">${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<button class="cm${k === (S.mdl || 0) ? ' on' : ''}" data-m="${k}"><img src="${window.FX ? FX('au_car' + (k + 1)) : 'assets/fx/au_car' + (k + 1) + '.webp'}" alt=""></button>`).join('')}</div></div>`;
+  ov.querySelectorAll('.cm').forEach(b => { b.onclick = () => { S.mdl = +b.dataset.m; try { localStorage.au_mdl = S.mdl; } catch (e) {} if (S.host) { const c = carById(S.G, S.me); if (c) c.mdl = S.mdl; } ov.querySelectorAll('.cm').forEach(q => q.classList.toggle('on', q === b)); snd('tick'); }; }); /* pick your car while you vote */
   ov.querySelectorAll('.vm').forEach(b => { const i = +b.dataset.i, cv = b.querySelector('canvas'), x = cv.getContext('2d'); x.drawImage(paintMaze(i), 0, 0, 100, 60);
     b.onclick = () => { S.vote = i; if (S.host) S.G.votes[S.me] = i; ov.querySelectorAll('.vm').forEach(q => q.classList.toggle('on', q === b)); snd('tick'); }; });
 }
 function hud(V) {
   const t = $('#auTime'); if (!t) return; const ph = V.ph;
   t.textContent = ph === 'vote' ? '🗳️ ' + Math.ceil(V.vl) : fmt(V.tl); $('#auMapN').textContent = V.mi >= 0 ? AU_MAPS[V.mi].n : '';
+  if (S.host && S.G) { const c0 = carById(S.G, S.me); if (c0 && c0.mdl !== (S.mdl || 0)) c0.mdl = S.mdl || 0; }
   if (ph === 'vote') { const ov = $('#auOv'); const bar = ov && ov.querySelector('.vbar i'); if (bar) bar.style.width = (V.vl / 5.4 * 100) + '%'; if (ov) ov.querySelectorAll('.vm em').forEach((e, i) => { const n = V.vc[i] || 0; if (e._n !== n) { e._n = n; e.innerHTML = voters(n, i); } }); }
   // the scoreboard: who has held the star longest
   const L = V.c.slice().sort((a, b) => b[6] - a[6]); const key = L.map(c => c[0] + ':' + Math.floor(c[6]) + ':' + c[5] + ':' + (c[4] & 8192) + ':' + (hasSt(V, c[0]))).join('|');
@@ -44480,6 +44492,9 @@ function render(V, now) {
   const mc = myCar(); if (mc && (mc[4] & 8192) && V.ph === 'play') { x.font = '800 16px system-ui'; x.textAlign = 'center'; x.fillStyle = '#fff'; x.fillText('Te quedaste sin vidas: estás mirando', cw / 2, top + 22); }
 }
 
+window.autosGuide = () => { const D = { oil: 'Dejas una mancha de aceite verde: el que pasa patina.', turbo: 'Vas muy rápido 3 s y chocar quita la estrella.', statue: 'Dejas una estatua gigante que tapa el pasillo.', missile: 'Disparas misiles hacia adelante.', shield: 'Una burbuja te protege de un golpe.', spikes: 'Púas: el que te choca pierde.', invul: 'Nada te hace daño 7 s.', bolt: 'Un rayo encoge y frena a todos los demás.', invis: 'Nadie te ve un rato.', freeze: 'Congela a los autos cerca.', ink: 'Mancha de tinta la pantalla de los otros.', stop: 'Paras el tiempo a los demás.', chase: 'Un misil que persigue al que tiene la estrella.', fire: 'Bola de fuego (arrastra para apuntar): deja el piso ardiendo.', barrel: 'Una caja trampa que parece un poder.', ramp: 'Una rampa: saltas por encima.', slow: 'Trampa que deja lento al que la pisa.', bombs: 'Sueltas bombas detrás.', tornado: 'Un tornado que arrastra autos.' };
+  const ic = k => `<img class="icimg" src="${window.FX ? FX('au_' + k + '_icon') : 'assets/fx/au_' + k + '_icon.webp'}" alt="" onerror="this.replaceWith(document.createTextNode('${PW[k].ic}'))">`;
+  return `<div class="glbl">⭐ Cómo se juega</div><small class="gnote">Toma la estrella y aguántala: gana el que la tuvo más tiempo. Choca al que la tiene para robarla. Las cajas ? te dan un poder al azar (tomar una caja no te quita la estrella).</small><div class="glbl">🎁 Poderes de las cajas (${PWL.length})</div><div class="gd gd2">` + PWL.map(k => `<div class="gi">${ic(k)}<div><b>${PW[k].n}</b><small>${D[k] || ''}</small></div></div>`).join('') + '</div>'; };
 window.AUTOS = { start, stop, quit, maps: AU_MAPS, powers: PW, state: () => S, _test: { newMatch, step, snap, usePower, carById, PWL, carSprite, startMap, gridOf, CS } };
 })();
 
@@ -44503,15 +44518,24 @@ const BREAK = { LTrc: [10, 'Rocas'], LTbx: [6, 'Caja'], LTcr: [6, 'Caja'], LTbr:
 const DEST = []; /* [doo index, hits, cells] */
 /* the rock corner (top right of the arena): one rock wall with a single 3-cell lane that winds to a dead end; there only you and one monster fit, one against one */
 const RKI0 = 196, RKJ0 = 246, RKW = 49, RKH = 51, RKMZ = new Uint8Array(GWd * GHd);
-const inRock = (x, y) => { const i = Math.floor((x - M0) / CELL) - RKI0, j = Math.floor((y - M0) / CELL) - RKJ0; return i >= 0 && j >= 0 && i < RKW && j < RKH; };
-const RKX = [[230, 292, 235, 295], [242, 286, 243, 289]]; /* extra rocks (cells) that leave a 2-cell nook against the wall: you inside, one monster at the mouth, the rest in line behind */
+const SPOTS = [[1184, 3312], [1568, 3120], [1440, -944], [1648, -32], [-2784, -944], [-3056, -608], [-2464, 3344], [-3056, 3040]]; /* where you stand in each nook (bots go there too) */
+const inRock = (x, y) => { const i = Math.floor((x - M0) / CELL) - RKI0, j = Math.floor((y - M0) / CELL) - RKJ0; if (i >= 0 && j >= 0 && i < RKW && j < RKH) return true; for (const s of SPOTS) if (Math.abs(s[0] - x) < 300 && Math.abs(s[1] - y) < 300) return true; return false; }; /* the rock corner and every nook: one at a time */
+/* Perrin's fighting spots: 2 nooks in each corner (you inside, one monster at the mouth, the rest in line) and walls with 3-4 doors around the forest and the crates. Every piece breaks like its kind (rocks 10 hits, barrels and crates 6) */
+const XBLK = [['LTrc', 230, 292, 235, 295], ['LTrc', 242, 286, 243, 289], /* rocks, top right */
+  ['LTba', 232, 160, 235, 166], ['LTba', 238, 160, 241, 166], ['LTba', 239, 186, 243, 189], ['LTba', 239, 192, 243, 195], /* barrels, bottom right */
+  ['LTrc', 100, 160, 103, 166], ['LTrc', 106, 160, 109, 166], ['LTrc', 96, 168, 100, 171], ['LTrc', 96, 174, 100, 177], /* rocks, bottom left */
+  ['LTbx', 110, 292, 113, 296], ['LTbx', 116, 292, 119, 296], ['LTbx', 96, 282, 100, 285], ['LTbx', 96, 288, 100, 291] /* crates, top left */];
+{ const ring = (t, i0, j0, i1, j1, gaps) => { for (let i = i0; i <= i1; i++) for (const j of [j0, j1]) if (!gaps.some(([a, b]) => a === i && b === j)) XBLK.push([t, i, j, i, j]); for (let j = j0 + 1; j < j1; j++) for (const i of [i0, i1]) if (!gaps.some(([a, b]) => a === i && b === j)) XBLK.push([t, i, j, i, j]); };
+  ring('YTft', 136, 186, 168, 243, [[136, 214], [136, 215], [168, 214], [168, 215], [151, 243], [152, 243], [151, 186], [152, 186]]); /* the forest: 4 doors */
+  ring('LTbx', 184, 176, 212, 207, [[184, 191], [184, 192], [197, 207], [198, 207], [212, 191], [212, 192]]); /* the crates: 3 doors */ }
+for (const [t, i0, j0, i1, j1] of XBLK) for (let i = i0; i <= i1; i += 2) for (let j = j0; j <= j1; j += 2) { const cl = []; for (let jj = j; jj <= Math.min(j + 1, j1); jj++) for (let ii = i; ii <= Math.min(i + 1, i1); ii++) cl.push(jj * GWd + ii); const w = Math.min(2, i1 - i + 1), h = Math.min(2, j1 - j + 1); MP.doo.push([t, M0 + (i + w / 2) * CELL, M0 + (j + h / 2) * CELL, 0, t === 'YTft' ? 0.7 : 0.55, cl]); }
 const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })();
 { /* the stones, columns, trees and boxes of the map block the way too (that is how the corners where monsters come one by one are made) */
   const RAD = { LOic: 48, LOsc: 48, AOsr: 60, LTrc: 52, YObs: 64, YSco: 48, YObw: 64, YTft: 40, LTbx: 40, LTcr: 40, LTba: 48, YOwb: 48, YObb: 48, YSaw: 48, LSst: 48, YOfs: 32, YOks: 32, LTbr: 32, LTbs: 32, LTex: 40 };
   const SQ = { LTrc: 64 }; /* rock chunks block a 4x4 square like in the editor: side by side they make the walls of the corner pockets */
   for (let di0 = 0; di0 < MP.doo.length; di0++) { const d = MP.doo[di0]; const brk = BREAK[d[0]], cl = brk ? [] : null; const blockC = k => { if (cl) { if (!cl.includes(k)) { cl.push(k); DMK[k]++; } } else WALK[k >> 3] &= ~(1 << (k & 7)); };
+    if (d[5]) { for (const k of d[5]) blockC(k); if (cl) DEST.push([di0, brk[0], cl]); continue; } /* a placed piece: exactly its cells */
     if (SQ[d[0]]) { const h = SQ[d[0]]; for (let j = Math.floor((d[2] - h - M0) / CELL); j <= Math.floor((d[2] + h - M0) / CELL); j++) for (let i = Math.floor((d[1] - h - M0) / CELL); i <= Math.floor((d[1] + h - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if (Math.abs(cx - d[1]) >= h || Math.abs(cy - d[2]) >= h || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl) DEST.push([di0, brk[0], cl]); continue; } let r = RAD[d[0]]; if (!r) continue; r *= d[4] || 1; for (let j = Math.floor((d[2] - r - M0) / CELL); j <= Math.floor((d[2] + r - M0) / CELL); j++) for (let i = Math.floor((d[1] - r - M0) / CELL); i <= Math.floor((d[1] + r - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if ((cx - d[1]) ** 2 + (cy - d[2]) ** 2 > r * r || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl && cl.length) DEST.push([di0, brk[0], cl]); } }
-for (const [i0, j0, i1, j1] of RKX) { for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const k = j * GWd + i; WALK[k >> 3] &= ~(1 << (k & 7)); } for (let i = i0; i <= i1; i += 3) for (let j = j0; j <= j1; j += 3) MP.doo.push(['LTrk', M0 + (Math.min(i + 1.5, i1 + 1)) * CELL, M0 + (Math.min(j + 1.5, j1 + 1)) * CELL, 0, 1]); } /* drawn like the other rock chunks (they do not break) */
 const FOUNT = MP.fount, SHOPS = MP.shops, ARENA = MP.arena, GATEB = MP.gate;
 function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false; const k = j * GWd + i; return !DMK[k] && !!(WALK[k >> 3] & (1 << (k & 7))); }
 // the cell doors: each cell has its iron gate shut until its gladiator picks a weapon (1 s later it opens for good)
@@ -44553,29 +44577,29 @@ const WEAP = {
 const WL = Object.keys(WEAP);
 
 // ---------- the monsters, round by round (the original's list) ----------
-// hp, d: damage, sp: speed, r: reach (ranged > 150), as: attack time, sz: size, b: gold
+// hp, d: damage, sp: speed, r: reach (ranged > 150), as: attack time, sz: size, b: gold. hp, d and as are the ORIGINAL map's numbers (war3map.w3u), so it takes the same hits as there
 const CREEPS = [
   null,
-  { n: 'Araña', ic: '🕷️', hp: 70, d: 7, sp: 250, r: 55, as: 1, sz: 26, b: 10 },
-  { n: 'Kóbold', ic: '🐀', hp: 110, d: 10, sp: 240, r: 55, as: 1, sz: 28, b: 11 },
-  { n: 'Murloc', ic: '🐸', hp: 140, d: 12, sp: 280, r: 55, as: 0.9, sz: 28, b: 12 },
-  { n: 'Furbolg polar', ic: '🐻‍❄️', hp: 230, d: 16, sp: 240, r: 60, as: 1.1, sz: 34, b: 14 },
-  { n: 'Araña gigante', ic: '🕷️', hp: 900, d: 26, sp: 240, r: 70, as: 1.1, sz: 52, b: 40, boss: 1, spl: 'spider', txt: 'Ronda 5: ¡jefes! Las arañas gigantes atrapan con telarañas, envenenan, y de cada una salen 2 arañas al morir.' },
-  { n: 'Aracnátido', ic: '🦂', hp: 200, d: 14, sp: 230, r: 330, as: 1.3, sz: 30, b: 15, shot: 'spit' },
-  { n: 'Bandido', ic: '🥷', hp: 300, d: 22, sp: 270, r: 60, as: 1, sz: 32, b: 17 },
-  { n: 'Centauro arquero', ic: '🐎', hp: 300, d: 20, sp: 260, r: 380, as: 1.2, sz: 36, b: 18, shot: 'arrow' },
-  { n: 'Oso polar', ic: '🐻‍❄️', hp: 480, d: 30, sp: 250, r: 65, as: 1.2, sz: 40, b: 20 },
-  { n: 'Dragón azul', ic: '🐉', hp: 2000, d: 48, sp: 300, r: 75, as: 1, sz: 56, b: 60, boss: 1, spl: 'dragon', txt: 'Ronda 10: ¡jefes! Los dragones azules esquivan golpes, se curan solos, corren y pegan fuerte.' },
-  { n: 'Furbolg', ic: '🐻', hp: 620, d: 34, sp: 250, r: 65, as: 1.1, sz: 40, b: 22 },
-  { n: 'Gólem de barro', ic: '🗿', hp: 850, d: 38, sp: 200, r: 65, as: 1.3, sz: 44, b: 24 },
-  { n: 'Gnoll asesino', ic: '🐺', hp: 620, d: 40, sp: 260, r: 360, as: 1.1, sz: 36, b: 25, shot: 'knife' },
-  { n: 'Ogro guerrero', ic: '👹', hp: 1100, d: 52, sp: 240, r: 70, as: 1.2, sz: 48, b: 28 },
-  { n: 'Fúrbol lunar', ic: '🦉', hp: 3400, d: 46, sp: 170, r: 75, as: 0.45, sz: 58, b: 80, boss: 1, spl: 'wild', txt: 'Ronda 15: ¡jefes! Los fúrboles lunares no sienten la magia (tus poderes les hacen poco) y pegan rapidísimo, pero caminan lento.' },
-  { n: 'Troll berserker', ic: '🧌', hp: 1050, d: 56, sp: 260, r: 360, as: 0.9, sz: 44, b: 30, shot: 'axe' },
-  { n: 'Hidra ancestral', ic: '🐲', hp: 4200, d: 70, sp: 210, r: 420, as: 1.2, sz: 64, b: 100, boss: 1, shot: 'acid', spl: 'hydra', txt: 'Ronda 17: ¡jefes! Las hidras ancestrales escupen ácido desde lejos.' },
-  { n: 'Guardián humano', ic: '🛡️', hp: 12000, d: 90, sp: 250, r: 80, as: 1, sz: 72, b: 300, boss: 1, spl: 'warden', txt: 'Ronda 18, la final: el Guardián humano viene en persona con sus soldados de élite. «Les voy a acabar yo mismo, bestias».' },
+  { n: 'Araña', ic: '🕷️', hp: 210, d: 11, sp: 250, r: 55, as: 1.6, sz: 26, b: 10 },
+  { n: 'Kóbold', ic: '🐀', hp: 260, d: 18, sp: 240, r: 55, as: 1.35, sz: 28, b: 11 },
+  { n: 'Murloc', ic: '🐸', hp: 300, d: 23, sp: 280, r: 55, as: 1.35, sz: 28, b: 12 },
+  { n: 'Furbolg polar', ic: '🐻‍❄️', hp: 350, d: 25, sp: 240, r: 60, as: 1.35, sz: 34, b: 14 },
+  { n: 'Araña gigante', ic: '🕷️', hp: 500, d: 40, sp: 240, r: 70, as: 1.7, sz: 52, b: 40, boss: 1, spl: 'spider', txt: 'Ronda 5: ¡jefes! Las arañas gigantes atrapan con telarañas, envenenan, y de cada una salen 2 arañas al morir.' },
+  { n: 'Aracnátido', ic: '🦂', hp: 380, d: 42, sp: 230, r: 330, as: 1.35, sz: 30, b: 15, shot: 'spit' },
+  { n: 'Bandido', ic: '🥷', hp: 600, d: 53, sp: 270, r: 60, as: 1.35, sz: 32, b: 17 },
+  { n: 'Centauro arquero', ic: '🐎', hp: 650, d: 47, sp: 260, r: 380, as: 1.2, sz: 36, b: 18, shot: 'arrow' },
+  { n: 'Oso polar', ic: '🐻‍❄️', hp: 850, d: 72, sp: 250, r: 65, as: 1.35, sz: 40, b: 20 },
+  { n: 'Dragón azul', ic: '🐉', hp: 1100, d: 70, sp: 300, r: 75, as: 1.7, sz: 56, b: 60, boss: 1, spl: 'dragon', txt: 'Ronda 10: ¡jefes! Los dragones azules esquivan golpes, se curan solos, corren y pegan fuerte.' },
+  { n: 'Furbolg', ic: '🐻', hp: 1275, d: 82, sp: 250, r: 65, as: 1.35, sz: 40, b: 22 },
+  { n: 'Gólem de barro', ic: '🗿', hp: 1050, d: 62, sp: 200, r: 65, as: 1.35, sz: 44, b: 24 },
+  { n: 'Gnoll asesino', ic: '🐺', hp: 1250, d: 50, sp: 260, r: 360, as: 1.1, sz: 36, b: 25, shot: 'knife' },
+  { n: 'Ogro guerrero', ic: '👹', hp: 1800, d: 93, sp: 240, r: 70, as: 1.5, sz: 48, b: 28 },
+  { n: 'Fúrbol lunar', ic: '🦉', hp: 2200, d: 66, sp: 170, r: 75, as: 0.5, sz: 58, b: 80, boss: 1, spl: 'wild', txt: 'Ronda 15: ¡jefes! Los fúrboles lunares no sienten la magia (tus poderes les hacen poco) y pegan rapidísimo, pero caminan lento.' },
+  { n: 'Troll berserker', ic: '🧌', hp: 2100, d: 86, sp: 260, r: 360, as: 1.35, sz: 44, b: 30, shot: 'axe' },
+  { n: 'Hidra ancestral', ic: '🐲', hp: 3000, d: 72, sp: 210, r: 420, as: 1.2, sz: 64, b: 100, boss: 1, shot: 'acid', spl: 'hydra', txt: 'Ronda 17: ¡jefes! Las hidras ancestrales escupen ácido desde lejos.' },
+  { n: 'Guardián humano', ic: '🛡️', hp: 2500, d: 195, sp: 250, r: 80, as: 0.8, sz: 72, b: 300, boss: 1, spl: 'warden', txt: 'Ronda 18, la final: el Guardián humano viene en persona con sus soldados de élite. «Les voy a acabar yo mismo, bestias».' },
 ];
-const FOOTMAN = { n: 'Soldado de élite', ic: '💂', hp: 1300, d: 50, sp: 260, r: 65, as: 1, sz: 40, b: 25 };
+const FOOTMAN = { n: 'Soldado de élite', ic: '💂', hp: 2000, d: 107, sp: 260, r: 65, as: 1.0, sz: 40, b: 25 };
 
 // ---------- the shops (all together; open only between rounds) ----------
 // st: stats it gives. use: what it does when you press it. rec: recipe (needs these items)
@@ -44634,7 +44658,7 @@ function ev(G, ...a) { G.ev.push([++G.evSeq, ...a]); if (G.ev.length > 60) G.ev.
 
 // a hero's numbers with its weapon, level and items
 function stat(G, u) {
-  const W = WEAP[u.wp] || WEAP.samurai; const L = u.lv - 1; const st = { d: W.d + L * 4, hp: W.hp + L * 45, ar: W.ar + L * 0.4, sp: W.sp, ev: 0, crit: W.crit ? W.crit[0] : 0, critM: W.crit ? W.crit[1] : 2, leech: W.leech || 0, rg: 1 + L * 0.3, sr: 0, aura_ar: 0, aura_d: 0, r: W.ranged ? W.r + 80 : W.r + 45, as: W.as };
+  const W = WEAP[u.wp] || WEAP.samurai; const L = u.lv - 1; const st = { d: W.d * 1.35 + L * 4, /* level 1 hits ~40 like the original Orc Slave (13-17 +25) */ hp: W.hp + L * 45, ar: W.ar + 3 + L * 0.4, /* +3: the original slave starts with 5 armor */ sp: W.sp, ev: 0, crit: W.crit ? W.crit[0] : 0, critM: W.crit ? W.crit[1] : 2, leech: W.leech || 0, rg: 1 + L * 0.3, sr: 0, aura_ar: 0, aura_d: 0, r: W.ranged ? W.r + 80 : W.r + 45, as: W.as };
   for (const k of u.inv) { const I = ITEMS[k.id]; if (!I || !I.st) continue; for (const [a, v] of Object.entries(I.st)) st[a] = a === 'ev' ? 1 - (1 - st.ev) * (1 - v) : a === 'crit' ? Math.max(st.crit, v) : (st[a] || 0) + v; }
   for (const o of heroes(G)) { if (o.dead || hyp(o.x - u.x, o.y - u.y) > 500) continue; let ar = 0, d = 0; for (const k of o.inv) { const I = ITEMS[k.id]; if (I && I.st) { ar = Math.max(ar, I.st.aura_ar || 0); d = Math.max(d, I.st.aura_d || 0); } } st.aura_ar = Math.max(st.aura_ar, ar); st.aura_d = Math.max(st.aura_d, d); }
   st.ar += st.aura_ar; st.d *= 1 + st.aura_d; const t = G.t;
@@ -44832,11 +44856,11 @@ function step(G, dt) {
     if (!c.np || t > c.npT) { if (c.np && hyp(c.x - c.np[0], c.y - c.np[1]) < 6 && d > C.r + 40) { let n = G.fH && downhill(G.fH, c); if (!n || !free(n[0], n[1], c.sz, 1)) n = G.fH && nearField(G.fH, c); if (n && !G.units.some(o => o !== c && o.creep && !o.dead && hyp(o.x - n[0], o.y - n[1]) < (o.sz + c.sz) * 1.2)) { c.x = n[0]; c.y = n[1]; } /* never jump past the monster in front */ } c.np = [c.x, c.y]; c.npT = t + 0.7; } /* caught on a rock corner: one step along its way */
     { const k = Math.floor((c.y - M0) / CELL) * GWd + Math.floor((c.x - M0) / CELL); if (!c.thin && G.fH && G.fH[k] < 0) { c.thinT = (c.thinT || 0) + dt; if (c.thinT > 8) c.thin = 1; } } /* no way for a wide monster (you hid in a tight corridor): after 8 s it squeezes in anyway */
     if (d > (C.shot ? C.r + (tg.sz || 24) * 0.6 : Math.min(C.r, c.sz + (tg.sz || 24) + 10)) || (!C.shot && (!los(c.x, c.y, tg.x, tg.y) || behind(G, c, tg, d)))) { if (!(inRock(c.x, c.y) && G.units.some(o => o !== c && o.creep && !o.dead && hyp(o.x - c.x, o.y - c.y) < (o.sz + c.sz) * 1.5 && hyp(o.x - tg.x, o.y - tg.y) < d - 4))) moveTo(c, tg.x, tg.y, sp, dt, c.thin ? (G.fN || G.fH) : G.fH); } /* in the rock lane the ones behind wait their turn */ /* melee needs a clear line: no hitting through the rocks */
-    else if (c.atkT + C.as * ((c.e.slow || 0) > t ? 1.4 : 1) <= t) { c.atkT = t; c.a = Math.atan2(tg.y - c.y, tg.x - c.x); const dm = C.d * (window.OG_DM || 1.25) * (c.small ? 0.4 : 1) * ((c.e.howl || 0) > t ? 0.7 : 1) * (1 + G.round * 0.05); /* like the original: two or three at once nearly kill you */
+    else if (c.atkT + C.as * ((c.e.slow || 0) > t ? 1.4 : 1) <= t) { c.atkT = t; c.a = Math.atan2(tg.y - c.y, tg.x - c.x); const dm = C.d * (window.OG_DM || 1) * (c.small ? 0.4 : 1) * ((c.e.howl || 0) > t ? 0.7 : 1) * (1 + G.round * 0.05); /* like the original: two or three at once nearly kill you */
       if (C.shot) shoot(G, c, C.shot, c.a, dm, C.r + 120, false); else { hurt(G, c, tg, dm, false); ev(G, 'hit', tg.x | 0, tg.y | 0); }
       if (C.spl === 'spider' && !c.small && rnd() < 0.25) { tg.e.stun = t + 1.2; ev(G, 'web', tg.id); } } }
   // keep everybody from standing in one pile
-  const U = G.units.filter(u => !u.dead); for (let i = 0; i < U.length; i++) for (let j = i + 1; j < U.length; j++) { const a = U[i], b = U[j], ra = a.sz || 24, rb = b.sz || 24, dx = b.x - a.x, dy = b.y - a.y, d = hyp(dx, dy), m = (a.creep && b.creep) ? (ra + rb) * 1.45 : (a.creep || b.creep) && inRock(a.x, a.y) ? (ra + rb) * 1.05 : (ra + rb) * 0.75; /* in the rock lane nobody slips past you */ if (d > 0 && d < m) { const k = (m - d) / d * 0.5; slide(a, a.x - dx * k, a.y - dy * k, ra); slide(b, b.x + dx * k, b.y + dy * k, rb); } }
+  const U = G.units.filter(u => !u.dead); for (let i = 0; i < U.length; i++) for (let j = i + 1; j < U.length; j++) { const a = U[i], b = U[j], ra = a.sz || 24, rb = b.sz || 24, dx = b.x - a.x, dy = b.y - a.y, d = hyp(dx, dy), m = (a.creep && b.creep) ? (ra + rb) * 1.45 : (a.creep || b.creep) && inRock(a.x, a.y) ? (ra + rb) * 1.05 : (a.creep || b.creep) ? (ra + rb) * 0.85 : (ra + rb) * 0.75; /* in the rock lane nobody slips past you */ if (d > 0 && d < m) { const k = (m - d) / d * 0.5; if (a.creep !== b.creep) { const [p, q, sg, rp] = a.creep ? [b, a, 1, rb] : [a, b, -1, ra]; slide(p, p.x + sg * dx * k * 2, p.y + sg * dy * k * 2, rp); continue; } /* a gladiator never pushes a monster: the monster stays, you stop */ slide(a, a.x - dx * k, a.y - dy * k, ra); slide(b, b.x + dx * k, b.y + dy * k, rb); } }
   // shots
   for (const p of G.pr.slice()) { if (p.tgt) { const T = G.units.find(u => u.id === p.tgt); if (T) p.a = Math.atan2(T.y - p.y, T.x - p.x); }
     const s = p.sp * dt; p.x += Math.cos(p.a) * s; p.y += Math.sin(p.a) * s; p.left -= s; let hit = null;
@@ -44855,8 +44879,8 @@ function resetDest() { DMK.fill(0); for (const [, , cl] of DEST) for (const k of
 function breakDest(G, di, by) { const D0 = DEST.find(q => q[0] === di); if (!D0 || G.dd.includes(di)) return; G.dd.push(di); for (const k of D0[2]) DMK[k] = Math.max(0, DMK[k] - 1); WIDE = null; CHUNK.clear(); const d = MP.doo[di]; ev(G, 'boom', d[1] | 0, d[2] | 0, 40);
   if (d[0] === 'LTex') { for (const o of near(G, d[1], d[2], 280, o => o.creep)) hurt(G, by, o, 300 + G.round * 20, true); ev(G, 'boom', d[1] | 0, d[2] | 0, 160); } } /* the explosive barrel only hurts the monsters */
 function hitDest(G, h, st) { /* walking into a rock, box or barrel (and no monster to hit): you hit it */
-  const t = G.t; if (h.atkT + st.as > t || h.in.m < 0.3) return; if (nearestFoe(G, h, st.r + 60)) return; let best = null, bd = 1e9;
-  for (const [di, hp] of DEST) { if (G.dd.includes(di)) continue; const d = MP.doo[di], dx = d[1] - h.x, dy = d[2] - h.y, L2 = hyp(dx, dy), reach = (d[0] === 'LTrc' ? 90 : 60) + Math.min(st.r, 90); if (L2 > reach || L2 < 1) continue; if ((dx * h.in.dx + dy * h.in.dy) / L2 < 0.4) continue; if (L2 < bd) { bd = L2; best = [di, hp]; } }
+  const t = G.t, hold = h.in.a; if (h.atkT + st.as > t || (h.in.m < 0.3 && !hold)) return; if (nearestFoe(G, h, st.r + 60)) return; let best = null, bd = 1e9; /* the attack button: you keep hitting the nearest rock, box or barrel */
+  for (const [di, hp] of DEST) { if (G.dd.includes(di)) continue; const d = MP.doo[di], dx = d[1] - h.x, dy = d[2] - h.y, L2 = hyp(dx, dy), reach = (d[0] === 'LTrc' ? 90 : 60) + Math.min(st.r, 90) + (hold ? 50 : 0); if (L2 > reach || L2 < 1) continue; if (!hold && (dx * h.in.dx + dy * h.in.dy) / L2 < 0.4) continue; if (L2 < bd) { bd = L2; best = [di, hp]; } }
   if (!best) return; h.atkT = t; ev(G, 'swing', h.id); G.dh[best[0]] = (G.dh[best[0]] || 0) + 1; if (G.dh[best[0]] >= best[1]) breakDest(G, best[0], h); }
 function setWeapon(G, h) { const st = stat(G, h); h.mhp = h.hp = Math.round(st.hp); }
 function attackNear(G, h, st) {
@@ -44879,6 +44903,8 @@ function botThink(G, h, dt) {
   if (G.ph === 'pick') { const F = staticFields(); return go(FOUNT[0], FOUNT[1] + 200, F.fount); }
   if (G.ph !== 'wave') return;
   if (h.hp < h.mhp * 0.35) { const pi = h.inv.findIndex(k => ITEMS[k.id].use === 'heal'); if (pi >= 0) useItem(G, h, pi); }
+  if (ai.spot == null || heroes(G).some(o => o !== h && !o.dead && o.ai && o.ai.spot === ai.spot)) { let bi = -1, bd = 1e9; SPOTS.forEach((p, i) => { if (heroes(G).some(o => o !== h && !o.dead && o.ai && o.ai.spot === i)) return; const dd = hyp(p[0] - h.x, p[1] - h.y); if (dd < bd) { bd = dd; bi = i; } }); ai.spot = bi; } /* bots fight from a nook, like a good player */
+  if (ai.spot >= 0) { const p = SPOTS[ai.spot]; G.fSp = G.fSp || []; const F = G.fSp[ai.spot] || (G.fSp[ai.spot] = field([[p[0], p[1]]], false)); if (hyp(p[0] - h.x, p[1] - h.y) > 30) { const n = downhill(F, h); if (n) { const dx = n[0] - h.x, dy = n[1] - h.y, L = hyp(dx, dy) || 1; h.in = { dx: dx / L, dy: dy / L, m: 1 }; } else go(p[0], p[1]); } else h.in = { dx: 0, dy: 0, m: 0 }; if (ai.t <= 0 && near(G, h.x, h.y, 200, o => o.creep).length) { ai.t = 0.8; for (const k of ['r', 'q', 'w', 'e']) if (useSkill(G, h, k)) break; } return; }
   const tg = nearestFoe(G, h, 3000); if (!tg) return go(MP.inArena[0], MP.inArena[1] + 600, null);
   const d = hyp(tg.x - h.x, tg.y - h.y); const many = near(G, h.x, h.y, 320, o => o.creep).length;
   if (ai.t <= 0) { ai.t = 0.6 + rnd() * 0.6; if (many >= 2 || tg.boss) { for (const k of ['r', 'q', 'w', 'e']) if (useSkill(G, h, k)) break; } else if (rnd() < 0.3) useSkill(G, h, SKEY[Math.floor(rnd() * 4)]); }
@@ -44917,9 +44943,9 @@ const CSS = `#og{position:fixed;inset:0;z-index:50;background:#07070d;touch-acti
 #ogParty div{display:flex;align-items:center;gap:4px;background:#0008;border-radius:7px;padding:2px 6px;min-width:120px}#ogParty div.dead{opacity:.45}#ogParty i{display:block;height:5px;border-radius:3px;background:#3c3;flex:1;max-width:60px}#ogParty span{max-width:62px;overflow:hidden;white-space:nowrap}
 #ogStick{position:absolute;width:120px;height:120px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33;left:20px;bottom:30px;pointer-events:none;opacity:.55}
 #ogStick.on{opacity:1;bottom:auto}#ogStick .kn{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:#ffffffaa;box-shadow:0 2px 8px #0008}
-#ogSk{position:absolute;right:12px;bottom:26px;display:grid;grid-template-columns:auto auto;gap:8px;align-items:end}#ogSk .ogb.pas{opacity:.75;filter:none}
+#ogSk{position:absolute;right:10px;bottom:22px;width:210px;height:210px}#ogSk .ogb{position:absolute;width:54px;height:54px;font-size:24px}#ogSk .ogA{right:0;bottom:0;width:92px;height:92px;font-size:44px;border-color:#fff}#ogSk .ogA.on{box-shadow:0 0 16px #ffd84a}#ogQ{right:104px;bottom:2px}#ogW{right:96px;bottom:68px}#ogE{right:52px;bottom:122px}#ogR{right:0;bottom:150px;width:62px!important;height:62px!important;border-color:#ff7a3a!important}/* Mobile-Legends style: the big basic attack in the corner, the 4 powers curved around it, the ultimate on top */#ogSk .ogb.pas{opacity:.75;filter:none}
 .ogb{position:relative;width:74px;height:74px;border-radius:50%;border:3px solid #ffd84a;background:radial-gradient(#3a2a10,#120c04);color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;touch-action:none;padding:0}
-.ogb small{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font:800 10px system-ui;white-space:nowrap;text-shadow:0 1px 2px #000}
+.ogb small{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);font:800 8.5px system-ui;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px #000}
 .ogb.cd{filter:grayscale(.8) brightness(.6)}.ogb b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 22px system-ui;text-shadow:0 2px 3px #000}
 #ogInv{position:absolute;right:12px;bottom:200px;display:flex;flex-direction:column;gap:6px}
 #ogInv button{width:44px;height:44px;border-radius:11px;border:2px solid #ffffff44;background:#000a;font-size:22px;position:relative;padding:0}#ogInv button i{position:absolute;right:1px;bottom:0;font:800 10px system-ui;font-style:normal}
@@ -44941,7 +44967,7 @@ function buildDom() {
   let el = $('#og'); if (el) el.remove(); el = document.createElement('div'); el.id = 'og';
   el.innerHTML = `<canvas id="ogCv"></canvas><div id="ogTop"><button id="ogMenu">⏸</button><div id="ogInfo"></div><div id="ogGold"></div></div><div id="ogParty"></div>
     <div id="ogStick"><div class="kn"></div></div><div id="ogInv"></div><button id="ogShopB" type="button"><span>🛒</span><em>Tienda</em></button>
-    <div id="ogSk"><button class="ogb" id="ogE" type="button"></button><button class="ogb" id="ogR" type="button"></button><button class="ogb" id="ogQ" type="button"></button><button class="ogb" id="ogW" type="button"></button></div><div id="ogMsg"></div><div id="ogOv"></div>`;
+    <div id="ogSk"><button class="ogb ogA" id="ogA" type="button"></button><button class="ogb" id="ogQ" type="button"></button><button class="ogb" id="ogW" type="button"></button><button class="ogb" id="ogE" type="button"></button><button class="ogb" id="ogR" type="button"></button></div><div id="ogMsg"></div><div id="ogOv"></div>`;
   document.body.appendChild(el);
 }
 function start(o) {
@@ -44963,11 +44989,12 @@ function whyLocal(h, id) { const V = S.V, I = ITEMS[id]; if (V.ph !== 'break') r
 function myHero() { const V = S.V; return V && V.h.find(h => h[1] === S.me); }
 function bindInput() {
   const st = $('#ogStick'), kn = st.querySelector('.kn'), cv = $('#ogCv'); let sid = null, ox = 0, oy = 0;
-  const setStick = (dx, dy) => { const L = hyp(dx, dy), R = 55, k = L > R ? R / L : 1; kn.style.transform = `translate(${dx * k}px,${dy * k}px)`; S.input = L > 6 ? { dx: dx / L, dy: dy / L, m: Math.min(1, L / R) } : { dx: 0, dy: 0, m: 0 }; };
+  const setStick = (dx, dy) => { const L = hyp(dx, dy), R = 55, k = L > R ? R / L : 1; kn.style.transform = `translate(${dx * k}px,${dy * k}px)`; S.input = L > 6 ? { dx: dx / L, dy: dy / L, m: Math.min(1, L / R) } : { dx: 0, dy: 0, m: 0 }; if (L > 6) S.atk = false; };
   cv.addEventListener('pointerdown', e => { if (sid != null) return; if (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55) return; sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
   addEventListener('pointermove', e => { if (S && e.pointerId === sid) setStick(e.clientX - ox, e.clientY - oy); });
   const up = e => { if (!S || e.pointerId !== sid) return; sid = null; st.classList.remove('on'); kn.style.transform = ''; S.input = { dx: 0, dy: 0, m: 0 }; }; addEventListener('pointerup', up); addEventListener('pointercancel', up);
   for (const k of SKEY) $('#og' + k.toUpperCase()).addEventListener('pointerdown', e => { e.stopPropagation(); act(k); });
+  $('#ogA').addEventListener('pointerdown', e => { e.stopPropagation(); S.atk = true; snd('skill'); }); /* basic attack: press once and you keep hitting (monsters on their own; rocks, boxes and barrels too) until you move */
   $('#ogShopB').addEventListener('click', () => { if (!S.nearShop) return; if (S.V && S.V.ph === 'break') { S.tab = S.nearShop; shopOverlay(); } else flash('🔒 Las tiendas abren al terminar la ronda'); });
   $('#ogMenu').addEventListener('click', pauseMenu);
   const K = {}; const upd = () => { const dx = (K.ArrowRight || K.d ? 1 : 0) - (K.ArrowLeft || K.a ? 1 : 0), dy = (K.ArrowDown || K.s ? 1 : 0) - (K.ArrowUp || K.w ? 1 : 0); if (sid == null) { const L = hyp(dx, dy); S.input = L ? { dx: dx / L, dy: dy / L, m: 1 } : { dx: 0, dy: 0, m: 0 }; } };
@@ -45002,13 +45029,13 @@ function closeOv() { const ov = $('#ogOv'); ov.classList.remove('on'); ov.innerH
 
 function loop(now) {
   if (!S) return; S.raf = requestAnimationFrame(loop); const dt = Math.min(0.1, (now - S.last) / 1000); S.last = now; const O = S.online;
-  if (S.host) { const G = S.G, h = heroOf(G, S.me); if (h && !h.bot) h.in = { dx: S.input.dx, dy: -S.input.dy, m: S.input.m }; /* the screen is y down, the map is y up */
+  if (S.host) { const G = S.G, h = heroOf(G, S.me); if (h && !h.bot) h.in = { dx: S.input.dx, dy: -S.input.dy, m: S.input.m, a: S.atk ? 1 : 0 }; /* the screen is y down, the map is y up */
     if (O) readClients(G);
     if (!S.paused) { S.acc += dt; let n = 0; while (S.acc >= DT && n++ < 5) { step(G, DT); S.acc -= DT; } if (S.acc > DT) S.acc = 0; }
     S.V = snap(G); S.vAt = now;
     if (O && now - (S.sent || 0) > 80) { S.sent = now; try { O.net.room.presence({ og: S.V }); } catch (e) {} }
   } else { const net = O.net;
-    if (now - (S.sent || 0) > 66) { S.sent = now; const I = S.input; try { net.room.presence({ ogi: { x: Math.round(I.dx * 100) / 100, y: Math.round(I.dy * 100) / 100, m: Math.round(I.m * 100) / 100, w: S.want, sk: mySkin() } }); } catch (e) {} }
+    if (now - (S.sent || 0) > 66) { S.sent = now; const I = S.input; try { net.room.presence({ ogi: { x: Math.round(I.dx * 100) / 100, y: Math.round(I.dy * 100) / 100, m: Math.round(I.m * 100) / 100, a: S.atk ? 1 : 0, w: S.want, sk: mySkin() } }); } catch (e) {} }
     const hp = net.hostPeer && net.hostPeer(); const og = hp && hp.presence && hp.presence.og;
     if (og && (!S.V || og.t !== S.V.t)) { S.prevV = S.V; S.V = og; S.vAt = now; }
     if (!hp) { S.hostGone = (S.hostGone || 0) + dt; if (S.hostGone > 6 && !S.goneShown) { S.goneShown = true; showEnd(true); } } else S.hostGone = 0; }
@@ -45021,7 +45048,7 @@ function mySkin() { try { const st = SW.settings, id = st.skins && st.skins.shro
 function readClients(G) {
   const O = S.online, g = O.game; S.cin = S.cin || {};
   for (const p of O.net.room.peers()) { if (p.sameTab) continue; const slot = g.slots[p.peer]; if (slot == null) continue; const I = p.presence && p.presence.ogi; const h = heroOf(G, slot); if (!I || !h) continue;
-    h.in = { dx: +I.x || 0, dy: -(+I.y || 0), m: clamp(+I.m || 0, 0, 1) }; if (typeof I.sk === 'string') h.sk = I.sk.slice(0, 40);
+    h.in = { dx: +I.x || 0, dy: -(+I.y || 0), m: clamp(+I.m || 0, 0, 1), a: I.a ? 1 : 0 }; if (typeof I.sk === 'string') h.sk = I.sk.slice(0, 40);
     const seen = S.cin[slot] || (S.cin[slot] = {});
     for (const [k, n, a] of Array.isArray(I.w) ? I.w : []) { if ((seen[k] || 0) >= n) continue; seen[k] = n;
       if (SKEY.includes(k)) useSkill(G, h, k); else if (k === 'i') useItem(G, h, a | 0); else if (k === 'b' && ITEMS[a]) buy(G, h, a); else if (k === 's') sell(G, h, a | 0); else if (k === 'p' && G.ph === 'pick' && WEAP[a]) { h.wp = a; setWeapon(G, h); } } }
@@ -45057,6 +45084,7 @@ function hud(V) {
   const pt = $('#ogPickT'); if (pt && V.ph === 'pick') pt.textContent = 'Empieza en ' + Math.ceil(V.pe) + ' s';
   if (!h) return; $('#ogGold').textContent = '💰 ' + h[8];
   const W = WEAP[h[9]], cds = [h[12], h[13], h[20] || 0, h[21] || 0];
+  { const a = $('#ogA'), k2 = (W ? W.ic : '⚔️') + (S.atk ? 1 : 0); if (a._k !== k2) { a._k = k2; a.innerHTML = (W ? W.ic : '⚔️') + '<small>Atacar</small>'; a.classList.toggle('on', !!S.atk); } }
   SKEY.forEach((k, i) => { const el = $('#og' + k.toUpperCase()), S0 = W && W.sk[i], lv = W ? (h[7] < SKL[i] ? 0 : 1) : 0, cd = cds[i]; const key = (S0 ? S0.id : '') + ':' + Math.ceil(cd) + ':' + h[10] + ':' + lv; if (el._k === key) return; el._k = key;
     el.style.display = S0 ? '' : 'none'; if (!S0) return; el.innerHTML = !lv ? `🔒<small>Nivel ${SKL[i]}</small>` : `${S0.ic}${cd > 0 ? `<b>${Math.ceil(cd)}</b>` : ''}<small>${S0.n}${S0.p ? ' · pasiva' : ''}</small>`; el.classList.toggle('cd', !lv || !!S0.p || cd > 0 || !!h[10]); el.classList.toggle('pas', !!S0.p && !!lv); });
   const inv = h[11] ? h[11].split(',') : [], ik = h[11]; const iv = $('#ogInv'); if (iv._k !== ik) { iv._k = ik; iv.innerHTML = inv.map((s, i) => { const [id, ch] = s.split(':'), I = ITEMS[id]; return I && I.use ? `<button data-i="${i}" type="button">${icon('og_i_' + id, I.ic)}${+ch > 1 ? `<i>${ch}</i>` : ''}</button>` : ''; }).join(''); iv.querySelectorAll('[data-i]').forEach(b => b.addEventListener('pointerdown', e => { e.stopPropagation(); act('i', +b.dataset.i); snd('skill'); })); }
@@ -45225,12 +45253,14 @@ function drawCreep(g, c, now, w2s, z) {
   if (merc) { g.strokeStyle = '#7dff8a'; g.lineWidth = 2; g.beginPath(); g.ellipse(sx, sy, size * 0.42, size * 0.16, 0, 0, 7); g.stroke(); }
   if (C && C.boss) { g.strokeStyle = `rgba(255,216,74,${0.6 + 0.3 * Math.sin(now * 6)})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, size * 0.45, size * 0.17, 0, 0, 7); g.stroke(); }
   let top = sy - size;
-  if (q) { const w = size, h = w * q.height / q.width; g.save(); g.translate(sx + Math.cos(a) * lunge, sy - bob); if (Math.cos(a) < 0) g.scale(-1, 1); if (ill) g.globalAlpha = 0.5; if (f & 2) g.filter = 'hue-rotate(160deg) saturate(1.4)'; g.drawImage(q, -w / 2, -h, w, h); g.restore(); top = sy - h; }
+  if (q) { const w = size, h = w * q.height / q.width; g.save(); g.translate(sx + Math.cos(a) * lunge, sy + size * 0.06); if (Math.cos(a) < 0) g.scale(-1, 1); g.scale(1 + bob * 0.012, 1 - bob * 0.02); /* standing on its shadow: a little squash when it walks, no hopping */ if (ill) g.globalAlpha = 0.5; if (f & 2) g.filter = 'hue-rotate(160deg) saturate(1.4)'; g.drawImage(q, -w / 2, -h, w, h); g.restore(); top = sy - h; }
   else { g.font = Math.round(size * 0.7) + 'px system-ui'; g.textAlign = 'center'; g.fillText(merc ? (ic || '🧑') : C.ic, sx, sy - size * 0.2); }
   if (f & 1) label(g, '💫', sx, top - 4, '#fff', 13);
   if (hpP < 100 || (C && C.boss)) { const bw = Math.max(28, size * 0.6); g.fillStyle = '#000a'; g.fillRect(sx - bw / 2 - 1, top - 3, bw + 2, 5); g.fillStyle = merc ? '#3ad04a' : '#e8402a'; g.fillRect(sx - bw / 2, top - 2, bw * hpP / 100, 3); }
 }
 
+window.orcGuide = () => { const ic = w => { const n = 'og_gl_' + w; return window.FXDATA && FXDATA[n] ? `<span class="icimg" style="display:inline-block;width:34px;height:34px;background:url(${FX(n)}) 0 0/800% 100% no-repeat"></span>` : `<span class="icemo">${WEAP[w].ic}</span>`; };
+  return `<div class="glbl">⚔️ Cómo se juega</div><small class="gnote">Eres un gladiador preso: eliges tu arma (tu clase), sales de tu celda y aguantas 18 rondas de monstruos que entran por 3 puertas. Entre rondas te curas en la fuente y compras en las tiendas. En el medio te matan: pelea en los huecos de las esquinas, el bosque y las cajas, donde entran de a uno. Rocas 10 golpes, cajas y barriles 6.</small><div class="glbl">🗡️ Clases (${WL.length})</div><div class="gd gd2">` + WL.map(w => `<div class="gi">${ic(w)}<div><b>${WEAP[w].n}</b><small>${WEAP[w].ranged ? 'A distancia' : 'Cuerpo a cuerpo'} · vida ${WEAP[w].hp} · 4 poderes al subir de nivel</small></div></div>`).join('') + `</div><div class="glbl">👹 Monstruos</div><small class="gnote">${CREEPS.slice(1).map((c, i) => (i + 1) + '. ' + c.n).join(' · ')}</small>`; };
 window.ORC = { start, stop, quit, weapons: WEAP, items: ITEMS, creeps: CREEPS, state: () => S, _test: { walkC, newMatch, step, snap, buy, useSkill, heroOf, startRound, startBreak, DOORS } };
 })();
 
@@ -46681,6 +46711,7 @@ const GAME_SPEED = 0.5; // whole game runs slower (hero, enemies, timers) so lev
     kitty5: [[ic('ic_jump'), 'Saltar', 'Pasas por encima de los lobos.'], [ic('ic_roar'), 'Gruñido', 'Espanta a los lobos cercanos.'], [ic('ic_invis'), 'Invisible', 'Casi invisible unos segundos.'], [ic('ic_stun'), 'Aturdir', 'Los lobos cerca quedan quietos 5 s.'], [ic('ic_dash'), 'Embestida', 'Corres mucho más rápido 3 s.'], ],
     bob: [[ic('ic_jump'), 'Saltar', 'Saltas alto sobre los cangrejos, hacia donde te deslizas.']] };
   window.guideHTML = id => { const g = (t, L) => L.length ? `<div class="glbl">${t}</div><div class="gd">` + L.map(([e, n, d]) => `<div class="gi">${e}<div><b>${n}</b><small>${d}</small></div></div>`).join('') + '</div>' : '';
+    if (id === 'autos' && window.autosGuide) return autosGuide(); if (id === 'orc' && window.orcGuide) return orcGuide();
     if (window.ARENA && ARENA[id] && window.arenaGuide) return arenaGuide(id); /* arenas: powers with the button pictures, runes and the shop */
     return g('⚡ Poderes', POW[id] || []) + g(id === 'shroom25' ? '🔮 Secretos' : '🎒 Objetos', secretList(id)); };
   function fillPowers() { const id = W && W.profile.id; $('#pwShroom').style.display = 'none'; $('#pwRun').innerHTML = guideHTML(id); $('#pwSec').innerHTML = ''; }
