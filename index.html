@@ -43892,8 +43892,16 @@ function behind(c, d) { return [c.x - Math.cos(c.a) * d, c.y - Math.sin(c.a) * d
 function freeSpot(G, x, y) { const g = G.g; let cx = cellOf(x), cy = cellOf(y); if (isWall(g, cx, cy)) { cx = cellOf(x + (mid(cellOf(x)) - x)); } if (isWall(g, cx, cy)) return null; return [x, y]; }
 function nearestEnemy(G, me, pred) { let best = null, bd = 1e9; const D = bfs(G.g, [[cellOf(me.x), cellOf(me.y)]]); for (const c of G.cars) { if (c === me || c.out || (pred && !pred(c))) continue; const k = cellOf(c.y) * G.g.w + cellOf(c.x); const d = D[k] < 0 ? 999 : D[k]; if (d < bd) { bd = d; best = c; } } return best; }
 
+function awayPick(G, byId, cx, cy, L) { /* Perrin: tornado and fire go down the corridors AWAY from the one who threw them: pick the way that ends farthest from his car */
+  const o = G.cars.find(q => q.id === byId); if (!o || L.length < 2) return null; const D = bfs(G.g, [[cellOf(o.x), cellOf(o.y)]]); let best = null, bd = -1;
+  for (const d of L) { const k = (cy + d[1]) * G.g.w + (cx + d[0]), v = D[k] < 0 ? 999 : D[k]; if (v > bd) { bd = v; best = d; } } return best; }
 function usePower(G, c, aim) {
   const p = c.pw; if (!p || c.out || c.hurt > G.t || (c.e.foot || 0) > G.t || c.e.frozen > G.t || c.e.tor) return false;
+  let RJ = null; if (p === 'ramp') { /* Perrin: the ramp ONLY jumps the wall next to you, toward where you point (stick); with no wall there it does nothing and you keep it */
+    const g = G.g, cx = cellOf(c.x), cy = cellOf(c.y), dirs = []; const ad = (vx, vy) => { const d = Math.abs(vx) > Math.abs(vy) ? [Math.sign(vx), 0] : [0, Math.sign(vy)]; if ((d[0] || d[1]) && !dirs.some(q => q[0] === d[0] && q[1] === d[1])) dirs.push(d); };
+    if (aim && Math.hypot(aim[0], aim[1]) > 0.2) ad(aim[0], aim[1]); else if (c.in && c.in.m > 0.15) ad(c.in.dx, c.in.dy); else ad(Math.cos(c.a), Math.sin(c.a));
+    for (const [dx, dy] of dirs) { if (!isWall(g, cx + dx, cy + dy)) continue; for (let k = 2; k <= 3; k++) { const x = cx + dx * k, y = cy + dy * k; if (x < 1 || y < 1 || x >= g.w - 1 || y >= g.h - 1) break; if (!isWall(g, x, y)) { RJ = [x, y, dx, dy]; break; } } if (RJ) break; }
+    if (!RJ) return false; }
   c.pw = null; ev(G, 'pw', c.id, PWL.indexOf(p)); const t = G.t;
   if (p === 'oil') { const g = G.g; for (let k = 1; k <= 5; k++) { const x = c.x - Math.cos(c.a) * CS * k, y = c.y - Math.sin(c.a) * CS * k; if (isWall(g, cellOf(x), cellOf(y))) break; G.hz.push({ id: G.uid++, k: 'oil', x, y, r: 30, until: t + 6, by: c.id, arm: t + 0.3 }); } } /* a long trail of oil behind the car: 5 squares joined */
   else if (p === 'slow' || p === 'statue' || p === 'barrel') { const [x, y] = behind(c, p === 'statue' ? 44 : 34); const s = freeSpot(G, x, y) || [c.x, c.y];
@@ -43912,10 +43920,7 @@ function usePower(G, c, aim) {
   else if (p === 'missile') { for (let k = 0; k < 2; k++) { const o = nearestEnemy(G, c, x => x.hurt <= t); G.pr.push({ id: G.uid++, k: 'missile', x: c.x, y: c.y, a: c.a + (k ? 0.4 : -0.4), tgt: o ? o.id : -1, by: c.id, sp: 300, until: t + 6, d0: k * 0.25 }); } }
   else if (p === 'chase') { let o = nearestEnemy(G, c, x => !!starOf(G, x)); if (!o) o = nearestEnemy(G, c); G.pr.push({ id: G.uid++, k: 'chase', x: c.x, y: c.y, a: c.a, tgt: o ? o.id : -1, by: c.id, sp: 270, until: t + 10 }); }
   else if (p === 'fire') { const aimed = aim && Math.hypot(aim[0], aim[1]) > 0.2; let a = aimed ? Math.atan2(aim[1], aim[0]) : c.a + Math.PI; G.pr.push({ id: G.uid++, k: 'fire', x: c.x + Math.cos(a) * 20, y: c.y + Math.sin(a) * 20, a, by: c.id, sp: 600, until: t + 4, trail: [], tgt: -1, home: false }); } /* not aimed: it goes out BEHIND your car (you always drive forward) */
-  else if (p === 'ramp') { /* jump forward over up to three walls, to the first free cell after them */
-    const dx = Math.abs(Math.cos(c.a)) > Math.abs(Math.sin(c.a)) ? Math.sign(Math.cos(c.a)) : 0, dy = dx ? 0 : Math.sign(Math.sin(c.a)); let cx = cellOf(c.x), cy = cellOf(c.y), walls = 0, land = null;
-    for (let k = 1; k <= 7; k++) { const x = cx + dx * k, y = cy + dy * k; if (x < 1 || y < 1 || x >= G.g.w - 1 || y >= G.g.h - 1) break; if (isWall(G.g, x, y)) { walls++; if (walls > 3) break; continue; } land = [x, y]; if (walls > 0) break; if (k >= 3) break; }
-    if (!land) land = [cx, cy]; c.e.jump = { x0: c.x, y0: c.y, x1: mid(land[0]), y1: mid(land[1]), t0: t, d: 0.75 }; c.a = Math.atan2(dy, dx); }
+  else if (p === 'ramp') { c.e.jump = { x0: c.x, y0: c.y, x1: mid(RJ[0]), y1: mid(RJ[1]), t0: t, d: 0.6 }; c.a = Math.atan2(RJ[3], RJ[2]); } /* a little hop over the wall, landing right behind it */
   else if (p === 'bombs') { const g = G.g, open = []; for (let y = 1; y < g.h - 1; y++) for (let x = 1; x < g.w - 1; x++) if (!isWall(g, x, y)) open.push([x, y]);
     const foes = G.cars.filter(o => o !== c && !o.out); for (let k = 0; k < 7; k++) { let cell; if (k < 4 && foes.length) { const o = foes[(rnd() * foes.length) | 0]; const near = open.filter(([x, y]) => Math.abs(x - cellOf(o.x)) + Math.abs(y - cellOf(o.y)) <= 2); cell = near[(rnd() * near.length) | 0]; } if (!cell) cell = open[(rnd() * open.length) | 0];
       G.pr.push({ id: G.uid++, k: 'bomb', x0: c.x, y0: c.y, x1: mid(cell[0]) + (rnd() - 0.5) * 20, y1: mid(cell[1]) + (rnd() - 0.5) * 20, t0: t + k * 0.12, d: 1.3 + rnd() * 0.6, by: c.id, x: c.x, y: c.y }); } }
@@ -44049,7 +44054,7 @@ function step(G, dt) {
   for (const p of G.pr.slice()) { if (t > p.until) { G.pr.splice(G.pr.indexOf(p), 1); continue; } flyStep(G, p, stopped != null && p.by !== stopped ? dt * SLO : dt); }
   // tornados
   for (const T of G.tn.slice()) { if (t > T.until) { G.tn.splice(G.tn.indexOf(T), 1); continue; }
-    const g = G.g; if (!T.tx || Math.hypot(T.tx - T.x, T.ty - T.y) < 4) { const cx = cellOf(T.x), cy = cellOf(T.y), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy)); const back = N.filter(([dx, dy]) => !(mid(cx + dx) === T.px && mid(cy + dy) === T.py)); const L2 = back.length ? back : N, st = L2.find(([dx, dy]) => dx === T.dx && dy === T.dy); const [dx, dy] = st || L2[(rnd() * L2.length) | 0] || [0, 0]; T.dx = dx; T.dy = dy; /* straight on while it can, turns at walls, never comes back */ T.px = mid(cx); T.py = mid(cy); T.tx = mid(cx + dx); T.ty = mid(cy + dy); }
+    const g = G.g; if (!T.tx || Math.hypot(T.tx - T.x, T.ty - T.y) < 4) { const cx = cellOf(T.x), cy = cellOf(T.y), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy)); const back = N.filter(([dx, dy]) => !(mid(cx + dx) === T.px && mid(cy + dy) === T.py)); const L2 = back.length ? back : N, st = L2.find(([dx, dy]) => dx === T.dx && dy === T.dy), aw = awayPick(G, T.by, cx, cy, L2); const [dx, dy] = aw || st || L2[(rnd() * L2.length) | 0] || [0, 0]; T.dx = dx; T.dy = dy; /* straight on while it can, turns at walls, never comes back */ T.px = mid(cx); T.py = mid(cy); T.tx = mid(cx + dx); T.ty = mid(cy + dy); }
     const d = Math.hypot(T.tx - T.x, T.ty - T.y), s = Math.min(d, 560 * dt); /* very fast */ if (d > 0) { T.x += (T.tx - T.x) / d * s; T.y += (T.ty - T.y) / d * s; }
     for (const c of G.cars) { if (c.out || c.e.tor || c.e.jump || c.hurt > t || (c.e.invul || 0) > t || c.id === T.by) continue; /* your own tornado never takes you */ if (Math.hypot(c.x - T.x, c.y - T.y) < 26) { c.e.tor = { id: T.id, until: t + 2, a: 0 }; ev(G, 'tor', c.id); passStar(G, c); } } }
   // the end
@@ -44068,7 +44073,7 @@ function flyStep(G, p, dt) {
   if (p.k === 'fire') { const nx = p.x + Math.cos(p.a) * p.sp * dt, ny = p.y + Math.sin(p.a) * p.sp * dt; const ck = cellOf(ny) * g.w + cellOf(nx);
     if (p.x0 == null) { p.x0 = p.x; p.y0 = p.y; } if (!p.trail.includes(ck) && !isWall(g, cellOf(nx), cellOf(ny)) && Math.hypot(nx - p.x0, ny - p.y0) > CS * 1.6) { p.trail.push(ck); /* the fire starts burning a bit ahead of you, not under your car */ G.hz.push({ id: G.uid++, k: 'fire', x: mid(cellOf(nx)), y: mid(cellOf(ny)), r: 20, until: t + 3, by: p.by, arm: t + 0.25 }); }
     let hitCar = G.cars.find(c => c.id !== p.by && !c.out && c.hurt <= t && !c.e.jump && Math.hypot(c.x - nx, c.y - ny) < 26);
-    if (isWall(g, cellOf(nx), cellOf(ny)) && !hitCar && t < p.until) { const cx = cellOf(p.x), cy = cellOf(p.y), bx = -Math.round(Math.cos(p.a)), by2 = -Math.round(Math.sin(p.a)), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy) && !(dx === bx && dy === by2)); if (N.length) { const [dx, dy] = N[(rnd() * N.length) | 0]; p.x = mid(cx); p.y = mid(cy); p.a = Math.atan2(dy, dx); return; } } /* at a wall it turns and keeps burning the road */
+    if (isWall(g, cellOf(nx), cellOf(ny)) && !hitCar && t < p.until) { const cx = cellOf(p.x), cy = cellOf(p.y), bx = -Math.round(Math.cos(p.a)), by2 = -Math.round(Math.sin(p.a)), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy) && !(dx === bx && dy === by2)); if (N.length) { const [dx, dy] = awayPick(G, p.by, cx, cy, N) || N[(rnd() * N.length) | 0]; p.x = mid(cx); p.y = mid(cy); p.a = Math.atan2(dy, dx); return; } } /* at a wall it turns and keeps burning the road */
     if (isWall(g, cellOf(nx), cellOf(ny)) || hitCar) { G.pr.splice(G.pr.indexOf(p), 1); fireBlast(G, isWall(g, cellOf(nx), cellOf(ny)) ? p.x : nx, isWall(g, cellOf(nx), cellOf(ny)) ? p.y : ny, p.by); return; }
     p.x = nx; p.y = ny; return; }
   // missiles and the chaser: they follow the corridors to their target
@@ -44338,7 +44343,7 @@ function bindInput() {
   const kd = e => { if (!S || e.repeat) return; K[e.key] = 1; if (e.key === ' ' || e.key === 'e') press(null); upd(); }, ku = e => { if (!S) return; K[e.key] = 0; upd(); };
   addEventListener('keydown', kd); addEventListener('keyup', ku); S.keys = [kd, ku];
 }
-function press(aim) { if (!S) return; if (S.host) { const c = carById(S.G, S.me); if (c && usePower(S.G, c, aim)) snd('pw'); } else { S.pwSeq++; S.pwAim = aim; } }
+function press(aim) { if (!S) return; if (S.host) { const c = carById(S.G, S.me); if (c && usePower(S.G, c, aim)) snd('pw'); else if (c && c.pw === 'ramp') S.fxs.push({ k: 'txt', x: c.x, y: c.y, s: '🧱 ¿muro?', t0: performance.now() / 1000 }); } else { S.pwSeq++; S.pwAim = aim; } }
 function myCar() { const V = S && S.V; return V && V.c && V.c.find(c => c[0] === S.me); }
 // on a phone held upright the maze is turned a quarter, so the stick turns with it
 function toWorld(dx, dy, m) { return S && S.rot ? { dx: dy, dy: -dx, m } : { dx, dy, m }; }
@@ -44379,7 +44384,7 @@ function onEvent(V, e, now) {
   const [, k, a, b, c] = e, car = id => V.c.find(q => q[0] === id);
   if (k === 'horn') { if (a !== S.me || !S.host) snd('horn', a); }
   else if (k === 'boom') { snd('boom'); S.fxs.push({ k: 'boom', x: a, y: b, r: c || 50, t0: now / 1000 }); }
-  else if (k === 'bolt') { snd('bolt'); S.fxs.push({ k: 'bolt', ids: String(b).split(',').map(Number), t0: now / 1000 }); }
+  else if (k === 'bolt') { snd('bolt'); S.fxs.push({ k: 'bolt', ids: String(b == null ? '' : b).split(',').filter(q => q !== '').map(Number).filter(q => q !== a), t0: now / 1000 }); } /* never on the one who threw it (alone: on nobody) */
   else if (k === 'box') { if (a === S.me) snd('box'); }
   else if (k === 'pw') { if (a === S.me) snd('pw'); const q = car(a); if (q && !['tornado', 'fire', 'bolt'].includes(PWL[b])) S.fxs.push({ k: 'txt', x: q[1], y: q[2], s: PW[PWL[b]].ic, t0: now / 1000 }); /* these go off right away: no icon popping on your own car */ if (PWL[b] === 'stop') snd('tick'); }
   else if (k === 'hit') { snd('hit'); const q = car(a); if (q) S.fxs.push({ k: 'boom', x: q[1], y: q[2], r: 28, t0: now / 1000 }); }
@@ -44541,9 +44546,17 @@ const XBLK = [['LTrc', 230, 292, 235, 295], ['LTrc', 242, 286, 243, 289], /* roc
   /* the crates: a messy pile with 2 pockets */
   const PC = [[189, 186, -1, 0], [207, 199, 1, 0]]; for (const [i, j, dx, dy] of PC) pocket('LTbx', i, j, dx, dy); scatter('LTbx', 198, 192, 12, 14, 5, 0.55, PC);
   /* top left: an arc of broken towers with 2 pockets */
-  const PT = [[108, 290, 0, -1], [100, 282, 1, 0]]; for (const [i, j, dx, dy] of PT) pocket('LOsc', i, j, dx, dy); for (const [i, j] of [[114, 292], [104, 287], [97, 276], [111, 284]]) XBLK.push(['LOsc', i, j, i + 1, j + 1]); }
+  const PT = [[108, 290, 0, -1], [100, 282, 1, 0]]; for (const [i, j, dx, dy] of PT) pocket('LTbx', i, j, dx, dy); /* Perrin: the pockets of the tower corner are made of crates (the towers stand in a fan) */ }
+{ /* Perrin: towers ONLY in the top-left corner, in a fan where the rocks and barrels were (those become towers and crates, no rocks or barrels there); no towers in the forest, the crates or on the edge of the arena */
+  const IJ = d => [Math.round((d[1] - M0) / CELL), Math.round((d[2] - M0) / CELL)], inA = (i, j) => i >= 94 && i <= 246 && j >= 155 && j <= 298, TLS = (i, j) => i <= 135 && j >= 250 && i >= 98 && j <= 294, keep = [], tw = []; MP.clr = [];
+  for (const d of MP.doo) { const [i, j] = IJ(d); if (!inA(i, j) || d[5]) { keep.push(d); continue; }
+    if (TLS(i, j)) { if (/^(LOsm|LSst|LOic|LOsc)$/.test(d[0])) { if (tw.some(t => Math.hypot(t[0] - i, t[1] - j) < 5)) continue; tw.push([i, j]); d[0] = 'LOsc'; d[4] = 1.25; } else if (d[0] === 'LTba') d[0] = 'LTbx'; else if (/^(YOfs|AOsr|LOsk|LOss|YOks|YObb|YOwb)$/.test(d[0])) { MP.clr.push(d); continue; } }
+    else if (/^LO(ic|sc)$/.test(d[0])) { MP.clr.push(d); continue; }
+    keep.push(d); }
+  MP.doo.length = 0; for (const d of keep) MP.doo.push(d); }
 for (const [t, i0, j0, i1, j1] of XBLK) for (let i = i0; i <= i1; i += 2) for (let j = j0; j <= j1; j += 2) { const cl = []; for (let jj = j; jj <= Math.min(j + 1, j1); jj++) for (let ii = i; ii <= Math.min(i + 1, i1); ii++) cl.push(jj * GWd + ii); const w = Math.min(2, i1 - i + 1), h = Math.min(2, j1 - j + 1); MP.doo.push([t, M0 + (i + w / 2) * CELL, M0 + (j + h / 2) * CELL, 0, t === 'YTft' ? 0.7 : 0.55, cl]); }
 const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })(), TERR = WALK.slice(); /* TERR: the ground itself, before rocks, trees and boxes block it */
+for (const d of MP.clr || []) for (let j = Math.floor((d[2] - 56 - M0) / CELL); j <= Math.floor((d[2] + 56 - M0) / CELL); j++) for (let i = Math.floor((d[1] - 56 - M0) / CELL); i <= Math.floor((d[1] + 56 - M0) / CELL); i++) { const x = M0 + i * CELL + 16, y = M0 + j * CELL + 16; if (x < MP.arena[0] + 64 || x > MP.arena[2] - 64 || y < MP.arena[1] + 64 || y > MP.arena[3] - 64) continue; const k = j * GWd + i; WALK[k >> 3] |= 1 << (k & 7); TERR[k >> 3] |= 1 << (k & 7); } /* the removed towers leave free sand */
 { /* the stones, columns, trees and boxes of the map block the way too (that is how the corners where monsters come one by one are made) */
   const RAD = { LOic: 48, LOsc: 48, AOsr: 60, LTrc: 52, YObs: 64, YSco: 48, YObw: 64, YTft: 40, LTbx: 40, LTcr: 40, LTba: 48, YOwb: 48, YObb: 48, YSaw: 48, LSst: 48, YOfs: 32, YOks: 32, LTbr: 32, LTbs: 32, LTex: 40 };
   const SQ = { LTrc: 64 }; /* rock chunks block a 4x4 square like in the editor: side by side they make the walls of the corner pockets */
@@ -44552,25 +44565,28 @@ const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for
     if (SQ[d[0]]) { const h = SQ[d[0]]; for (let j = Math.floor((d[2] - h - M0) / CELL); j <= Math.floor((d[2] + h - M0) / CELL); j++) for (let i = Math.floor((d[1] - h - M0) / CELL); i <= Math.floor((d[1] + h - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if (Math.abs(cx - d[1]) >= h || Math.abs(cy - d[2]) >= h || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl) DEST.push([di0, brk[0], cl]); continue; } let r = RAD[d[0]]; if (!r) continue; r *= d[4] || 1; for (let j = Math.floor((d[2] - r - M0) / CELL); j <= Math.floor((d[2] + r - M0) / CELL); j++) for (let i = Math.floor((d[1] - r - M0) / CELL); i <= Math.floor((d[1] + r - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if ((cx - d[1]) ** 2 + (cy - d[2]) ** 2 > r * r || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl && cl.length) DEST.push([di0, brk[0], cl]); } }
 for (const k of FOREST) WALK[k >> 3] &= ~(1 << (k & 7));
 for (const [i, j] of [[104, 167], [104, 168]]) { const k = j * GWd + i; WALK[k >> 3] |= 1 << (k & 7); DMK[k] = 0; } /* the mouth of the bottom-left nook */
+const SANDM = new Uint8Array(GWd * GHd); for (const d of MP.doo) { const ci = Math.floor((d[1] - M0) / CELL), cj = Math.floor((d[2] - M0) / CELL); if (d[1] < MP.arena[0] || d[1] > MP.arena[2] || d[2] < MP.arena[1] || d[2] > MP.arena[3]) continue; for (let j = cj - 3; j <= cj + 3; j++) for (let i = ci - 3; i <= ci + 3; i++) if (i >= 0 && j >= 0 && i < GWd && j < GHd) SANDM[j * GWd + i] = 1; } /* Perrin: under every rock, tower or box of the arena the ground is sand (no grey squares) */
 const FOUNT = MP.fount, SHOPS = MP.shops, ARENA = MP.arena, GATEB = MP.gate;
 function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false; const k = j * GWd + i; return !DMK[k] && !!(WALK[k >> 3] & (1 << (k & 7))); }
 // the cell doors: each cell has its iron gate shut until its gladiator picks a weapon (1 s later it opens for good)
 { /* 12 cells, one per player (the map had 10): the first cell is copied twice to its left, same walls, same door */
   const c0 = MP.cells[0], c1 = MP.cells[1], per = Math.round((c1[0] - c0[0]) / CELL), ci0 = Math.floor((c0[0] - M0) / CELL), cj0 = Math.floor((c0[1] - M0) / CELL), bit = k => (WALK[k >> 3] >> (k & 7)) & 1, set = (k, v) => { if (v) WALK[k >> 3] |= 1 << (k & 7); else WALK[k >> 3] &= ~(1 << (k & 7)); TERR[k >> 3] = WALK[k >> 3]; };
   if (MP.cells.length === 10) for (const n of [1, 2]) { for (let j = cj0 - 13; j <= cj0 + 23; j++) for (let di = -Math.ceil(per / 2); di < Math.ceil(per / 2); di++) { const src = j * GWd + ci0 + di, dst = j * GWd + ci0 + di - per * n; set(dst, bit(src)); } MP.cells.unshift([c0[0] - per * n * CELL, c0[1]]); MP.cells.splice(0, 1); MP.cells.unshift([c0[0] - per * n * CELL, c0[1]]); }
+    /* Perrin: the way to the shops must stay the original one (out of the cell: up, left, down a bit). The copies sat in the old side room, so wall off what is left of that room: the corridor of the cells must not open into it */
+  if (MP.cells.length === 12) { const L = ci0 - 2 * per - Math.ceil(per / 2); for (let i = L - 14; i < L; i++) for (let j = cj0 - 5; j <= cj0 + 26; j++) set(j * GWd + i, 0); }
   if (MP.cells.length > 12) MP.cells.length = 12; MP.cells.sort((a, b) => ((a[1] < -4500) === (b[1] < -4500)) ? (a[1] < -4500 ? a[0] - b[0] : a[1] - b[1]) : (a[1] < -4500 ? -1 : 1)); }
 const DOORM = new Uint8Array(GWd * GHd), DOORS = MP.cells.map((c, ci) => { const right = c[0] > 4400 && c[1] > -4500, di = right ? -1 : 0, dj = right ? 0 : 1; let i = Math.floor((c[0] - M0) / CELL), j = Math.floor((c[1] - M0) / CELL); const run = (i, j) => { const L = []; if (!walkC(i, j)) return L; L.push([i, j]); for (const s of [-1, 1]) for (let k = 1; k < 20; k++) { const a = i + (dj ? s * k : 0), b = j + (di ? s * k : 0); if (!walkC(a, b)) break; L.push([a, b]); } return L; };
   let room = 0; for (let k = 0; k < 40; k++, i += di, j += dj) { const R = run(i, j); if (!R.length) break; if (!room || R.length >= room * 0.8) room = Math.max(room, R.length); else if (R.length <= room * 0.7) { const R2 = run(i + di, j + dj); const cells = R.concat(R2.length && R2.length <= room * 0.7 ? R2 : []); const xs = cells.map(q => M0 + q[0] * CELL), ys = cells.map(q => M0 + q[1] * CELL); return { ci, cells: cells.map(q => q[1] * GWd + q[0]), r: [Math.min(...xs), Math.min(...ys), Math.max(...xs) + CELL, Math.max(...ys) + CELL], v: !!dj }; } }
   return null; });
 function setDoors(open) { DOORM.fill(0); DOORS.forEach((d, i) => { if (d && !open[i]) for (const k of d.cells) DOORM[k] = 1; }); }
 /* the arena's doors (left, top, right): shut while a round is fought, open in the break so you walk to the shops (Perrin: in the original nobody gets in or out during a round) */
-const AGM = new Uint8Array(GWd * GHd), AOPEN = []; let AGON = false;
+const AGM = new Uint8Array(GWd * GHd), AOPEN = []; let AGON = false, GOPEN = false; /* GOPEN: the yard gate (bottom) is open in the break */
 { const [ax0, ay0, ax1, ay1] = MP.arena, i0 = Math.floor((ax0 - M0) / CELL), i1 = Math.floor((ax1 - M0) / CELL), j0 = Math.floor((ay0 - M0) / CELL), j1 = Math.floor((ay1 - M0) / CELL);
   const side = (cells, inward) => { let run = []; const flush = () => { if (run.length >= 2) { for (const [i, j] of run) for (let d = 0; d < 2; d++) AGM[(j - inward[1] * d) * GWd + (i - inward[0] * d)] = 1; const m = run[run.length >> 1]; AOPEN.push({ x: M0 + (m[0] + inward[0] * 4) * CELL + 16, y: M0 + (m[1] + inward[1] * 4) * CELL + 16, ax: inward[1] !== 0 ? 1 : 0, w: run.length * CELL / 2 }); } run = []; };
     for (const c of cells) { if (walkC(c[0], c[1])) run.push(c); else flush(); } flush(); };
   const L = [], R = [], T = []; for (let j = j0; j <= j1; j++) { L.push([i0 - 1, j]); R.push([i1 + 1, j]); } for (let i = i0; i <= i1; i++) T.push([i, j1 + 1]);
   side(L, [1, 0]); side(R, [-1, 0]); side(T, [0, -1]); }
-function walkable(x, y, nd) { if (!nd) { const i = Math.floor((x - M0) / CELL), j = Math.floor((y - M0) / CELL); if (i >= 0 && j >= 0 && i < GWd && j < GHd && (DOORM[j * GWd + i] || (AGON && AGM[j * GWd + i]))) return false; } if (x > GATEB[0] && x < GATEB[2] && y > GATEB[1] && y < GATEB[3]) return false; /* the gate to the arena is always shut: you go in when the round starts */ return walkC(Math.floor((x - M0) / CELL), Math.floor((y - M0) / CELL)); }
+function walkable(x, y, nd) { if (!nd) { const i = Math.floor((x - M0) / CELL), j = Math.floor((y - M0) / CELL); if (i >= 0 && j >= 0 && i < GWd && j < GHd && (DOORM[j * GWd + i] || AGM[j * GWd + i])) return false; } if (!GOPEN && x > GATEB[0] && x < GATEB[2] && y > GATEB[1] && y < GATEB[3]) return false; /* Perrin: the side gates are only for the monsters (players never pass); the yard gate is open in the break (go in and pick your place) and shut in the round */ return walkC(Math.floor((x - M0) / CELL), Math.floor((y - M0) / CELL)); }
 const AC = [(MP.arena[0] + MP.arena[2]) / 2, (MP.arena[1] + MP.arena[3]) / 2]; /* the very middle of the arena: everybody appears there when a round starts */
 const inArena = (x, y) => x > ARENA[0] && x < ARENA[2] && y > ARENA[1] && y < ARENA[3];
 
@@ -44846,7 +44862,7 @@ function spawnSpot(Sr) { const A = staticFields().arena; for (let k = 0; k < 60;
 
 // ---------- the simulation ----------
 function step(G, dt) {
-  AGON = G.ph === 'wave'; /* the arena doors */
+  AGON = G.ph === 'wave'; GOPEN = G.ph === 'break'; /* the arena doors */
   G.t += dt; const t = G.t;
   if (G.ph === 'pick') { for (const h of heroes(G)) if (!h.wp && h.bot && t > 1.5 + (h.pid % 4) * 0.7) { h.wp = WL[Math.floor(rnd() * WL.length)]; setWeapon(G, h); }
     if (t >= G.phEnd || heroes(G).every(h => h.wp)) { for (const h of heroes(G)) if (!h.wp) { h.wp = WL[Math.floor(rnd() * WL.length)]; setWeapon(G, h); } startBreak(G, true); }
@@ -44947,7 +44963,7 @@ function botThink(G, h, dt) {
 // ---------- what goes over the network ----------
 function snap(G) {
   const t = G.t;
-  return { t: Math.round(t * 100) / 100, ph: G.ph, pe: Math.max(0, Math.round((G.phEnd - t) * 10) / 10), r: G.round, won: G.won,
+  return { t: Math.round(t * 100) / 100, ph: G.ph, gs: G.ph === 'wave' && G.pend.some(q => !q.fx) ? 1 : 0, pe: Math.max(0, Math.round((G.phEnd - t) * 10) / 10), r: G.round, won: G.won,
     h: heroes(G).map(h => [h.id, h.pid, Math.round(h.x), Math.round(h.y), Math.round(h.a * 100) / 100, Math.round(h.hp), h.mhp, h.lv, h.gold, h.wp, h.dead ? 1 : 0, h.inv.map(k => k.id + ':' + k.ch).join(','), Math.max(0, Math.round(((h.cd.q || 0) - t) * 10) / 10), Math.max(0, Math.round(((h.cd.w || 0) - t) * 10) / 10), effBits(G, h), h.name, h.col, h.sk || '', h.xp, Math.round(t - (h.atkT || -9)) < 1 ? 1 : 0, Math.max(0, Math.round(((h.cd.e || 0) - t) * 10) / 10), Math.max(0, Math.round(((h.cd.r || 0) - t) * 10) / 10)]),
     c: G.units.filter(u => !u.hero).map(u => [u.id, u.creep ? u.ci : 'm', Math.round(u.x), Math.round(u.y), Math.round(u.hp / u.mhp * 100), Math.round(u.sz), effBits(G, u), u.merc ? (u.ic || '') : '', u.merc ? u.owner : -1, u.ill ? 1 : 0, Math.round(u.a * 10) / 10, (u.atkT || 0) > t - 0.3 ? 1 : 0]),
     p: G.pr.map(p => [p.k, Math.round(p.x), Math.round(p.y), Math.round(p.a * 100) / 100]), tr: G.traps.map(q => [Math.round(q.x), Math.round(q.y)]), wd: G.wards.map(q => [Math.round(q.x), Math.round(q.y)]),
@@ -45103,6 +45119,7 @@ function onPhase(V, was) {
 }
 function onEvent(V, e, now) {
   const k = e[1], a = e[2], b = e[3], c = e[4];
+  if (k === 'swing') { S.atk0 = S.atk0 || {}; S.atk0[a] = now; } /* the attack animation starts */
   if (k === 'clear') { snd('coin'); flash(`¡Ronda ${a} superada!`, '🛒 Ve a la tienda: sigue la flecha amarilla. Se viene la próxima ronda'); }
   if (k === 'round') { snd('horn'); const C = CREEPS[a]; flash(`Ronda ${a} de ${ROUNDS}`, (b ? '👑 ¡Jefes! ' : '') + C.ic + ' ' + C.n + (CREEPS[a].shot ? ' · atacan de lejos' : '')); }
   else if (k === 'break') { const C = CREEPS[a]; if (a > 1) flash('✅ ¡Ronda superada!', `Descanso: cúrate en la fuente y compra en las tiendas. Viene: ${C.ic} ${C.n}`, 3600); if (C.txt) setTimeout(() => { if (S) flash('⚠️ Viene un jefe', C.txt, 5200); }, a > 1 ? 3800 : 4600); }
@@ -45157,28 +45174,28 @@ function hsh(a, b) { let x = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; re
 function paintChunk(ci, cj) {
   const x0 = ci * CHW, y0 = cj * CHW, y1 = y0 + CHW, c = document.createElement('canvas'); c.width = c.height = Math.round(CHW * CK); const g = c.getContext('2d'); let miss = false;
   const sand = im('og_sand'); const pat = sand ? g.createPattern(sand, 'repeat') : null; if (!sand) miss = true;
+  const tp = (n, cells) => { const q = im(n); if (!q) { miss = true; return null; } const p = g.createPattern(q, 'repeat'); try { p.setTransform(new DOMMatrix().scale(cells * CELL * CK / q.width)); } catch (e) {} return p; }, PW = tp('og_t_wall_top', 4), PJ = tp('og_t_cell', 4), PS = tp('og_t_corridor', 5); /* Perrin's floors and walls */
   const P = (x, y) => [(x - x0) * CK, (y1 - y) * CK], cs = CELL * CK + 0.6;
-  for (let y = y0; y < y1; y += CELL) for (let x = x0; x < x0 + CHW; x += CELL) { const [px, py] = P(x, y + CELL), w = walkable(x + 16, y + 16) || (inArena(x + 16, y + 16) && (() => { const k = Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL); return !!(TERR[k >> 3] & (1 << (k & 7))); })()) /* under a rock or a box it is still sand */ || (x + 16 > GATEB[0] && x + 16 < GATEB[2] && y + 16 > GATEB[1] && y + 16 < GATEB[3]), r = hsh(x, y);
+  for (let y = y0; y < y1; y += CELL) for (let x = x0; x < x0 + CHW; x += CELL) { const [px, py] = P(x, y + CELL), w = walkable(x + 16, y + 16) || (inArena(x + 16, y + 16) && (() => { const k = Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL); return !!(TERR[k >> 3] & (1 << (k & 7))) || !!SANDM[k]; })()) /* under a rock or a box it is still sand */ || (x + 16 > GATEB[0] && x + 16 < GATEB[2] && y + 16 > GATEB[1] && y + 16 < GATEB[3]), r = hsh(x, y);
     if (w) { const z = inArena(x + 16, y + 16) ? 'sand' : y < -2300 ? 'jail' : 'stand';
       if (z === 'sand') { if (pat) { g.fillStyle = pat; g.save(); g.translate(-(x0 * CK) % 115, 0); g.restore(); } g.fillStyle = pat || '#c8a46a'; }
-      else g.fillStyle = z === 'jail' ? (r < 0.5 ? '#5d5650' : '#57504a') : (r < 0.5 ? '#8a7d6c' : '#83776a');
+      else g.fillStyle = z === 'jail' ? (PJ || (r < 0.5 ? '#5d5650' : '#57504a')) : (PS || (r < 0.5 ? '#8a7d6c' : '#83776a'));
       g.fillRect(px, py, cs, cs); if (z === 'sand') { g.fillStyle = 'rgba(205,168,108,.55)'; g.fillRect(px, py, cs, cs); }
-      if (z !== 'sand' && (Math.floor((x - M0) / CELL) + Math.floor((y - M0) / CELL)) % 2) { g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(px, py, cs, cs); } /* stone slabs */
+      if (z !== 'sand' && !PJ && (Math.floor((x - M0) / CELL) + Math.floor((y - M0) / CELL)) % 2) { g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(px, py, cs, cs); } /* stone slabs */
       if (z === 'sand' && r < 0.04) { g.fillStyle = 'rgba(120,20,10,.22)'; g.beginPath(); g.ellipse(px + cs / 2, py + cs / 2, cs * 0.9, cs * 0.5, r * 9, 0, 7); g.fill(); } }
-    else if (((x > 1500 && y < -4500) || (x > 4400 && y < 0)) && (walkable(x + 48, y + 16) || walkable(x - 16, y + 16) || walkable(x + 16, y + 48) || walkable(x + 16, y - 16))) { /* the prisoners' cells: iron bars */ g.fillStyle = '#2a2624'; g.fillRect(px, py, cs, cs); g.fillStyle = '#9a9aa2'; for (let b = 3; b < cs; b += cs / 3) g.fillRect(px + b, py, Math.max(1.5, cs * 0.12), cs); g.fillStyle = '#6a6a72'; g.fillRect(px, py + cs * 0.15, cs, cs * 0.1); }
+    else if (((x > 1500 && y < -4500) || (x > 4400 && y < 0)) && (walkable(x + 48, y + 16) || walkable(x - 16, y + 16) || walkable(x + 16, y + 48) || walkable(x + 16, y - 16))) { /* the prisoners' cells: iron bars (Perrin's bars) */ const qb = im('og_m_bars'); g.fillStyle = PJ || '#2a2624'; g.fillRect(px, py, cs, cs); if (qb) g.drawImage(qb, px - cs * 0.05, py - cs * 0.15, cs * 1.1, cs * 1.25); else { g.fillStyle = '#9a9aa2'; for (let b = 3; b < cs; b += cs / 3) g.fillRect(px + b, py, Math.max(1.5, cs * 0.12), cs); } }
     else if (RKMZ[Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL)]) { /* the rock wall of the rock corner: piled boulders, a darker face where the lane is in front */
       g.fillStyle = r < 0.5 ? '#6d655c' : '#675f57'; g.fillRect(px, py, cs, cs); }
     else { /* walls: stone blocks, with a darker front face where the floor is in front (below) so they look tall */
-      const front = walkable(x + 16, y - 16); g.fillStyle = r < 0.5 ? '#4a3f45' : '#463c42'; g.fillRect(px, py, cs, cs);
-      g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1);
-      if (front) { g.fillStyle = '#2b2328'; g.fillRect(px, py + cs * 0.45, cs, cs * 0.55); g.fillStyle = '#6a5c62'; g.fillRect(px, py + cs * 0.4, cs, cs * 0.1); } } }
+      const front = walkable(x + 16, y - 16); g.fillStyle = PW || (r < 0.5 ? '#4a3f45' : '#463c42'); g.fillRect(px, py, cs, cs);
+      if (!PW) { g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1); }
+      if (front) { g.fillStyle = PW ? 'rgba(20,14,18,.55)' : '#2b2328'; g.fillRect(px, py + cs * 0.45, cs, cs * 0.55); g.fillStyle = PW ? 'rgba(255,240,220,.18)' : '#6a5c62'; g.fillRect(px, py + cs * 0.4, cs, cs * 0.1); } } }
   for (let y = y0 - CELL * 2; y < y1 + CELL * 2; y += CELL) for (let x = x0 - CELL * 2; x < x0 + CHW + CELL * 2; x += CELL) { const i = Math.floor((x + 16 - M0) / CELL), j = Math.floor((y + 16 - M0) / CELL); if (i < 0 || j < 0 || i >= GWd || j >= GHd || !RKMZ[j * GWd + i] || (i + j * 3) % 2) continue; /* boulders on every other cell of the rock wall */
     const r = hsh(x * 1.7, y * 0.9), [px, py] = P(x + 16 + (r - 0.5) * 14, y + 16 + (hsh(y, x) - 0.5) * 14), R = CELL * CK * (0.95 + r * 0.4), front = !RKMZ[(j - 1) * GWd + i] && walkable(x + 16, y - 16);
     g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px + R * 0.25, py + R * 0.35, R, R * 0.6, 0, 0, 7); g.fill();
     g.fillStyle = r < 0.33 ? '#8f877c' : r < 0.66 ? '#857d73' : '#9a9185'; g.strokeStyle = '#3b3530'; g.lineWidth = 1.2; g.beginPath(); for (let q = 0; q < 7; q++) { const an = q / 7 * 6.283 + r * 4, rr = R * (0.78 + 0.22 * hsh(q, r)); g.lineTo(px + Math.cos(an) * rr, py - (front ? R * 0.3 : 0) + Math.sin(an) * rr * 0.85); } g.closePath(); g.fill(); g.stroke();
     g.fillStyle = 'rgba(255,255,255,.2)'; g.beginPath(); g.ellipse(px - R * 0.3, py - R * 0.45, R * 0.35, R * 0.2, 0, 0, 7); g.fill(); }
-  // the gate between the yard and the arena (always shut)
-  { const [gx, gy] = P(GATEB[0], GATEB[3]); g.fillStyle = '#2a2420'; g.fillRect(gx, gy, (GATEB[2] - GATEB[0]) * CK, (GATEB[3] - GATEB[1]) * CK); g.strokeStyle = '#8a8a90'; g.lineWidth = 3; for (let x = GATEB[0] + 16; x < GATEB[2]; x += 40) { const [lx, ly] = P(x, GATEB[3]); g.beginPath(); g.moveTo(lx, ly); g.lineTo(lx, ly + (GATEB[3] - GATEB[1]) * CK); g.stroke(); } }
+  // the yard gate is drawn as a sprite (open in the break, shut in the round)
   return { cv: c, miss };
 }
 function drawGround(g, cam, z, cw, ch) {
@@ -45240,7 +45257,8 @@ function render(V, now) {
     else if (k === 'shop') { const p = SHOPS[o], [sx, sy] = w2s(p[0], p[1]), q = im('og_st_' + o); if (q) { const w = 300 * z, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.8, w, h); }
       const nm = SECTIONS.find(x => x[0] === o); if (nm) label(g, nm[1] + ' ' + nm[2], sx, sy + 16, '#ffe9a8', 12); }
     else if (k === 'fount') { const [sx, sy] = w2s(FOUNT[0], FOUNT[1]), q = im('og_fount'); if (q) { const w = 300 * z, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.75, w, h); } label(g, '💧 Fuente: te cura', sx, sy + 18, '#bfe9ff', 12); }
-    else if (k === 'gate') { const [sx, sy] = w2s(o[0], o[1]), q = im('og_gate'); if (q) { const w = 260 * z, h = w * q.height / q.width; g.save(); if (o[2] === 'B') g.globalAlpha = 1; g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); g.restore(); } if (o[2] === 'B' && V.ph !== 'wave') label(g, '🔒 Reja cerrada · al empezar la ronda entras a la arena', sx, sy + 14, '#ffd84a', 11); }
+    else if (k === 'gate') { const [sx, sy] = w2s(o[0], o[1]), side = o[2] === 'L' ? 'L' : o[2] === 'R' ? 'R' : 'F', open = o[2] === 'B' ? V.ph === 'break' : (V.ph === 'wave' && V.gs), q = im('og_gate' + side + (open ? '_o' : '_c')) || im('og_gate');
+      if (q) { const h = (side === 'F' ? 230 : 300) * z, w = h * q.width / q.height; g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); } if (o[2] === 'B' && V.ph === 'break') label(g, '🔓 Puerta abierta · entra a buscar tu puesto', sx, sy + 14, '#9dff8a', 11); }
     else if (k === 'door') drawDoor(g, o, w2s, z);
     else if (k === 'c') drawCreep(g, o, now, w2s, z);
     else drawHero(g, o, now, w2s, z); }
@@ -45266,7 +45284,8 @@ function render(V, now) {
   if (V.ph === 'wave' && me) { let shown = 0; for (const c of V.c) { if (c[1] === 'm' || shown > 6) continue; const [sx, sy] = w2s(c[2], c[3]); if (sx > 0 && sx < cw && sy > 50 && sy < ch) continue; shown++; const a = Math.atan2(sy - ch / 2, sx - cw / 2); const px = clamp(cw / 2 + Math.cos(a) * cw, 16, cw - 16), py = clamp(ch / 2 + Math.sin(a) * ch, 60, ch - 16); g.save(); g.translate(px, py); g.rotate(a); g.fillStyle = 'rgba(255,70,50,.85)'; g.beginPath(); g.moveTo(12, 0); g.lineTo(-8, -8); g.lineTo(-8, 8); g.fill(); g.restore(); } }
   if (me && me[10] && V.ph === 'wave') { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, cw, ch); label(g, '💀 Revives al terminar la ronda', cw / 2, ch * 0.22, '#fff', 17); }
 }
-function drawDoor(g, d, w2s, z) { /* the iron gate of a cell, shut until you pick */ const [x0, y0, x1, y1] = d.r, H = 120 * z; g.save(); g.lineCap = 'round'; if (d.open) { g.translate(0, -H * 0.95); g.globalAlpha = 0.85; }
+function drawDoor(g, d, w2s, z) { /* the iron gate of a cell, shut until you pick */ const [x0, y0, x1, y1] = d.r, H = 120 * z;
+  { const q = im(d.open ? 'og_m_gate_o' : 'og_m_gate_c'); if (q) { /* Perrin's prison gate (stone arch and bars) */ let ax, ay, w; if (d.v) { const ym = (y0 + y1) / 2; [ax, ay] = w2s(x0 - 10, ym); w = w2s(x1 + 10, ym)[0] - ax; } else { const xm = (x0 + x1) / 2, a1 = w2s(xm, y1 + 8), b1 = w2s(xm, y0 - 8); w = Math.max(60 * z, (b1[1] - a1[1]) * 0.9); ax = a1[0] - w / 2; ay = b1[1]; } const h = w * q.height / q.width; g.drawImage(q, ax, ay - h * 0.9, w, h); return; } } g.save(); g.lineCap = 'round'; if (d.open) { g.translate(0, -H * 0.95); g.globalAlpha = 0.85; }
   if (d.v) { const ym = (y0 + y1) / 2, [ax, ay] = w2s(x0 - 8, ym), [bx] = w2s(x1 + 8, ym); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(ax, ay - 3, bx - ax, 8);
     g.strokeStyle = '#2a2a30'; g.lineWidth = 5; g.beginPath(); g.moveTo(ax, ay - H); g.lineTo(bx, ay - H); g.moveTo(ax, ay - H * 0.5); g.lineTo(bx, ay - H * 0.5); g.moveTo(ax, ay); g.lineTo(bx, ay); g.stroke();
     const n = Math.max(4, Math.round((bx - ax) / 9)); for (let k = 0; k <= n; k++) { const x = ax + (bx - ax) * k / n; g.strokeStyle = '#1c1c22'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, ay); g.lineTo(x, ay - H - 6); g.stroke(); g.strokeStyle = '#9aa0ac'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x - 1, ay); g.lineTo(x - 1, ay - H - 6); g.stroke(); } }
@@ -45274,6 +45293,8 @@ function drawDoor(g, d, w2s, z) { /* the iron gate of a cell, shut until you pic
     const n = Math.max(4, Math.round((by - ay) / 9)); for (let k = 0; k <= n; k++) { const y = ay + (by - ay) * k / n; g.strokeStyle = '#1c1c22'; g.lineWidth = 4; g.beginPath(); g.moveTo(ax, y); g.lineTo(ax, y - H); g.stroke(); g.strokeStyle = '#9aa0ac'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(ax - 1, y); g.lineTo(ax - 1, y - H); g.stroke(); } }
   g.restore(); }
 function label(g, txt, x, y, col, size) { g.font = `900 ${size || 13}px system-ui`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineWidth = 4; g.strokeStyle = 'rgba(0,0,0,.8)'; g.strokeText(txt, x, y); g.fillStyle = col || '#fff'; g.fillText(txt, x, y); }
+const GLM = {"w_frost":[0.944,0.864],"a_frost":[0.914,0.814],"a_bow":[0.955,0.833],"w_bow":[0.899,0.816],"a_storm":[0.889,0.781],"w_storm":[0.884,0.819],"w_hammer":[0.894,0.848],"a_hammer":[0.891,0.775],"w_samurai":[0.932,0.889],"a_samurai":[0.955,0.816],"a_axe":[0.952,0.838],"w_axe":[0.955,0.864],"a_great":[0.962,0.779],"w_great":[0.874,0.834],"a_spear":[0.909,0.828],"w_spear":[0.939,0.892],"w_druid":[0.902,0.843],"a_druid":[0.874,0.811],"w_wizard":[0.872,0.838],"a_wizard":[0.914,0.751]}; /* [feet, height] of each walk (w_) and attack (a_) sheet, in cells */
+const GLR = [[4, 1], [3, 1], [2, 1], [1, 1], [0, 1], [1, -1], [2, -1], [3, -1]]; /* view of the 8-view strip -> [row of the 5-row sheets (back, 3/4 back, side, 3/4 front, front; facing right), mirror] */
 function drawHero(g, h, now, w2s, z) {
   const [id, pid, x, y, a, hp, mhp, lv, , wp, dead, , , , f, name, col, sk] = h, [sx, sy] = w2s(x, y);
   if (dead) { g.font = '22px system-ui'; g.textAlign = 'center'; g.fillText('🪦', sx, sy); return; }
@@ -45287,7 +45308,10 @@ function drawHero(g, h, now, w2s, z) {
   if (GLq) { const deg = a * 180 / Math.PI, vi = ((Math.round((deg + 90) / 45) % 8) + 8) % 8, cw = GLq.width / 8, H0 = 128 * z * ((f & 32) ? 1.25 : 1), sc = H0 / GLq.height, w = cw * sc;
     const bob = mv ? Math.abs(Math.sin((S.dist[id] || 0) / 18)) * 5 : Math.sin(now * 2.5 + id) * 1.2, sway = mv ? Math.sin((S.dist[id] || 0) / 18) * 0.07 : 0, atk = h[19] ? Math.sin(now * 28) : 0;
     g.save(); g.translate(sx + Math.cos(a) * atk * 8, sy - Math.sin(a) * atk * 4 - bob); g.rotate(sway + atk * 0.12 * (Math.cos(a) >= 0 ? 1 : -1)); if (f & 4) g.rotate(now * 20); if (f & 8) g.globalAlpha = 0.45;
-    g.drawImage(GLq, vi * cw, 0, cw, GLq.height, -w / 2, -H0, w, H0); g.restore(); top = sy - H0 - bob; }
+    const a0 = S.atk0 && S.atk0[id], att = a0 != null && now - a0 < 0.5, an = att ? 'a' : mv ? 'w' : null, AQ = an && im('og_g' + an + '_' + wp), MW = GLM['w_' + wp];
+    if (AQ && MW) { /* Perrin's walking and attack sheets: 8 frames, 5 views (the left ones are the right ones mirrored) */ g.restore(); const [row, mir] = GLR[vi], cs = AQ.width / 8, fi = att ? Math.min(7, Math.floor((now - a0) / 0.06)) : Math.floor((S.dist[id] || 0) / 20) % 8, M = GLM[an + '_' + wp] || MW, k = H0 / (MW[1] * cs), dw = cs * k;
+      g.save(); g.translate(sx, sy); g.scale(mir, 1); if (f & 4) g.rotate(now * 20); if (f & 8) g.globalAlpha = 0.45; g.drawImage(AQ, fi * cs, row * cs, cs, cs, -dw / 2, -M[0] * dw, dw, dw); g.restore(); top = sy - H0; }
+    else { g.drawImage(GLq, vi * cw, 0, cw, GLq.height, -w / 2, -H0, w, H0); g.restore(); top = sy - H0 - bob; } }
   else if (C) { const deg = a * 180 / Math.PI; const [row, mir] = SPR.dir(deg); const an = mv ? (C.anims.run ? 'run' : C.anims.walk ? 'walk' : SPR.stand(cid)) : (C.anims.idle ? 'idle' : SPR.stand(cid)); const n = (C.anims[an] && C.anims[an].n && C.anims[an].n[row]) || 8;
     const fi = mv ? Math.floor((S.dist[id] || 0) / 34) % n : Math.floor(now * 8) % n; const F = SPR.frame(cid, an, row, fi) || SPR.frame(cid, SPR.stand(cid), row, 0);
     if (F) { const s = (C.sc || 112 / 96) * (C.bg || 1) * (F.k || 1) * z * ((f & 32) ? 1.25 : 1), w = F.sw * s, hh = F.sh * s; g.save(); g.translate(sx, sy); if (f & 4) g.rotate(now * 20); g.scale(mir, 1); if (f & 8) g.globalAlpha = 0.45; g.drawImage(F.im, F.sx, F.sy, F.sw, F.sh, -w / 2, -hh + (F.oy || 0) * s, w, hh); g.restore(); top = sy - hh + (F.oy || 0) * s; } }
@@ -45315,7 +45339,7 @@ function drawCreep(g, c, now, w2s, z) {
 
 window.orcGuide = () => { const ic = w => { const n = 'og_gl_' + w; return window.FXDATA && FXDATA[n] ? `<span class="icimg" style="display:inline-block;width:34px;height:34px;background:url(${FX(n)}) 0 0/800% 100% no-repeat"></span>` : `<span class="icemo">${WEAP[w].ic}</span>`; };
   return `<div class="glbl">⚔️ Cómo se juega</div><small class="gnote">Eres un gladiador preso: eliges tu arma (tu clase), sales de tu celda y aguantas 18 rondas de monstruos que entran por 3 puertas. Entre rondas te curas en la fuente y compras en las tiendas. En el medio te matan: pelea en los huecos de las esquinas, el bosque y las cajas, donde entran de a uno. Rocas 10 golpes, cajas y barriles 6.</small><div class="glbl">🗡️ Clases (${WL.length})</div><div class="gd gd2">` + WL.map(w => `<div class="gi">${ic(w)}<div><b>${WEAP[w].n}</b><small>${WEAP[w].ranged ? 'A distancia' : 'Cuerpo a cuerpo'} · vida ${WEAP[w].hp} · 4 poderes al subir de nivel</small></div></div>`).join('') + `</div><div class="glbl">👹 Monstruos</div><small class="gnote">${CREEPS.slice(1).map((c, i) => (i + 1) + '. ' + c.n).join(' · ')}</small>`; };
-window.ORC = { start, stop, quit, weapons: WEAP, items: ITEMS, creeps: CREEPS, state: () => S, _test: { SPOTS, walkC, newMatch, step, snap, buy, useSkill, heroOf, startRound, startBreak, DOORS } };
+window.ORC = { start, stop, quit, weapons: WEAP, items: ITEMS, creeps: CREEPS, state: () => S, _test: { MP, SPOTS, walkC, newMatch, step, snap, buy, useSkill, heroOf, startRound, startBreak, DOORS } };
 })();
 
 // 'Laberinto de Trampas' maps (the 'tonto' family): a small Warcraft-like layer on top of the JASS engine —
