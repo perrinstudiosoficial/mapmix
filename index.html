@@ -42334,7 +42334,7 @@ function arenaWander(A, c, best, list, spd, dt, keepComp) { const W = A.W, t = W
   const ux = dx / d, uy = dy / d; c.moving = tryStep(ux, uy) || tryStep(Math.sign(ux) || 0.001, 0) || tryStep(0, Math.sign(uy) || 0.001) || tryStep(-uy, ux) || tryStep(uy, -ux);
   if (!c.moving) c.reT = 0; /* stuck: next tick it picks another lane */
   c.facing = Math.atan2(dy, dx) * 180 / Math.PI; c.fx = dx > 0 ? 1 : -1; return c.moving; }
-function arenaIllusion(A, u, n) { const W = A.W; for (let i = 0; i < n; i++) { const a = W.rand() * 6.28 + i * 3.14; A.illus.push({ src: u, x: u.x + Math.cos(a) * 140, y: u.y + Math.sin(a) * 140, until: W.time + 10, facing: u.facing, tx: null }); } A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.5, col: '200,160,255' }); }
+function arenaIllusion(A, u, n) { const W = A.W; for (let i = 0; i < n; i++) { let px = u.x, py = u.y; for (let q = 0; q < 24; q++) { const a = W.rand() * 6.28 + i * 3.14, rr = 140 - q * 4, x = u.x + Math.cos(a) * rr, y = u.y + Math.sin(a) * rr; if (W.walkable(x, y) && (A.id !== 'pudge' || !A.compAt || A.compAt(x, y) === A.compAt(u.x, u.y))) { px = x; py = y; break; } } /* never on the water */ A.illus.push({ src: u, x: px, y: py, until: W.time + 10, facing: u.facing, tx: null }); } A.addFx({ k: 'puff', x: u.x, y: u.y, t: W.time, dur: 0.5, col: '200,160,255' }); }
 
 // ---------------- damage changes: double damage, armour, dodge, shields, lifesteal, silence ----------------
 function arenaHitMod(A, by, u, dmg) {
@@ -42370,7 +42370,7 @@ function arenaItemsTick(A, dt) {
     // one rune right beside every human player (in the river for the hooks, at the height where you are)
     let hum = A.heroes.filter(u => u.alive && !u.removed && !u.owner.ai); if (!hum.length) hum = A.alive().slice(0, 1);
     for (const h of hum) { const k = keys[Math.floor(W.rand() * keys.length)];
-      if (A.river) { if (!A.runes.some(r => r.mid)) { const y = (A.river.y0 + A.river.y1) / 2; A.runes.push({ x: A.river.x, y, y0: y, k, t, flow: 1, mid: 1, o: -1 }); } } /* one rune, always in the middle of the river between the two islands, under the clock; it stays still */
+      if (A.river) { if (!A.runes.some(r => r.mid)) { const up = W.rand() < 0.5, y = (A.river.y0 + A.river.y1) / 2 - 90 + (up ? 1 : -1) * (160 + W.rand() * 140); A.runes.push({ x: A.river.x + (W.rand() - 0.5) * 160, y, y0: y, k, t, flow: 1, mid: 1, o: -1 }); } } /* above or below the clock, a little to the left or right */ /* one rune, always in the middle of the river between the two islands, under the clock; it stays still */
       else for (let n = 0; n < 24; n++) { const a = W.rand() * 6.28, rr = 140 + W.rand() * 90, x = h.x + Math.cos(a) * rr, y = h.y + Math.sin(a) * rr; if (W.walkable(x, y) && A.compAt(x, y) === A.compAt(h.x, h.y)) { A.runes.push({ x, y, k, t, o: h.owner.id }); break; } } }
     A.say(A.river ? '✨ ¡Una runa en el río, frente a ti: engánchala!' : '✨ ¡Una runa apareció a tu lado!', 'ffbfa0ff'); }
   if (A.river) for (const r of A.runes) if (r.flow && !r.mid) { const age = t - r.t; r.y = r.y0 - 260 * age; r.x = A.river.x + 60 * Math.sin(age * 2.2); if (age > 6 || r.y < A.river.y0 - 200) r.taken = true; } /* it drifts slowly where you can hook it */
@@ -43895,7 +43895,8 @@ function nearestEnemy(G, me, pred) { let best = null, bd = 1e9; const D = bfs(G.
 function usePower(G, c, aim) {
   const p = c.pw; if (!p || c.out || c.hurt > G.t || (c.e.foot || 0) > G.t || c.e.frozen > G.t || c.e.tor) return false;
   c.pw = null; ev(G, 'pw', c.id, PWL.indexOf(p)); const t = G.t;
-  if (p === 'oil' || p === 'slow' || p === 'statue' || p === 'barrel') { const [x, y] = behind(c, p === 'statue' ? 44 : 34); const s = freeSpot(G, x, y) || [c.x, c.y];
+  if (p === 'oil') { const g = G.g; for (let k = 1; k <= 5; k++) { const x = c.x - Math.cos(c.a) * CS * k, y = c.y - Math.sin(c.a) * CS * k; if (isWall(g, cellOf(x), cellOf(y))) break; G.hz.push({ id: G.uid++, k: 'oil', x, y, r: 30, until: t + 6, by: c.id, arm: t + 0.3 }); } } /* a long trail of oil behind the car: 5 squares joined */
+  else if (p === 'slow' || p === 'statue' || p === 'barrel') { const [x, y] = behind(c, p === 'statue' ? 44 : 34); const s = freeSpot(G, x, y) || [c.x, c.y];
     G.hz.push({ id: G.uid++, k: p, x: s[0], y: s[1], ...(p === 'oil' ? { ox: Math.cos(c.a), oy: Math.sin(c.a) } : {}), d4: ((Math.round(c.a / (Math.PI / 2)) % 4) + 4) % 4, r: p === 'statue' ? 24 : p === 'oil' ? 58 : 20, until: t + (p === 'oil' ? 5 : p === 'statue' ? 10 : 20), by: c.id, arm: t + (p === 'barrel' ? 0.8 : 0.3) }); }
   else if (p === 'turbo') c.e.turbo = t + 3;
   else if (p === 'shield') c.e.shield = 1;
@@ -43910,7 +43911,7 @@ function usePower(G, c, aim) {
   else if (p === 'stop') G.stop = { by: c.id, until: t + 4.5 }; /* slow motion for everybody but you */
   else if (p === 'missile') { for (let k = 0; k < 2; k++) { const o = nearestEnemy(G, c, x => x.hurt <= t); G.pr.push({ id: G.uid++, k: 'missile', x: c.x, y: c.y, a: c.a + (k ? 0.4 : -0.4), tgt: o ? o.id : -1, by: c.id, sp: 300, until: t + 6, d0: k * 0.25 }); } }
   else if (p === 'chase') { let o = nearestEnemy(G, c, x => !!starOf(G, x)); if (!o) o = nearestEnemy(G, c); G.pr.push({ id: G.uid++, k: 'chase', x: c.x, y: c.y, a: c.a, tgt: o ? o.id : -1, by: c.id, sp: 270, until: t + 10 }); }
-  else if (p === 'fire') { const aimed = aim && Math.hypot(aim[0], aim[1]) > 0.2; let a = aimed ? Math.atan2(aim[1], aim[0]) : c.a + Math.PI; G.pr.push({ id: G.uid++, k: 'fire', x: c.x + Math.cos(a) * 20, y: c.y + Math.sin(a) * 20, a, by: c.id, sp: 380, until: t + 6, trail: [], tgt: -1, home: false }); } /* not aimed: it goes out BEHIND your car (you always drive forward) */
+  else if (p === 'fire') { const aimed = aim && Math.hypot(aim[0], aim[1]) > 0.2; let a = aimed ? Math.atan2(aim[1], aim[0]) : c.a + Math.PI; G.pr.push({ id: G.uid++, k: 'fire', x: c.x + Math.cos(a) * 20, y: c.y + Math.sin(a) * 20, a, by: c.id, sp: 600, until: t + 4, trail: [], tgt: -1, home: false }); } /* not aimed: it goes out BEHIND your car (you always drive forward) */
   else if (p === 'ramp') { /* jump forward over up to three walls, to the first free cell after them */
     const dx = Math.abs(Math.cos(c.a)) > Math.abs(Math.sin(c.a)) ? Math.sign(Math.cos(c.a)) : 0, dy = dx ? 0 : Math.sign(Math.sin(c.a)); let cx = cellOf(c.x), cy = cellOf(c.y), walls = 0, land = null;
     for (let k = 1; k <= 7; k++) { const x = cx + dx * k, y = cy + dy * k; if (x < 1 || y < 1 || x >= G.g.w - 1 || y >= G.g.h - 1) break; if (isWall(G.g, x, y)) { walls++; if (walls > 3) break; continue; } land = [x, y]; if (walls > 0) break; if (k >= 3) break; }
@@ -43918,7 +43919,7 @@ function usePower(G, c, aim) {
   else if (p === 'bombs') { const g = G.g, open = []; for (let y = 1; y < g.h - 1; y++) for (let x = 1; x < g.w - 1; x++) if (!isWall(g, x, y)) open.push([x, y]);
     const foes = G.cars.filter(o => o !== c && !o.out); for (let k = 0; k < 7; k++) { let cell; if (k < 4 && foes.length) { const o = foes[(rnd() * foes.length) | 0]; const near = open.filter(([x, y]) => Math.abs(x - cellOf(o.x)) + Math.abs(y - cellOf(o.y)) <= 2); cell = near[(rnd() * near.length) | 0]; } if (!cell) cell = open[(rnd() * open.length) | 0];
       G.pr.push({ id: G.uid++, k: 'bomb', x0: c.x, y0: c.y, x1: mid(cell[0]) + (rnd() - 0.5) * 20, y1: mid(cell[1]) + (rnd() - 0.5) * 20, t0: t + k * 0.12, d: 1.3 + rnd() * 0.6, by: c.id, x: c.x, y: c.y }); } }
-  else if (p === 'tornado') { const [x, y] = behind(c, 60); const s = freeSpot(G, x, y) || [c.x, c.y]; G.tn.push({ id: G.uid++, x: mid(cellOf(s[0])), y: mid(cellOf(s[1])), tx: 0, ty: 0, px: mid(cellOf(c.x)), py: mid(cellOf(c.y)), until: t + 7, by: c.id }); } /* it comes out BEHIND you and goes away from you */
+  else if (p === 'tornado') { const [x, y] = behind(c, 60); const s = freeSpot(G, x, y) || [c.x, c.y]; G.tn.push({ id: G.uid++, x: mid(cellOf(s[0])), y: mid(cellOf(s[1])), tx: 0, ty: 0, px: mid(cellOf(c.x)), py: mid(cellOf(c.y)), dx: -Math.round(Math.cos(c.a)), dy: Math.round(Math.cos(c.a)) ? 0 : -Math.round(Math.sin(c.a)), until: t + 4, by: c.id }); } /* it comes out BEHIND you and goes away from you */
   return true;
 }
 // the bad box: you lose your car for 3 s (and every trap on the map goes off)
@@ -44048,8 +44049,8 @@ function step(G, dt) {
   for (const p of G.pr.slice()) { if (t > p.until) { G.pr.splice(G.pr.indexOf(p), 1); continue; } flyStep(G, p, stopped != null && p.by !== stopped ? dt * SLO : dt); }
   // tornados
   for (const T of G.tn.slice()) { if (t > T.until) { G.tn.splice(G.tn.indexOf(T), 1); continue; }
-    const g = G.g; if (!T.tx || Math.hypot(T.tx - T.x, T.ty - T.y) < 4) { const cx = cellOf(T.x), cy = cellOf(T.y), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy)); const back = N.filter(([dx, dy]) => !(mid(cx + dx) === T.px && mid(cy + dy) === T.py)); const [dx, dy] = (back.length ? back : N)[(rnd() * (back.length || N.length)) | 0] || [0, 0]; T.px = mid(cx); T.py = mid(cy); T.tx = mid(cx + dx); T.ty = mid(cy + dy); }
-    const d = Math.hypot(T.tx - T.x, T.ty - T.y), s = Math.min(d, 150 * dt); if (d > 0) { T.x += (T.tx - T.x) / d * s; T.y += (T.ty - T.y) / d * s; }
+    const g = G.g; if (!T.tx || Math.hypot(T.tx - T.x, T.ty - T.y) < 4) { const cx = cellOf(T.x), cy = cellOf(T.y), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy)); const back = N.filter(([dx, dy]) => !(mid(cx + dx) === T.px && mid(cy + dy) === T.py)); const L2 = back.length ? back : N, st = L2.find(([dx, dy]) => dx === T.dx && dy === T.dy); const [dx, dy] = st || L2[(rnd() * L2.length) | 0] || [0, 0]; T.dx = dx; T.dy = dy; /* straight on while it can, turns at walls, never comes back */ T.px = mid(cx); T.py = mid(cy); T.tx = mid(cx + dx); T.ty = mid(cy + dy); }
+    const d = Math.hypot(T.tx - T.x, T.ty - T.y), s = Math.min(d, 560 * dt); /* very fast */ if (d > 0) { T.x += (T.tx - T.x) / d * s; T.y += (T.ty - T.y) / d * s; }
     for (const c of G.cars) { if (c.out || c.e.tor || c.e.jump || c.hurt > t || (c.e.invul || 0) > t || c.id === T.by) continue; /* your own tornado never takes you */ if (Math.hypot(c.x - T.x, c.y - T.y) < 26) { c.e.tor = { id: T.id, until: t + 2, a: 0 }; ev(G, 'tor', c.id); passStar(G, c); } } }
   // the end
   const live = G.cars.filter(alive);
@@ -44067,6 +44068,7 @@ function flyStep(G, p, dt) {
   if (p.k === 'fire') { const nx = p.x + Math.cos(p.a) * p.sp * dt, ny = p.y + Math.sin(p.a) * p.sp * dt; const ck = cellOf(ny) * g.w + cellOf(nx);
     if (p.x0 == null) { p.x0 = p.x; p.y0 = p.y; } if (!p.trail.includes(ck) && !isWall(g, cellOf(nx), cellOf(ny)) && Math.hypot(nx - p.x0, ny - p.y0) > CS * 1.6) { p.trail.push(ck); /* the fire starts burning a bit ahead of you, not under your car */ G.hz.push({ id: G.uid++, k: 'fire', x: mid(cellOf(nx)), y: mid(cellOf(ny)), r: 20, until: t + 3, by: p.by, arm: t + 0.25 }); }
     let hitCar = G.cars.find(c => c.id !== p.by && !c.out && c.hurt <= t && !c.e.jump && Math.hypot(c.x - nx, c.y - ny) < 26);
+    if (isWall(g, cellOf(nx), cellOf(ny)) && !hitCar && t < p.until) { const cx = cellOf(p.x), cy = cellOf(p.y), bx = -Math.round(Math.cos(p.a)), by2 = -Math.round(Math.sin(p.a)), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy) && !(dx === bx && dy === by2)); if (N.length) { const [dx, dy] = N[(rnd() * N.length) | 0]; p.x = mid(cx); p.y = mid(cy); p.a = Math.atan2(dy, dx); return; } } /* at a wall it turns and keeps burning the road */
     if (isWall(g, cellOf(nx), cellOf(ny)) || hitCar) { G.pr.splice(G.pr.indexOf(p), 1); fireBlast(G, isWall(g, cellOf(nx), cellOf(ny)) ? p.x : nx, isWall(g, cellOf(nx), cellOf(ny)) ? p.y : ny, p.by); return; }
     p.x = nx; p.y = ny; return; }
   // missiles and the chaser: they follow the corridors to their target
@@ -44254,7 +44256,7 @@ function drawHazard(x, h, now) {
   const [k, X, Y, left] = h, K = HZK[k]; x.save(); x.translate(X, Y); x.globalAlpha = left < 1 ? Math.max(0.15, left) : 1;
   { const nm = { oil: 'au_oil_puddle', slow: 'au_slow_goo', statue: 'au_statue_statue', fire: 'au_fire_floor' }[K], im = nm && auIm(nm); /* Perrin's pictures when they're loaded */
     if (im && K === 'statue') { if (S && S.rot) x.rotate(-Math.PI / 2); drawStatue(x, im, 1); /* always looking at the camera, also when the maze is turned for the phone (Perrin) */ x.restore(); return; }
-    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 62, hh = w * v.height / v.width; for (const [ox, oy, sc] of [[-44, -6, 0.9], [44, 8, 0.85], [-14, 24, 1], [16, -22, 0.95], [0, 0, 1.15]]) x.drawImage(v, ox - w * sc / 2, oy - hh * sc / 2, w * sc, hh * sc); x.restore(); return; } /* a big green slippery pool: several puddles joined into one liquid */
+    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 62, hh = w * v.height / v.width; for (const [ox, oy, sc] of [[-12, -4, 1.05], [12, 5, 1.05], [0, 0, 1.2]]) x.drawImage(v, ox - w * sc / 2, oy - hh * sc / 2, w * sc, hh * sc); x.restore(); return; } /* a big green slippery pool: several puddles joined into one liquid */
     if (im) { const w = K === 'fire' ? 50 + Math.sin(now * 12 + X) * 3 : 56, hh = w * im.height / im.width; x.drawImage(im, -w / 2, -hh / 2, w, hh); x.restore(); return; } }
   if (K === 'oil') { x.fillStyle = '#0c0c0c'; x.beginPath(); for (let i = 0; i < 9; i++) { const t2 = i / 9 * 6.28, r = 24 + Math.sin(i * 2.7) * 5; x.lineTo(Math.cos(t2) * r, Math.sin(t2) * r * 0.8); } x.closePath(); x.fill(); x.fillStyle = 'rgba(120,160,255,.35)'; x.beginPath(); x.ellipse(-6, -5, 8, 3, -0.4, 0, 7); x.fill(); }
   else if (K === 'slow') { x.fillStyle = 'rgba(150,70,230,.7)'; x.beginPath(); x.arc(0, 0, 20, 0, 7); x.fill(); x.font = '18px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('🐌', 0, 1); }
@@ -44379,7 +44381,7 @@ function onEvent(V, e, now) {
   else if (k === 'boom') { snd('boom'); S.fxs.push({ k: 'boom', x: a, y: b, r: c || 50, t0: now / 1000 }); }
   else if (k === 'bolt') { snd('bolt'); S.fxs.push({ k: 'bolt', ids: String(b).split(',').map(Number), t0: now / 1000 }); }
   else if (k === 'box') { if (a === S.me) snd('box'); }
-  else if (k === 'pw') { if (a === S.me) snd('pw'); const q = car(a); if (q) S.fxs.push({ k: 'txt', x: q[1], y: q[2], s: PW[PWL[b]].ic, t0: now / 1000 }); if (PWL[b] === 'stop') snd('tick'); }
+  else if (k === 'pw') { if (a === S.me) snd('pw'); const q = car(a); if (q && !['tornado', 'fire', 'bolt'].includes(PWL[b])) S.fxs.push({ k: 'txt', x: q[1], y: q[2], s: PW[PWL[b]].ic, t0: now / 1000 }); /* these go off right away: no icon popping on your own car */ if (PWL[b] === 'stop') snd('tick'); }
   else if (k === 'hit') { snd('hit'); const q = car(a); if (q) S.fxs.push({ k: 'boom', x: q[1], y: q[2], r: 28, t0: now / 1000 }); }
   else if (k === 'steal' || k === 'gets') { snd('steal'); const q = car(a); if (q) S.fxs.push({ k: 'ring', x: q[1], y: q[2], t0: now / 1000 }); }
   else if (k === 'skid') snd('skid'); else if (k === 'ice') snd('ice'); else if (k === 'pop') snd('pop'); else if (k === 'go') snd('go'); else if (k === 'out') snd('out');
@@ -44520,25 +44522,28 @@ const BREAK = { LTrc: [10, 'Rocas'], LTbx: [6, 'Caja'], LTcr: [6, 'Caja'], LTbr:
 const DEST = []; /* [doo index, hits, cells] */
 /* the rock corner (top right of the arena): one rock wall with a single 3-cell lane that winds to a dead end; there only you and one monster fit, one against one */
 const RKI0 = 196, RKJ0 = 246, RKW = 49, RKH = 51, RKMZ = new Uint8Array(GWd * GHd);
-const SPOTS = [[1200, 3312], [1584, 3120], [1456, -944], [1648, -16], [-2800, -944], [-3056, -592], [-2448, 3344], [-3056, 3056]]; /* where you stand in each nook (bots go there too) */
+const SPOTS = [[1200, 3312], [1584, 3120], [1456, -944], [1648, -16], [-2800, -944], [-3056, -592]]; /* where you stand in each nook (bots go there too) */
 const inRock = (x, y) => { const i = Math.floor((x - M0) / CELL) - RKI0, j = Math.floor((y - M0) / CELL) - RKJ0; if (i >= 0 && j >= 0 && i < RKW && j < RKH) return true; for (const s of SPOTS) if (Math.abs(s[0] - x) < 300 && Math.abs(s[1] - y) < 300) return true; return false; }; /* the rock corner and every nook: one at a time */
 /* Perrin's fighting spots: 2 nooks in each corner (you inside, one monster at the mouth, the rest in line) and walls with 3-4 doors around the forest and the crates. Every piece breaks like its kind (rocks 10 hits, barrels and crates 6) */
 const FOREST = [];
 const XBLK = [['LTrc', 230, 292, 235, 295], ['LTrc', 242, 286, 243, 289], /* rocks, top right */
   ['LTba', 232, 160, 235, 166], ['LTba', 238, 160, 241, 166], ['LTba', 239, 186, 243, 189], ['LTba', 239, 192, 243, 195], /* barrels, bottom right */
   ['LTrc', 100, 160, 103, 166], ['LTrc', 106, 160, 109, 166], ['LTrc', 96, 168, 100, 171], ['LTrc', 96, 174, 100, 177], /* rocks, bottom left */
-  ['LTrc', 228, 292, 228, 295], ['LTrc', 240, 286, 240, 289], ['LTrc', 236, 160, 236, 166], ['LTrc', 105, 160, 105, 166], ['LTrc', 238, 190, 242, 190], ['LTrc', 96, 172, 100, 172], ['LTrc', 114, 292, 114, 295], ['LTrc', 96, 286, 100, 286], /* every nook only 1 space wide: you and one monster */
-  ['LTbx', 110, 292, 113, 296], ['LTbx', 116, 292, 119, 296], ['LTbx', 96, 282, 100, 285], ['LTbx', 96, 288, 100, 291] /* crates, top left */];
-{ const ring = (t, i0, j0, i1, j1, gaps) => { for (let i = i0; i <= i1; i++) for (const j of [j0, j1]) if (!gaps.some(([a, b]) => a === i && b === j)) XBLK.push([t, i, j, i, j]); for (let j = j0 + 1; j < j1; j++) for (const i of [i0, i1]) if (!gaps.some(([a, b]) => a === i && b === j)) XBLK.push([t, i, j, i, j]); };
-  { /* the forest: one thick irregular wood (no square, no perfect circle), with 3 narrow dead-end paths into it: one space, you and one monster */
-    const cx = 152, cy = 214, rx = 13.5, ry = 23, nz = a => 1 + 0.13 * Math.sin(a * 3 + 1.3) + 0.08 * Math.sin(a * 5 + 0.4) + 0.06 * Math.cos(a * 7 + 2.1), inF = (i, j) => { const dx = (i - cx) / rx, dy = (j - cy) / ry; return Math.hypot(dx, dy) < nz(Math.atan2(dy, dx)); };
-    const cut = new Set(); for (const [a, L] of [[Math.PI, 7], [-0.35, 7], [Math.PI / 2 + 0.2, 7]]) { let i = cx + Math.cos(a) * rx * 1.6, j = cy + Math.sin(a) * ry * 1.6, n = 0, last = null; const st = Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? [-Math.sign(Math.cos(a)), 0] : [0, -Math.sign(Math.sin(a))]; i = Math.round(i); j = Math.round(j);
-      while (n < L && Math.abs(i - cx) < 40 && Math.abs(j - cy) < 40) { if (inF(i, j)) { cut.add(i + ',' + j); n++; last = [i, j]; } i += st[0]; j += st[1]; } if (last) SPOTS.push([M0 + last[0] * CELL + 16, M0 + last[1] * CELL + 16]); }
-    let r = 7; const rr = () => (r = (r * 16807) % 2147483647) / 2147483647;
-    for (let j = cy - 30; j <= cy + 30; j++) for (let i = cx - 20; i <= cx + 20; i++) if (inF(i, j) && !cut.has(i + ',' + j)) { FOREST.push(j * GWd + i); if ((i + j) % 2 === 0 || rr() < 0.25) MP.doo.push(['YTft', M0 + (i + 0.5 + (rr() - 0.5) * 0.9) * CELL, M0 + (j + 0.5 + (rr() - 0.5) * 0.9) * CELL, 0, 0.55 + rr() * 0.35, []]); } }
-  ring('LTbx', 184, 176, 212, 207, [[184, 191], [184, 192], [197, 207], [198, 207], [212, 191], [212, 192]]); /* the crates: 3 doors */ }
+  ['LTrc', 228, 292, 228, 295], ['LTrc', 240, 286, 240, 289], ['LTrc', 236, 160, 236, 166], ['LTrc', 105, 160, 105, 166], ['LTrc', 238, 190, 242, 190], ['LTrc', 96, 172, 100, 172], /* every nook only 1 space wide: you and one monster */];
+{ /* Perrin's fighting pockets: one space for you, the mouth for one monster, thick walls around (no square rings) */
+  const pocket = (t, i, j, dx, dy) => { const ax = Math.abs(dy), ay = Math.abs(dx), C = (lx, ly) => [i + ax * lx - dx * ly, j + ay * lx - dy * ly];
+    for (const [x0, y0, x1, y1] of [[-2, -1, -1, 1], [1, -1, 2, 1], [-2, 1, 2, 2]]) { const A = C(x0, y0), B = C(x1, y1); XBLK.push([t, Math.min(A[0], B[0]), Math.min(A[1], B[1]), Math.max(A[0], B[0]), Math.max(A[1], B[1])]); }
+    SPOTS.push([M0 + i * CELL + 16, M0 + j * CELL + 16]); };
+  let r = 11; const rr = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  const scatter = (t, cx, cy, rx, ry, step, keep, P) => { for (let j = cy - ry; j <= cy + ry; j += step) for (let i = cx - rx; i <= cx + rx; i += step) { const x = i + Math.round((rr() - 0.5) * 2), y = j + Math.round((rr() - 0.5) * 2); if (Math.hypot((x - cx) / rx, (y - cy) / ry) > 0.95 + rr() * 0.15 || rr() > keep) continue; if (P.some(([pi, pj]) => Math.abs(pi - x) < 5 && Math.abs(pj - y) < 5)) continue; XBLK.push([t, x, y, x + 1, y + 1]); } };
+  /* the forest: trees here and there (you walk between them) and 3 pockets made of trees */
+  const PF = [[145, 224, -1, 0], [159, 206, 1, 0], [151, 236, 0, 1]]; for (const [i, j, dx, dy] of PF) pocket('YTft', i, j, dx, dy); scatter('YTft', 152, 214, 13, 22, 5, 0.62, PF);
+  /* the crates: a messy pile with 2 pockets */
+  const PC = [[189, 186, -1, 0], [207, 199, 1, 0]]; for (const [i, j, dx, dy] of PC) pocket('LTbx', i, j, dx, dy); scatter('LTbx', 198, 192, 12, 14, 5, 0.55, PC);
+  /* top left: an arc of broken towers with 2 pockets */
+  const PT = [[108, 290, 0, -1], [100, 282, 1, 0]]; for (const [i, j, dx, dy] of PT) pocket('LOsc', i, j, dx, dy); for (const [i, j] of [[114, 292], [104, 287], [97, 276], [111, 284]]) XBLK.push(['LOsc', i, j, i + 1, j + 1]); }
 for (const [t, i0, j0, i1, j1] of XBLK) for (let i = i0; i <= i1; i += 2) for (let j = j0; j <= j1; j += 2) { const cl = []; for (let jj = j; jj <= Math.min(j + 1, j1); jj++) for (let ii = i; ii <= Math.min(i + 1, i1); ii++) cl.push(jj * GWd + ii); const w = Math.min(2, i1 - i + 1), h = Math.min(2, j1 - j + 1); MP.doo.push([t, M0 + (i + w / 2) * CELL, M0 + (j + h / 2) * CELL, 0, t === 'YTft' ? 0.7 : 0.55, cl]); }
-const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })();
+const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })(), TERR = WALK.slice(); /* TERR: the ground itself, before rocks, trees and boxes block it */
 { /* the stones, columns, trees and boxes of the map block the way too (that is how the corners where monsters come one by one are made) */
   const RAD = { LOic: 48, LOsc: 48, AOsr: 60, LTrc: 52, YObs: 64, YSco: 48, YObw: 64, YTft: 40, LTbx: 40, LTcr: 40, LTba: 48, YOwb: 48, YObb: 48, YSaw: 48, LSst: 48, YOfs: 32, YOks: 32, LTbr: 32, LTbs: 32, LTex: 40 };
   const SQ = { LTrc: 64 }; /* rock chunks block a 4x4 square like in the editor: side by side they make the walls of the corner pockets */
@@ -44550,6 +44555,10 @@ for (const [i, j] of [[104, 167], [104, 168]]) { const k = j * GWd + i; WALK[k >
 const FOUNT = MP.fount, SHOPS = MP.shops, ARENA = MP.arena, GATEB = MP.gate;
 function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false; const k = j * GWd + i; return !DMK[k] && !!(WALK[k >> 3] & (1 << (k & 7))); }
 // the cell doors: each cell has its iron gate shut until its gladiator picks a weapon (1 s later it opens for good)
+{ /* 12 cells, one per player (the map had 10): the first cell is copied twice to its left, same walls, same door */
+  const c0 = MP.cells[0], c1 = MP.cells[1], per = Math.round((c1[0] - c0[0]) / CELL), ci0 = Math.floor((c0[0] - M0) / CELL), cj0 = Math.floor((c0[1] - M0) / CELL), bit = k => (WALK[k >> 3] >> (k & 7)) & 1, set = (k, v) => { if (v) WALK[k >> 3] |= 1 << (k & 7); else WALK[k >> 3] &= ~(1 << (k & 7)); TERR[k >> 3] = WALK[k >> 3]; };
+  if (MP.cells.length === 10) for (const n of [1, 2]) { for (let j = cj0 - 13; j <= cj0 + 23; j++) for (let di = -Math.ceil(per / 2); di < Math.ceil(per / 2); di++) { const src = j * GWd + ci0 + di, dst = j * GWd + ci0 + di - per * n; set(dst, bit(src)); } MP.cells.unshift([c0[0] - per * n * CELL, c0[1]]); MP.cells.splice(0, 1); MP.cells.unshift([c0[0] - per * n * CELL, c0[1]]); }
+  if (MP.cells.length > 12) MP.cells.length = 12; MP.cells.sort((a, b) => ((a[1] < -4500) === (b[1] < -4500)) ? (a[1] < -4500 ? a[0] - b[0] : a[1] - b[1]) : (a[1] < -4500 ? -1 : 1)); }
 const DOORM = new Uint8Array(GWd * GHd), DOORS = MP.cells.map((c, ci) => { const right = c[0] > 4400 && c[1] > -4500, di = right ? -1 : 0, dj = right ? 0 : 1; let i = Math.floor((c[0] - M0) / CELL), j = Math.floor((c[1] - M0) / CELL); const run = (i, j) => { const L = []; if (!walkC(i, j)) return L; L.push([i, j]); for (const s of [-1, 1]) for (let k = 1; k < 20; k++) { const a = i + (dj ? s * k : 0), b = j + (di ? s * k : 0); if (!walkC(a, b)) break; L.push([a, b]); } return L; };
   let room = 0; for (let k = 0; k < 40; k++, i += di, j += dj) { const R = run(i, j); if (!R.length) break; if (!room || R.length >= room * 0.8) room = Math.max(room, R.length); else if (R.length <= room * 0.7) { const R2 = run(i + di, j + dj); const cells = R.concat(R2.length && R2.length <= room * 0.7 ? R2 : []); const xs = cells.map(q => M0 + q[0] * CELL), ys = cells.map(q => M0 + q[1] * CELL); return { ci, cells: cells.map(q => q[1] * GWd + q[0]), r: [Math.min(...xs), Math.min(...ys), Math.max(...xs) + CELL, Math.max(...ys) + CELL], v: !!dj }; } }
   return null; });
@@ -44702,7 +44711,7 @@ function startBreak(G, first) {
   G.pr = []; const nx = G.round + 1; if (nx <= ROUNDS) { const C = CREEPS[nx]; ev(G, 'break', nx, C.boss ? 1 : 0); }
 }
 function startRound(G) {
-  G.round++; G.ph = 'wave'; { let k = 0; for (const u of G.units) if ((u.hero && !u.dead) || u.merc) { const p = spotNear(AC[0] + ((k % 6) - 2.5) * 80, AC[1] + Math.floor(k / 6) * 80); u.x = p[0]; u.y = p[1]; k++; } } /* the gate opens: everybody into the arena */ const C = CREEPS[G.round]; const nP = heroes(G).length; const perGate = C.boss ? (G.round === 18 ? 1 : Math.max(1, Math.ceil((nP + 1) / 2))) : nP * 2 + 4; /* like the original: a crowd every round, in the open they eat you; in a corner pocket they come one by one */
+  G.round++; G.ph = 'wave'; { let k = 0; for (const u of G.units) if (((u.hero && !u.dead) || u.merc) && !inArena(u.x, u.y)) { const p = spotNear(AC[0] + ((k % 6) - 2.5) * 80, AC[1] + Math.floor(k / 6) * 80); u.x = p[0]; u.y = p[1]; k++; } } /* the gate opens: everybody into the arena */ const C = CREEPS[G.round]; const nP = heroes(G).length; const perGate = C.boss ? (G.round === 18 ? 1 : Math.max(1, Math.ceil((nP + 1) / 2))) : nP * 2 + 4; /* like the original: a crowd every round, in the open they eat you; in a corner pocket they come one by one */
   G.pend = []; const nb = nP <= 2 ? 1 : nP <= 5 ? 2 : 3, gs = C.boss ? [1, 0, 2].slice(0, G.round === 18 ? 1 : nb) : [0, 1, 2]; /* bosses: fewer gates with few players; the final: one Guardián */
   for (let g = 0; g < 3; g++) { if (!gs.includes(g)) continue; for (let i = 0; i < perGate; i++) G.pend.push({ g, at: G.t + 0.5 + i * 0.9 + g * 0.2, c: G.round }); } /* the final: one Guardián (top gate) and his soldiers from every gate */
   if (G.round === 18) for (let g = 0; g < 3; g++) for (let i = 0; i < Math.min(5, nP + 1); i++) G.pend.push({ g, at: G.t + 2 + i * 1.2, c: 'foot' });
@@ -44961,7 +44970,7 @@ const CSS = `#og{position:fixed;inset:0;z-index:50;background:#07070d;touch-acti
 #ogTop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;padding:6px 8px;background:linear-gradient(#000c,#0000);pointer-events:none}
 #ogTop button{pointer-events:auto;width:34px;height:30px;border-radius:9px;border:0;background:#ffffff22;color:#fff;font-size:16px}
 #ogInfo{font:900 15px Nunito,system-ui;text-shadow:0 2px 0 #000;flex:1;min-width:0}#ogInfo small{display:block;font:700 11px system-ui;color:#ffe9a8;opacity:.95}
-#ogGold{font:900 15px system-ui;color:#ffd84a;text-shadow:0 2px 0 #000}
+#ogGold{font:900 15px system-ui;color:#ffd84a;text-shadow:0 2px 0 #000}#ogCam{position:absolute;right:8px;top:62px;display:flex;flex-direction:column;gap:6px}#ogCam button{width:38px;height:38px;border-radius:10px;border:2px solid #fff4;background:#0009;color:#fff;font-size:18px}#ogCam button.on{border-color:#ffd84a;background:#ffd84a33}
 #ogParty{position:absolute;left:6px;top:46px;display:flex;flex-direction:column;gap:3px;pointer-events:none;font:700 10px system-ui}
 #ogParty div{display:flex;align-items:center;gap:4px;background:#0008;border-radius:7px;padding:2px 6px;min-width:120px}#ogParty div.dead{opacity:.45}#ogParty i{display:block;height:5px;border-radius:3px;background:#3c3;flex:1;max-width:60px}#ogParty span{max-width:62px;overflow:hidden;white-space:nowrap}
 #ogStick{position:absolute;width:120px;height:120px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33;left:20px;bottom:30px;pointer-events:none;opacity:.55}
@@ -44988,7 +44997,7 @@ const CSS = `#og{position:fixed;inset:0;z-index:50;background:#07070d;touch-acti
 function buildDom() {
   if (!document.getElementById('ogCss')) { const st = document.createElement('style'); st.id = 'ogCss'; st.textContent = CSS; document.head.appendChild(st); }
   let el = $('#og'); if (el) el.remove(); el = document.createElement('div'); el.id = 'og';
-  el.innerHTML = `<canvas id="ogCv"></canvas><div id="ogTop"><button id="ogMenu">⏸</button><div id="ogInfo"></div><div id="ogGold"></div></div><div id="ogParty"></div>
+  el.innerHTML = `<canvas id="ogCv"></canvas><div id="ogTop"><button id="ogMenu">⏸</button><div id="ogInfo"></div><div id="ogGold"></div></div><div id="ogCam"><button id="ogCamFree" type="button" title="Cámara libre">📷</button><button id="ogCamMe" type="button" title="Volver a mi gladiador">◎</button><button id="ogFull" type="button" title="Pantalla completa">⛶</button></div><div id="ogParty"></div>
     <div id="ogStick"><div class="kn"></div></div><div id="ogInv"></div><button id="ogShopB" type="button"><span>🛒</span><em>Tienda</em></button>
     <div id="ogSk"><button class="ogb ogA" id="ogA" type="button"></button><button class="ogb" id="ogQ" type="button"></button><button class="ogb" id="ogW" type="button"></button><button class="ogb" id="ogE" type="button"></button><button class="ogb" id="ogR" type="button"></button></div><div id="ogMsg"></div><div id="ogOv"></div>`;
   document.body.appendChild(el);
@@ -45013,10 +45022,16 @@ function myHero() { const V = S.V; return V && V.h.find(h => h[1] === S.me); }
 function bindInput() {
   const st = $('#ogStick'), kn = st.querySelector('.kn'), cv = $('#ogCv'); let sid = null, ox = 0, oy = 0;
   const setStick = (dx, dy) => { const L = hyp(dx, dy), R = 55, k = L > R ? R / L : 1; kn.style.transform = `translate(${dx * k}px,${dy * k}px)`; S.input = L > 6 ? { dx: dx / L, dy: dy / L, m: Math.min(1, L / R) } : { dx: 0, dy: 0, m: 0 }; if (L > 6) S.atk = false; };
-  cv.addEventListener('pointerdown', e => { if (sid != null) return; if (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55) { tapSelect(e.clientX, e.clientY); return; } sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
+  cv.addEventListener('pointerdown', e => { if (sid != null) return; if (S.freeCam && e.clientX >= innerWidth * 0.45) return; if (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55) { tapSelect(e.clientX, e.clientY); return; } sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
   addEventListener('pointermove', e => { if (S && e.pointerId === sid) setStick(e.clientX - ox, e.clientY - oy); });
   const up = e => { if (!S || e.pointerId !== sid) return; if (Math.hypot(e.clientX - ox, e.clientY - oy) < 14) tapSelect(e.clientX, e.clientY); sid = null; st.classList.remove('on'); kn.style.transform = ''; S.input = { dx: 0, dy: 0, m: 0 }; }; addEventListener('pointerup', up); addEventListener('pointercancel', up);
   for (const k of SKEY) $('#og' + k.toUpperCase()).addEventListener('pointerdown', e => { e.stopPropagation(); act(k); });
+  $('#ogCamFree').addEventListener('pointerdown', e => { e.stopPropagation(); S.freeCam = !S.freeCam; e.currentTarget.classList.toggle('on', S.freeCam); }); /* free camera: drag the map with your finger */
+  $('#ogCamMe').addEventListener('pointerdown', e => { e.stopPropagation(); S.freeCam = false; S.camOff = null; $('#ogCamFree').classList.remove('on'); });
+  $('#ogFull').addEventListener('pointerdown', e => { e.stopPropagation(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (er) {} });
+  { let pid = null, lx = 0, ly = 0; cv.addEventListener('pointerdown', e => { if (!S.freeCam || pid != null || e.clientX < innerWidth * 0.45) return; pid = e.pointerId; lx = e.clientX; ly = e.clientY; }, true);
+    addEventListener('pointermove', e => { if (e.pointerId !== pid) return; S.camOff = S.camOff || { x: 0, y: 0 }; S.camOff.x -= (e.clientX - lx) / ZOOM; S.camOff.y += (e.clientY - ly) / ZOOM; lx = e.clientX; ly = e.clientY; });
+    addEventListener('pointerup', e => { if (e.pointerId === pid) pid = null; }); }
   $('#ogA').addEventListener('pointerdown', e => { e.stopPropagation(); S.atk = true; snd('skill'); }); /* basic attack: press once and you keep hitting (monsters on their own; rocks, boxes and barrels too) until you move */
   $('#ogShopB').addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); if (!S.nearShop) return; if (S.V && S.V.ph === 'break') { S.tab = S.nearShop; shopOverlay(); } else flash('🔒 Las tiendas abren al terminar la ronda'); });
   $('#ogMenu').addEventListener('click', pauseMenu);
@@ -45143,7 +45158,7 @@ function paintChunk(ci, cj) {
   const x0 = ci * CHW, y0 = cj * CHW, y1 = y0 + CHW, c = document.createElement('canvas'); c.width = c.height = Math.round(CHW * CK); const g = c.getContext('2d'); let miss = false;
   const sand = im('og_sand'); const pat = sand ? g.createPattern(sand, 'repeat') : null; if (!sand) miss = true;
   const P = (x, y) => [(x - x0) * CK, (y1 - y) * CK], cs = CELL * CK + 0.6;
-  for (let y = y0; y < y1; y += CELL) for (let x = x0; x < x0 + CHW; x += CELL) { const [px, py] = P(x, y + CELL), w = walkable(x + 16, y + 16) || (x + 16 > GATEB[0] && x + 16 < GATEB[2] && y + 16 > GATEB[1] && y + 16 < GATEB[3]), r = hsh(x, y);
+  for (let y = y0; y < y1; y += CELL) for (let x = x0; x < x0 + CHW; x += CELL) { const [px, py] = P(x, y + CELL), w = walkable(x + 16, y + 16) || (inArena(x + 16, y + 16) && (() => { const k = Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL); return !!(TERR[k >> 3] & (1 << (k & 7))); })()) /* under a rock or a box it is still sand */ || (x + 16 > GATEB[0] && x + 16 < GATEB[2] && y + 16 > GATEB[1] && y + 16 < GATEB[3]), r = hsh(x, y);
     if (w) { const z = inArena(x + 16, y + 16) ? 'sand' : y < -2300 ? 'jail' : 'stand';
       if (z === 'sand') { if (pat) { g.fillStyle = pat; g.save(); g.translate(-(x0 * CK) % 115, 0); g.restore(); } g.fillStyle = pat || '#c8a46a'; }
       else g.fillStyle = z === 'jail' ? (r < 0.5 ? '#5d5650' : '#57504a') : (r < 0.5 ? '#8a7d6c' : '#83776a');
@@ -45174,8 +45189,15 @@ function drawGround(g, cam, z, cw, ch) {
   if (CHUNK.size > 90) for (const k of [...CHUNK.keys()].slice(0, 20)) CHUNK.delete(k);
 }
 const ROCKY = /^(AOsr|LTr[ck]|LOs[^c]|YOb.|YOfs|YOks|YOwb|YSaw|LSst)$/;
-function drawProp(g, d, sx, sy, z, now) { /* stones, columns, trees and boxes of the original map */
+const OBTINT = {}; function obRed(q) { if (OBTINT[q.src]) return OBTINT[q.src]; const c = document.createElement('canvas'); c.width = q.width; c.height = q.height; const x = c.getContext('2d'); x.drawImage(q, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = '#ff2a2a'; x.fillRect(0, 0, c.width, c.height); return OBTINT[q.src] = c; }
+function drawSel(g, q, x, y, w, h, sel) { if (sel) { const R = obRed(q), o = 3; for (const [dx, dy] of [[-o, 0], [o, 0], [0, -o], [0, o], [-o, -o], [o, o], [-o, o], [o, -o]]) g.drawImage(R, x + dx, y + dy, w, h); } g.drawImage(q, x, y, w, h); } /* selected: the whole outline of the thing in red */
+function obName(id, r, d) { if (/^LTr[ck]$/.test(id)) return ['og_ob_rock_big', 'og_ob_rock_med', 'og_ob_rock_pile', 'og_ob_rock_crack', 'og_ob_rock_med', 'og_ob_rock_pile'][Math.floor(r * 6)];
+  if (ROCKY.test(id)) return ['og_ob_rock_med', 'og_ob_rock_pile', 'og_ob_rock_big'][Math.floor(r * 3)]; if (/^LT(ba|br|bs)/.test(id)) return 'og_ob_barrel'; if (id === 'LTex') return 'og_ob_barrel_ex'; if (/^LT(bx|cr)/.test(id)) return r < 0.7 ? 'og_ob_crate' : 'og_ob_crate2';
+  if (/^LO(ic|sc)/.test(id)) return r < 0.5 ? 'og_ob_tower' : 'og_ob_tower_half'; if (/^YTft/.test(id)) return r < 0.62 ? 'og_ob_tree' : r < 0.85 ? 'og_ob_bush' : r < 0.95 ? 'og_ob_tree_dead' : 'og_ob_palm'; return null; }
+const OBW = { og_ob_rock_big: 80, og_ob_rock_med: 70, og_ob_rock_pile: 72, og_ob_barrel: 54, og_ob_barrel_ex: 54, og_ob_crate: 62, og_ob_crate2: 52, og_ob_tower: 96, og_ob_tower_half: 104, og_ob_tree: 104, og_ob_bush: 80, og_ob_tree_dead: 96, og_ob_palm: 92 };
+function drawProp(g, d, sx, sy, z, now, sel) { /* stones, columns, trees and boxes of the original map */
   const [id, , , a, sc] = d, s = (sc || 1) * z, r = hsh(d[1], d[2]);
+  { let n = obName(id, r, d); if (n && sel === 'hit' && /^LTr[ck]$/.test(id)) n = 'og_ob_rock_crack'; const q = n && im(n); if (q) { const w = (OBW[n] || 70) * Math.max(0.75, Math.min(1.5, (sc || 1) * (/^YTft/.test(id) ? 1.3 : 1))) * z * (0.9 + r * 0.2), h = w * q.height / q.width; g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(sx, sy, w * 0.42, w * 0.16, 0, 0, 7); g.fill(); drawSel(g, q, sx - w / 2, sy - h * 0.82, w, h, sel === true); return; } } /* Perrin's drawings */
   if (id === 'YSco') { const q = im('og_column'); if (q) { const w = 120 * s, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); return; } }
   if (ROCKY.test(id) || id === 'YSco') { const R = (id[0] === 'Y' ? 46 : /^LTr[ck]$/.test(id) ? 62 : 34) * s * (0.8 + r * 0.5); g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx + R * 0.2, sy + R * 0.3, R, R * 0.55, 0, 0, 7); g.fill();
     g.fillStyle = id === 'AOsr' ? '#7a7280' : '#8c8478'; g.strokeStyle = '#3b3530'; g.lineWidth = Math.max(1.5, 3 * z); g.beginPath(); for (let k = 0; k < 8; k++) { const an = k / 8 * 6.283 + r * 3, rr = R * (0.75 + 0.25 * hsh(k, r)); g.lineTo(sx + Math.cos(an) * rr, sy - R * 0.35 + Math.sin(an) * rr * 0.8); } g.closePath(); g.fill(); g.stroke();
@@ -45192,7 +45214,7 @@ function render(V, now) {
   if (cv.width !== Math.round(cw * dpr) || cv.height !== Math.round(ch * dpr)) { cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); }
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = '#120c10'; g.fillRect(0, 0, cw, ch);
   S.prevPos = S.prevPos || {}; S.dist = S.dist || {}; S.lastMove = S.lastMove || {};
-  const me = myHero(), z = ZOOM; const tx = me ? me[2] : MP.inArena[0], ty = me ? me[3] : MP.inArena[1];
+  const me = myHero(), z = ZOOM; const co = S.freeCam && S.camOff ? S.camOff : { x: 0, y: 0 }, tx = (me ? me[2] : MP.inArena[0]) + co.x, ty = (me ? me[3] : MP.inArena[1]) + co.y;
   if (!S.cam || hyp(tx - S.cam.x, ty - S.cam.y) > 1500) S.cam = { x: tx, y: ty }; S.cam.x += (tx - S.cam.x) * 0.18; S.cam.y += (ty - S.cam.y) * 0.18; /* a teleport jumps the camera */
   const cam = S.cam, w2s = (x, y) => [cw / 2 + (x - cam.x) * z, ch / 2 - (y - cam.y) * z]; S.w2s = w2s;
   drawGround(g, cam, z, cw, ch);
@@ -45201,17 +45223,18 @@ function render(V, now) {
   if (V.ph === 'break' || V.ph === 'pick') { const [fx, fy] = w2s(FOUNT[0], FOUNT[1]); g.fillStyle = `rgba(140,220,255,${0.13 + 0.06 * Math.sin(now * 3)})`; g.beginPath(); g.ellipse(fx, fy, 450 * z, 450 * z * 0.8, 0, 0, 7); g.fill(); }
   // everything that stands up, sorted back (high y) to front (low y)
   const L = [];
-  const DDs = new Set((V.dd || '').split(',').filter(x => x).map(Number)); MP.doo.forEach((d, i) => { if (!DDs.has(i) && on(d[1], d[2], 120)) L.push([d[2], 'd', d]); });
+  const DDs = new Set((V.dd || '').split(',').filter(x => x).map(Number)); MP.doo.forEach((d, i) => { if (!DDs.has(i) && on(d[1], d[2], 120)) L.push([d[2], 'd', d, i]); });
   for (const sp of MP.spec) if (on(sp[1], sp[2], 40)) L.push([sp[2], 's', sp]);
   for (const k of Object.keys(SHOPS)) { const p = SHOPS[k]; if (on(p[0], p[1], 260)) L.push([p[1], 'shop', k]); }
   if (on(FOUNT[0], FOUNT[1], 260)) L.push([FOUNT[1] + 1, 'fount']);
   const GTS = [[ARENA[0] - 10, 700, 'L'], [-512, ARENA[3] + 10, 'U'], [ARENA[2] + 10, 850, 'R'], [-768, GATEB[1] + 60, 'B']]; for (const q of GTS) if (on(q[0], q[1], 200)) L.push([q[1] + 30, 'gate', q]);
-  DOORS.forEach((d, i) => { if (d && V.dr && V.dr[i] === '1' && on(d.r[0], d.r[1], 200)) L.push([d.v ? (d.r[1] + d.r[3]) / 2 : d.r[1], 'door', d]); });
+  DOORS.forEach((d, i) => { if (d && V.dr && on(d.r[0], d.r[1], 200)) L.push([d.v ? (d.r[1] + d.r[3]) / 2 : d.r[1], 'door', Object.assign(Object.create(d), { open: V.dr[i] !== '1' })]); }); /* open gates are drawn lifted up */
   for (const c of V.c) L.push([c[3], 'c', c]); for (const h of V.h) L.push([h[3], 'h', h]);
   L.sort((a, b) => b[0] - a[0]);
-  for (const [, k, o] of L) {
-    if (k === 'd') { const [sx, sy] = w2s(o[1], o[2]); drawProp(g, o, sx, sy, z, now); }
+  for (const it of L) { const k = it[1], o = it[2];
+    if (k === 'd') { const [sx, sy] = w2s(o[1], o[2]); drawProp(g, o, sx, sy, z, now, !!(S.sel && S.sel[0] === 'd' && S.sel[1] === it[3])); }
     else if (k === 's') { const [sx, sy] = w2s(o[1], o[2]); const r = hsh(o[1], o[2]), cheer = S.cheer && now - S.cheer < 1.2, b = Math.abs(Math.sin(now * (cheer ? 14 : 3) + r * 9)) * (cheer ? 6 : 1.5);
+      { const q = im('og_ob_fan' + (1 + Math.floor(r * 8))); if (q) { const w = 62 * z, h = w * q.height / q.width; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx, sy, w * 0.35, w * 0.12, 0, 0, 7); g.fill(); g.drawImage(q, sx - w / 2, sy - h - b * z, w, h); continue; } } /* Perrin's cheering crowd */
       const cl = ['#b85a3a', '#3a6ab8', '#4a8a3a', '#8a3ab8', '#b8a03a', '#6a6a6a'][Math.floor(r * 6)]; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx, sy, 10, 4, 0, 0, 7); g.fill();
       g.fillStyle = cl; g.fillRect(sx - 6, sy - 16 - b, 12, 14); g.fillStyle = '#e8c39a'; g.beginPath(); g.arc(sx, sy - 21 - b, 6, 0, 7); g.fill(); if (cheer) { g.strokeStyle = '#e8c39a'; g.lineWidth = 3; g.beginPath(); g.moveTo(sx - 6, sy - 14 - b); g.lineTo(sx - 10, sy - 26 - b); g.moveTo(sx + 6, sy - 14 - b); g.lineTo(sx + 10, sy - 26 - b); g.stroke(); } }
     else if (k === 'shop') { const p = SHOPS[o], [sx, sy] = w2s(p[0], p[1]), q = im('og_st_' + o); if (q) { const w = 300 * z, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.8, w, h); }
@@ -45222,7 +45245,7 @@ function render(V, now) {
     else if (k === 'c') drawCreep(g, o, now, w2s, z);
     else drawHero(g, o, now, w2s, z); }
   if (S.sel) { const sl = S.sel, ddl = String(V.dd || '').split(',').filter(Boolean).map(Number); let p = null, r = 40; if (sl[0] === 'c') { const o = (V.c || []).find(q => q[0] === sl[1]); if (o) { p = [o[2], o[3]]; r = o[5] + 10; } } else if (!ddl.includes(sl[1])) { const d0 = MP.doo[sl[1]]; p = [d0[1], d0[2]]; r = 60; }
-    if (!p) S.sel = null; else { const [sx, sy] = w2s(p[0], p[1]); g.save(); g.strokeStyle = '#ffe23b'; g.lineWidth = 3; g.setLineDash([8, 6]); g.lineDashOffset = -now / 30; g.beginPath(); g.ellipse(sx, sy, r * z * 1.3, r * z * 0.8, 0, 0, 7); g.stroke(); g.restore(); } } /* your target */
+    if (!p) S.sel = null; else if (false) { const [sx, sy] = w2s(p[0], p[1]); g.save(); g.strokeStyle = '#ff2a2a'; g.lineWidth = 3; g.setLineDash([8, 6]); g.lineDashOffset = -now / 30; g.beginPath(); g.ellipse(sx, sy, r * z * 1.3, r * z * 0.8, 0, 0, 7); g.stroke(); g.restore(); } } /* your target */
   { const me2 = myHero(); if (me2 && !me2[10] && (V.ph === 'break' || (V.ph === 'pick' && me2[9])) && !Object.values(SHOPS).some(p => hyp(p[0] - me2[2], p[1] - me2[3]) < 650)) { /* an arrow that always shows the way to the shops */
       const D = staticFields().shop; let u = { x: me2[2], y: me2[3] }; for (let k = 0; k < 6; k++) { const n = downhill(D, u); if (!n) break; u = { x: n[0], y: n[1] }; } const an = Math.atan2(u.y - me2[3], u.x - me2[2]); if (u.x !== me2[2] || u.y !== me2[3]) { const [hx, hy] = w2s(me2[2], me2[3]), r = 62, px = hx + Math.cos(an) * r, py = hy - 30 * z - Math.sin(an) * r, pul = 1 + Math.sin(now * 6) * 0.12;
         g.save(); g.translate(px, py); g.rotate(-an); g.scale(pul, pul); g.fillStyle = '#ffd84a'; g.strokeStyle = '#5a3a00'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-8, -13); g.lineTo(-3, 0); g.lineTo(-8, 13); g.closePath(); g.fill(); g.stroke(); g.restore(); } } }
@@ -45243,7 +45266,7 @@ function render(V, now) {
   if (V.ph === 'wave' && me) { let shown = 0; for (const c of V.c) { if (c[1] === 'm' || shown > 6) continue; const [sx, sy] = w2s(c[2], c[3]); if (sx > 0 && sx < cw && sy > 50 && sy < ch) continue; shown++; const a = Math.atan2(sy - ch / 2, sx - cw / 2); const px = clamp(cw / 2 + Math.cos(a) * cw, 16, cw - 16), py = clamp(ch / 2 + Math.sin(a) * ch, 60, ch - 16); g.save(); g.translate(px, py); g.rotate(a); g.fillStyle = 'rgba(255,70,50,.85)'; g.beginPath(); g.moveTo(12, 0); g.lineTo(-8, -8); g.lineTo(-8, 8); g.fill(); g.restore(); } }
   if (me && me[10] && V.ph === 'wave') { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, cw, ch); label(g, '💀 Revives al terminar la ronda', cw / 2, ch * 0.22, '#fff', 17); }
 }
-function drawDoor(g, d, w2s, z) { /* the iron gate of a cell, shut until you pick */ const [x0, y0, x1, y1] = d.r, H = 120 * z; g.save(); g.lineCap = 'round';
+function drawDoor(g, d, w2s, z) { /* the iron gate of a cell, shut until you pick */ const [x0, y0, x1, y1] = d.r, H = 120 * z; g.save(); g.lineCap = 'round'; if (d.open) { g.translate(0, -H * 0.95); g.globalAlpha = 0.85; }
   if (d.v) { const ym = (y0 + y1) / 2, [ax, ay] = w2s(x0 - 8, ym), [bx] = w2s(x1 + 8, ym); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(ax, ay - 3, bx - ax, 8);
     g.strokeStyle = '#2a2a30'; g.lineWidth = 5; g.beginPath(); g.moveTo(ax, ay - H); g.lineTo(bx, ay - H); g.moveTo(ax, ay - H * 0.5); g.lineTo(bx, ay - H * 0.5); g.moveTo(ax, ay); g.lineTo(bx, ay); g.stroke();
     const n = Math.max(4, Math.round((bx - ax) / 9)); for (let k = 0; k <= n; k++) { const x = ax + (bx - ax) * k / n; g.strokeStyle = '#1c1c22'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, ay); g.lineTo(x, ay - H - 6); g.stroke(); g.strokeStyle = '#9aa0ac'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x - 1, ay); g.lineTo(x - 1, ay - H - 6); g.stroke(); } }
@@ -45284,7 +45307,7 @@ function drawCreep(g, c, now, w2s, z) {
   if (merc) { g.strokeStyle = '#7dff8a'; g.lineWidth = 2; g.beginPath(); g.ellipse(sx, sy, size * 0.42, size * 0.16, 0, 0, 7); g.stroke(); }
   if (C && C.boss) { g.strokeStyle = `rgba(255,216,74,${0.6 + 0.3 * Math.sin(now * 6)})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, size * 0.45, size * 0.17, 0, 0, 7); g.stroke(); }
   let top = sy - size;
-  if (q) { const w = size, h = w * q.height / q.width; g.save(); g.translate(sx + Math.cos(a) * lunge, sy + size * 0.06); if (Math.cos(a) < 0) g.scale(-1, 1); g.scale(1 + bob * 0.012, 1 - bob * 0.02); /* standing on its shadow: a little squash when it walks, no hopping */ if (ill) g.globalAlpha = 0.5; if (f & 2) g.filter = 'hue-rotate(160deg) saturate(1.4)'; g.drawImage(q, -w / 2, -h, w, h); g.restore(); top = sy - h; }
+  if (q) { const w = size, h = w * q.height / q.width; g.save(); g.translate(sx + Math.cos(a) * lunge, sy + size * 0.06); if (Math.cos(a) < 0) g.scale(-1, 1); g.scale(1 + bob * 0.012, 1 - bob * 0.02); /* standing on its shadow: a little squash when it walks, no hopping */ if (ill) g.globalAlpha = 0.5; if (f & 2) g.filter = 'hue-rotate(160deg) saturate(1.4)'; drawSel(g, q, -w / 2, -h, w, h, !!(S.sel && S.sel[0] === 'c' && S.sel[1] === id)); g.restore(); top = sy - h; }
   else { g.font = Math.round(size * 0.7) + 'px system-ui'; g.textAlign = 'center'; g.fillText(merc ? (ic || '🧑') : C.ic, sx, sy - size * 0.2); }
   if (f & 1) label(g, '💫', sx, top - 4, '#fff', 13);
   if (hpP < 100 || (C && C.boss)) { const bw = Math.max(28, size * 0.6); g.fillStyle = '#000a'; g.fillRect(sx - bw / 2 - 1, top - 3, bw + 2, 5); g.fillStyle = merc ? '#3ad04a' : '#e8402a'; g.fillRect(sx - bw / 2, top - 2, bw * hpP / 100, 3); }
@@ -49405,7 +49428,7 @@ class Net {
     $('#fed').classList.remove('hidden'); $('#edUI').classList.add('hidden'); $('#fplay').classList.remove('hidden'); $('#fEnd').classList.add('hidden');
     $('#fpName').textContent = (opt.test ? '🧪 ' : '') + opt.name; $('#fpExit').textContent = opt.test ? '✏️ Editar' : '✕ Salir';
     $('#fpStick').classList.toggle('hidden', !touchDev);
-    PL.on = true; resize(); try { sfx.init(); sfx.musicOn = S.music; sfx.setSong('fortaleza'); } catch (e) {}
+    PL.on = true; resize(); try { sfx.init(); sfx.musicOn = S.music; sfx.setSong('estampida'); } catch (e) {}
     loop.kick();
   }
   // ---------- Entrenamiento: a small closed plaza, no enemies, to try your things ----------
