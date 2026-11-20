@@ -541,7 +541,7 @@ body.tcine #hud > *:not(#sprayWrap):not(#emoteWrap), body.tcine #stickBase{opaci
 #auOv .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;width:min(560px,90vw)}
 #auOv .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:min(560px,90vw)}#auOv .cm{background:#0006;border:2px solid #fff3;border-radius:10px;padding:4px;height:46px}#auOv .cm img{width:100%;height:100%;object-fit:contain}#auOv .cm.on{border-color:#ffe23b;background:#ffe23b33}
 #auOv .vm{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px!important;background:#1f2742!important;border:2px solid transparent!important}#auOv .vm.on{border-color:#ffe23b!important}
-#auOv .vm canvas{width:100px;height:60px;border-radius:6px}#auOv .vm span{font:800 11px system-ui}#auOv .vm em{font:800 10px system-ui;color:#ffe23b;font-style:normal;min-height:18px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;max-width:104px}#auOv .vm em svg{margin:0 -1px}
+#auOv .vm canvas{width:auto;height:auto;max-width:100px;max-height:100px;border-radius:6px}@media (orientation:portrait){#auOv .vgrid{grid-template-columns:repeat(4,1fr)}#auOv .vm canvas{width:54px;height:90px}}#auOv .vm span{font:800 11px system-ui}#auOv .vm em{font:800 10px system-ui;color:#ffe23b;font-style:normal;min-height:18px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;max-width:104px}#auOv .vm em svg{margin:0 -1px}
 #auOv .vbar{height:6px;background:#ffffff22;border-radius:3px;overflow:hidden}#auOv .vbar i{display:block;height:100%;background:#ffe23b}
 #auOv .rk{display:flex;flex-direction:column;gap:3px;min-width:240px}#auOv .rk div{display:flex;align-items:center;gap:6px;background:#0005;border-radius:8px;padding:4px 8px;font:700 13px system-ui}#auOv .rk div.me{outline:2px solid #ffe23b}#auOv .rk b{margin-left:auto;color:#ffe23b}#auOv .rk u{text-decoration:none}
 #auOv .coins{font:900 18px system-ui;color:#ffe23b}#auOv .row{display:flex;gap:8px;justify-content:center}#auOv .wait{font:700 13px system-ui;opacity:.8;align-self:center}
@@ -42370,10 +42370,10 @@ function arenaItemsTick(A, dt) {
     // one rune right beside every human player (in the river for the hooks, at the height where you are)
     let hum = A.heroes.filter(u => u.alive && !u.removed && !u.owner.ai); if (!hum.length) hum = A.alive().slice(0, 1);
     for (const h of hum) { const k = keys[Math.floor(W.rand() * keys.length)];
-      if (A.river) { const y = Math.min(A.river.y1 - 60, h.y + 520); A.runes.push({ x: A.river.x, y, y0: y, k, t, flow: 1, o: h.owner.id }); } /* it comes down the river from above you */
+      if (A.river) { if (!A.runes.some(r => r.mid)) { const y = (A.river.y0 + A.river.y1) / 2; A.runes.push({ x: A.river.x, y, y0: y, k, t, flow: 1, mid: 1, o: -1 }); } } /* one rune, always in the middle of the river between the two islands, under the clock; it stays still */
       else for (let n = 0; n < 24; n++) { const a = W.rand() * 6.28, rr = 140 + W.rand() * 90, x = h.x + Math.cos(a) * rr, y = h.y + Math.sin(a) * rr; if (W.walkable(x, y) && A.compAt(x, y) === A.compAt(h.x, h.y)) { A.runes.push({ x, y, k, t, o: h.owner.id }); break; } } }
     A.say(A.river ? '✨ ¡Una runa en el río, frente a ti: engánchala!' : '✨ ¡Una runa apareció a tu lado!', 'ffbfa0ff'); }
-  if (A.river) for (const r of A.runes) if (r.flow) { const age = t - r.t; r.y = r.y0 - 260 * age; r.x = A.river.x + 60 * Math.sin(age * 2.2); if (age > 6 || r.y < A.river.y0 - 200) r.taken = true; } /* it drifts slowly where you can hook it */
+  if (A.river) for (const r of A.runes) if (r.flow && !r.mid) { const age = t - r.t; r.y = r.y0 - 260 * age; r.x = A.river.x + 60 * Math.sin(age * 2.2); if (age > 6 || r.y < A.river.y0 - 200) r.taken = true; } /* it drifts slowly where you can hook it */
   A.runes = A.runes.filter(r => r.flow || t - (r.t || t) < 30); /* runes on the ground vanish after 30 s */
   if (false) { const keys = Object.keys(RUNES); for (const sp of A.runeSpots) if (!A.runes.some(r => r.x === sp.x && r.y === sp.y)) A.runes.push({ x: sp.x, y: sp.y, k: keys[Math.floor(W.rand() * keys.length)], t }); A.say('✨ ¡Aparecieron runas en el mapa!', 'ffbfa0ff'); }
   for (const r of A.runes) { if (r.taken || r.flow) continue; for (const u of A.alive()) if (Math.hypot(u.x - r.x, u.y - r.y) < 80) { r.taken = true; arenaTakeRune(A, u, r.k); break; } }
@@ -42434,7 +42434,7 @@ function arenaItemsGround(A, g) {
   const W = A.W, t = W.time;
   // (no shop stall on the ground: the shop is the 🛒 button)
   // runes
-  if (A.river && A.runeT != null) { const me = A.W.heroOf(A.W.local); if (me) { /* a small countdown clock in the river: when it reaches 0 the next rune comes */ const cx = A.river.x, cy = Math.min(A.river.y1 - 60, me.y + 300), q = Math.max(0, Math.min(1, A.runeT / RIVER_EVERY)); g.save(); g.translate(cx, cy);
+  if (A.river && A.runeT != null) { const me = A.W.heroOf(A.W.local); if (me) { /* a small countdown clock in the river: when it reaches 0 the next rune comes */ const cx = A.river.x, cy = (A.river.y0 + A.river.y1) / 2 - 90, /* fixed in the middle of the river */ q = Math.max(0, Math.min(1, A.runeT / RIVER_EVERY)); g.save(); g.translate(cx, cy);
     g.fillStyle = 'rgba(10,20,40,0.75)'; g.beginPath(); g.arc(0, 0, 34, 0, 7); g.fill(); g.strokeStyle = '#ffd34d'; g.lineWidth = 6; g.beginPath(); g.arc(0, 0, 28, Math.PI / 2, Math.PI / 2 + q * 6.283); g.stroke(); g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = 3; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(Math.PI / 2 + q * 6.283) * 20, Math.sin(Math.PI / 2 + q * 6.283) * 20); g.stroke();
     g.scale(1, -1); g.font = '900 20px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 4; g.strokeStyle = '#000'; const tx = String(Math.ceil(A.runeT)); g.strokeText(tx, 0, 46); g.fillStyle = '#fff'; g.fillText(tx, 0, 46); g.restore(); } }
   for (const r of A.runes || []) { const im = runeImg(r.k), bob = 10 * Math.sin(t * 3 + r.x), s = 124; g.save(); g.translate(r.x, r.y); g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(0, -4, 40, 14, 0, 0, 7); g.fill();
@@ -42529,7 +42529,7 @@ function arenaItemsBot(A, b, u, D) {
   // use what they carry
   for (const s of A.inv[id] || []) { const it = ITEMS[s.k]; if (!it.act || (A.icd[id + 'it:' + s.k] || 0) > W.time || Math.random() > D.cast * 0.3) continue; if ((it.act === 'heal30' || it.act === 'heal40' || it.act === 'salve' || it.act === 'tango') && u.ahp > u.amax * 0.5) continue; arenaUseItem(A, u, s.k); }
   // hooks: aim at a rune floating down the river
-  if (A.river && A.ready && A.ready(u, 'hook') <= 0) for (const r of A.runes) if (r.flow) { const lead = Math.hypot(r.x - u.x, r.y - u.y) / 1150, ty = r.y - 260 * lead, d = Math.hypot(r.x - u.x, ty - u.y); if (d < 750 && Math.random() < 0.04 + 0.08 * D.keep) { arenaCast(A, u, 'hook', { dx: (r.x - u.x) / d, dy: (ty - u.y) / d, exact: true }); return false; } }
+  if (A.river && A.ready && A.ready(u, 'hook') <= 0) for (const r of A.runes) if (r.flow) { const lead = Math.hypot(r.x - u.x, r.y - u.y) / 1150, ty = r.mid ? r.y : r.y - 260 * lead, d = Math.hypot(r.x - u.x, ty - u.y); if (d < 750 && Math.random() < 0.04 + 0.08 * D.keep) { arenaCast(A, u, 'hook', { dx: (r.x - u.x) / d, dy: (ty - u.y) / d, exact: true }); return false; } }
   // a rune close by: go and take it
   let best = null, bd = 420; for (const r of A.runes) { const d = Math.hypot(r.x - u.x, r.y - u.y); if (d < bd && A.compAt(r.x, r.y) === A.compAt(u.x, u.y)) { bd = d; best = r; } }
   if (best && Math.random() < 0.3 + 0.4 * D.keep) { botGo(W, u, best.x, best.y); return true; }
@@ -42543,7 +42543,7 @@ window.arenaGuide = id => {
   const SK = { stun: 'Deja quieto 2 s al Pillador cerca de ti.', blink: 'Te teletransportas hacia donde apuntas.', shield: 'Nada te atrapa por 3 s.', invis: 'El Pillador no te ve 4 s.', grab: 'Lanzas la mano y traes al que toques.', dash: 'Corres mucho más rápido 1,6 s.', roar: 'Los que corren cerca quedan lentos 2,5 s.', cloud: 'Una nube verde te sigue 5 s: frena y daña poco a poco.', hook: 'Atrapa al primero que toque y lo arrastra en curva hacia ti.', leap: 'Un gran salto sobre árboles y muros.', arrow: 'Mientras más lejos llega, más daño y más aturde.', raze1: 'Sombra cerca de ti.', raze2: 'Sombra a media distancia.', raze3: 'Sombra lejos.', requiem: 'Explosión alrededor: más fuerte con más cargas (hasta 20).' };
   const sk = (C.skills || []).concat(C.chaser || []).filter((s, i, a) => a.findIndex(x => x.id === s.id) === i);
   let h = `<div class="glbl">⚡ Poderes</div><div class="gd gd2">` + sk.map(s => `<div class="gi">${ic(s.img, s.ic)}<div><b>${s.n}</b><small>${SK[s.id] || ''}</small></div></div>`).join('') + '</div>';
-  if (SHOPS[id]) { h += `<div class="glbl">✨ Runas (${id === 'pudge' ? 'cada ' + RIVER_EVERY + ' s una en el río frente a ti: engánchala' : 'cada ' + RUNE_EVERY + ' s una a tu lado'}, al azar)</div><div class="gd gd2">` + Object.entries(RUNES).map(([k, r]) => `<div class="gi">${ic(r.img)}<div><b>${r.n} · ${r.dur} s</b><small>${r.d}</small></div></div>`).join('') + '</div>';
+  if (SHOPS[id]) { h += `<div class="glbl">✨ Runas (${id === 'pudge' ? 'cada ' + RIVER_EVERY + ' s una al medio del río, bajo el reloj: engánchala' : 'cada ' + RUNE_EVERY + ' s una a tu lado'}, al azar)</div><div class="gd gd2">` + Object.entries(RUNES).map(([k, r]) => `<div class="gi">${ic(r.img)}<div><b>${r.n} · ${r.dur} s</b><small>${r.d}</small></div></div>`).join('') + '</div>';
     h += `<div class="glbl">🛒 Tienda en tu base (${SHOPS[id].join(' · ')})</div><small class="gnote">Ganas 🪙 ${GOLD_KILL} por baja y ${GOLD_SEC} por segundo. Hay ${itemsOf(id).length} objetos: ${itemsOf(id).map(k => ITEMS[k].n).join(', ')}.</small>`; }
   return h;
 };
@@ -43863,7 +43863,7 @@ function startMap(G) {
 const alive = c => !c.out;
 const starOf = (G, c) => G.stars.find(s => s.h === c.id); /* each car can carry only one star */
 function grab(G, s, c, from) { s.h = c.id; s.lock = G.t + 2; c.e.boost = G.t + 2; ev(G, from ? 'steal' : 'gets', c.id, from ? from.id : -1); } /* 2 s nobody can take it and a free turbo to get away */
-const canHold = (G, c) => !c.out && c.hurt <= G.t && !c.e.foot && !c.e.tor && !c.e.jump;
+const canHold = (G, c) => !c.out && c.hurt <= G.t && !((c.e.foot || 0) > G.t) && !c.e.tor && !c.e.jump; /* foot is a timer: after it ends you can take the star again */
 const inStop = (G, c) => G.stop && G.stop.until > G.t && G.stop.by !== c.id;
 function carById(G, id) { return G.cars.find(c => c.id === id); }
 function farStar(G, s) { const g = G.g, D = bfs(g, G.cars.filter(c => !c.out).map(c => [cellOf(c.x), cellOf(c.y)]).concat(G.stars.filter(q => q !== s).map(q => [cellOf(q.x), cellOf(q.y)])));
@@ -43893,10 +43893,10 @@ function freeSpot(G, x, y) { const g = G.g; let cx = cellOf(x), cy = cellOf(y); 
 function nearestEnemy(G, me, pred) { let best = null, bd = 1e9; const D = bfs(G.g, [[cellOf(me.x), cellOf(me.y)]]); for (const c of G.cars) { if (c === me || c.out || (pred && !pred(c))) continue; const k = cellOf(c.y) * G.g.w + cellOf(c.x); const d = D[k] < 0 ? 999 : D[k]; if (d < bd) { bd = d; best = c; } } return best; }
 
 function usePower(G, c, aim) {
-  const p = c.pw; if (!p || c.out || c.hurt > G.t || c.e.foot || c.e.frozen > G.t || c.e.tor) return false;
+  const p = c.pw; if (!p || c.out || c.hurt > G.t || (c.e.foot || 0) > G.t || c.e.frozen > G.t || c.e.tor) return false;
   c.pw = null; ev(G, 'pw', c.id, PWL.indexOf(p)); const t = G.t;
   if (p === 'oil' || p === 'slow' || p === 'statue' || p === 'barrel') { const [x, y] = behind(c, p === 'statue' ? 44 : 34); const s = freeSpot(G, x, y) || [c.x, c.y];
-    G.hz.push({ id: G.uid++, k: p, x: s[0], y: s[1], d4: ((Math.round(c.a / (Math.PI / 2)) % 4) + 4) % 4, r: p === 'statue' ? 24 : p === 'oil' ? 26 : 20, until: t + (p === 'oil' ? 5 : p === 'statue' ? 10 : 20), by: c.id, arm: t + (p === 'barrel' ? 0.8 : 0.3) }); }
+    G.hz.push({ id: G.uid++, k: p, x: s[0], y: s[1], ...(p === 'oil' ? { ox: Math.cos(c.a), oy: Math.sin(c.a) } : {}), d4: ((Math.round(c.a / (Math.PI / 2)) % 4) + 4) % 4, r: p === 'statue' ? 24 : p === 'oil' ? 58 : 20, until: t + (p === 'oil' ? 5 : p === 'statue' ? 10 : 20), by: c.id, arm: t + (p === 'barrel' ? 0.8 : 0.3) }); }
   else if (p === 'turbo') c.e.turbo = t + 3;
   else if (p === 'shield') c.e.shield = 1;
   else if (p === 'spikes') c.e.spikes = t + 6;
@@ -43910,7 +43910,7 @@ function usePower(G, c, aim) {
   else if (p === 'stop') G.stop = { by: c.id, until: t + 4.5 }; /* slow motion for everybody but you */
   else if (p === 'missile') { for (let k = 0; k < 2; k++) { const o = nearestEnemy(G, c, x => x.hurt <= t); G.pr.push({ id: G.uid++, k: 'missile', x: c.x, y: c.y, a: c.a + (k ? 0.4 : -0.4), tgt: o ? o.id : -1, by: c.id, sp: 300, until: t + 6, d0: k * 0.25 }); } }
   else if (p === 'chase') { let o = nearestEnemy(G, c, x => !!starOf(G, x)); if (!o) o = nearestEnemy(G, c); G.pr.push({ id: G.uid++, k: 'chase', x: c.x, y: c.y, a: c.a, tgt: o ? o.id : -1, by: c.id, sp: 270, until: t + 10 }); }
-  else if (p === 'fire') { const aimed = aim && Math.hypot(aim[0], aim[1]) > 0.2; let a = aimed ? Math.atan2(aim[1], aim[0]) : c.a; const o = aimed ? null : nearestEnemy(G, c, x => x.hurt <= t); G.pr.push({ id: G.uid++, k: 'fire', x: c.x + Math.cos(a) * 20, y: c.y + Math.sin(a) * 20, a, by: c.id, sp: 380, until: t + 6, trail: [], tgt: o ? o.id : -1, home: !aimed && !!o }); } /* not aimed: it looks for the nearest car */
+  else if (p === 'fire') { const aimed = aim && Math.hypot(aim[0], aim[1]) > 0.2; let a = aimed ? Math.atan2(aim[1], aim[0]) : c.a + Math.PI; G.pr.push({ id: G.uid++, k: 'fire', x: c.x + Math.cos(a) * 20, y: c.y + Math.sin(a) * 20, a, by: c.id, sp: 380, until: t + 6, trail: [], tgt: -1, home: false }); } /* not aimed: it goes out BEHIND your car (you always drive forward) */
   else if (p === 'ramp') { /* jump forward over up to three walls, to the first free cell after them */
     const dx = Math.abs(Math.cos(c.a)) > Math.abs(Math.sin(c.a)) ? Math.sign(Math.cos(c.a)) : 0, dy = dx ? 0 : Math.sign(Math.sin(c.a)); let cx = cellOf(c.x), cy = cellOf(c.y), walls = 0, land = null;
     for (let k = 1; k <= 7; k++) { const x = cx + dx * k, y = cy + dy * k; if (x < 1 || y < 1 || x >= G.g.w - 1 || y >= G.g.h - 1) break; if (isWall(G.g, x, y)) { walls++; if (walls > 3) break; continue; } land = [x, y]; if (walls > 0) break; if (k >= 3) break; }
@@ -43918,7 +43918,7 @@ function usePower(G, c, aim) {
   else if (p === 'bombs') { const g = G.g, open = []; for (let y = 1; y < g.h - 1; y++) for (let x = 1; x < g.w - 1; x++) if (!isWall(g, x, y)) open.push([x, y]);
     const foes = G.cars.filter(o => o !== c && !o.out); for (let k = 0; k < 7; k++) { let cell; if (k < 4 && foes.length) { const o = foes[(rnd() * foes.length) | 0]; const near = open.filter(([x, y]) => Math.abs(x - cellOf(o.x)) + Math.abs(y - cellOf(o.y)) <= 2); cell = near[(rnd() * near.length) | 0]; } if (!cell) cell = open[(rnd() * open.length) | 0];
       G.pr.push({ id: G.uid++, k: 'bomb', x0: c.x, y0: c.y, x1: mid(cell[0]) + (rnd() - 0.5) * 20, y1: mid(cell[1]) + (rnd() - 0.5) * 20, t0: t + k * 0.12, d: 1.3 + rnd() * 0.6, by: c.id, x: c.x, y: c.y }); } }
-  else if (p === 'tornado') { const [x, y] = behind(c, -40); const s = freeSpot(G, x, y) || [c.x, c.y]; G.tn.push({ id: G.uid++, x: mid(cellOf(s[0])), y: mid(cellOf(s[1])), tx: 0, ty: 0, until: t + 7, by: c.id }); }
+  else if (p === 'tornado') { const [x, y] = behind(c, 60); const s = freeSpot(G, x, y) || [c.x, c.y]; G.tn.push({ id: G.uid++, x: mid(cellOf(s[0])), y: mid(cellOf(s[1])), tx: 0, ty: 0, px: mid(cellOf(c.x)), py: mid(cellOf(c.y)), until: t + 7, by: c.id }); } /* it comes out BEHIND you and goes away from you */
   return true;
 }
 // the bad box: you lose your car for 3 s (and every trap on the map goes off)
@@ -43995,6 +43995,8 @@ function driveCar(G, c, dt) {
   // corridors: keep the car in the middle of its lane and help it into the side road you point at
   if (I.m > 0.15 && !((E.spin || 0) > t)) { const g = G.g, cx = cellOf(c.x), cy = cellOf(c.y), hx = Math.abs(I.dx) >= Math.abs(I.dy); const sx = hx ? Math.sign(I.dx) : 0, sy = hx ? 0 : Math.sign(I.dy);
     const ahead = !isWall(g, cx + sx, cy + sy), k = Math.min(1, (ahead ? 9 : 5) * dt);
+    const diag = Math.abs(I.dx) > 0.38 && Math.abs(I.dy) > 0.38, px = hx ? 0 : 1, py = hx ? 1 : 0, o1 = !isWall(g, cx + px, cy + py), o2 = !isWall(g, cx - px, cy - py), toward = hx ? (I.dy > 0 ? o1 : o2) : (I.dx > 0 ? o1 : o2);
+    if ((o1 && o2) || (diag && toward)) { wallPush(G, c, CR); return; } /* open space: free driving, diagonals too (Perrin). Only narrow corridors keep you in the lane */
     if (hx) { if (ahead || Math.abs(Math.cos(c.a)) > 0.7) c.y += (mid(cy) - c.y) * k; } else { if (ahead || Math.abs(Math.sin(c.a)) > 0.7) c.x += (mid(cx) - c.x) * k; } }
   wallPush(G, c, CR);
 }
@@ -44048,7 +44050,7 @@ function step(G, dt) {
   for (const T of G.tn.slice()) { if (t > T.until) { G.tn.splice(G.tn.indexOf(T), 1); continue; }
     const g = G.g; if (!T.tx || Math.hypot(T.tx - T.x, T.ty - T.y) < 4) { const cx = cellOf(T.x), cy = cellOf(T.y), N = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isWall(g, cx + dx, cy + dy)); const back = N.filter(([dx, dy]) => !(mid(cx + dx) === T.px && mid(cy + dy) === T.py)); const [dx, dy] = (back.length ? back : N)[(rnd() * (back.length || N.length)) | 0] || [0, 0]; T.px = mid(cx); T.py = mid(cy); T.tx = mid(cx + dx); T.ty = mid(cy + dy); }
     const d = Math.hypot(T.tx - T.x, T.ty - T.y), s = Math.min(d, 150 * dt); if (d > 0) { T.x += (T.tx - T.x) / d * s; T.y += (T.ty - T.y) / d * s; }
-    for (const c of G.cars) { if (c.out || c.e.tor || c.e.jump || c.hurt > t || (c.e.invul || 0) > t || c.id === T.by && t < T.until - 6.5) continue; if (Math.hypot(c.x - T.x, c.y - T.y) < 26) { c.e.tor = { id: T.id, until: t + 2, a: 0 }; ev(G, 'tor', c.id); passStar(G, c); } } }
+    for (const c of G.cars) { if (c.out || c.e.tor || c.e.jump || c.hurt > t || (c.e.invul || 0) > t || c.id === T.by) continue; /* your own tornado never takes you */ if (Math.hypot(c.x - T.x, c.y - T.y) < 26) { c.e.tor = { id: T.id, until: t + 2, a: 0 }; ev(G, 'tor', c.id); passStar(G, c); } } }
   // the end
   const live = G.cars.filter(alive);
   if (G.tl <= 0 || (G.lives && G.cars.length > 1 && live.length <= 1)) endMatch(G);
@@ -44251,8 +44253,8 @@ function drawStatue(x, im, d) { const v = statueView(im, d), w = 58, hh = w * v.
 function drawHazard(x, h, now) {
   const [k, X, Y, left] = h, K = HZK[k]; x.save(); x.translate(X, Y); x.globalAlpha = left < 1 ? Math.max(0.15, left) : 1;
   { const nm = { oil: 'au_oil_puddle', slow: 'au_slow_goo', statue: 'au_statue_statue', fire: 'au_fire_floor' }[K], im = nm && auIm(nm); /* Perrin's pictures when they're loaded */
-    if (im && K === 'statue') { drawStatue(x, im, 1); /* always looking at the camera (Perrin) */ x.restore(); return; }
-    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 60, hh = w * v.height / v.width; x.drawImage(v, -w / 2, -hh / 2, w, hh); x.restore(); return; } /* green slippery oil */
+    if (im && K === 'statue') { if (S && S.rot) x.rotate(-Math.PI / 2); drawStatue(x, im, 1); /* always looking at the camera, also when the maze is turned for the phone (Perrin) */ x.restore(); return; }
+    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 62, hh = w * v.height / v.width; for (const [ox, oy, sc] of [[-44, -6, 0.9], [44, 8, 0.85], [-14, 24, 1], [16, -22, 0.95], [0, 0, 1.15]]) x.drawImage(v, ox - w * sc / 2, oy - hh * sc / 2, w * sc, hh * sc); x.restore(); return; } /* a big green slippery pool: several puddles joined into one liquid */
     if (im) { const w = K === 'fire' ? 50 + Math.sin(now * 12 + X) * 3 : 56, hh = w * im.height / im.width; x.drawImage(im, -w / 2, -hh / 2, w, hh); x.restore(); return; } }
   if (K === 'oil') { x.fillStyle = '#0c0c0c'; x.beginPath(); for (let i = 0; i < 9; i++) { const t2 = i / 9 * 6.28, r = 24 + Math.sin(i * 2.7) * 5; x.lineTo(Math.cos(t2) * r, Math.sin(t2) * r * 0.8); } x.closePath(); x.fill(); x.fillStyle = 'rgba(120,160,255,.35)'; x.beginPath(); x.ellipse(-6, -5, 8, 3, -0.4, 0, 7); x.fill(); }
   else if (K === 'slow') { x.fillStyle = 'rgba(150,70,230,.7)'; x.beginPath(); x.arc(0, 0, 20, 0, 7); x.fill(); x.font = '18px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('🐌', 0, 1); }
@@ -44398,7 +44400,7 @@ function voteOverlay() {
   const ov = $('#auOv'); ov.classList.add('on');
   ov.innerHTML = `<div class="card vote"><b>Vota el laberinto</b><div class="vbar"><i></i></div><div class="vgrid">${AU_MAPS.map((m, i) => `<button class="vm" data-i="${i}"><canvas width="100" height="60"></canvas><span>${m.n}</span><em>0</em></button>`).join('')}</div><b style="font-size:14px">Elige tu auto</b><div class="cgrid">${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<button class="cm${k === (S.mdl || 0) ? ' on' : ''}" data-m="${k}"><img src="${window.FX ? FX('au_car' + (k + 1)) : 'assets/fx/au_car' + (k + 1) + '.webp'}" alt=""></button>`).join('')}</div></div>`;
   ov.querySelectorAll('.cm').forEach(b => { b.onclick = () => { S.mdl = +b.dataset.m; try { localStorage.au_mdl = S.mdl; } catch (e) {} if (S.host) { const c = carById(S.G, S.me); if (c) c.mdl = S.mdl; } ov.querySelectorAll('.cm').forEach(q => q.classList.toggle('on', q === b)); snd('tick'); }; }); /* pick your car while you vote */
-  ov.querySelectorAll('.vm').forEach(b => { const i = +b.dataset.i, cv = b.querySelector('canvas'), x = cv.getContext('2d'); x.drawImage(paintMaze(i), 0, 0, 100, 60);
+  ov.querySelectorAll('.vm').forEach(b => { const i = +b.dataset.i, cv = b.querySelector('canvas'), x = cv.getContext('2d'); const pm = paintMaze(i); if (S.rot !== false && innerHeight > innerWidth) { cv.width = 60; cv.height = 100; x.save(); x.translate(60, 0); x.rotate(Math.PI / 2); x.drawImage(pm, 0, 0, 100, 60); x.restore(); } else x.drawImage(pm, 0, 0, 100, 60); /* the thumbnail turned like the maze you will play */
     b.onclick = () => { S.vote = i; if (S.host) S.G.votes[S.me] = i; ov.querySelectorAll('.vm').forEach(q => q.classList.toggle('on', q === b)); snd('tick'); }; });
 }
 function hud(V) {
@@ -44518,15 +44520,22 @@ const BREAK = { LTrc: [10, 'Rocas'], LTbx: [6, 'Caja'], LTcr: [6, 'Caja'], LTbr:
 const DEST = []; /* [doo index, hits, cells] */
 /* the rock corner (top right of the arena): one rock wall with a single 3-cell lane that winds to a dead end; there only you and one monster fit, one against one */
 const RKI0 = 196, RKJ0 = 246, RKW = 49, RKH = 51, RKMZ = new Uint8Array(GWd * GHd);
-const SPOTS = [[1184, 3312], [1568, 3120], [1440, -944], [1648, -32], [-2784, -944], [-3056, -608], [-2464, 3344], [-3056, 3040]]; /* where you stand in each nook (bots go there too) */
+const SPOTS = [[1200, 3312], [1584, 3120], [1456, -944], [1648, -16], [-2800, -944], [-3056, -592], [-2448, 3344], [-3056, 3056]]; /* where you stand in each nook (bots go there too) */
 const inRock = (x, y) => { const i = Math.floor((x - M0) / CELL) - RKI0, j = Math.floor((y - M0) / CELL) - RKJ0; if (i >= 0 && j >= 0 && i < RKW && j < RKH) return true; for (const s of SPOTS) if (Math.abs(s[0] - x) < 300 && Math.abs(s[1] - y) < 300) return true; return false; }; /* the rock corner and every nook: one at a time */
 /* Perrin's fighting spots: 2 nooks in each corner (you inside, one monster at the mouth, the rest in line) and walls with 3-4 doors around the forest and the crates. Every piece breaks like its kind (rocks 10 hits, barrels and crates 6) */
+const FOREST = [];
 const XBLK = [['LTrc', 230, 292, 235, 295], ['LTrc', 242, 286, 243, 289], /* rocks, top right */
   ['LTba', 232, 160, 235, 166], ['LTba', 238, 160, 241, 166], ['LTba', 239, 186, 243, 189], ['LTba', 239, 192, 243, 195], /* barrels, bottom right */
   ['LTrc', 100, 160, 103, 166], ['LTrc', 106, 160, 109, 166], ['LTrc', 96, 168, 100, 171], ['LTrc', 96, 174, 100, 177], /* rocks, bottom left */
+  ['LTrc', 228, 292, 228, 295], ['LTrc', 240, 286, 240, 289], ['LTrc', 236, 160, 236, 166], ['LTrc', 105, 160, 105, 166], ['LTrc', 238, 190, 242, 190], ['LTrc', 96, 172, 100, 172], ['LTrc', 114, 292, 114, 295], ['LTrc', 96, 286, 100, 286], /* every nook only 1 space wide: you and one monster */
   ['LTbx', 110, 292, 113, 296], ['LTbx', 116, 292, 119, 296], ['LTbx', 96, 282, 100, 285], ['LTbx', 96, 288, 100, 291] /* crates, top left */];
 { const ring = (t, i0, j0, i1, j1, gaps) => { for (let i = i0; i <= i1; i++) for (const j of [j0, j1]) if (!gaps.some(([a, b]) => a === i && b === j)) XBLK.push([t, i, j, i, j]); for (let j = j0 + 1; j < j1; j++) for (const i of [i0, i1]) if (!gaps.some(([a, b]) => a === i && b === j)) XBLK.push([t, i, j, i, j]); };
-  ring('YTft', 136, 186, 168, 243, [[136, 214], [136, 215], [168, 214], [168, 215], [151, 243], [152, 243], [151, 186], [152, 186]]); /* the forest: 4 doors */
+  { /* the forest: one thick irregular wood (no square, no perfect circle), with 3 narrow dead-end paths into it: one space, you and one monster */
+    const cx = 152, cy = 214, rx = 13.5, ry = 23, nz = a => 1 + 0.13 * Math.sin(a * 3 + 1.3) + 0.08 * Math.sin(a * 5 + 0.4) + 0.06 * Math.cos(a * 7 + 2.1), inF = (i, j) => { const dx = (i - cx) / rx, dy = (j - cy) / ry; return Math.hypot(dx, dy) < nz(Math.atan2(dy, dx)); };
+    const cut = new Set(); for (const [a, L] of [[Math.PI, 7], [-0.35, 7], [Math.PI / 2 + 0.2, 7]]) { let i = cx + Math.cos(a) * rx * 1.6, j = cy + Math.sin(a) * ry * 1.6, n = 0, last = null; const st = Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? [-Math.sign(Math.cos(a)), 0] : [0, -Math.sign(Math.sin(a))]; i = Math.round(i); j = Math.round(j);
+      while (n < L && Math.abs(i - cx) < 40 && Math.abs(j - cy) < 40) { if (inF(i, j)) { cut.add(i + ',' + j); n++; last = [i, j]; } i += st[0]; j += st[1]; } if (last) SPOTS.push([M0 + last[0] * CELL + 16, M0 + last[1] * CELL + 16]); }
+    let r = 7; const rr = () => (r = (r * 16807) % 2147483647) / 2147483647;
+    for (let j = cy - 30; j <= cy + 30; j++) for (let i = cx - 20; i <= cx + 20; i++) if (inF(i, j) && !cut.has(i + ',' + j)) { FOREST.push(j * GWd + i); if ((i + j) % 2 === 0 || rr() < 0.25) MP.doo.push(['YTft', M0 + (i + 0.5 + (rr() - 0.5) * 0.9) * CELL, M0 + (j + 0.5 + (rr() - 0.5) * 0.9) * CELL, 0, 0.55 + rr() * 0.35, []]); } }
   ring('LTbx', 184, 176, 212, 207, [[184, 191], [184, 192], [197, 207], [198, 207], [212, 191], [212, 192]]); /* the crates: 3 doors */ }
 for (const [t, i0, j0, i1, j1] of XBLK) for (let i = i0; i <= i1; i += 2) for (let j = j0; j <= j1; j += 2) { const cl = []; for (let jj = j; jj <= Math.min(j + 1, j1); jj++) for (let ii = i; ii <= Math.min(i + 1, i1); ii++) cl.push(jj * GWd + ii); const w = Math.min(2, i1 - i + 1), h = Math.min(2, j1 - j + 1); MP.doo.push([t, M0 + (i + w / 2) * CELL, M0 + (j + h / 2) * CELL, 0, t === 'YTft' ? 0.7 : 0.55, cl]); }
 const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })();
@@ -44536,6 +44545,8 @@ const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for
   for (let di0 = 0; di0 < MP.doo.length; di0++) { const d = MP.doo[di0]; const brk = BREAK[d[0]], cl = brk ? [] : null; const blockC = k => { if (cl) { if (!cl.includes(k)) { cl.push(k); DMK[k]++; } } else WALK[k >> 3] &= ~(1 << (k & 7)); };
     if (d[5]) { for (const k of d[5]) blockC(k); if (cl) DEST.push([di0, brk[0], cl]); continue; } /* a placed piece: exactly its cells */
     if (SQ[d[0]]) { const h = SQ[d[0]]; for (let j = Math.floor((d[2] - h - M0) / CELL); j <= Math.floor((d[2] + h - M0) / CELL); j++) for (let i = Math.floor((d[1] - h - M0) / CELL); i <= Math.floor((d[1] + h - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if (Math.abs(cx - d[1]) >= h || Math.abs(cy - d[2]) >= h || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl) DEST.push([di0, brk[0], cl]); continue; } let r = RAD[d[0]]; if (!r) continue; r *= d[4] || 1; for (let j = Math.floor((d[2] - r - M0) / CELL); j <= Math.floor((d[2] + r - M0) / CELL); j++) for (let i = Math.floor((d[1] - r - M0) / CELL); i <= Math.floor((d[1] + r - M0) / CELL); i++) { const cx = M0 + i * CELL + 16, cy = M0 + j * CELL + 16; if ((cx - d[1]) ** 2 + (cy - d[2]) ** 2 > r * r || i < 0 || j < 0 || i >= GWd || j >= GHd) continue; const k = j * GWd + i; blockC(k); } if (cl && cl.length) DEST.push([di0, brk[0], cl]); } }
+for (const k of FOREST) WALK[k >> 3] &= ~(1 << (k & 7));
+for (const [i, j] of [[104, 167], [104, 168]]) { const k = j * GWd + i; WALK[k >> 3] |= 1 << (k & 7); DMK[k] = 0; } /* the mouth of the bottom-left nook */
 const FOUNT = MP.fount, SHOPS = MP.shops, ARENA = MP.arena, GATEB = MP.gate;
 function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false; const k = j * GWd + i; return !DMK[k] && !!(WALK[k >> 3] & (1 << (k & 7))); }
 // the cell doors: each cell has its iron gate shut until its gladiator picks a weapon (1 s later it opens for good)
@@ -44543,7 +44554,14 @@ const DOORM = new Uint8Array(GWd * GHd), DOORS = MP.cells.map((c, ci) => { const
   let room = 0; for (let k = 0; k < 40; k++, i += di, j += dj) { const R = run(i, j); if (!R.length) break; if (!room || R.length >= room * 0.8) room = Math.max(room, R.length); else if (R.length <= room * 0.7) { const R2 = run(i + di, j + dj); const cells = R.concat(R2.length && R2.length <= room * 0.7 ? R2 : []); const xs = cells.map(q => M0 + q[0] * CELL), ys = cells.map(q => M0 + q[1] * CELL); return { ci, cells: cells.map(q => q[1] * GWd + q[0]), r: [Math.min(...xs), Math.min(...ys), Math.max(...xs) + CELL, Math.max(...ys) + CELL], v: !!dj }; } }
   return null; });
 function setDoors(open) { DOORM.fill(0); DOORS.forEach((d, i) => { if (d && !open[i]) for (const k of d.cells) DOORM[k] = 1; }); }
-function walkable(x, y, nd) { if (!nd) { const i = Math.floor((x - M0) / CELL), j = Math.floor((y - M0) / CELL); if (i >= 0 && j >= 0 && i < GWd && j < GHd && DOORM[j * GWd + i]) return false; } if (x > GATEB[0] && x < GATEB[2] && y > GATEB[1] && y < GATEB[3]) return false; /* the gate to the arena is always shut: you go in when the round starts */ return walkC(Math.floor((x - M0) / CELL), Math.floor((y - M0) / CELL)); }
+/* the arena's doors (left, top, right): shut while a round is fought, open in the break so you walk to the shops (Perrin: in the original nobody gets in or out during a round) */
+const AGM = new Uint8Array(GWd * GHd), AOPEN = []; let AGON = false;
+{ const [ax0, ay0, ax1, ay1] = MP.arena, i0 = Math.floor((ax0 - M0) / CELL), i1 = Math.floor((ax1 - M0) / CELL), j0 = Math.floor((ay0 - M0) / CELL), j1 = Math.floor((ay1 - M0) / CELL);
+  const side = (cells, inward) => { let run = []; const flush = () => { if (run.length >= 2) { for (const [i, j] of run) for (let d = 0; d < 2; d++) AGM[(j - inward[1] * d) * GWd + (i - inward[0] * d)] = 1; const m = run[run.length >> 1]; AOPEN.push({ x: M0 + (m[0] + inward[0] * 4) * CELL + 16, y: M0 + (m[1] + inward[1] * 4) * CELL + 16, ax: inward[1] !== 0 ? 1 : 0, w: run.length * CELL / 2 }); } run = []; };
+    for (const c of cells) { if (walkC(c[0], c[1])) run.push(c); else flush(); } flush(); };
+  const L = [], R = [], T = []; for (let j = j0; j <= j1; j++) { L.push([i0 - 1, j]); R.push([i1 + 1, j]); } for (let i = i0; i <= i1; i++) T.push([i, j1 + 1]);
+  side(L, [1, 0]); side(R, [-1, 0]); side(T, [0, -1]); }
+function walkable(x, y, nd) { if (!nd) { const i = Math.floor((x - M0) / CELL), j = Math.floor((y - M0) / CELL); if (i >= 0 && j >= 0 && i < GWd && j < GHd && (DOORM[j * GWd + i] || (AGON && AGM[j * GWd + i]))) return false; } if (x > GATEB[0] && x < GATEB[2] && y > GATEB[1] && y < GATEB[3]) return false; /* the gate to the arena is always shut: you go in when the round starts */ return walkC(Math.floor((x - M0) / CELL), Math.floor((y - M0) / CELL)); }
 const AC = [(MP.arena[0] + MP.arena[2]) / 2, (MP.arena[1] + MP.arena[3]) / 2]; /* the very middle of the arena: everybody appears there when a round starts */
 const inArena = (x, y) => x > ARENA[0] && x < ARENA[2] && y > ARENA[1] && y < ARENA[3];
 
@@ -44792,6 +44810,9 @@ function sell(G, h, slot) { const k = h.inv[slot]; if (!k || G.ph !== 'break' ||
 // ---------- moving ----------
 function spotNear(x, y) { if (walkable(x, y)) return [x, y]; for (let r = 32; r < 600; r += 32) for (let a = 0; a < 6.28; a += 0.5) { const qx = x + Math.cos(a) * r, qy = y + Math.sin(a) * r; if (walkable(qx, qy)) return [qx, qy]; } return [x, y]; }
 const free = (x, y, r, cr) => { const q = inRock(x, y) ? 10 : cr ? Math.min(22, r * 0.85) : Math.min(14, r * 0.5); /* the rock lane is 2 cells: one at a time */ /* monsters are wide: through a narrow pocket entrance only one fits */ return walkable(x, y) && walkable(x + q, y) && walkable(x - q, y) && walkable(x, y + q) && walkable(x, y - q); };
+function heroStep(G, h, nx, ny) { /* monsters are solid: you never squeeze between or through them, a ring of monsters keeps you in */
+  const bad = (x, y) => G.units.some(o => o.creep && !o.dead && hyp(o.x - x, o.y - y) < (o.sz || 24) + 24 && hyp(o.x - x, o.y - y) < hyp(o.x - h.x, o.y - h.y) - 0.01);
+  if (!bad(nx, ny)) return slide(h, nx, ny, 26); if (!bad(nx, h.y)) return slide(h, nx, h.y, 26); if (!bad(h.x, ny)) return slide(h, h.x, ny, 26); return false; }
 function slide(u, nx, ny, r) { const cr = !!u.creep && !u.thin; if (!cr || free(u.x, u.y, r, 1)) { if (free(nx, ny, r, cr)) { u.x = nx; u.y = ny; return true; } if (free(nx, u.y, r, cr)) { u.x = nx; return true; } if (free(u.x, ny, r, cr)) { u.y = ny; return true; } return false; }
   if (free(nx, ny, r)) { u.x = nx; u.y = ny; return true; } if (free(nx, u.y, r)) { u.x = nx; return true; } if (free(u.x, ny, r)) { u.y = ny; return true; } return false; } /* (a monster already squeezed somewhere tight can still move out) */
 function clampArena(x, y) { return spotNear(x, y); }
@@ -44816,6 +44837,7 @@ function spawnSpot(Sr) { const A = staticFields().arena; for (let k = 0; k < 60;
 
 // ---------- the simulation ----------
 function step(G, dt) {
+  AGON = G.ph === 'wave'; /* the arena doors */
   G.t += dt; const t = G.t;
   if (G.ph === 'pick') { for (const h of heroes(G)) if (!h.wp && h.bot && t > 1.5 + (h.pid % 4) * 0.7) { h.wp = WL[Math.floor(rnd() * WL.length)]; setWeapon(G, h); }
     if (t >= G.phEnd || heroes(G).every(h => h.wp)) { for (const h of heroes(G)) if (!h.wp) { h.wp = WL[Math.floor(rnd() * WL.length)]; setWeapon(G, h); } startBreak(G, true); }
@@ -44827,7 +44849,7 @@ function step(G, dt) {
   // things that were waiting for their moment: monsters out of the gates, fire falling from the sky
   for (const q of G.pend.slice()) { if (q.at > t) continue; G.pend.splice(G.pend.indexOf(q), 1);
     if (q.fx === 'rain') { const by = G.units.find(u => u.id === q.by); for (const o of near(G, q.x, q.y, q.r || 130, o => o.creep)) { hurt(G, by, o, q.d, true); if (q.slow) o.e.slow = t + 3; } ev(G, 'boom', q.x | 0, q.y | 0, q.r ? q.r * 0.5 : 70); continue; }
-    if (G.ph !== 'wave') continue; const Sr = MP.spawn[q.g]; const p = spawnSpot(Sr); spawnCreep(G, q.c, p[0], p[1]); }
+    if (G.ph !== 'wave') continue; const Sr = MP.spawn[q.g], scx = (Sr[0] + Sr[2]) / 2, scy = (Sr[1] + Sr[3]) / 2; const O = AOPEN.slice().sort((a, b) => hyp(a.x - scx, a.y - scy) - hyp(b.x - scx, b.y - scy))[0]; let p = O ? null : spawnSpot(Sr); if (O) for (let n = 0; n < 20 && !p; n++) { const o = (rnd() - 0.5) * 2 * O.w, x = O.x + (O.ax ? o : 0) + (rnd() - 0.5) * 60 * (O.ax ? 0 : 1), y = O.y + (O.ax ? 0 : o); if (walkable(x, y, 1)) p = [x, y]; } if (!p) p = spawnSpot(Sr); spawnCreep(G, q.c, p[0], p[1]); } /* they come in through the doors, right inside the arena */
   // heroes
   for (const h of heroes(G)) { if (h.dead) continue; const st = stat(G, h); h.mhp = Math.round(st.hp); if (h.hp > h.mhp) h.hp = h.mhp;
     let rg = st.rg; if (G.ph === 'break' || G.ph === 'pick') rg += hyp(h.x - FOUNT[0], h.y - FOUNT[1]) < 450 ? 120 : 15; if (G.units.some(o => o.hero && (o.e.regen || 0) > t && hyp(o.x - h.x, o.y - h.y) < 450)) rg += 25; for (const w of G.wards) if (w.until > t && hyp(w.x - h.x, w.y - h.y) < 350) rg += 40;
@@ -44835,7 +44857,8 @@ function step(G, dt) {
     if (G.ph !== 'end') { h.gAcc = (h.gAcc || 0) + dt; if (h.gAcc >= 1) { h.gAcc -= 1; h.gold++; } } /* gold trickles in: 1 per second, like the original */
     if (h.bot) botThink(G, h, dt);
     const I = h.in; const stun = (h.e.stun || 0) > t;
-    if (!stun && I.m > 0.15) { const sp = st.sp * Math.min(1, I.m) * ((h.atkT > t - 0.25) && !WEAP[h.wp].ranged ? 0.75 : 1); slide(h, h.x + I.dx * sp * dt, h.y + I.dy * sp * dt, 26); h.a = Math.atan2(I.dy, I.dx); h.mv = t; }
+    if (!stun && I.m <= 0.15 && I.a && I.sel) { const sl = I.sel, tg = sl[0] === 'c' ? G.units.find(u => u.id === sl[1] && u.creep && !u.dead) : (!G.dd.includes(sl[1]) && MP.doo[sl[1]] ? { x: MP.doo[sl[1]][1], y: MP.doo[sl[1]][2], sz: 60 } : null); if (tg) { const dx = tg.x - h.x, dy = tg.y - h.y, L = hyp(dx, dy), need = sl[0] === 'c' ? st.r + tg.sz : 110; if (L > need) { heroStep(G, h, h.x + dx / L * st.sp * dt, h.y + dy / L * st.sp * dt); h.a = Math.atan2(dy, dx); h.mv = t; } } } /* attack on a selected target: walk to it */
+    if (!stun && I.m > 0.15) { const sp = st.sp * Math.min(1, I.m) * ((h.atkT > t - 0.25) && !WEAP[h.wp].ranged ? 0.75 : 1); heroStep(G, h, h.x + I.dx * sp * dt, h.y + I.dy * sp * dt); h.a = Math.atan2(I.dy, I.dx); h.mv = t; }
     if ((h.e.starfall || 0) > t && (!h.e.sfT || t > h.e.sfT)) { h.e.sfT = t + 1; for (const o of near(G, h.x, h.y, 650, o => o.creep)) hurt(G, h, o, 25 + hasSk(h, 'starfall') * 20, true); ev(G, 'ring', h.x | 0, h.y | 0, 650, 'nova'); }
     { const fa = hasSk(h, 'faura'); if (fa) for (const o of near(G, h.x, h.y, 260 + fa * 40, o => o.creep)) o.e.slow = Math.max(o.e.slow || 0, t + 0.3); } /* frost aura: monsters near you are slow */
     { const br = hasSk(h, 'brill'); if (br) for (const o of near(G, h.x, h.y, 600, o => o.hero)) for (const kk of SKEY) if (o.cd[kk] > t) o.cd[kk] -= dt * 0.12 * br; } /* brilliance: skills come back sooner */
@@ -44879,12 +44902,12 @@ function resetDest() { DMK.fill(0); for (const [, , cl] of DEST) for (const k of
 function breakDest(G, di, by) { const D0 = DEST.find(q => q[0] === di); if (!D0 || G.dd.includes(di)) return; G.dd.push(di); for (const k of D0[2]) DMK[k] = Math.max(0, DMK[k] - 1); WIDE = null; CHUNK.clear(); const d = MP.doo[di]; ev(G, 'boom', d[1] | 0, d[2] | 0, 40);
   if (d[0] === 'LTex') { for (const o of near(G, d[1], d[2], 280, o => o.creep)) hurt(G, by, o, 300 + G.round * 20, true); ev(G, 'boom', d[1] | 0, d[2] | 0, 160); } } /* the explosive barrel only hurts the monsters */
 function hitDest(G, h, st) { /* walking into a rock, box or barrel (and no monster to hit): you hit it */
-  const t = G.t, hold = h.in.a; if (h.atkT + st.as > t || (h.in.m < 0.3 && !hold)) return; if (nearestFoe(G, h, st.r + 60)) return; let best = null, bd = 1e9; /* the attack button: you keep hitting the nearest rock, box or barrel */
+  const t = G.t, hold = h.in.a, sl = h.in.sel, sd = sl && sl[0] === 'd' && hold && !G.dd.includes(sl[1]) ? DEST.find(q => q[0] === sl[1]) : null; if (h.atkT + st.as > t || (h.in.m < 0.3 && !hold)) return; if (sd) { const d = MP.doo[sd[0]]; if (hyp(d[1] - h.x, d[2] - h.y) <= 130 + Math.min(st.r, 90)) { h.atkT = t; ev(G, 'swing', h.id); G.dh[sd[0]] = (G.dh[sd[0]] || 0) + 1; if (G.dh[sd[0]] >= sd[1]) breakDest(G, sd[0], h); } return; } if (nearestFoe(G, h, st.r + 60)) return; let best = null, bd = 1e9; /* the attack button: you keep hitting the nearest rock, box or barrel */
   for (const [di, hp] of DEST) { if (G.dd.includes(di)) continue; const d = MP.doo[di], dx = d[1] - h.x, dy = d[2] - h.y, L2 = hyp(dx, dy), reach = (d[0] === 'LTrc' ? 90 : 60) + Math.min(st.r, 90) + (hold ? 50 : 0); if (L2 > reach || L2 < 1) continue; if (!hold && (dx * h.in.dx + dy * h.in.dy) / L2 < 0.4) continue; if (L2 < bd) { bd = L2; best = [di, hp]; } }
   if (!best) return; h.atkT = t; ev(G, 'swing', h.id); G.dh[best[0]] = (G.dh[best[0]] || 0) + 1; if (G.dh[best[0]] >= best[1]) breakDest(G, best[0], h); }
 function setWeapon(G, h) { const st = stat(G, h); h.mhp = h.hp = Math.round(st.hp); }
 function attackNear(G, h, st) {
-  const t = G.t, W = WEAP[h.wp]; if (h.atkT + st.as > t) return; const tg = nearestFoe(G, h, st.r + 40); if (!tg) return; const d = hyp(tg.x - h.x, tg.y - h.y); if (d > st.r + tg.sz) return;
+  const t = G.t, W = WEAP[h.wp]; if (h.atkT + st.as > t) return; const sl = h.in.sel; if (sl && sl[0] === 'd' && !G.dd.includes(sl[1]) && h.in.a) return; /* a selected rock/box/barrel comes first */ const sc = sl && sl[0] === 'c' ? G.units.find(u => u.id === sl[1] && u.creep && !u.dead) : null; const tg = sc && hyp(sc.x - h.x, sc.y - h.y) <= st.r + sc.sz + 40 ? sc : nearestFoe(G, h, st.r + 40); if (!tg) return; const d = hyp(tg.x - h.x, tg.y - h.y); if (d > st.r + tg.sz) return;
   h.atkT = t; if (!(h.mv > t - 0.05)) h.a = Math.atan2(tg.y - h.y, tg.x - h.x); let dm = st.d; if (st.crit && rnd() < st.crit) { dm *= st.critM; ev(G, 'crit', tg.x | 0, tg.y | 0); }
   if (h.e.windHit && (h.e.wind || 0) > t) { dm += h.e.windHit; h.e.windHit = 0; h.e.wind = 0; }
   if (W.ranged) { shoot(G, h, W.ranged, Math.atan2(tg.y - h.y, tg.x - h.x), dm, st.r + 120, W.ranged !== 'arrow', 0); ev(G, 'swing', h.id); return; }
@@ -44943,7 +44966,7 @@ const CSS = `#og{position:fixed;inset:0;z-index:50;background:#07070d;touch-acti
 #ogParty div{display:flex;align-items:center;gap:4px;background:#0008;border-radius:7px;padding:2px 6px;min-width:120px}#ogParty div.dead{opacity:.45}#ogParty i{display:block;height:5px;border-radius:3px;background:#3c3;flex:1;max-width:60px}#ogParty span{max-width:62px;overflow:hidden;white-space:nowrap}
 #ogStick{position:absolute;width:120px;height:120px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33;left:20px;bottom:30px;pointer-events:none;opacity:.55}
 #ogStick.on{opacity:1;bottom:auto}#ogStick .kn{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:#ffffffaa;box-shadow:0 2px 8px #0008}
-#ogSk{position:absolute;right:10px;bottom:22px;width:210px;height:210px}#ogSk .ogb{position:absolute;width:54px;height:54px;font-size:24px}#ogSk .ogA{right:0;bottom:0;width:92px;height:92px;font-size:44px;border-color:#fff}#ogSk .ogA.on{box-shadow:0 0 16px #ffd84a}#ogQ{right:104px;bottom:2px}#ogW{right:96px;bottom:68px}#ogE{right:52px;bottom:122px}#ogR{right:0;bottom:150px;width:62px!important;height:62px!important;border-color:#ff7a3a!important}/* Mobile-Legends style: the big basic attack in the corner, the 4 powers curved around it, the ultimate on top */#ogSk .ogb.pas{opacity:.75;filter:none}
+#ogSk{position:absolute;right:10px;bottom:22px;width:210px;height:210px;pointer-events:none}#ogSk .ogb{pointer-events:auto;position:absolute;width:54px;height:54px;font-size:24px}#ogSk .ogA{right:0;bottom:0;width:92px;height:92px;font-size:44px;border-color:#fff}#ogSk .ogA.on{box-shadow:0 0 16px #ffd84a}#ogQ{right:137px;bottom:19px}#ogW{right:121px;bottom:78px}#ogE{right:78px;bottom:121px}#ogR{right:15px;bottom:133px;width:62px!important;height:62px!important;border-color:#ff7a3a!important}/* Mobile-Legends style: the big basic attack in the corner, the 4 powers curved around it, the ultimate on top */#ogSk .ogb.pas{opacity:.75;filter:none}
 .ogb{position:relative;width:74px;height:74px;border-radius:50%;border:3px solid #ffd84a;background:radial-gradient(#3a2a10,#120c04);color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;touch-action:none;padding:0}
 .ogb small{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);font:800 8.5px system-ui;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px #000}
 .ogb.cd{filter:grayscale(.8) brightness(.6)}.ogb b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 22px system-ui;text-shadow:0 2px 3px #000}
@@ -44990,12 +45013,12 @@ function myHero() { const V = S.V; return V && V.h.find(h => h[1] === S.me); }
 function bindInput() {
   const st = $('#ogStick'), kn = st.querySelector('.kn'), cv = $('#ogCv'); let sid = null, ox = 0, oy = 0;
   const setStick = (dx, dy) => { const L = hyp(dx, dy), R = 55, k = L > R ? R / L : 1; kn.style.transform = `translate(${dx * k}px,${dy * k}px)`; S.input = L > 6 ? { dx: dx / L, dy: dy / L, m: Math.min(1, L / R) } : { dx: 0, dy: 0, m: 0 }; if (L > 6) S.atk = false; };
-  cv.addEventListener('pointerdown', e => { if (sid != null) return; if (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55) return; sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
+  cv.addEventListener('pointerdown', e => { if (sid != null) return; if (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55) { tapSelect(e.clientX, e.clientY); return; } sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
   addEventListener('pointermove', e => { if (S && e.pointerId === sid) setStick(e.clientX - ox, e.clientY - oy); });
-  const up = e => { if (!S || e.pointerId !== sid) return; sid = null; st.classList.remove('on'); kn.style.transform = ''; S.input = { dx: 0, dy: 0, m: 0 }; }; addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  const up = e => { if (!S || e.pointerId !== sid) return; if (Math.hypot(e.clientX - ox, e.clientY - oy) < 14) tapSelect(e.clientX, e.clientY); sid = null; st.classList.remove('on'); kn.style.transform = ''; S.input = { dx: 0, dy: 0, m: 0 }; }; addEventListener('pointerup', up); addEventListener('pointercancel', up);
   for (const k of SKEY) $('#og' + k.toUpperCase()).addEventListener('pointerdown', e => { e.stopPropagation(); act(k); });
   $('#ogA').addEventListener('pointerdown', e => { e.stopPropagation(); S.atk = true; snd('skill'); }); /* basic attack: press once and you keep hitting (monsters on their own; rocks, boxes and barrels too) until you move */
-  $('#ogShopB').addEventListener('click', () => { if (!S.nearShop) return; if (S.V && S.V.ph === 'break') { S.tab = S.nearShop; shopOverlay(); } else flash('🔒 Las tiendas abren al terminar la ronda'); });
+  $('#ogShopB').addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); if (!S.nearShop) return; if (S.V && S.V.ph === 'break') { S.tab = S.nearShop; shopOverlay(); } else flash('🔒 Las tiendas abren al terminar la ronda'); });
   $('#ogMenu').addEventListener('click', pauseMenu);
   const K = {}; const upd = () => { const dx = (K.ArrowRight || K.d ? 1 : 0) - (K.ArrowLeft || K.a ? 1 : 0), dy = (K.ArrowDown || K.s ? 1 : 0) - (K.ArrowUp || K.w ? 1 : 0); if (sid == null) { const L = hyp(dx, dy); S.input = L ? { dx: dx / L, dy: dy / L, m: 1 } : { dx: 0, dy: 0, m: 0 }; } };
   const kd = e => { if (!S || e.repeat) return; K[e.key] = 1; if (SKEY.includes(e.key)) act(e.key); upd(); }, ku = e => { if (!S) return; K[e.key] = 0; upd(); };
@@ -45013,6 +45036,11 @@ function pickOverlay() {
 }
 const icon = (n, fb) => `<img src="${window.FX ? FX(n) : 'assets/fx/' + n + '.webp'}" style="width:1.25em;height:1.25em;object-fit:contain;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('${fb}'))">`;
 function invHtml(inv, cls) { return (inv || []).map((s, i) => { const [id, ch] = s.split(':'), I = ITEMS[id]; return I ? `<button data-s="${i}" type="button" title="${I.n}">${icon('og_i_' + id, I.ic)}${I.ch > 0 && +ch > 1 ? `<i>${ch}</i>` : ''}</button>` : ''; }).join(''); }
+function tapSelect(sx, sy) { /* tap a monster, a rock, a box or a barrel: it is your target (attack button hits it first) */
+  if (!S || !S.V || !S.cam) return; const cv = $('#ogCv'), z = ZOOM, wx = S.cam.x + (sx - cv.clientWidth / 2) / z, wy = S.cam.y - (sy - cv.clientHeight / 2) / z; let best = null, bd = 70;
+  for (const o of S.V.c || []) if (o[1] !== 'm') { const d = hyp(o[2] - wx, o[3] - wy); if (d < bd) { bd = d; best = ['c', o[0]]; } }
+  const ddl = String(S.V.dd || '').split(',').filter(Boolean).map(Number); for (const [di] of DEST) { if (ddl.includes(di)) continue; const d0 = MP.doo[di], d = hyp(d0[1] - wx, d0[2] - wy); if (d < bd) { bd = d; best = ['d', di]; } }
+  if (best) { S.sel = best; snd('tick'); } }
 function shopOverlay() {
   const ov = $('#ogOv'); ov.classList.add('on'); S.shopOpen = true; const h = myHero(); if (!h) return; const gold = h[8], inv = h[11] ? h[11].split(',') : [];
   const L = IL.filter(k => ITEMS[k].s === S.tab);
@@ -45029,13 +45057,13 @@ function closeOv() { const ov = $('#ogOv'); ov.classList.remove('on'); ov.innerH
 
 function loop(now) {
   if (!S) return; S.raf = requestAnimationFrame(loop); const dt = Math.min(0.1, (now - S.last) / 1000); S.last = now; const O = S.online;
-  if (S.host) { const G = S.G, h = heroOf(G, S.me); if (h && !h.bot) h.in = { dx: S.input.dx, dy: -S.input.dy, m: S.input.m, a: S.atk ? 1 : 0 }; /* the screen is y down, the map is y up */
+  if (S.host) { const G = S.G, h = heroOf(G, S.me); if (h && !h.bot) h.in = { dx: S.input.dx, dy: -S.input.dy, m: S.input.m, a: S.atk ? 1 : 0, sel: S.sel || null }; /* the screen is y down, the map is y up */
     if (O) readClients(G);
     if (!S.paused) { S.acc += dt; let n = 0; while (S.acc >= DT && n++ < 5) { step(G, DT); S.acc -= DT; } if (S.acc > DT) S.acc = 0; }
     S.V = snap(G); S.vAt = now;
     if (O && now - (S.sent || 0) > 80) { S.sent = now; try { O.net.room.presence({ og: S.V }); } catch (e) {} }
   } else { const net = O.net;
-    if (now - (S.sent || 0) > 66) { S.sent = now; const I = S.input; try { net.room.presence({ ogi: { x: Math.round(I.dx * 100) / 100, y: Math.round(I.dy * 100) / 100, m: Math.round(I.m * 100) / 100, a: S.atk ? 1 : 0, w: S.want, sk: mySkin() } }); } catch (e) {} }
+    if (now - (S.sent || 0) > 66) { S.sent = now; const I = S.input; try { net.room.presence({ ogi: { x: Math.round(I.dx * 100) / 100, y: Math.round(I.dy * 100) / 100, m: Math.round(I.m * 100) / 100, a: S.atk ? 1 : 0, sl: S.sel || null, w: S.want, sk: mySkin() } }); } catch (e) {} }
     const hp = net.hostPeer && net.hostPeer(); const og = hp && hp.presence && hp.presence.og;
     if (og && (!S.V || og.t !== S.V.t)) { S.prevV = S.V; S.V = og; S.vAt = now; }
     if (!hp) { S.hostGone = (S.hostGone || 0) + dt; if (S.hostGone > 6 && !S.goneShown) { S.goneShown = true; showEnd(true); } } else S.hostGone = 0; }
@@ -45048,7 +45076,7 @@ function mySkin() { try { const st = SW.settings, id = st.skins && st.skins.shro
 function readClients(G) {
   const O = S.online, g = O.game; S.cin = S.cin || {};
   for (const p of O.net.room.peers()) { if (p.sameTab) continue; const slot = g.slots[p.peer]; if (slot == null) continue; const I = p.presence && p.presence.ogi; const h = heroOf(G, slot); if (!I || !h) continue;
-    h.in = { dx: +I.x || 0, dy: -(+I.y || 0), m: clamp(+I.m || 0, 0, 1), a: I.a ? 1 : 0 }; if (typeof I.sk === 'string') h.sk = I.sk.slice(0, 40);
+    h.in = { dx: +I.x || 0, dy: -(+I.y || 0), m: clamp(+I.m || 0, 0, 1), a: I.a ? 1 : 0, sel: Array.isArray(I.sl) ? I.sl : null }; if (typeof I.sk === 'string') h.sk = I.sk.slice(0, 40);
     const seen = S.cin[slot] || (S.cin[slot] = {});
     for (const [k, n, a] of Array.isArray(I.w) ? I.w : []) { if ((seen[k] || 0) >= n) continue; seen[k] = n;
       if (SKEY.includes(k)) useSkill(G, h, k); else if (k === 'i') useItem(G, h, a | 0); else if (k === 'b' && ITEMS[a]) buy(G, h, a); else if (k === 's') sell(G, h, a | 0); else if (k === 'p' && G.ph === 'pick' && WEAP[a]) { h.wp = a; setWeapon(G, h); } } }
@@ -45060,6 +45088,7 @@ function onPhase(V, was) {
 }
 function onEvent(V, e, now) {
   const k = e[1], a = e[2], b = e[3], c = e[4];
+  if (k === 'clear') { snd('coin'); flash(`¡Ronda ${a} superada!`, '🛒 Ve a la tienda: sigue la flecha amarilla. Se viene la próxima ronda'); }
   if (k === 'round') { snd('horn'); const C = CREEPS[a]; flash(`Ronda ${a} de ${ROUNDS}`, (b ? '👑 ¡Jefes! ' : '') + C.ic + ' ' + C.n + (CREEPS[a].shot ? ' · atacan de lejos' : '')); }
   else if (k === 'break') { const C = CREEPS[a]; if (a > 1) flash('✅ ¡Ronda superada!', `Descanso: cúrate en la fuente y compra en las tiendas. Viene: ${C.ic} ${C.n}`, 3600); if (C.txt) setTimeout(() => { if (S) flash('⚠️ Viene un jefe', C.txt, 5200); }, a > 1 ? 3800 : 4600); }
   else if (k === 'kill') { snd('kill'); S.cheer = now; S.fxs.push({ k: 'pop', x: a, y: b, t0: now, big: c }); }
@@ -45086,7 +45115,7 @@ function hud(V) {
   const W = WEAP[h[9]], cds = [h[12], h[13], h[20] || 0, h[21] || 0];
   { const a = $('#ogA'), k2 = (W ? W.ic : '⚔️') + (S.atk ? 1 : 0); if (a._k !== k2) { a._k = k2; a.innerHTML = (W ? W.ic : '⚔️') + '<small>Atacar</small>'; a.classList.toggle('on', !!S.atk); } }
   SKEY.forEach((k, i) => { const el = $('#og' + k.toUpperCase()), S0 = W && W.sk[i], lv = W ? (h[7] < SKL[i] ? 0 : 1) : 0, cd = cds[i]; const key = (S0 ? S0.id : '') + ':' + Math.ceil(cd) + ':' + h[10] + ':' + lv; if (el._k === key) return; el._k = key;
-    el.style.display = S0 ? '' : 'none'; if (!S0) return; el.innerHTML = !lv ? `🔒<small>Nivel ${SKL[i]}</small>` : `${S0.ic}${cd > 0 ? `<b>${Math.ceil(cd)}</b>` : ''}<small>${S0.n}${S0.p ? ' · pasiva' : ''}</small>`; el.classList.toggle('cd', !lv || !!S0.p || cd > 0 || !!h[10]); el.classList.toggle('pas', !!S0.p && !!lv); });
+    el.style.display = S0 ? '' : 'none'; if (!S0) return; el.innerHTML = !lv ? `🔒<small>Nivel ${SKL[i]}</small>` : `${icon('og_sk_' + S0.id, S0.ic)}${cd > 0 ? `<b>${Math.ceil(cd)}</b>` : ''}<small>${S0.n}${S0.p ? ' · pasiva' : ''}</small>`; el.classList.toggle('cd', !lv || !!S0.p || cd > 0 || !!h[10]); el.classList.toggle('pas', !!S0.p && !!lv); });
   const inv = h[11] ? h[11].split(',') : [], ik = h[11]; const iv = $('#ogInv'); if (iv._k !== ik) { iv._k = ik; iv.innerHTML = inv.map((s, i) => { const [id, ch] = s.split(':'), I = ITEMS[id]; return I && I.use ? `<button data-i="${i}" type="button">${icon('og_i_' + id, I.ic)}${+ch > 1 ? `<i>${ch}</i>` : ''}</button>` : ''; }).join(''); iv.querySelectorAll('[data-i]').forEach(b => b.addEventListener('pointerdown', e => { e.stopPropagation(); act('i', +b.dataset.i); snd('skill'); })); }
   // the shop button: shows up when you walk to the shops; open only in the break
   const sb = $('#ogShopB'); let near1 = null; if (!h[10]) for (const [k, p] of Object.entries(SHOPS)) if (hyp(h[2] - p[0], h[3] - p[1]) < SHOP_R) near1 = k; const open = V.ph === 'break', sec = SECTIONS.find(x => x[0] === near1);
@@ -45192,6 +45221,8 @@ function render(V, now) {
     else if (k === 'door') drawDoor(g, o, w2s, z);
     else if (k === 'c') drawCreep(g, o, now, w2s, z);
     else drawHero(g, o, now, w2s, z); }
+  if (S.sel) { const sl = S.sel, ddl = String(V.dd || '').split(',').filter(Boolean).map(Number); let p = null, r = 40; if (sl[0] === 'c') { const o = (V.c || []).find(q => q[0] === sl[1]); if (o) { p = [o[2], o[3]]; r = o[5] + 10; } } else if (!ddl.includes(sl[1])) { const d0 = MP.doo[sl[1]]; p = [d0[1], d0[2]]; r = 60; }
+    if (!p) S.sel = null; else { const [sx, sy] = w2s(p[0], p[1]); g.save(); g.strokeStyle = '#ffe23b'; g.lineWidth = 3; g.setLineDash([8, 6]); g.lineDashOffset = -now / 30; g.beginPath(); g.ellipse(sx, sy, r * z * 1.3, r * z * 0.8, 0, 0, 7); g.stroke(); g.restore(); } } /* your target */
   { const me2 = myHero(); if (me2 && !me2[10] && (V.ph === 'break' || (V.ph === 'pick' && me2[9])) && !Object.values(SHOPS).some(p => hyp(p[0] - me2[2], p[1] - me2[3]) < 650)) { /* an arrow that always shows the way to the shops */
       const D = staticFields().shop; let u = { x: me2[2], y: me2[3] }; for (let k = 0; k < 6; k++) { const n = downhill(D, u); if (!n) break; u = { x: n[0], y: n[1] }; } const an = Math.atan2(u.y - me2[3], u.x - me2[2]); if (u.x !== me2[2] || u.y !== me2[3]) { const [hx, hy] = w2s(me2[2], me2[3]), r = 62, px = hx + Math.cos(an) * r, py = hy - 30 * z - Math.sin(an) * r, pul = 1 + Math.sin(now * 6) * 0.12;
         g.save(); g.translate(px, py); g.rotate(-an); g.scale(pul, pul); g.fillStyle = '#ffd84a'; g.strokeStyle = '#5a3a00'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-8, -13); g.lineTo(-3, 0); g.lineTo(-8, 13); g.closePath(); g.fill(); g.stroke(); g.restore(); } } }
@@ -45261,7 +45292,7 @@ function drawCreep(g, c, now, w2s, z) {
 
 window.orcGuide = () => { const ic = w => { const n = 'og_gl_' + w; return window.FXDATA && FXDATA[n] ? `<span class="icimg" style="display:inline-block;width:34px;height:34px;background:url(${FX(n)}) 0 0/800% 100% no-repeat"></span>` : `<span class="icemo">${WEAP[w].ic}</span>`; };
   return `<div class="glbl">⚔️ Cómo se juega</div><small class="gnote">Eres un gladiador preso: eliges tu arma (tu clase), sales de tu celda y aguantas 18 rondas de monstruos que entran por 3 puertas. Entre rondas te curas en la fuente y compras en las tiendas. En el medio te matan: pelea en los huecos de las esquinas, el bosque y las cajas, donde entran de a uno. Rocas 10 golpes, cajas y barriles 6.</small><div class="glbl">🗡️ Clases (${WL.length})</div><div class="gd gd2">` + WL.map(w => `<div class="gi">${ic(w)}<div><b>${WEAP[w].n}</b><small>${WEAP[w].ranged ? 'A distancia' : 'Cuerpo a cuerpo'} · vida ${WEAP[w].hp} · 4 poderes al subir de nivel</small></div></div>`).join('') + `</div><div class="glbl">👹 Monstruos</div><small class="gnote">${CREEPS.slice(1).map((c, i) => (i + 1) + '. ' + c.n).join(' · ')}</small>`; };
-window.ORC = { start, stop, quit, weapons: WEAP, items: ITEMS, creeps: CREEPS, state: () => S, _test: { walkC, newMatch, step, snap, buy, useSkill, heroOf, startRound, startBreak, DOORS } };
+window.ORC = { start, stop, quit, weapons: WEAP, items: ITEMS, creeps: CREEPS, state: () => S, _test: { SPOTS, walkC, newMatch, step, snap, buy, useSkill, heroOf, startRound, startBreak, DOORS } };
 })();
 
 // 'Laberinto de Trampas' maps (the 'tonto' family): a small Warcraft-like layer on top of the JASS engine —
