@@ -41458,8 +41458,14 @@ window.SPR_MAN={"chars":{"caracal":{"anims":{"walk":{"f":"caracal_walk.webp","cw
   const P = typeof Renderer !== 'undefined' && Renderer.prototype; if (!P) return;
   P.sprCharOf = function (u) { const map = this.W.profile.id; return SPR.charOf(u.owner, map, this.W); };
   P.sprReady = function (u) { const cid = this.sprCharOf(u); const c = MAN.chars[cid]; if (!c) return false; SPR.preload(cid); return true; };
+  const _zv = {}; function zvImg(n) { let im = _zv[n]; if (!im) { im = _zv[n] = new Image(); try { im.src = window.FX ? FX(n) : ''; } catch (e) {} } return im.complete && im.naturalWidth ? im : null; }
   P.drawSprHero = function (g, u) {
-    const W = this.W; if (!u.alive) return; const map = window.charGame ? window.charGame(W.profile.id) : W.profile.id, cid = this.sprCharOf(u), C = MAN.chars[cid]; if (!C) return;
+    const W = this.W; if (!u.alive) return;
+    { /* Perrin's Infección Zombi classes: each class has its own 8 views */ const A = W.arena, cl = A && A.cls && u.owner && A.cls[u.owner.id], q = cl && W.profile.id === 'zombie' && zvImg('zv_' + cl);
+      if (q) { if (u._rf == null) u._rf = u.facing; const dt = Math.min(0.1, this._dt || 0.016); { const d = ((u.facing - u._rf) % 360 + 540) % 360 - 180, st = 640 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
+        const mv = u._lx != null && Math.hypot(u.x - u._lx, u.y - u._ly) > 0.4; if (mv) u._lastMv = W.time; u._lx = u.x; u._ly = u.y; const moving = u._lastMv != null && W.time - u._lastMv < 0.15;
+        const vi = ((Math.round((u._rf + 90) / 45) % 8) + 8) % 8, cw = q.width / 8, H = ({ tank: 230, heavy: 200, raptor: 175 })[cl] || 185, w = H * cw / q.height, bob = moving ? Math.abs(Math.sin(W.time * 12)) * 9 : Math.sin(W.time * 2.4) * 2, sway = moving ? Math.sin(W.time * 12) * 0.06 : 0;
+        g.save(); if (u.invisUntil > W.time) g.globalAlpha *= 0.35; g.translate(0, bob); g.rotate(sway); g.scale(1, -1); g.drawImage(q, vi * cw, 0, cw, q.height, -w / 2, -H, w, H); g.restore(); return; } } const map = window.charGame ? window.charGame(W.profile.id) : W.profile.id, cid = this.sprCharOf(u), C = MAN.chars[cid]; if (!C) return;
     const t = W.time, dt = Math.min(0.1, this._dt || 0.016), col = this.heroColor(u);
     if (u._rf == null) u._rf = u.facing; { const d = ((u.facing - u._rf) % 360 + 540) % 360 - 180, st = 640 * dt; u._rf += Math.abs(d) <= st ? d : Math.sign(d) * st; }
     { const mv = u._lx != null && Math.hypot(u.x - u._lx, u.y - u._ly) > 0.4; if (mv) u._lastMv = t; }
@@ -43903,7 +43909,7 @@ function usePower(G, c, aim) {
     for (const [dx, dy] of dirs) { if (!isWall(g, cx + dx, cy + dy)) continue; for (let k = 2; k <= 3; k++) { const x = cx + dx * k, y = cy + dy * k; if (x < 1 || y < 1 || x >= g.w - 1 || y >= g.h - 1) break; if (!isWall(g, x, y)) { RJ = [x, y, dx, dy]; break; } } if (RJ) break; }
     if (!RJ) return false; }
   c.pw = null; ev(G, 'pw', c.id, PWL.indexOf(p)); const t = G.t;
-  if (p === 'oil') { const g = G.g; for (let k = 1; k <= 5; k++) { const x = c.x - Math.cos(c.a) * CS * k, y = c.y - Math.sin(c.a) * CS * k; if (isWall(g, cellOf(x), cellOf(y))) break; G.hz.push({ id: G.uid++, k: 'oil', x, y, r: 30, until: t + 6, by: c.id, arm: t + 0.3 }); } } /* a long trail of oil behind the car: 5 squares joined */
+  if (p === 'oil') { const x = c.x - Math.cos(c.a) * CS * 0.8, y = c.y - Math.sin(c.a) * CS * 0.8; G.hz.push({ id: G.uid++, k: 'oil', x, y, r: 30, until: t + 7, by: c.id, arm: t + 0.3 }); c.e.oil = { n: 4, x, y, end: t + 4 }; } /* Perrin: the oil pours out of the car as it goes: 5 squares joined, dropped one by one */
   else if (p === 'slow' || p === 'statue' || p === 'barrel') { const [x, y] = behind(c, p === 'statue' ? 44 : 34); const s = freeSpot(G, x, y) || [c.x, c.y];
     G.hz.push({ id: G.uid++, k: p, x: s[0], y: s[1], ...(p === 'oil' ? { ox: Math.cos(c.a), oy: Math.sin(c.a) } : {}), d4: ((Math.round(c.a / (Math.PI / 2)) % 4) + 4) % 4, r: p === 'statue' ? 24 : p === 'oil' ? 58 : 20, until: t + (p === 'oil' ? 5 : p === 'statue' ? 10 : 20), by: c.id, arm: t + (p === 'barrel' ? 0.8 : 0.3) }); }
   else if (p === 'turbo') c.e.turbo = t + 3;
@@ -44015,6 +44021,7 @@ function step(G, dt) {
   const stopped = G.stop && G.stop.until > t ? G.stop.by : null; if (G.stop && G.stop.until <= t) G.stop = null;
   G.tl = Math.max(0, G.tl - dt); const SLO = 0.3;
   for (const c of G.cars) if (c.bot && !c.out) botThink(G, c, dt);
+  for (const c of G.cars) { const O = c.e.oil; if (O && !c.out) { const bx = c.x - Math.cos(c.a) * CS * 0.55, by = c.y - Math.sin(c.a) * CS * 0.55, d = Math.hypot(bx - O.x, by - O.y); if (t > O.end || O.n <= 0) c.e.oil = null; else if (d >= CS * 0.7) { const k = Math.ceil(d / (CS * 0.7)); for (let q = 1; q <= k && O.n > 0; q++) { const x = O.x + (bx - O.x) * q / k, y = O.y + (by - O.y) * q / k; G.hz.push({ id: G.uid++, k: 'oil', x, y, r: 30, until: t + 7, by: c.id, arm: t + 0.4 }); O.n--; } O.x = bx; O.y = by; } } }
   for (const c of G.cars) { if (c.out) continue; driveCar(G, c, stopped != null && c.id !== stopped ? dt * SLO : dt);
     }
   // statues are solid
@@ -44261,7 +44268,7 @@ function drawHazard(x, h, now) {
   const [k, X, Y, left] = h, K = HZK[k]; x.save(); x.translate(X, Y); x.globalAlpha = left < 1 ? Math.max(0.15, left) : 1;
   { const nm = { oil: 'au_oil_puddle', slow: 'au_slow_goo', statue: 'au_statue_statue', fire: 'au_fire_floor' }[K], im = nm && auIm(nm); /* Perrin's pictures when they're loaded */
     if (im && K === 'statue') { if (S && S.rot) x.rotate(-Math.PI / 2); drawStatue(x, im, 1); /* always looking at the camera, also when the maze is turned for the phone (Perrin) */ x.restore(); return; }
-    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 62, hh = w * v.height / v.width; for (const [ox, oy, sc] of [[-12, -4, 1.05], [12, 5, 1.05], [0, 0, 1.2]]) x.drawImage(v, ox - w * sc / 2, oy - hh * sc / 2, w * sc, hh * sc); x.restore(); return; } /* a big green slippery pool: several puddles joined into one liquid */
+    if (im && K === 'oil') { const v = OILG.c || (OILG.c = (() => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g2 = c.getContext('2d'); g2.drawImage(im, 0, 0); g2.globalCompositeOperation = 'source-atop'; g2.fillStyle = 'rgba(70,200,40,.62)'; g2.fillRect(0, 0, c.width, c.height); return c; })()), w = 74, hh = w * v.height / v.width; for (const [ox, oy, sc] of [[-16, -6, 1.1], [16, 6, 1.1], [0, 0, 1.3]]) x.drawImage(v, ox - w * sc / 2, oy - hh * sc / 2, w * sc, hh * sc); x.restore(); return; } /* a big green slippery pool: several puddles joined into one liquid */
     if (im) { const w = K === 'fire' ? 50 + Math.sin(now * 12 + X) * 3 : 56, hh = w * im.height / im.width; x.drawImage(im, -w / 2, -hh / 2, w, hh); x.restore(); return; } }
   if (K === 'oil') { x.fillStyle = '#0c0c0c'; x.beginPath(); for (let i = 0; i < 9; i++) { const t2 = i / 9 * 6.28, r = 24 + Math.sin(i * 2.7) * 5; x.lineTo(Math.cos(t2) * r, Math.sin(t2) * r * 0.8); } x.closePath(); x.fill(); x.fillStyle = 'rgba(120,160,255,.35)'; x.beginPath(); x.ellipse(-6, -5, 8, 3, -0.4, 0, 7); x.fill(); }
   else if (K === 'slow') { x.fillStyle = 'rgba(150,70,230,.7)'; x.beginPath(); x.arc(0, 0, 20, 0, 7); x.fill(); x.font = '18px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('🐌', 0, 1); }
@@ -44523,7 +44530,7 @@ const COLS = ['#ff3b3b', '#3b7bff', '#1ce6b9', '#9b4dff', '#ffe23b', '#ff9a1e', 
 // the closed gate, the arena with its stones, the stands with the public and the 3 doors the monsters come in by
 const MP = window.ORC_MAP, M0 = MP.m0, GWd = MP.w, GHd = MP.h, CELL = 32;
 const DMK = new Uint8Array(GWd * GHd); /* cells blocked by things you can break (rocks, boxes, barrels) */
-const BREAK = { LTrc: [10, 'Rocas'], LTbx: [6, 'Caja'], LTcr: [6, 'Caja'], LTbr: [6, 'Barril'], LTbs: [6, 'Barril'], LTba: [6, 'Barril'], LTex: [6, 'Barril explosivo'] }; /* hits to break, like the original */
+const BREAK = { RKB: [10, 'Roca'], LTrc: [10, 'Rocas'], LTbx: [6, 'Caja'], LTcr: [6, 'Caja'], LTbr: [6, 'Barril'], LTbs: [6, 'Barril'], LTba: [6, 'Barril'], LTex: [6, 'Barril explosivo'] }; /* hits to break, like the original */
 const DEST = []; /* [doo index, hits, cells] */
 /* the rock corner (top right of the arena): one rock wall with a single 3-cell lane that winds to a dead end; there only you and one monster fit, one against one */
 const RKI0 = 196, RKJ0 = 246, RKW = 49, RKH = 51, RKMZ = new Uint8Array(GWd * GHd);
@@ -44557,6 +44564,33 @@ const XBLK = [['LTrc', 230, 292, 235, 295], ['LTrc', 242, 286, 243, 289], /* roc
 for (const [t, i0, j0, i1, j1] of XBLK) for (let i = i0; i <= i1; i += 2) for (let j = j0; j <= j1; j += 2) { const cl = []; for (let jj = j; jj <= Math.min(j + 1, j1); jj++) for (let ii = i; ii <= Math.min(i + 1, i1); ii++) cl.push(jj * GWd + ii); const w = Math.min(2, i1 - i + 1), h = Math.min(2, j1 - j + 1); MP.doo.push([t, M0 + (i + w / 2) * CELL, M0 + (j + h / 2) * CELL, 0, t === 'YTft' ? 0.7 : 0.55, cl]); }
 const WALK = (() => { const b = atob(MP.walk), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; })(), TERR = WALK.slice(); /* TERR: the ground itself, before rocks, trees and boxes block it */
 for (const d of MP.clr || []) for (let j = Math.floor((d[2] - 56 - M0) / CELL); j <= Math.floor((d[2] + 56 - M0) / CELL); j++) for (let i = Math.floor((d[1] - 56 - M0) / CELL); i <= Math.floor((d[1] + 56 - M0) / CELL); i++) { const x = M0 + i * CELL + 16, y = M0 + j * CELL + 16; if (x < MP.arena[0] + 64 || x > MP.arena[2] - 64 || y < MP.arena[1] + 64 || y > MP.arena[3] - 64) continue; const k = j * GWd + i; WALK[k >> 3] |= 1 << (k & 7); TERR[k >> 3] |= 1 << (k & 7); } /* the removed towers leave free sand */
+{ /* Perrin's arena (v327): clean sand; keep the forest and the crates; NO small rocks and no loose towers;
+     top-left: a banana of towers and crates; bottom-left and top-right: big rocks with 1v1 pockets */
+  const ai0 = Math.round((MP.arena[0] - M0) / CELL), ai1 = Math.round((MP.arena[2] - M0) / CELL) - 1, aj0 = Math.round((MP.arena[1] - M0) / CELL), aj1 = Math.round((MP.arena[3] - M0) / CELL) - 1;
+  for (let j = aj0; j <= aj1; j++) for (let i = ai0; i <= ai1; i++) { const k = j * GWd + i; WALK[k >> 3] |= 1 << (k & 7); TERR[k >> 3] |= 1 << (k & 7); }
+  const GT = [[ai0, 214], [176, aj1], [ai1, 219], [168, aj0]], nearGate = (i, j, r) => GT.some(([a, b]) => Math.abs(a - i) <= r && Math.abs(b - j) <= r);
+  const inA = d => d[1] >= MP.arena[0] - 32 && d[1] <= MP.arena[2] + 32 && d[2] >= MP.arena[1] - 32 && d[2] <= MP.arena[3] + 32, TLz = (i, j) => i < 140 && j > 245;
+  const keep = MP.doo.filter(d => { if (!inA(d)) return false; const i = Math.round((d[1] - M0) / CELL), j = Math.round((d[2] - M0) / CELL); if (TLz(i, j) || nearGate(i, j, 6)) return false; return /^(YTft|LTbx|LTcr|LTba|LTex)$/.test(d[0]); });
+  MP.doo.length = 0; for (const d of keep) MP.doo.push(d);
+  const used = new Uint8Array(GWd * GHd), free = (i0, j0, i1, j1) => { for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { if (i < ai0 + 1 || i > ai1 - 1 || j < aj0 + 1 || j > aj1 - 1 || used[j * GWd + i] || nearGate(i, j, 5)) return false; } return true; };
+  const put = (t, i, j, rr, sc, spr, flip) => { const cl = []; for (let b = -rr; b <= rr; b++) for (let a = -rr; a <= rr; a++) if (a * a + b * b <= rr * rr + rr) { const k = (j + b) * GWd + (i + a); cl.push(k); used[k] = 1; } MP.doo.push([t, M0 + (i + 0.5) * CELL, M0 + (j + 0.5) * CELL, 0, sc, cl, spr || null, flip ? 1 : 0]); };
+  for (const d of keep) { const i = Math.round((d[1] - M0) / CELL), j = Math.round((d[2] - M0) / CELL); for (let b = -2; b <= 2; b++) for (let a = -2; a <= 2; a++) used[(j + b) * GWd + i + a] = 1; }
+  SPOTS.length = 0; let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  /* top-left banana: towers and crates on one curved line around the corner (the corner itself stays empty), two crate pockets for 1v1 */
+  const cx = ai0 + 28, cy = aj1 - 26, RX = 21, RY = 17, arc = []; /* 3/4 of an oval, open toward the empty corner */
+  for (let a = 195; a <= 435; a += 12) { const t = a * Math.PI / 180; arc.push([Math.round(cx + RX * Math.cos(t)), Math.round(cy + RY * Math.sin(t))]); }
+  arc.forEach(([i, j], n) => { if (n === 5 || n === 15) { /* a pocket: crates around a spot, open toward the inside of the banana */ const ox = Math.sign(cx - i), oy = Math.sign(cy - j); for (const [p, q] of (Math.abs(i - cx) * RY > Math.abs(j - cy) * RX ? [[-ox * 2, -2], [-ox * 2, 0], [-ox * 2, 2], [0, -2], [0, 2]] : [[-2, -oy * 2], [0, -oy * 2], [2, -oy * 2], [-2, 0], [2, 0]])) put('LTbx', i + p, j + q, 0, 0.9); SPOTS.push([M0 + (i + 0.5) * CELL, M0 + (j + 0.5) * CELL]); return; }
+    if (n % 3 === 0) put('LOsc', i, j, 1, 1.6); else put('LTbx', i, j, 0, 0.9); });
+  /* big rocks: only the big kinds, different sizes, some mirrored; gaps to walk through and 1v1 pockets */
+  const BIG = ['og_ob_rock_big', 'og_ob_rock_med', 'og_ob_rock_pile'];
+  const field = (i0, j0, i1, j1, pk) => {
+    for (const [pi, pj, ux, uy] of pk) { /* the pocket: 3 big rocks around a spot, open toward (ux,uy) */ const side = ux ? [[0, -3], [0, 3]] : [[-3, 0], [3, 0]]; for (const [a, b] of side.concat([[-ux * 3, -uy * 3]])) put('RKB', pi + a, pj + b, 1, 1.6, BIG[0], (a + b) % 2); SPOTS.push([M0 + (pi + 0.5) * CELL, M0 + (pj + 0.5) * CELL]); for (let b = -1; b <= 1; b++) for (let a = -1; a <= 1; a++) used[(pj + b) * GWd + pi + a] = 1; for (let k = 1; k <= 3; k++) used[(pj + uy * k) * GWd + pi + ux * k] = 1; }
+    for (let j = j0; j <= j1; j += 5) for (let i = i0 + ((j / 5) % 2) * 2; i <= i1; i += 6) { const x = i + Math.floor(rnd() * 3) - 1, y = j + Math.floor(rnd() * 3) - 1, big = rnd() < 0.4, rr = big ? 2 : 1; if (rnd() < 0.35) continue; if (!free(x - rr - 1, y - rr - 1, x + rr + 1, y + rr + 1)) continue; put('RKB', x, y, rr, big ? 2.3 + rnd() * 0.5 : 1.55 + rnd() * 0.35, BIG[Math.floor(rnd() * 2)], rnd() < 0.5); /* Perrin: only big rocks (the smallest one is the size he marked) */ } };
+  field(ai1 - 42, aj1 - 40, ai1 - 3, aj1 - 3, [[ai1 - 30, aj1 - 12, -1, 0], [ai1 - 12, aj1 - 30, 0, -1]]);
+  field(ai0 + 3, aj0 + 3, ai0 + 42, aj0 + 40, [[ai0 + 12, aj0 + 30, 0, 1], [ai0 + 30, aj0 + 12, 1, 0]]);
+  /* the old pockets of the forest and the crates stay as places to stand */
+  SPOTS.push([M0 + 145.5 * CELL, M0 + 224.5 * CELL], [M0 + 159.5 * CELL, M0 + 206.5 * CELL], [M0 + 189.5 * CELL, M0 + 186.5 * CELL], [M0 + 207.5 * CELL, M0 + 199.5 * CELL]);
+}
 { /* the stones, columns, trees and boxes of the map block the way too (that is how the corners where monsters come one by one are made) */
   const RAD = { LOic: 48, LOsc: 48, AOsr: 60, LTrc: 52, YObs: 64, YSco: 48, YObw: 64, YTft: 40, LTbx: 40, LTcr: 40, LTba: 48, YOwb: 48, YObb: 48, YSaw: 48, LSst: 48, YOfs: 32, YOks: 32, LTbr: 32, LTbs: 32, LTex: 40 };
   const SQ = { LTrc: 64 }; /* rock chunks block a 4x4 square like in the editor: side by side they make the walls of the corner pockets */
@@ -44578,6 +44612,31 @@ function walkC(i, j) { if (i < 0 || j < 0 || i >= GWd || j >= GHd) return false;
 const DOORM = new Uint8Array(GWd * GHd), DOORS = MP.cells.map((c, ci) => { const right = c[0] > 4400 && c[1] > -4500, di = right ? -1 : 0, dj = right ? 0 : 1; let i = Math.floor((c[0] - M0) / CELL), j = Math.floor((c[1] - M0) / CELL); const run = (i, j) => { const L = []; if (!walkC(i, j)) return L; L.push([i, j]); for (const s of [-1, 1]) for (let k = 1; k < 20; k++) { const a = i + (dj ? s * k : 0), b = j + (di ? s * k : 0); if (!walkC(a, b)) break; L.push([a, b]); } return L; };
   let room = 0; for (let k = 0; k < 40; k++, i += di, j += dj) { const R = run(i, j); if (!R.length) break; if (!room || R.length >= room * 0.8) room = Math.max(room, R.length); else if (R.length <= room * 0.7) { const R2 = run(i + di, j + dj); const cells = R.concat(R2.length && R2.length <= room * 0.7 ? R2 : []); const xs = cells.map(q => M0 + q[0] * CELL), ys = cells.map(q => M0 + q[1] * CELL); return { ci, cells: cells.map(q => q[1] * GWd + q[0]), r: [Math.min(...xs), Math.min(...ys), Math.max(...xs) + CELL, Math.max(...ys) + CELL], v: !!dj }; } }
   return null; });
+{ /* Perrin (v327): outside the arena there is ONE way only: the 12 cells on an L corridor (6 below, 6 on the right) -> from the first cell straight up, then left
+     into a square shop plaza -> a straight corridor as wide as the gate up to the arena. Everything else is thick wall (nothing behind the monsters' gates). */
+  const ORIG = WALK.slice(), ob = (i, j) => (ORIG[(j * GWd + i) >> 3] >> ((j * GWd + i) & 7)) & 1, setw = (i, j, v) => { const k = j * GWd + i; if (v) WALK[k >> 3] |= 1 << (k & 7); else WALK[k >> 3] &= ~(1 << (k & 7)); };
+  const ai0 = Math.round((ARENA[0] - M0) / CELL), ai1 = Math.round((ARENA[2] - M0) / CELL) - 1, aj0 = Math.round((ARENA[1] - M0) / CELL), aj1 = Math.round((ARENA[3] - M0) / CELL) - 1;
+  for (let j = 0; j < GHd; j++) for (let i = 0; i < GWd; i++) if (i < ai0 || i > ai1 || j < aj0 || j > aj1) setw(i, j, 0);
+  const box = (i0, j0, i1, j1) => { for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) setw(i, j, 1); };
+  const gi0 = Math.floor((GATEB[0] - M0) / CELL), gi1 = Math.floor((GATEB[2] - 1 - M0) / CELL);
+  const P = [150, 66, 184, 100]; /* the square shop plaza */
+  box(P[0], P[1], P[2], P[3]); box(gi0, P[3] + 1, gi1, aj0); /* plaza + the corridor to the arena gate, as wide as the gate (no stone in the way) */
+  box(190, 56, 331, 63); /* the corridor in front of the 6 cells below */
+  let topJ = 63; DOORS.forEach(d => { if (d && !d.v) topJ = Math.max(topJ, Math.floor((d.r[3] - M0) / CELL) + 4); }); box(324, 56, 331, topJ); /* ... and up along the 6 cells on the right */
+  box(190, 56, 197, P[3] - 4); box(P[2] + 1, P[3] - 11, 197, P[3] - 4); /* from the first cell: straight up, then left into the plaza */
+  DOORS.forEach((d, n) => { if (!d) return; for (const k of d.cells) setw(k % GWd, Math.floor(k / GWd), 1);
+    const di = d.v ? 0 : 1, dj = d.v ? 1 : 0; /* from the gate out to the corridor */ for (const k of d.cells) { let i = k % GWd, j = Math.floor(k / GWd); for (let s = 0; s < 14; s++) { i -= di; j += dj; if (d.v ? j > 63 : i < 324) break; if (ob(i, j)) setw(i, j, 1); } }
+    /* the room behind the gate */ const c = MP.cells[n], st = [[Math.floor((c[0] - M0) / CELL), Math.floor((c[1] - M0) / CELL)]], seen = new Set(d.cells), lim = 900;
+    while (st.length && seen.size < lim + d.cells.length) { const [i, j] = st.pop(), k = j * GWd + i; if (seen.has(k) || !ob(i, j)) continue; seen.add(k); setw(i, j, 1); st.push([i + 1, j], [i - 1, j], [i, j + 1], [i, j - 1]); } });
+  const W = (i, j) => [M0 + (i + 0.5) * CELL, M0 + (j + 0.5) * CELL], put = (a, p) => { a[0] = p[0]; a[1] = p[1]; };
+  const SP = [[154, 70], [167, 69], [180, 70], [154, 83], [180, 83]]; Object.keys(SHOPS).forEach((k, n) => put(SHOPS[k], W(...SP[n % SP.length])));
+  put(FOUNT, W(167, 81)); put(MP.yard, W(167, 92));
+  /* the stands: a ring of seats around the arena, full of people (also in the four corners) */
+  const S0 = 22; MP.stand = new Uint8Array(GWd * GHd); MP.spec = [];
+  for (let j = aj0 - S0; j <= aj1 + S0; j++) for (let i = ai0 - S0; i <= ai1 + S0; i++) { if (i >= ai0 - 2 && i <= ai1 + 2 && j >= aj0 - 2 && j <= aj1 + 2) continue; let nearW = false; for (let b = -2; b <= 2 && !nearW; b++) for (let a = -2; a <= 2; a++) { const x = i + a, y = j + b; if ((x < ai0 || x > ai1 || y < aj0 || y > aj1) && ((WALK[(y * GWd + x) >> 3] >> ((y * GWd + x) & 7)) & 1)) { nearW = true; break; } } if (!nearW) MP.stand[j * GWd + i] = 1; }
+  let sd = 3; const rn = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  for (let j = aj0 - S0; j <= aj1 + S0; j += 2) for (let i = ai0 - S0; i <= ai1 + S0; i += 2) if (MP.stand[j * GWd + i] && rn() < 0.8) MP.spec.push(['f', M0 + (i + rn() * 2) * CELL, M0 + (j + rn() * 2) * CELL]);
+}
 function setDoors(open) { DOORM.fill(0); DOORS.forEach((d, i) => { if (d && !open[i]) for (const k of d.cells) DOORM[k] = 1; }); }
 /* the arena's doors (left, top, right): shut while a round is fought, open in the break so you walk to the shops (Perrin: in the original nobody gets in or out during a round) */
 const AGM = new Uint8Array(GWd * GHd), AOPEN = []; let AGON = false, GOPEN = false; /* GOPEN: the yard gate (bottom) is open in the break */
@@ -44868,7 +44927,7 @@ function step(G, dt) {
     if (t >= G.phEnd || heroes(G).every(h => h.wp)) { for (const h of heroes(G)) if (!h.wp) { h.wp = WL[Math.floor(rnd() * WL.length)]; setWeapon(G, h); } startBreak(G, true); }
     else { for (const h of heroes(G)) { if (h.wp && G.doorT[h.cell] > t + 2) G.doorT[h.cell] = t + 2; /* the gate opens 2 s after you pick */ } setDoors(G.doorT.map(q => q <= t));
       for (const h of heroes(G)) { if (!h.wp) continue; if (h.bot) botThink(G, h, dt); const I = h.in; if (I.m > 0.15) { const sp = stat(G, h).sp * Math.min(1, I.m); slide(h, h.x + I.dx * sp * dt, h.y + I.dy * sp * dt, 26); h.a = Math.atan2(I.dy, I.dx); h.mv = t; } } return; } }
-  if (G.ph === 'break' && G.round === 0) { for (let i = 0; i < G.doorT.length; i++) if (G.doorT[i] > t + 2) G.doorT[i] = t + 2; setDoors(G.doorT.map(q => q <= t)); }
+  if (G.ph === 'break' && G.round === 0) { for (const h of heroes(G)) if (G.doorT[h.cell] > t + 2) G.doorT[h.cell] = t + 2; /* Perrin: only the cells of the players in the match open */ setDoors(G.doorT.map(q => q <= t)); }
   if (G.ph === 'end') return;
   if (G.ph === 'break' && t >= G.phEnd) startRound(G);
   // things that were waiting for their moment: monsters out of the gates, fire falling from the sky
@@ -45038,7 +45097,7 @@ function myHero() { const V = S.V; return V && V.h.find(h => h[1] === S.me); }
 function bindInput() {
   const st = $('#ogStick'), kn = st.querySelector('.kn'), cv = $('#ogCv'); let sid = null, ox = 0, oy = 0;
   const setStick = (dx, dy) => { const L = hyp(dx, dy), R = 55, k = L > R ? R / L : 1; kn.style.transform = `translate(${dx * k}px,${dy * k}px)`; S.input = L > 6 ? { dx: dx / L, dy: dy / L, m: Math.min(1, L / R) } : { dx: 0, dy: 0, m: 0 }; if (L > 6) S.atk = false; };
-  cv.addEventListener('pointerdown', e => { if (sid != null) return; if (S.freeCam && e.clientX >= innerWidth * 0.45) return; if (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55) { tapSelect(e.clientX, e.clientY); return; } sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
+  cv.addEventListener('pointerdown', e => { if (sid != null) return; if (S.freeCam && e.clientX >= innerWidth * 0.45) return; if (tapSelect(e.clientX, e.clientY) || (e.clientX > innerWidth * 0.6 && e.clientY > innerHeight * 0.55)) return; /* Perrin: tapping a rock/box/monster only selects it (no joystick) */ sid = e.pointerId; ox = e.clientX; oy = e.clientY; st.style.left = (ox - 60) + 'px'; st.style.top = (oy - 60) + 'px'; st.classList.add('on'); setStick(0, 0); });
   addEventListener('pointermove', e => { if (S && e.pointerId === sid) setStick(e.clientX - ox, e.clientY - oy); });
   const up = e => { if (!S || e.pointerId !== sid) return; if (Math.hypot(e.clientX - ox, e.clientY - oy) < 14) tapSelect(e.clientX, e.clientY); sid = null; st.classList.remove('on'); kn.style.transform = ''; S.input = { dx: 0, dy: 0, m: 0 }; }; addEventListener('pointerup', up); addEventListener('pointercancel', up);
   for (const k of SKEY) $('#og' + k.toUpperCase()).addEventListener('pointerdown', e => { e.stopPropagation(); act(k); });
@@ -45070,8 +45129,8 @@ function invHtml(inv, cls) { return (inv || []).map((s, i) => { const [id, ch] =
 function tapSelect(sx, sy) { /* tap a monster, a rock, a box or a barrel: it is your target (attack button hits it first) */
   if (!S || !S.V || !S.cam) return; const cv = $('#ogCv'), z = ZOOM, wx = S.cam.x + (sx - cv.clientWidth / 2) / z, wy = S.cam.y - (sy - cv.clientHeight / 2) / z; let best = null, bd = 70;
   for (const o of S.V.c || []) if (o[1] !== 'm') { const d = hyp(o[2] - wx, o[3] - wy); if (d < bd) { bd = d; best = ['c', o[0]]; } }
-  const ddl = String(S.V.dd || '').split(',').filter(Boolean).map(Number); for (const [di] of DEST) { if (ddl.includes(di)) continue; const d0 = MP.doo[di], d = hyp(d0[1] - wx, d0[2] - wy); if (d < bd) { bd = d; best = ['d', di]; } }
-  if (best) { S.sel = best; snd('tick'); } }
+  const ddl = String(S.V.dd || '').split(',').filter(Boolean).map(Number); for (const [di] of DEST) { if (ddl.includes(di)) continue; const d0 = MP.doo[di], d = Math.min(hyp(d0[1] - wx, d0[2] - wy), hyp(d0[1] - wx, d0[2] + 45 - wy)); if (d < bd) { bd = d; best = ['d', di]; } }
+  if (best) { S.sel = best; snd('tick'); } return !!best; }
 function shopOverlay() {
   const ov = $('#ogOv'); ov.classList.add('on'); S.shopOpen = true; const h = myHero(); if (!h) return; const gold = h[8], inv = h[11] ? h[11].split(',') : [];
   const L = IL.filter(k => ITEMS[k].s === S.tab);
@@ -45174,18 +45233,19 @@ function hsh(a, b) { let x = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; re
 function paintChunk(ci, cj) {
   const x0 = ci * CHW, y0 = cj * CHW, y1 = y0 + CHW, c = document.createElement('canvas'); c.width = c.height = Math.round(CHW * CK); const g = c.getContext('2d'); let miss = false;
   const sand = im('og_sand'); const pat = sand ? g.createPattern(sand, 'repeat') : null; if (!sand) miss = true;
-  const tp = (n, cells) => { const q = im(n); if (!q) { miss = true; return null; } const p = g.createPattern(q, 'repeat'); try { p.setTransform(new DOMMatrix().scale(cells * CELL * CK / q.width)); } catch (e) {} return p; }, PW = tp('og_t_wall_top', 4), PJ = tp('og_t_cell', 4), PS = tp('og_t_corridor', 5); /* Perrin's floors and walls */
+  const tp = (n, cells) => { const q = im(n); if (!q) { miss = true; return null; } const p = g.createPattern(q, 'repeat'); try { p.setTransform(new DOMMatrix().scale(cells * CELL * CK / q.width)); } catch (e) {} return p; }, PW = tp('og_t_wall_top', 4), PJ = tp('og_t_cell', 4), PS = tp('og_t_corr2', 4), PST = tp('og_t_steps', 3); /* Perrin's floors and walls */
   const P = (x, y) => [(x - x0) * CK, (y1 - y) * CK], cs = CELL * CK + 0.6;
   for (let y = y0; y < y1; y += CELL) for (let x = x0; x < x0 + CHW; x += CELL) { const [px, py] = P(x, y + CELL), w = walkable(x + 16, y + 16) || (inArena(x + 16, y + 16) && (() => { const k = Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL); return !!(TERR[k >> 3] & (1 << (k & 7))) || !!SANDM[k]; })()) /* under a rock or a box it is still sand */ || (x + 16 > GATEB[0] && x + 16 < GATEB[2] && y + 16 > GATEB[1] && y + 16 < GATEB[3]), r = hsh(x, y);
-    if (w) { const z = inArena(x + 16, y + 16) ? 'sand' : y < -2300 ? 'jail' : 'stand';
+    if (w) { const z = inArena(x + 16, y + 16) ? 'sand' : 'stand'; /* Perrin: every corridor the same floor */
       if (z === 'sand') { if (pat) { g.fillStyle = pat; g.save(); g.translate(-(x0 * CK) % 115, 0); g.restore(); } g.fillStyle = pat || '#c8a46a'; }
       else g.fillStyle = z === 'jail' ? (PJ || (r < 0.5 ? '#5d5650' : '#57504a')) : (PS || (r < 0.5 ? '#8a7d6c' : '#83776a'));
       g.fillRect(px, py, cs, cs); if (z === 'sand') { g.fillStyle = 'rgba(205,168,108,.55)'; g.fillRect(px, py, cs, cs); }
       if (z !== 'sand' && !PJ && (Math.floor((x - M0) / CELL) + Math.floor((y - M0) / CELL)) % 2) { g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(px, py, cs, cs); } /* stone slabs */
       if (z === 'sand' && r < 0.04) { g.fillStyle = 'rgba(120,20,10,.22)'; g.beginPath(); g.ellipse(px + cs / 2, py + cs / 2, cs * 0.9, cs * 0.5, r * 9, 0, 7); g.fill(); } }
-    else if (((x > 1500 && y < -4500) || (x > 4400 && y < 0)) && (walkable(x + 48, y + 16) || walkable(x - 16, y + 16) || walkable(x + 16, y + 48) || walkable(x + 16, y - 16))) { /* the prisoners' cells: iron bars (Perrin's bars) */ const qb = im('og_m_bars'); g.fillStyle = PJ || '#2a2624'; g.fillRect(px, py, cs, cs); if (qb) g.drawImage(qb, px - cs * 0.05, py - cs * 0.15, cs * 1.1, cs * 1.25); else { g.fillStyle = '#9a9aa2'; for (let b = 3; b < cs; b += cs / 3) g.fillRect(px + b, py, Math.max(1.5, cs * 0.12), cs); } }
+    else if (((x > 1500 && y < -4500) || (x > 4400 && y < 0)) && (walkable(x + 48, y + 16) || walkable(x - 16, y + 16) || walkable(x + 16, y + 48) || walkable(x + 16, y - 16))) { /* the prisoners' cells: iron bars (Perrin's bars) */ const qb = im('og_p_bars_h') || im('og_m_bars'); g.fillStyle = PJ || '#2a2624'; g.fillRect(px, py, cs, cs); if (qb) g.drawImage(qb, px - cs * 0.05, py - cs * 0.15, cs * 1.1, cs * 1.25); else { g.fillStyle = '#9a9aa2'; for (let b = 3; b < cs; b += cs / 3) g.fillRect(px + b, py, Math.max(1.5, cs * 0.12), cs); } }
     else if (RKMZ[Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL)]) { /* the rock wall of the rock corner: piled boulders, a darker face where the lane is in front */
       g.fillStyle = r < 0.5 ? '#6d655c' : '#675f57'; g.fillRect(px, py, cs, cs); }
+    else if (MP.stand && MP.stand[Math.floor((y + 16 - M0) / CELL) * GWd + Math.floor((x + 16 - M0) / CELL)]) { /* Perrin: the stands, rows of stone seats full of people */ g.fillStyle = PST || '#6b5d52'; g.fillRect(px, py, cs, cs); if (Math.floor((y - M0) / CELL) % 3 === 0) { g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(px, py + cs * 0.8, cs, cs * 0.2); } }
     else { /* walls: stone blocks, with a darker front face where the floor is in front (below) so they look tall */
       const front = walkable(x + 16, y - 16); g.fillStyle = PW || (r < 0.5 ? '#4a3f45' : '#463c42'); g.fillRect(px, py, cs, cs);
       if (!PW) { g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 1; g.strokeRect(px + 0.5, py + 0.5, cs - 1, cs - 1); }
@@ -45214,7 +45274,7 @@ function obName(id, r, d) { if (/^LTr[ck]$/.test(id)) return ['og_ob_rock_big', 
 const OBW = { og_ob_rock_big: 80, og_ob_rock_med: 70, og_ob_rock_pile: 72, og_ob_barrel: 54, og_ob_barrel_ex: 54, og_ob_crate: 62, og_ob_crate2: 52, og_ob_tower: 96, og_ob_tower_half: 104, og_ob_tree: 104, og_ob_bush: 80, og_ob_tree_dead: 96, og_ob_palm: 92 };
 function drawProp(g, d, sx, sy, z, now, sel) { /* stones, columns, trees and boxes of the original map */
   const [id, , , a, sc] = d, s = (sc || 1) * z, r = hsh(d[1], d[2]);
-  { let n = obName(id, r, d); if (n && sel === 'hit' && /^LTr[ck]$/.test(id)) n = 'og_ob_rock_crack'; const q = n && im(n); if (q) { const w = (OBW[n] || 70) * Math.max(0.75, Math.min(1.5, (sc || 1) * (/^YTft/.test(id) ? 1.3 : 1))) * z * (0.9 + r * 0.2), h = w * q.height / q.width; g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(sx, sy, w * 0.42, w * 0.16, 0, 0, 7); g.fill(); drawSel(g, q, sx - w / 2, sy - h * 0.82, w, h, sel === true); return; } } /* Perrin's drawings */
+  { let n = d[6] || obName(id, r, d); if (n && sel === 'hit' && /^LTr[ck]$/.test(id)) n = 'og_ob_rock_crack'; const q = n && im(n); if (q) { const w = (OBW[n] || 70) * (id === 'RKB' ? (sc || 1) : Math.max(0.75, Math.min(1.5, (sc || 1) * (/^YTft/.test(id) ? 1.3 : 1)))) * z * (0.9 + r * 0.2), h = w * q.height / q.width; g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(sx, sy, w * 0.42, w * 0.16, 0, 0, 7); g.fill(); if (d[7]) { g.save(); g.translate(sx, 0); g.scale(-1, 1); drawSel(g, q, -w / 2, sy - h * 0.82, w, h, sel === true); g.restore(); } else drawSel(g, q, sx - w / 2, sy - h * 0.82, w, h, sel === true); return; } } /* Perrin's drawings */
   if (id === 'YSco') { const q = im('og_column'); if (q) { const w = 120 * s, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); return; } }
   if (ROCKY.test(id) || id === 'YSco') { const R = (id[0] === 'Y' ? 46 : /^LTr[ck]$/.test(id) ? 62 : 34) * s * (0.8 + r * 0.5); g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx + R * 0.2, sy + R * 0.3, R, R * 0.55, 0, 0, 7); g.fill();
     g.fillStyle = id === 'AOsr' ? '#7a7280' : '#8c8478'; g.strokeStyle = '#3b3530'; g.lineWidth = Math.max(1.5, 3 * z); g.beginPath(); for (let k = 0; k < 8; k++) { const an = k / 8 * 6.283 + r * 3, rr = R * (0.75 + 0.25 * hsh(k, r)); g.lineTo(sx + Math.cos(an) * rr, sy - R * 0.35 + Math.sin(an) * rr * 0.8); } g.closePath(); g.fill(); g.stroke();
@@ -45250,7 +45310,7 @@ function render(V, now) {
   L.sort((a, b) => b[0] - a[0]);
   for (const it of L) { const k = it[1], o = it[2];
     if (k === 'd') { const [sx, sy] = w2s(o[1], o[2]); drawProp(g, o, sx, sy, z, now, !!(S.sel && S.sel[0] === 'd' && S.sel[1] === it[3])); }
-    else if (k === 's') { const [sx, sy] = w2s(o[1], o[2]); const r = hsh(o[1], o[2]), cheer = S.cheer && now - S.cheer < 1.2, b = Math.abs(Math.sin(now * (cheer ? 14 : 3) + r * 9)) * (cheer ? 6 : 1.5);
+    else if (k === 's') { const [sx, sy] = w2s(o[1], o[2]); const r = hsh(o[1], o[2]), cheer = S.cheer && now - S.cheer < 1.2, b = Math.abs(Math.sin(now * (cheer ? 14 : 7) + r * 9)) * (cheer ? 9 : 5); /* Perrin: the crowd is always jumping */
       { const q = im('og_ob_fan' + (1 + Math.floor(r * 8))); if (q) { const w = 62 * z, h = w * q.height / q.width; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx, sy, w * 0.35, w * 0.12, 0, 0, 7); g.fill(); g.drawImage(q, sx - w / 2, sy - h - b * z, w, h); continue; } } /* Perrin's cheering crowd */
       const cl = ['#b85a3a', '#3a6ab8', '#4a8a3a', '#8a3ab8', '#b8a03a', '#6a6a6a'][Math.floor(r * 6)]; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(sx, sy, 10, 4, 0, 0, 7); g.fill();
       g.fillStyle = cl; g.fillRect(sx - 6, sy - 16 - b, 12, 14); g.fillStyle = '#e8c39a'; g.beginPath(); g.arc(sx, sy - 21 - b, 6, 0, 7); g.fill(); if (cheer) { g.strokeStyle = '#e8c39a'; g.lineWidth = 3; g.beginPath(); g.moveTo(sx - 6, sy - 14 - b); g.lineTo(sx - 10, sy - 26 - b); g.moveTo(sx + 6, sy - 14 - b); g.lineTo(sx + 10, sy - 26 - b); g.stroke(); } }
@@ -45258,7 +45318,7 @@ function render(V, now) {
       const nm = SECTIONS.find(x => x[0] === o); if (nm) label(g, nm[1] + ' ' + nm[2], sx, sy + 16, '#ffe9a8', 12); }
     else if (k === 'fount') { const [sx, sy] = w2s(FOUNT[0], FOUNT[1]), q = im('og_fount'); if (q) { const w = 300 * z, h = w * q.height / q.width; g.drawImage(q, sx - w / 2, sy - h * 0.75, w, h); } label(g, '💧 Fuente: te cura', sx, sy + 18, '#bfe9ff', 12); }
     else if (k === 'gate') { const [sx, sy] = w2s(o[0], o[1]), side = o[2] === 'L' ? 'L' : o[2] === 'R' ? 'R' : 'F', open = o[2] === 'B' ? V.ph === 'break' : (V.ph === 'wave' && V.gs), q = im('og_gate' + side + (open ? '_o' : '_c')) || im('og_gate');
-      if (q) { const h = (side === 'F' ? 230 : 300) * z, w = h * q.width / q.height; g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); } if (o[2] === 'B' && V.ph === 'break') label(g, '🔓 Puerta abierta · entra a buscar tu puesto', sx, sy + 14, '#9dff8a', 11); }
+      if (q) { let h = (side === 'F' ? 230 : 300) * z, w = h * q.width / q.height; if (o[2] === 'B') { w = (GATEB[2] - GATEB[0] + 90) * z; h = w * q.height / q.width; } /* Perrin: the gate as wide as its corridor */ g.drawImage(q, sx - w / 2, sy - h * 0.85, w, h); } if (o[2] === 'B' && V.ph === 'break') label(g, '🔓 Puerta abierta · entra a buscar tu puesto', sx, sy + 14, '#9dff8a', 11); }
     else if (k === 'door') drawDoor(g, o, w2s, z);
     else if (k === 'c') drawCreep(g, o, now, w2s, z);
     else drawHero(g, o, now, w2s, z); }
@@ -45285,7 +45345,7 @@ function render(V, now) {
   if (me && me[10] && V.ph === 'wave') { g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, cw, ch); label(g, '💀 Revives al terminar la ronda', cw / 2, ch * 0.22, '#fff', 17); }
 }
 function drawDoor(g, d, w2s, z) { /* the iron gate of a cell, shut until you pick */ const [x0, y0, x1, y1] = d.r, H = 120 * z;
-  { const q = im(d.open ? 'og_m_gate_o' : 'og_m_gate_c'); if (q) { /* Perrin's prison gate (stone arch and bars) */ let ax, ay, w; if (d.v) { const ym = (y0 + y1) / 2; [ax, ay] = w2s(x0 - 10, ym); w = w2s(x1 + 10, ym)[0] - ax; } else { const xm = (x0 + x1) / 2, a1 = w2s(xm, y1 + 8), b1 = w2s(xm, y0 - 8); w = Math.max(60 * z, (b1[1] - a1[1]) * 0.9); ax = a1[0] - w / 2; ay = b1[1]; } const h = w * q.height / q.width; g.drawImage(q, ax, ay - h * 0.9, w, h); return; } } g.save(); g.lineCap = 'round'; if (d.open) { g.translate(0, -H * 0.95); g.globalAlpha = 0.85; }
+  { const q = im('og_p_door_c') || im('og_m_gate_c'); if (q) { /* Perrin: the cell gate always seen from the front; open = the bars are lifted up */ let ax, ay, w; if (d.v) { const ym = (y0 + y1) / 2; [ax, ay] = w2s(x0 - 10, ym); w = w2s(x1 + 10, ym)[0] - ax; } else { const xm = (x0 + x1) / 2, a1 = w2s(xm, y1 + 8), b1 = w2s(xm, y0 - 8); w = Math.max(60 * z, (b1[1] - a1[1]) * 0.9); ax = a1[0] - w / 2; ay = b1[1]; } const h = w * q.height / q.width; if (d.open) { g.save(); g.globalAlpha = 0.9; g.drawImage(q, ax, ay - h * 0.9 - h * 0.8, w, h); g.restore(); } else g.drawImage(q, ax, ay - h * 0.9, w, h); return; } } g.save(); g.lineCap = 'round'; if (d.open) { g.translate(0, -H * 0.95); g.globalAlpha = 0.85; }
   if (d.v) { const ym = (y0 + y1) / 2, [ax, ay] = w2s(x0 - 8, ym), [bx] = w2s(x1 + 8, ym); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(ax, ay - 3, bx - ax, 8);
     g.strokeStyle = '#2a2a30'; g.lineWidth = 5; g.beginPath(); g.moveTo(ax, ay - H); g.lineTo(bx, ay - H); g.moveTo(ax, ay - H * 0.5); g.lineTo(bx, ay - H * 0.5); g.moveTo(ax, ay); g.lineTo(bx, ay); g.stroke();
     const n = Math.max(4, Math.round((bx - ax) / 9)); for (let k = 0; k <= n; k++) { const x = ax + (bx - ax) * k / n; g.strokeStyle = '#1c1c22'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, ay); g.lineTo(x, ay - H - 6); g.stroke(); g.strokeStyle = '#9aa0ac'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x - 1, ay); g.lineTo(x - 1, ay - H - 6); g.stroke(); } }
@@ -45309,7 +45369,7 @@ function drawHero(g, h, now, w2s, z) {
     const bob = mv ? Math.abs(Math.sin((S.dist[id] || 0) / 18)) * 5 : Math.sin(now * 2.5 + id) * 1.2, sway = mv ? Math.sin((S.dist[id] || 0) / 18) * 0.07 : 0, atk = h[19] ? Math.sin(now * 28) : 0;
     g.save(); g.translate(sx + Math.cos(a) * atk * 8, sy - Math.sin(a) * atk * 4 - bob); g.rotate(sway + atk * 0.12 * (Math.cos(a) >= 0 ? 1 : -1)); if (f & 4) g.rotate(now * 20); if (f & 8) g.globalAlpha = 0.45;
     const a0 = S.atk0 && S.atk0[id], att = a0 != null && now - a0 < 0.5, an = att ? 'a' : mv ? 'w' : null, AQ = an && im('og_g' + an + '_' + wp), MW = GLM['w_' + wp];
-    if (AQ && MW) { /* Perrin's walking and attack sheets: 8 frames, 5 views (the left ones are the right ones mirrored) */ g.restore(); const [row, mir] = GLR[vi], cs = AQ.width / 8, fi = att ? Math.min(7, Math.floor((now - a0) / 0.06)) : Math.floor((S.dist[id] || 0) / 20) % 8, M = GLM[an + '_' + wp] || MW, k = H0 / (MW[1] * cs), dw = cs * k;
+    if (AQ && MW) { /* Perrin's walking and attack sheets: 8 frames, 5 views (the left ones are the right ones mirrored) */ g.restore(); const [row, mir] = GLR[vi], cs = AQ.width / 8, fi = att ? Math.min(7, Math.floor((now - a0) / 0.06)) : Math.floor(now * 13) % 8, M = GLM[an + '_' + wp] || MW, k = H0 / (MW[1] * cs), dw = cs * k;
       g.save(); g.translate(sx, sy); g.scale(mir, 1); if (f & 4) g.rotate(now * 20); if (f & 8) g.globalAlpha = 0.45; g.drawImage(AQ, fi * cs, row * cs, cs, cs, -dw / 2, -M[0] * dw, dw, dw); g.restore(); top = sy - H0; }
     else { g.drawImage(GLq, vi * cw, 0, cw, GLq.height, -w / 2, -H0, w, H0); g.restore(); top = sy - H0 - bob; } }
   else if (C) { const deg = a * 180 / Math.PI; const [row, mir] = SPR.dir(deg); const an = mv ? (C.anims.run ? 'run' : C.anims.walk ? 'walk' : SPR.stand(cid)) : (C.anims.idle ? 'idle' : SPR.stand(cid)); const n = (C.anims[an] && C.anims[an].n && C.anims[an].n[row]) || 8;
