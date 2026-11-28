@@ -45679,11 +45679,11 @@ function render(V, now) {
   if (on(FOUNT[0], FOUNT[1], 260)) L.push([FOUNT[1] + 1, 'fount']);
   const GTS = [[ARENA[0], 776, 'L'], [-576, ARENA[3], 'U'], [ARENA[2], 904, 'R'], [-760, GATEB[1] + 60, 'B']]; /* v338: every gate centred on its corridor */ for (const q of GTS) if (on(q[0], q[1], 200)) L.push([q[1] + 30, 'gate', q]);
   DOORS.forEach(d => { if (!d || d.v || d.r[0] < 3000 || !on(d.r[0], d.r[1], 900)) return; /* Perrin (v348): the cells of the right column, built from HIS 4 wall pictures (top, bottom, left, right mirrored), joined in a U */
-    const [x0, y0, x1, y1] = d.r, rx0 = x1 + 16, rx1 = x1 + 528, ry0 = y0 - 128, ry1 = y1 + 128, X0 = x1 - 128, X1 = x1 + 640, SW = 148; /* v350: HIS new tileset (front wall, back wall, columns, corners), symmetric */
-    L.push([ry1 + 0.5, 'cw', { q: 'og_cw_top', r: [X0, ry1 - 30, X1, ry1 + 180], f: 1 }]);
-    L.push([ry0 - 76, 'cw', { q: 'og_cw_bot', r: [X0, ry0 - 76, X1, ry0 + 128], f: 1 }]);
-    L.push([ry0 - 76, 'cw', { q: 'og_cw_side', r: [X0, y1, X0 + SW, ry1 - 30], f: 1 }]);
-    L.push([ry0 - 76, 'cw', { q: 'og_cw_sideR', r: [X1 - SW, ry0 + 128, X1, ry1 - 30], f: 1 }]); });
+    const [x0, y0, x1, y1] = d.r, ry0 = y0 - 128, ry1 = y1 + 128, X0 = x1 - 128, X1 = x1 + 640; /* v351: HIS 4 walls, one row each: top = picture 1, left = 2, bottom = 3, right = 4 (only the face) */
+    L.push([ry1 + 0.5, 'cw', { q: 'og_cw_top', r: [X0, ry1 - 40, X1, ry1 + 128], f: 1 }]);
+    L.push([ry1 + 0.4, 'cw', { q: 'og_cw_side', r: [X0, y1 - 2, X0 + 168, ry1 - 40], f: 1 }], [ry1 + 0.4, 'cw', { q: 'og_cw_sideB', r: [X0, ry0 + 40, X0 + 168, y0 + 2], f: 1 }]);
+    L.push([ry1 + 0.4, 'cw', { q: 'og_cw_sideR', r: [X1 - 127, ry0 + 40, X1, ry1 - 40], f: 1 }]);
+    L.push([ry0 + 40, 'cw', { q: 'og_cw_bot', r: [X0, ry0 - 128, X1, ry0 + 40], f: 1 }]); });
   DOORS.forEach((d, i) => { if (d && V.dr && on(d.r[0], d.r[1], 200)) L.push([d.v ? (d.r[1] + d.r[3]) / 2 : d.r[1], 'door', Object.assign(Object.create(d), { open: V.dr[i] !== '1' })]); }); /* open gates are drawn lifted up */
   for (const c of V.c) L.push([c[3], 'c', c]); for (const h of V.h) L.push([h[3], 'h', h]);
   L.sort((a, b) => b[0] - a[0]);
